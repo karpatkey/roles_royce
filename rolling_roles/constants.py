@@ -10,6 +10,9 @@ class ETHAddr:
     stkAAVE = "0x4da27a545c0c5B758a6BA100e3a049001de870f5"
     stkABPT = "0xa1116930326D21fB917d5A27F1E9943A9595fb47"
 
+class GnosisChainAddr:
+    USDT = "0x4ECaBa5870353805a9F068101A40E0f32ed605C6"
+
 
 @dataclass
 class Blockchain:

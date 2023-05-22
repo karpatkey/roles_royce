@@ -1,3 +1,5 @@
+from rolling_roles import Operation
+from rolling_roles.generic_method import TxData
 from rolling_roles.utils import to_data_input
 
 AvatarSafeAddress = object()
@@ -5,10 +7,15 @@ AvatarSafeAddress = object()
 class InvalidArgument(Exception):
     pass
 
-class Method:
+class Method(TxData):
     name = None
     signature = None
     fixed_arguments = dict()
+    target_address = None
+    avatar = None
+
+    def __init__(self):
+        pass
 
     def get_args_list(self):
         args_list = []
@@ -30,3 +37,11 @@ class Method:
     @property
     def arg_types(self):
         return [arg_type for arg_name, arg_type in self.signature]
+
+    @property
+    def contract_address(self):
+        return self.target_address
+
+    @property
+    def operation(self):
+        return Operation.CALL
