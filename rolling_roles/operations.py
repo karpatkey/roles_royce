@@ -24,6 +24,8 @@ def check(txs: List[TxData],
         role (int): role that wants to execute
         account (str): account that wants to execute
         roles_mod_address (str): address to call execTransactionWithRole
+        blockchain (Blockchain)
+        web3 (Web3)
 
     Returns:
         bool: status
@@ -49,10 +51,12 @@ def send(txs: List[TxData],
     """Send transactions to the blockchain.
 
     Args:
-        txs (List[Dict]): list of transactions dictionaries
+        txs (List[TxData]): list of transactions
         role (int): role that wants to execute
         private_key (str): to access the EOA
         roles_mod_address (str): address to call execTransactionWithRole
+        blockchain (Blockchain)
+        web3 (Web3)
 
     Returns:
         (bool) status
