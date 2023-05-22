@@ -3,6 +3,7 @@ from rolling_roles.generic_method import TxData
 from rolling_roles.utils import to_data_input
 
 AvatarSafeAddress = object()
+Address = str
 
 class InvalidArgument(Exception):
     pass

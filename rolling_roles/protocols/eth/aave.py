@@ -1,9 +1,7 @@
 from enum import IntEnum
 
 from rolling_roles.constants import ETHAddr
-from rolling_roles.protocols.base import Method, InvalidArgument, AvatarSafeAddress
-
-Address = str
+from rolling_roles.protocols.base import Method, InvalidArgument, AvatarSafeAddress, Address
 
 
 class Approve(Method):
