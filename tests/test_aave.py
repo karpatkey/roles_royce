@@ -1,7 +1,7 @@
 import pytest
 from eth_abi import abi
 from rolling_roles.roles_modifier import RolesMod
-from rolling_roles.constants import ETHAddr, GnosisChainAddr
+from rolling_roles.constants import ETHAddr, GCAddr
 
 from rolling_roles.protocols.eth import aave
 from .utils import web3_eth
@@ -15,9 +15,9 @@ def decode_data_input(arg_types, data_input):
 
 
 def test_approve_method():
-    method = aave.ApproveForAaveLendingPoolV2(token=GnosisChainAddr.USDT, amount=123)
+    method = aave.ApproveForAaveLendingPoolV2(token=GCAddr.USDT, amount=123)
     assert method.get_args_list() == [ETHAddr.AaveLendingPoolV2, 123]
-    assert method.target_address == GnosisChainAddr.USDT
+    assert method.target_address == GCAddr.USDT
     assert method.data == "0x095ea7b30000000000000000000000007d2768de32b0b80b7a3454c06bdac94a69ddc7a9000000000000000000000000000000000000000000000000000000000000007b"
 
     amount = 10000
@@ -39,9 +39,9 @@ def test_approve_method_with_roles(web3_eth):
 
 
 def test_deposit_method():
-    method = aave.DepositToken(asset=GnosisChainAddr.USDT, amount=100, avatar=AVATAR)
+    method = aave.DepositToken(asset=GCAddr.USDT, amount=100, avatar=AVATAR)
     referral_code = 0
-    assert method.get_args_list() == [GnosisChainAddr.USDT, 100, AVATAR, referral_code]
+    assert method.get_args_list() == [GCAddr.USDT, 100, AVATAR, referral_code]
     assert method.target_address == ETHAddr.AaveLendingPoolV2
 
 
@@ -54,18 +54,18 @@ def test_deposit_eth():
 
 
 def test_borrow():
-    method = aave.Borrow(asset=GnosisChainAddr.USDT, amount=123, interest_rate_model=aave.InterestRateModel.STABLE,
-                    avatar=AVATAR)
+    method = aave.Borrow(asset=GCAddr.USDT, amount=123, interest_rate_model=aave.InterestRateModel.STABLE,
+                         avatar=AVATAR)
     referral_code = 0
-    assert method.get_args_list() == [GnosisChainAddr.USDT, 123, 1, referral_code, AVATAR]
+    assert method.get_args_list() == [GCAddr.USDT, 123, 1, referral_code, AVATAR]
     assert method.target_address == ETHAddr.AaveLendingPoolV2
 
 
 def test_borrow_with_bad_interest_rate():
-    method = aave.Borrow(asset=GnosisChainAddr.USDT, amount=123, interest_rate_model=aave.InterestRateModel.STABLE,
-                    avatar=AVATAR)
+    method = aave.Borrow(asset=GCAddr.USDT, amount=123, interest_rate_model=aave.InterestRateModel.STABLE,
+                         avatar=AVATAR)
     referral_code = 0
-    assert method.get_args_list() == [GnosisChainAddr.USDT, 123, 1, referral_code, AVATAR]
+    assert method.get_args_list() == [GCAddr.USDT, 123, 1, referral_code, AVATAR]
     assert method.target_address == ETHAddr.AaveLendingPoolV2
 
 
