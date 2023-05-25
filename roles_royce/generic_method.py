@@ -5,7 +5,7 @@ from web3 import Web3
 from web3.types import HexStr
 from web3._utils.abi import get_abi_input_types, filter_by_name
 from eth_abi import encode
-from rolling_roles.roles_modifier import Operation
+from roles_royce.roles_modifier import Operation
 
 
 @dataclass

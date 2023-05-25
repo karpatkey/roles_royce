@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch
-from rolling_roles.roles_modifier import RolesMod
+from roles_royce.roles_modifier import RolesMod
 from .utils import web3_gnosis
 
 ROLE = 2

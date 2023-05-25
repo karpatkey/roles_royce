@@ -1,9 +1,9 @@
 import pytest
 from eth_abi import abi
-from rolling_roles.roles_modifier import RolesMod
-from rolling_roles.constants import ETHAddr, GCAddr
+from roles_royce.roles_modifier import RolesMod
+from roles_royce.constants import ETHAddr, GCAddr
 
-from rolling_roles.protocols.eth import aave
+from roles_royce.protocols.eth import aave
 from .utils import web3_eth
 
 AVATAR = "0x0EFcCBb9E2C09Ea29551879bd9Da32362b32fc89"
