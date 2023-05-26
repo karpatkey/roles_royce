@@ -1,6 +1,6 @@
-from rolling_roles import Operation
-from rolling_roles.generic_method import TxData
-from rolling_roles.utils import to_data_input
+from roles_royce import Operation
+from roles_royce.generic_method import TxData
+from roles_royce.utils import to_data_input
 
 AvatarSafeAddress = object()
 Address = str
