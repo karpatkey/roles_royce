@@ -15,7 +15,8 @@ def check(txs: List[TxData],
           account: str,
           roles_mod_address: str,
           blockchain: Blockchain,
-          web3: Web3
+          web3: Web3,
+          block='latest'
           ) -> bool:
     """Test the transaction with static call
 
@@ -36,9 +37,9 @@ def check(txs: List[TxData],
         contract_address=roles_mod_address,
         account=account,
         operation=operation,
-        web3=web3
+        web3=web3,
     )
-    return roles_mod.check(contract_address, data)
+    return roles_mod.check(contract_address, data, block=block)
 
 
 def send(txs: List[TxData],

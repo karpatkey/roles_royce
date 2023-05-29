@@ -58,10 +58,10 @@ class RolesMod:
         base_fee = gas_used * base_fee_per_gas
         return base_fee * 2
 
-    def check(self, contract_address: str, data: str) -> bool:
+    def check(self, contract_address: str, data: str, block='latest') -> bool:
         """make a static call to validate a transaction."""
         try:
-            self._build_exec_transaction(contract_address, data).call({"from": self.account})
+            self._build_exec_transaction(contract_address, data).call({"from": self.account}, block_identifier=block)
             return True
         except exceptions.ContractLogicError:
             return False
