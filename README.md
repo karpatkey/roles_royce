@@ -27,7 +27,7 @@ from roles_royce import check, send, Chain
 from web3 import Web3, HTTPProvider
 
 
-claim = aave.ClaimAAVERewards(avatar=AVATAR, amount=10)
+claim = aave.ClaimAAVERewards(avatar="0x...", amount=10)
 
 w3 = Web3(HTTPProvider("https://..."))
 status = check([claim], 
@@ -55,6 +55,8 @@ send([claim],
 Multisend transactions are supported: `send([tx1, tx2, tx3], ...)`
 
 ### Generic calls
+
+Beside the provided protocol methods, generic calls can be performed:
 
 ```python
 
