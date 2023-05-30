@@ -28,12 +28,12 @@ def test_approve_method():
     assert decoded == (ETHAddr.stkAAVE.lower(), amount)
 
 
-@pytest.mark.xfail(reason="Mainnet role contract not properly configured")
 def test_approve_method_with_roles(web3_eth):
     method = aave.ApproveForStkAAVE(amount=1000)
-    ROLE = 2
-    ROLES_MOD_ADDRESS = '0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503'
-    roles_mod = RolesMod(role=ROLE, contract_address=ROLES_MOD_ADDRESS, account=AVATAR, web3=web3_eth)
+    ROLE = 1
+    ROLES_MOD_ADDRESS = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
+    REVOKER_ADDRESS = "0xf099e0f6604BDE0AA860B39F7da75770B34aC804"
+    roles_mod = RolesMod(role=ROLE, contract_address=ROLES_MOD_ADDRESS, account=REVOKER_ADDRESS, web3=web3_eth)
     check_transaction = roles_mod.check(method.target_address, method.data)
     assert check_transaction
 
