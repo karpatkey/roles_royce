@@ -21,7 +21,7 @@ class RolesModTester(RolesMod):
 def test_check_and_execute(web3_gnosis):
     usdt_approve = "0x095ea7b30000000000000000000000007f90122bf0700f9e7e1f688fe926940e8839f35300000000000000000000000000000000000000000000000000000000000003e8"
     roles = RolesModTester(role=ROLE, contract_address="0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503", web3=web3_gnosis, account=ACCOUNT)
-    assert roles.check(contract_address=USDT, data=usdt_approve)
+    assert roles.check(contract_address=USDT, data=usdt_approve, block=28209960)
 
     roles.private_key = '0xa60429f7d6b751ca19d52302826b4a611893fbb138f0059f354b79846f2ab125'
     with patch.object(roles.web3.eth, "get_transaction_count", lambda x: 42):
@@ -34,4 +34,4 @@ def test_check_and_execute(web3_gnosis):
 def test_gas_limit_estimation(web3_gnosis):
     usdt_approve = "0x095ea7b30000000000000000000000007f90122bf0700f9e7e1f688fe926940e8839f35300000000000000000000000000000000000000000000000000000000000003e8"
     roles = RolesModTester(role=ROLE, contract_address="0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503", web3=web3_gnosis, account=ACCOUNT)
-    assert roles.estimate_gas(contract_address=USDT, data=usdt_approve) == 101887
+    assert roles.estimate_gas(contract_address=USDT, data=usdt_approve, block=28209960) == 101887
