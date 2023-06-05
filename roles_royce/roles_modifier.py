@@ -66,8 +66,8 @@ class RolesMod:
         except exceptions.ContractLogicError:
             return False
 
-    def estimate_gas(self, contract_address: str, data: str) -> int:
-        return self._build_exec_transaction(contract_address, data).estimate_gas({"from": self.account})
+    def estimate_gas(self, contract_address: str, data: str, block='latest') -> int:
+        return self._build_exec_transaction(contract_address, data).estimate_gas({"from": self.account}, block_identifier=block)
 
     def execute(self,
                 contract_address: str,
