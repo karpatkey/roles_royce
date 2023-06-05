@@ -31,10 +31,6 @@ class GenericMethodTransaction(TxData):
 
     def _calc_data(self) -> HexStr:
         """Create the data input for the contract function."""
-        name = filter_by_name(self.function_name, json.loads(self.contract_abi))[0]
-        types = get_abi_input_types(name)
-        signature = (
-            Web3.keccak(text=f"{self.function_name}({','.join(types)})").hex()[:10]
-        )
-        result = HexStr(f"{signature}{encode(types, self.function_args).hex()}")
+        contract = Web3().eth.contract(address=None, abi=self.contract_abi)
+        result = contract.encodeABI(fn_name=self.function_name, args=self.function_args)
         return result
