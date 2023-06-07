@@ -20,15 +20,24 @@ class Method(TxData):
 
     def get_args_list(self):
         args_list = []
-        for arg_name, arg_type in self.signature:
+        for e in self.signature:
+            value = self.get_arg_value(e)
+            args_list.append(value)
+        return args_list
+
+    def get_arg_value(self, element):
+        arg_name, arg_type = element
+        if type(arg_type) in (list, tuple):
+            value = [self.get_arg_value(e) for e in arg_type]
+        else:
+            arg_name, arg_type = element
             if arg_name in self.fixed_arguments:
                 value = self.fixed_arguments[arg_name]
                 if value is AvatarSafeAddress:
                     value = self.avatar
             else:
                 value = getattr(self, arg_name)
-            args_list.append(value)
-        return args_list
+        return value
 
     @property
     def data(self):
@@ -37,6 +46,7 @@ class Method(TxData):
 
     @property
     def arg_types(self):
+        # TODO
         return [arg_type for arg_name, arg_type in self.signature]
 
     @property
