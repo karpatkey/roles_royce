@@ -11,9 +11,9 @@ from .generic_method import TxData
 logger = logging.getLogger(__name__)
 
 
-def to_data_input(name, arg_types, args):
-    encoded_signature = Web3.keccak(text=f"{name}({','.join(arg_types)})").hex()[:10]
-    encoded_args = abi.encode(arg_types, args).hex()
+def to_data_input(name, signature, args):
+    encoded_signature = Web3.keccak(text=f"{name}{signature}").hex()[:10]
+    encoded_args = abi.encode([signature], [args]).hex()
     return f"{encoded_signature}{encoded_args}"
 
 

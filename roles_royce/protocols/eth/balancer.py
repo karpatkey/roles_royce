@@ -51,7 +51,7 @@ class Exit(Method):
     user_data_abi = None
 
     def encode_user_data(self, user_data):
-        return '0x' + eth_abi.encode(self.user_data_abi, user_data).hex()
+        return eth_abi.encode(self.user_data_abi, user_data)
 
 class ExitPoolExactBPTInForOneTokenOut(Exit):
     """Single Asset Exit

@@ -1,5 +1,4 @@
 from roles_royce import Operation
-from roles_royce.generic_method import TxData
 from roles_royce.utils import to_data_input
 
 AvatarSafeAddress = object()
@@ -8,7 +7,7 @@ Address = str
 class InvalidArgument(Exception):
     pass
 
-class Method(TxData):
+class Method:
     name = None
     signature = None
     fixed_arguments = dict()
@@ -19,35 +18,38 @@ class Method(TxData):
         pass
 
     def get_args_list(self):
-        args_list = []
-        for e in self.signature:
-            value = self.get_arg_value(e)
-            args_list.append(value)
-        return args_list
+        return [self.get_arg_value(e) for e in self.signature]
 
     def get_arg_value(self, element):
         arg_name, arg_type = element
         if type(arg_type) in (list, tuple):
-            value = [self.get_arg_value(e) for e in arg_type]
+            value = tuple(self.get_arg_value(e) for e in arg_type)
         else:
-            arg_name, arg_type = element
             if arg_name in self.fixed_arguments:
                 value = self.fixed_arguments[arg_name]
                 if value is AvatarSafeAddress:
                     value = self.avatar
             else:
                 value = getattr(self, arg_name)
+        if type(arg_type) is str and arg_type.startswith("byte") and type(value) is str:
+            value = bytes.fromhex(value[2:])
         return value
 
     @property
     def data(self):
-        arg_types = [arg_type for arg_name, arg_type in self.signature]
-        return to_data_input(self.name, arg_types, self.get_args_list())
+        return to_data_input(self.name, self.short_signature, self.get_args_list())
 
     @property
-    def arg_types(self):
-        # TODO
-        return [arg_type for arg_name, arg_type in self.signature]
+    def short_signature(self):
+        return "(" + ",".join([self.get_arg_type(e) for e in self.signature]) + ")"
+
+    def get_arg_type(self, element):
+        _, _type = element
+        if type(_type) in (list, tuple):
+            value = "(" + ",".join([self.get_arg_type(e) for e in _type]) + ")"
+        else:
+            value = _type
+        return value
 
     @property
     def contract_address(self):
