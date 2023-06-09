@@ -19,8 +19,8 @@ class ApproveForVault(Approve):
 # There is another ExitKind that is for Weighted Pools
 class StablePoolExitKind(IntEnum):
     EXACT_BPT_IN_FOR_ONE_TOKEN_OUT = 0
-    BPT_IN_FOR_EXACT_TOKENS_OUT = 1
-    EXACT_BPT_IN_FOR_ALL_TOKENS_OUT = 2
+    EXACT_BPT_IN_FOR_TOKENS_OUT = 1
+    BPT_IN_FOR_EXACT_TOKENS_OUT = 2
 
 
 class QueryExit(Method):
@@ -53,7 +53,7 @@ class Exit(Method):
     def encode_user_data(self, user_data):
         return eth_abi.encode(self.user_data_abi, user_data)
 
-class ExitPoolExactBPTInForOneTokenOut(Exit):
+class SingleAssetExit(Exit):
     """Single Asset Exit
 
     User sends a precise quantity of BPT, and receives an estimated but unknown (computed at run time) quantity of a single token.
@@ -70,32 +70,13 @@ class ExitPoolExactBPTInForOneTokenOut(Exit):
         """
         self.user_data = self.encode_user_data([self.exit_kind, bpt_amount_in, exit_token_index])
 
-
-class ExitPoolExactBPTInForExactTokensOut(Exit):
-    """Custom Exit
-
-    User sends an estimated but unknown (computed at run time) quantity of BPT, and receives precise quantities of specified tokens.
-    """
-    exit_kind = StablePoolExitKind.BPT_IN_FOR_EXACT_TOKENS_OUT
-    user_data_abi = ['uint256', 'uint256[]', 'uint256']
-
-    def __init__(self, pool_id: str, avatar: Address, amounts_out: list[int], max_bpt_amount_in: int):
-        """
-
-        :param amounts_out: are the amounts of each token to be withdrawn from the pool
-        :param max_bpt_amount_in: is the minimum acceptable BPT to burn in return for withdrawn tokens
-        """
-        self.pool_id = pool_id
-        self.user_data = self.encode_user_data([self.exit_kind, amounts_out, max_bpt_amount_in])
-
-
-class ExitPoolExactBPTInForAllTokensOut(Exit):
+class ProportionalExit(Exit):
     """Proportional Exit
 
     User sends a precise quantity of BPT, and receives an estimated but unknown (computed at run time) quantities of all tokens.
     """
 
-    exit_kind = StablePoolExitKind.EXACT_BPT_IN_FOR_ALL_TOKENS_OUT
+    exit_kind = StablePoolExitKind.EXACT_BPT_IN_FOR_TOKENS_OUT
     user_data_abi = ['uint256', 'uint256']
 
     def __init__(self, pool_id: str, avatar: Address, assets: list[Address], min_amounts_out: list[int], bpt_amount_in: int):
@@ -108,6 +89,24 @@ class ExitPoolExactBPTInForAllTokensOut(Exit):
         self.min_amounts_out = min_amounts_out
         self.user_data = self.encode_user_data([self.exit_kind, bpt_amount_in])
         self.request = [self.assets, self.min_amounts_out, self.user_data, False]
+
+
+class CustomExit(Exit):
+    """Custom Exit
+
+    User sends an estimated but unknown (computed at run time) quantity of BPT, and receives precise quantities of specified tokens.
+    """
+    exit_kind = StablePoolExitKind.EXACT_BPT_IN_FOR_TOKENS_OUT
+    user_data_abi = ['uint256', 'uint256[]', 'uint256']
+
+    def __init__(self, pool_id: str, avatar: Address, amounts_out: list[int], max_bpt_amount_in: int):
+        """
+
+        :param amounts_out: are the amounts of each token to be withdrawn from the pool
+        :param max_bpt_amount_in: is the minimum acceptable BPT to burn in return for withdrawn tokens
+        """
+        self.pool_id = pool_id
+        self.user_data = self.encode_user_data([self.exit_kind, amounts_out, max_bpt_amount_in])
 
 
 # example with web3/Roles https://github.com/KarpatkeyDAO/manager-role/blob/main/Balancer/boosted_pool_manager.py
