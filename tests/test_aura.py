@@ -14,7 +14,7 @@ LP80GNO20WETH = "0x32296969Ef14EB0c6d29669C550D4a0449130230"
 
 def test_approve_method():
     method = aura.ApproveForBooster(token=LP80GNO20WETH, amount=123)
-    assert method.get_args_list() == [ETHAddr.AURABooster, 123]
+    assert method.args_list == [ETHAddr.AURABooster, 123]
     assert method.target_address == LP80GNO20WETH
     assert method.data == "0x095ea7b3000000000000000000000000a57b8d98dae62b26ec3bcc4a365338157060b234000000000000000000000000000000000000000000000000000000000000007b"
 

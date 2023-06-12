@@ -5,7 +5,7 @@ class CrossChainAddr:
 
 class ETHAddr:
     AaveLendingPoolV2 = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9"
-    AURABooster = "0xa57b8d98dae62b26ec3bcc4a365338157060b234"
+    AURABooster = "0xA57b8d98dAE62B26Ec3bcC4a365338157060B234"
     ParaSwapRepayAdapter = "0x80Aca0C645fEdABaa20fd2Bf0Daf57885A309FE6"
     WrappedTokenGatewayV2 = "0xEFFC18fC3b7eb8E676dac549E0c693ad50D1Ce31"
     AAVE = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9"

@@ -10,23 +10,17 @@ AVATAR = "0x0EFcCBb9E2C09Ea29551879bd9Da32362b32fc89"
 ROLES_MOD_ADDRESS = "0xd8dd9164E765bEF903E429c9462E51F0Ea8514F9"
 MANAGER_SAFE_ADDRESS = "0x60716991aCDA9E990bFB3b1224f1f0fB81538267"
 
-def decode_data_input(arg_types, data_input):
-    return abi.decode(arg_types, bytes.fromhex(data_input[10:]))
-
 
 def test_approve_method():
     method = aave.ApproveForAaveLendingPoolV2(token=GCAddr.USDT, amount=123)
-    assert method.get_args_list() == [ETHAddr.AaveLendingPoolV2, 123]
+    assert method.args_list == [ETHAddr.AaveLendingPoolV2, 123]
     assert method.target_address == GCAddr.USDT
     assert method.data == "0x095ea7b30000000000000000000000007d2768de32b0b80b7a3454c06bdac94a69ddc7a9000000000000000000000000000000000000000000000000000000000000007b"
 
     amount = 10000
     method = aave.ApproveForStkAAVE(amount=amount)
-    assert method.get_args_list() == [ETHAddr.stkAAVE, amount]
+    assert method.args_list == [ETHAddr.stkAAVE, amount]
     assert method.data == '0x095ea7b30000000000000000000000004da27a545c0c5b758a6ba100e3a049001de870f50000000000000000000000000000000000000000000000000000000000002710'
-    decoded = decode_data_input(method.arg_types, method.data)
-    assert decoded == (ETHAddr.stkAAVE.lower(), amount)
-
 
 def test_approve_method_with_roles(web3_eth):
     method = aave.ApproveForStkAAVE(amount=1000)
@@ -41,14 +35,14 @@ def test_approve_method_with_roles(web3_eth):
 def test_deposit_method():
     method = aave.DepositToken(asset=GCAddr.USDT, amount=100, avatar=AVATAR)
     referral_code = 0
-    assert method.get_args_list() == [GCAddr.USDT, 100, AVATAR, referral_code]
+    assert method.args_list == [GCAddr.USDT, 100, AVATAR, referral_code]
     assert method.target_address == ETHAddr.AaveLendingPoolV2
 
 
 def test_deposit_eth():
     method = aave.DepositETH(eth_amount=123, avatar=AVATAR)
     referral_code = 0
-    assert method.get_args_list() == [ETHAddr.AaveLendingPoolV2, AVATAR, referral_code]
+    assert method.args_list == [ETHAddr.AaveLendingPoolV2, AVATAR, referral_code]
     assert method.target_address == ETHAddr.WrappedTokenGatewayV2
     assert method.eth_amount == 123
 
@@ -57,7 +51,7 @@ def test_borrow():
     method = aave.Borrow(asset=GCAddr.USDT, amount=123, interest_rate_model=aave.InterestRateModel.STABLE,
                          avatar=AVATAR)
     referral_code = 0
-    assert method.get_args_list() == [GCAddr.USDT, 123, 1, referral_code, AVATAR]
+    assert method.args_list == [GCAddr.USDT, 123, 1, referral_code, AVATAR]
     assert method.target_address == ETHAddr.AaveLendingPoolV2
 
 
@@ -65,14 +59,14 @@ def test_borrow_with_bad_interest_rate():
     method = aave.Borrow(asset=GCAddr.USDT, amount=123, interest_rate_model=aave.InterestRateModel.STABLE,
                          avatar=AVATAR)
     referral_code = 0
-    assert method.get_args_list() == [GCAddr.USDT, 123, 1, referral_code, AVATAR]
+    assert method.args_list == [GCAddr.USDT, 123, 1, referral_code, AVATAR]
     assert method.target_address == ETHAddr.AaveLendingPoolV2
 
 
 def test_borrow_eth():
     method = aave.BorrowETH(amount=123, interest_rate_model=aave.InterestRateModel.VARIABLE)
     referral_code = 0
-    assert method.get_args_list() == [ETHAddr.AaveLendingPoolV2, 123, 2, referral_code]
+    assert method.args_list == [ETHAddr.AaveLendingPoolV2, 123, 2, referral_code]
     assert method.target_address == ETHAddr.WrappedTokenGatewayV2
 
 
