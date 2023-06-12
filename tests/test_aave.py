@@ -78,6 +78,7 @@ def test_cooldown(web3_eth):
 
 def test_claim(web3_eth):
     method = aave.ClaimAAVERewards(avatar=AVATAR, amount=10)
+
     roles_mod = RolesMod(role=1, contract_address=ROLES_MOD_ADDRESS, account=MANAGER_SAFE_ADDRESS, web3=web3_eth)
     check_transaction = roles_mod.check(method.target_address, method.data)
     assert check_transaction

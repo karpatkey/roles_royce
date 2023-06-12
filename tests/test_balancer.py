@@ -13,8 +13,6 @@ bb_a_DAI = "0x6667c6fa9f2b3Fc1Cc8D85320b62703d938E4385"
 bb_a_USDT = "0xA1697F9Af0875B63DdC472d6EeBADa8C1fAB8568"
 bb_a_USDC = "0xcbFA4532D8B2ade2C261D3DD5ef2A2284f792692"
 
-ABI_BALANCER_QUERIES = '[{"inputs":[{"internalType":"bytes32","name":"poolId","type":"bytes32"},{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"components":[{"internalType":"contract IAsset[]","name":"assets","type":"address[]"},{"internalType":"uint256[]","name":"minAmountsOut","type":"uint256[]"},{"internalType":"bytes","name":"userData","type":"bytes"},{"internalType":"bool","name":"toInternalBalance","type":"bool"}],"internalType":"struct IVault.ExitPoolRequest","name":"request","type":"tuple"}],"name":"queryExit","outputs":[{"internalType":"uint256","name":"bptIn","type":"uint256"},{"internalType":"uint256[]","name":"amountsOut","type":"uint256[]"}],"stateMutability":"nonpayable","type":"function"}, {"inputs":[{"internalType":"bytes32","name":"poolId","type":"bytes32"},{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"components":[{"internalType":"contract IAsset[]","name":"assets","type":"address[]"},{"internalType":"uint256[]","name":"maxAmountsIn","type":"uint256[]"},{"internalType":"bytes","name":"userData","type":"bytes"},{"internalType":"bool","name":"fromInternalBalance","type":"bool"}],"internalType":"struct IVault.JoinPoolRequest","name":"request","type":"tuple"}],"name":"queryJoin","outputs":[{"internalType":"uint256","name":"bptOut","type":"uint256"},{"internalType":"uint256[]","name":"amountsIn","type":"uint256[]"}],"stateMutability":"nonpayable","type":"function"}]'
-
 
 def test_exit_pool_single(web3_eth):
     assets = [bb_a_DAI, bb_a_USDT, bb_a_USDC, bb_a_USD]
@@ -24,21 +22,21 @@ def test_exit_pool_single(web3_eth):
                                                min_amounts_out=[0, 0, 0, 0],
                                                bpt_amount_in=100000,
                                                exit_token_index=2)
-    ctract = web3_eth.eth.contract(address=query_exit.contract_address, abi=ABI_BALANCER_QUERIES)
-    query_result = ctract.functions.queryExit(*query_exit.args_list).call(block_identifier=17065330)
-    amounts = query_result[1]
+
+    amounts = query_exit.call(web3_eth, block_identifier=17065330)[1]
     assert amounts == [0, 0, 98698, 0]
 
     exit_pool = balancer.SingleAssetExit(pool_id=bb_a_USD_pid,
-                                               avatar=avatar_address,
-                                               assets=assets,
-                                               min_amounts_out=amounts,
-                                               bpt_amount_in=100000,
-                                               exit_token_index=2)
+                                         avatar=avatar_address,
+                                         assets=assets,
+                                         min_amounts_out=amounts,
+                                         bpt_amount_in=100000,
+                                         exit_token_index=2)
 
     status = check(txs=[exit_pool], role=1, account=avatar_address, roles_mod_address=roles_mod_address,
                    web3=web3_eth, blockchain=Chain.ETHEREUM, block=17065330)
     assert status
+
 
 def test_exit_pool_proportional():
     assets = [bb_a_DAI, bb_a_USDT, bb_a_USDC, bb_a_USD]
