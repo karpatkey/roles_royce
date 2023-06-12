@@ -84,20 +84,6 @@ class SingleAssetExit(Exit):
         super().__init__(pool_id, avatar, assets, min_amounts_out, user_data=[self.exit_kind, bpt_amount_in, exit_token_index])
 
 
-class SingleAssetQueryExit(SingleAssetExit):
-    name = "queryExit"
-    target_address = '0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5'
-
-    def __init__(self, pool_id: str, avatar: Address, assets: list[Address], min_amounts_out: list[int],
-                 bpt_amount_in: int, exit_token_index: int):
-        """
-
-        :param bpt_amount_in: the amount of BPT to be burned
-        :param exit_token_index: the index of the token to removed from the pool
-        """
-        super().__init__(pool_id, avatar, assets, min_amounts_out, bpt_amount_in, exit_token_index)
-
-
 class ProportionalExit(Exit):
     """Proportional Exit
 
@@ -130,3 +116,18 @@ class CustomExit(Exit):
         :param max_bpt_amount_in: is the minimum acceptable BPT to burn in return for withdrawn tokens
         """
         super().__init__(pool_id, avatar, assets, amounts_out, user_data=[self.exit_kind, amounts_out, max_bpt_amount_in])
+
+
+class QueryExitMixin:
+    name = "queryExit"
+    target_address = '0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5'
+    out_signature = [("bpt_in", "uint256"), ("amounts_out", "uint256[]")]
+
+class SingleAssetQueryExit(QueryExitMixin, SingleAssetExit):
+    pass
+
+class ProportionalExitQueryExit(QueryExitMixin, ProportionalExit):
+    pass
+
+class CustomQueryExit(QueryExitMixin, CustomExit):
+    pass
