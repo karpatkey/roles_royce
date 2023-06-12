@@ -57,7 +57,6 @@ class Method:
             value = tuple(self._get_arg_value(e) for e in arg_type)
         else:
             if arg_name in self.fixed_arguments:
-                print(arg_name)
                 value = self.fixed_arguments[arg_name]
                 if value is AvatarSafeAddress:
                     value = self.avatar
