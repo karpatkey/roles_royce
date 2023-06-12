@@ -15,7 +15,7 @@ class ApproveForBooster(Approve):
 class WithdrawAndUndwrapStakedBPT(Method):
     """withdraw and unwrap AURAVaultToken"""
     name = "withdrawAndUnwrap"
-    signature = [("amount", "uint256"), ("claim", "bool")]
+    in_signature = [("amount", "uint256"), ("claim", "bool")]
     fixed_arguments = {"claim": True}
 
     def __init__(self, amount: int):
