@@ -1,6 +1,5 @@
 import json
 from roles_royce import Operation
-from roles_royce.utils import to_data_input
 from web3 import Web3
 
 AvatarSafeAddress = object()
@@ -13,7 +12,8 @@ class InvalidArgument(Exception):
 
 class Method:
     name = None
-    signature = None
+    in_signature = []
+    out_signature = []
     fixed_arguments = dict()
     target_address = None
     avatar = None
@@ -24,7 +24,7 @@ class Method:
 
     @property
     def args_list(self):
-        return [self._get_arg_value(e) for e in self.signature]
+        return [self._get_arg_value(e) for e in self.in_signature]
 
     @property
     def data(self):
@@ -34,13 +34,14 @@ class Method:
 
     @property
     def short_signature(self):
-        types = ",".join([self._get_arg_type(e) for e in self.signature])
+        types = ",".join([self._get_arg_type(e) for e in self.in_signature])
         return f"{self.name}({types})"
 
     @property
     def abi(self):
-        inputs = [self._abi_for(e) for e in self.signature]
-        abi = {"name": self.name, "type": "function", "inputs": inputs}
+        inputs = [self._abi_for(e) for e in self.in_signature]
+        outputs = [self._abi_for(e) for e in self.out_signature]
+        abi = {"name": self.name, "type": "function", "inputs": inputs, "outputs": outputs}
         return json.dumps([abi])
 
     @property
@@ -50,6 +51,10 @@ class Method:
     @property
     def operation(self):
         return Operation.CALL
+
+    def call(self, web3, *args, **kwargs):
+        contract = web3.eth.contract(address=self.target_address, abi=self.abi)
+        return contract.functions[self.name](*self.args_list).call(*args, **kwargs)
 
     def _get_arg_value(self, element):
         arg_name, arg_type = element
