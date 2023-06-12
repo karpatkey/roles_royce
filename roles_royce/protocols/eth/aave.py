@@ -6,7 +6,7 @@ from roles_royce.protocols.base import Method, InvalidArgument, AvatarSafeAddres
 
 class Approve(Method):
     name = "approve"
-    signature = [("spender", "address"), ("amount", "uint256")]
+    in_signature = [("spender", "address"), ("amount", "uint256")]
     token = None
     eth_amount = None
 
@@ -51,7 +51,7 @@ class ApproveForParaSwap(Approve):
 class DepositToken(Method):
     """Sender deposits Token and receives aToken in exchange"""
     name = "deposit"
-    signature = [("asset", "address"), ("amount", "uint256"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
+    in_signature = [("asset", "address"), ("amount", "uint256"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
     fixed_arguments = {"on_behalf_of": AvatarSafeAddress, "referral_code": 0}
     target_address = ETHAddr.AaveLendingPoolV2
 
@@ -64,7 +64,7 @@ class DepositToken(Method):
 class DepositETH(Method):
     """Sender deposits ETH and receives aETH in exchange"""
     name = "depositETH"
-    signature = [("address", "address"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
+    in_signature = [("address", "address"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
     fixed_arguments = {"address": ETHAddr.AaveLendingPoolV2, "on_behalf_of": AvatarSafeAddress, "referral_code": 0}
     target_address = ETHAddr.WrappedTokenGatewayV2
 
@@ -76,7 +76,7 @@ class DepositETH(Method):
 class WithdrawToken(Method):
     """Sender redeems aToken and withdraws Token"""
     name = "withdraw"
-    signature = [("asset", "address"), ("amount", "uint256"), ("to", "address")]
+    in_signature = [("asset", "address"), ("amount", "uint256"), ("to", "address")]
     fixed_arguments = {"to": AvatarSafeAddress}
     target_address = ETHAddr.AaveLendingPoolV2
 
@@ -89,7 +89,7 @@ class WithdrawToken(Method):
 class WithdrawETH(Method):
     """Sender redeems aETH and withdraws ETH"""
     name = "withdrawETH"
-    signature = [("address", "address"), ("amount", "uint256"), ("to", "address")]
+    in_signature = [("address", "address"), ("amount", "uint256"), ("to", "address")]
     fixed_arguments = {"address": ETHAddr.AaveLendingPoolV2, "to": AvatarSafeAddress}
     target_address = ETHAddr.WrappedTokenGatewayV2
 
@@ -101,7 +101,7 @@ class WithdrawETH(Method):
 class Collateralize(Method):
     """Set/unset asset as collateral"""
     name = "setUserUseReserveAsCollateral"
-    signature = [("asset", "address"), ("use_as_collateral", "bool")]
+    in_signature = [("asset", "address"), ("use_as_collateral", "bool")]
     fixed_arguments = {}
     target_address = ETHAddr.AaveLendingPoolV2
 
@@ -118,8 +118,8 @@ class InterestRateModel(IntEnum):
 class Borrow(Method):
     """Borrow"""
     name = "borrow"
-    signature = [("asset", "address"), ("amount", "uint256"), ("interest_rate_model", "uint256"),
-                 ("referral_code", "uint16"), ("on_behalf_of", "address")]
+    in_signature = [("asset", "address"), ("amount", "uint256"), ("interest_rate_model", "uint256"),
+                    ("referral_code", "uint16"), ("on_behalf_of", "address")]
     fixed_arguments = {"referral_code": 0, "on_behalf_of": AvatarSafeAddress}
     target_address = ETHAddr.AaveLendingPoolV2
 
@@ -135,7 +135,7 @@ class Borrow(Method):
 class BorrowETH(Method):
     """Borrow ETH"""
     name = "borrowETH"
-    signature = [("address", "address"), ("amount", "uint256"), ("interest_rate_model", "uint256"), ("referral_code", "uint16")]
+    in_signature = [("address", "address"), ("amount", "uint256"), ("interest_rate_model", "uint256"), ("referral_code", "uint16")]
     fixed_arguments = {"address": ETHAddr.AaveLendingPoolV2, "referral_code": 0}
     target_address = ETHAddr.WrappedTokenGatewayV2
 
@@ -148,7 +148,7 @@ class BorrowETH(Method):
 
 class StakeAAVE(Method):
     name = 'stake'
-    signature = [("on_behalf_of", "address"), ("amount", "uint256")]
+    in_signature = [("on_behalf_of", "address"), ("amount", "uint256")]
     fixed_arguments = {"on_behalf_of": AvatarSafeAddress}
     target_address = ETHAddr.stkAAVE
 
@@ -164,7 +164,7 @@ class StakeABPT(StakeAAVE):
 class UnstakeAAVE(Method):
     """Unstake AAVE. Can only be called during the 2 days unstaking window after the 10 days cooldown period"""
     name = 'redeem'
-    signature = [('to', 'address'), ('amount', 'uint256')]
+    in_signature = [('to', 'address'), ('amount', 'uint256')]
     fixed_arguments = {'to': AvatarSafeAddress}
     target_address = ETHAddr.stkAAVE
 
@@ -181,7 +181,7 @@ class UnstakeABPT(UnstakeAAVE):
 class CooldownStkAAVE(Method):
     """Initiates a 10 days cooldown period, once this is over the 2 days unstaking window opens"""
     name = 'cooldown'
-    signature = []
+    in_signature = []
     fixed_arguments = {}
     target_address = ETHAddr.stkAAVE
 
@@ -192,7 +192,7 @@ class CooldownStkABPT(CooldownStkAAVE):
 
 class ClaimAAVERewards(Method):
     name = 'claimRewards'
-    signature = [('to', 'address'), ('amount', 'uint256')]
+    in_signature = [('to', 'address'), ('amount', 'uint256')]
     fixed_arguments = {'to': AvatarSafeAddress}
     target_address = ETHAddr.stkAAVE
 
@@ -208,7 +208,7 @@ class ClaimABPTRewards(ClaimAAVERewards):
 class Repay(Method):
     """Repay"""
     name = 'repay'
-    signature = [('asset', 'address'), ('amount', 'uint256'), ('interest_rate_model', 'uint256'), ('on_behalf_of', 'address')]
+    in_signature = [('asset', 'address'), ('amount', 'uint256'), ('interest_rate_model', 'uint256'), ('on_behalf_of', 'address')]
     fixed_arguments = {'on_behalf_of': AvatarSafeAddress}
     target_address = ETHAddr.AaveLendingPoolV2
 
@@ -220,7 +220,7 @@ class Repay(Method):
 
 class RepayETH(Method):
     name = 'repayETH'
-    signature = [('address', 'address'), ('amount', 'uint256'), ('interest_rate_model', 'uint256'), ('on_behalf_of', 'address')]
+    in_signature = [('address', 'address'), ('amount', 'uint256'), ('interest_rate_model', 'uint256'), ('on_behalf_of', 'address')]
     fixed_arguments = {'address': ETHAddr.AaveLendingPoolV2, 'on_behalf_of': AvatarSafeAddress}
     target_address = ETHAddr.WrappedTokenGatewayV2
     value = True
@@ -233,18 +233,18 @@ class RepayETH(Method):
 class SwapAndRepay(Method):
     # TODO: review
     name = 'swapAndRepay'
-    signature = [("collateral_asset", "address"),
-                 ("debt_asset", "address"),
-                 ("collateral_amount", "uint256"),
-                 ("debt_repay_amount", "uint256"),
-                 ("debt_rate_mode", "uint256"),
-                 ("buy_all_balance_offset", "uint256"),
-                 ("paraswap_data", "bytes"),
-                 ("permit_sign_amount", "uint256"),
-                 ("permit_sign_deadline", "uint256"),
-                 ("permit_sign_v", "uint8"),
-                 ("permit_sign_r", "bytes32"),
-                 ("permit_sign_s", "bytes32")]
+    in_signature = [("collateral_asset", "address"),
+                    ("debt_asset", "address"),
+                    ("collateral_amount", "uint256"),
+                    ("debt_repay_amount", "uint256"),
+                    ("debt_rate_mode", "uint256"),
+                    ("buy_all_balance_offset", "uint256"),
+                    ("paraswap_data", "bytes"),
+                    ("permit_sign_amount", "uint256"),
+                    ("permit_sign_deadline", "uint256"),
+                    ("permit_sign_v", "uint8"),
+                    ("permit_sign_r", "bytes32"),
+                    ("permit_sign_s", "bytes32")]
     target_address = ETHAddr.ParaSwapRepayAdapter
     fixed_arguments = {}
 

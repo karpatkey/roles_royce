@@ -36,7 +36,7 @@ class QueryExit(Method):
 
 class Exit(Method):
     name = "exitPool"
-    signature = (
+    in_signature = (
         ("pool_id", "bytes32"),
         ("sender", "address"),
         ("recipient", "address"),
