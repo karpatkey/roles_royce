@@ -54,15 +54,14 @@ def _make_multisend(txs: List[TxData], blockchain: Blockchain) -> tuple:
     return multisend_address, data
 
 
-def multi_or_one(txs: List[TxData], blockchain: Blockchain):
+def multi_or_one(txs: List[TxData], blockchain: Blockchain) -> TxData:
     if len(txs) > 1:
         contract_address, data = _make_multisend(txs, blockchain)
-        operation = Operation.DELEGATE_CALL
+        return TxData(contract_address=contract_address,
+                      data=data,
+                      operation=Operation.DELEGATE_CALL,
+                      value=0)
     elif len(txs) == 1:
-        tx = txs[0]
-        contract_address = tx.contract_address
-        data = tx.data
-        operation = tx.operation
+        return txs[0]
     else:
         raise ValueError("No transactions found")
-    return operation, contract_address, data

@@ -17,7 +17,7 @@ class Method:
     fixed_arguments = dict()
     target_address = None
     avatar = None
-    values_dict = None
+    value: int = 0  # Eg: amount of ETH in mainnet, xDai in GC
 
     def __init__(self):
         pass
