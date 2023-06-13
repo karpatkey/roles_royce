@@ -1,6 +1,5 @@
 import logging
 from typing import List
-
 from eth_abi import abi
 from web3 import Web3
 from gnosis.safe.multi_send import MultiSend, MultiSendOperation, MultiSendTx
