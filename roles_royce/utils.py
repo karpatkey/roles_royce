@@ -16,9 +16,8 @@ def to_data_input(name, signature, args):
     return f"{encoded_signature}{encoded_args}"
 
 
-MULTISEND_CALL_ONLY = '0x40A2aCCbd92BCA938b02010E17A5b8929b49130D'
 MULTISENDS = {
-    Chain.ETHEREUM: '0x998739BFdAAdde7C933B942a68053933098f9EDa',
+    Chain.ETHEREUM: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
     Chain.GC: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
 }
 
@@ -37,7 +36,7 @@ class MultiSendOffline(MultiSend):
 
 
 def _make_multisend(txs: List[TxData], blockchain: Blockchain) -> tuple:
-    multisend_address = MULTISENDS.get(blockchain, MULTISEND_CALL_ONLY)  # FIXME: why this default value?!
+    multisend_address = MULTISENDS.get(blockchain)
     transactions = [
         MultiSendTx(
             MultiSendOperation.CALL,
