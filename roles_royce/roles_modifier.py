@@ -65,10 +65,10 @@ class RolesMod:
     def execute(self,
                 contract_address: str,
                 data: str,
-                gas_limit: int = 500_000,  # TODO: get the gas limit into the protocol files
                 max_priority_fee: int = None,
-                max_gas: int = None,
+                max_fee_per_gas: int = None,
                 check: bool = True,
+                fee_multiplier: float = 1.2,
                 ) -> str:
         """Execute a role-based transaction. Returns the transaction hash as a str."""
 
@@ -78,12 +78,14 @@ class RolesMod:
         if not max_priority_fee:
             max_priority_fee = self.web3.eth.max_priority_fee
 
-        if not max_gas:
-            max_gas = max_priority_fee + self.get_base_fee()
+        if not max_fee_per_gas:
+            max_fee_per_gas = max_priority_fee + int(self.get_base_fee_per_gas() * fee_multiplier)
+
+        gas_limit = int(self.estimate_gas(contract_address, data) * 2)
 
         nonce = self.nonce or self.web3.eth.get_transaction_count(self.account)
 
-        tx = self._build_transaction(contract_address, data, gas_limit, max_priority_fee, max_gas, nonce)
+        tx = self._build_transaction(contract_address, data, gas_limit, max_priority_fee, max_fee_per_gas, nonce)
         signed_txn = self._sign_transaction(tx)
         executed_txn = self._send_raw_transaction(signed_txn.rawTransaction)
         return executed_txn.hex()
