@@ -46,17 +46,10 @@ class RolesMod:
             address=self.contract_address, abi=self.contract_abi
         )
 
-    def get_base_fee(self) -> int:
-        """Get the base fee.
-
-        Returns:
-            int: The base fee.
-        """
+    def get_base_fee_per_gas(self) -> int:
         latest_block = self.web3.eth.get_block("latest")
-        gas_used = latest_block["gasUsed"]
         base_fee_per_gas = latest_block["baseFeePerGas"]
-        base_fee = gas_used * base_fee_per_gas
-        return base_fee * 2
+        return base_fee_per_gas
 
     def check(self, contract_address: str, data: str, block='latest') -> bool:
         """make a static call to validate a transaction."""
