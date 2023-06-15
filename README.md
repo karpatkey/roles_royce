@@ -11,6 +11,7 @@ so expect backwards incompatible changes.
 ## Protocols supported
 
 * AAVE
+* Lido
 
 
 ## Usage
