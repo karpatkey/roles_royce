@@ -69,7 +69,7 @@ class DepositETH(Method):
     target_address = ETHAddr.WrappedTokenGatewayV2
 
     def __init__(self, eth_amount: int, avatar: Address):
-        self.eth_amount = eth_amount
+        self.value = eth_amount
         self.avatar = avatar
 
 
@@ -223,11 +223,11 @@ class RepayETH(Method):
     in_signature = [('address', 'address'), ('amount', 'uint256'), ('interest_rate_model', 'uint256'), ('on_behalf_of', 'address')]
     fixed_arguments = {'address': ETHAddr.AaveLendingPoolV2, 'on_behalf_of': AvatarSafeAddress}
     target_address = ETHAddr.WrappedTokenGatewayV2
-    value = True
 
     def __init__(self, amount: int, interest_rate_model: InterestRateModel):
         self.amount = amount
         self.interest_rate_model = interest_rate_model
+        raise NotImplementedError("Not yet implemented/validated")
 
 
 class SwapAndRepay(Method):

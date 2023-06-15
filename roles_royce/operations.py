@@ -31,15 +31,16 @@ def check(txs: List[TxData],
     Returns:
         bool: status
     """
-    operation, contract_address, data = multi_or_one(txs, blockchain)
+    tx_data = multi_or_one(txs, blockchain)
     roles_mod = RolesMod(
         role=role,
         contract_address=roles_mod_address,
         account=account,
-        operation=operation,
+        operation=tx_data.operation,
         web3=web3,
+        value=tx_data.value
     )
-    return roles_mod.check(contract_address, data, block=block)
+    return roles_mod.check(tx_data.contract_address, tx_data.data, block=block)
 
 
 def send(txs: List[TxData],
@@ -62,15 +63,16 @@ def send(txs: List[TxData],
     Returns:
         (bool) status
     """
-    operation, contract_address, data = multi_or_one(txs, blockchain)
+    tx_data = multi_or_one(txs, blockchain)
     roles_mod = RolesMod(
         role=role,
         contract_address=roles_mod_address,
         private_key=private_key,
-        operation=operation,
-        web3=web3
+        operation=tx_data.operation,
+        web3=web3,
+        value=tx_data.value
     )
-    roles_mod_execute = roles_mod.execute(contract_address, data)
+    roles_mod_execute = roles_mod.execute(tx_data.contract_address, tx_data.data)
     logger.info('building receipt....')
     roles_mod_tx1 = roles_mod.get_tx_receipt(roles_mod_execute)
     logger.info(roles_mod_tx1)

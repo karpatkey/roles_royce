@@ -44,7 +44,7 @@ def test_deposit_eth():
     referral_code = 0
     assert method.args_list == [ETHAddr.AaveLendingPoolV2, AVATAR, referral_code]
     assert method.target_address == ETHAddr.WrappedTokenGatewayV2
-    assert method.eth_amount == 123
+    assert method.value == 123
 
 
 def test_borrow():
