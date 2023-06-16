@@ -16,6 +16,12 @@ def test_methods(web3_eth):
                    blockchain=Chain.ETHEREUM, web3=web3_eth, block=17067157)
     assert status
 
+def test_withdrawal_approvals():
+    approve_steth = lido.ApproveWithdrawalStETH(amount=100)
+    approve_wsteth = lido.ApproveWithdrawalWstETH(amount=100)
+    assert approve_steth.data == "0x095ea7b3000000000000000000000000889edc2edab5f40e902b864ad4d7ade8e412f9b10000000000000000000000000000000000000000000000000000000000000064"
+    assert approve_wsteth.data == "0x095ea7b3000000000000000000000000889edc2edab5f40e902b864ad4d7ade8e412f9b10000000000000000000000000000000000000000000000000000000000000064"
+
 
 def test_deposit(web3_eth):
     deposit = lido.Deposit(eth_amount=10)
@@ -40,11 +46,18 @@ def test_unwrap(web3_eth):
                    blockchain=Chain.ETHEREUM, web3=web3_eth, block=17067157)
     assert status
 
-def test_request_withdrawal():
+def test_request_withdrawal_steth():
     request = lido.RequestWithdrawals(_amounts=[1_000], _owner=AVATAR)
     assert request.data == "0xd66810420000000000000000000000000000000000000000000000000000000000000040000000000000000000000000" \
                             "c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000001" \
                             "00000000000000000000000000000000000000000000000000000000000003e8"
+
+def test_request_withdrawal_wsteth():
+    request = lido.RequestWithdrawalsWstETH(_amounts=[1_000], _owner=AVATAR)
+    assert request.data == "0x19aa62570000000000000000000000000000000000000000000000000000000000000040000000000000000000000000" \
+                            "c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000001" \
+                            "00000000000000000000000000000000000000000000000000000000000003e8"
+
 def test_claim_withdrawal():
     claim = lido.ClaimWithdrawals(_requestIds=[1], _hints=[35])
     assert claim.data == "0xe3afe0a3000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000" \
