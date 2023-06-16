@@ -57,12 +57,12 @@ class Unwrap(Method):
 class RequestWithdrawals(Method):
     """sender requests a claim on his ETH from stETH"""
     name = "requestWithdrawals"
-    in_signature = [("_amounts", "uint256[]"), ("_owner", "address")]
+    in_signature = [("amounts", "uint256[]"), ("owner", "address")]
     target_address = ETHAddr.unstETH
 
-    def __init__(self, _amounts: list, _owner: Address):
-        self._amounts = _amounts
-        self._owner = _owner
+    def __init__(self, amounts: list, owner: Address):
+        self.amounts = amounts
+        self.owner = owner
 
 #TODO: the amounts is a list, because it has a max of 1000 stETH per element, should built that in
 
@@ -73,10 +73,10 @@ class RequestWithdrawalsWstETH(RequestWithdrawals):
 class ClaimWithdrawals(Method):
     """sender wants to claim his ETH"""
     name = "claimWithdrawals"
-    in_signature = [("_requestIds", "uint256[]"), ("_hints", "uint256[]")]
+    in_signature = [("requestIds", "uint256[]"), ("hints", "uint256[]")]
     target_address = ETHAddr.unstETH
 
-    def __init__(self, _requestIds: list, _hints: list):
+    def __init__(self, requestIds: list, hints: list):
         """Amount of ETH user receives after claiming"""
-        self._requestIds = _requestIds
-        self._hints = _hints  
+        self.requestIds = requestIds
+        self.hints = hints  
