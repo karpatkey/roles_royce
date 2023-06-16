@@ -18,7 +18,7 @@ class ApproveWithdrawalStETH(Approve):
     target_address = ETHAddr.stETH
 
 class ApproveWithdrawalWstETH(Approve):
-    """approve stETH with withdrawal contract as spender"""
+    """approve wstETH with withdrawal contract as spender"""
     fixed_arguments = {"spender": ETHAddr.unstETH}
     target_address = ETHAddr.wstETH
 
