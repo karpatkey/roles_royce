@@ -15,7 +15,7 @@ class ApproveForVault(Approve):
 
     def __init__(self, token: Address, amount: int):
         super().__init__(amount)
-        self.token = token
+        self.args.token = token
 
 
 # There is another ExitKind that is for Weighted Pools
@@ -53,13 +53,12 @@ class Exit(Method):
     user_data_abi = None
 
     def __init__(self, pool_id: str, avatar: Address, assets: list[Address], min_amounts_out: list[int], user_data: list):
-        super().__init__()
-        self.pool_id = pool_id
-        self.avatar = avatar
-        self.assets = assets
-        self.min_amounts_out = min_amounts_out
-        self.user_data = self.encode_user_data(user_data)
-        self.request = [self.assets, self.min_amounts_out, self.user_data, self.fixed_arguments['to_internal_balance']]
+        super().__init__(avatar=avatar)
+        self.args.pool_id = pool_id
+        self.args.assets = assets
+        self.args.min_amounts_out = min_amounts_out
+        self.args.user_data = self.encode_user_data(user_data)
+        self.args.request = [self.args.assets, self.args.min_amounts_out, self.args.user_data, self.fixed_arguments['to_internal_balance']]
 
     def encode_user_data(self, user_data):
         return eth_abi.encode(self.user_data_abi, user_data)

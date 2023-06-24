@@ -8,8 +8,9 @@ class ApproveDAI(Method):
     target_address = ETHAddr.DAI
 
     def __init__(self, spender: Address, amount: int):
-        self.spender = spender
-        self.amount = amount
+        super().__init__()
+        self.args.spender = spender
+        self.args.amount = amount
 
 class ApproveWstETH(ApproveDAI):
     """approve stETH with CDP manager as spender"""
@@ -28,9 +29,10 @@ class WithdrawCollateral(Method):
     target_address = ETHAddr.MakerProxy
 
     def __init__(self, adapter: Address, cdp_vault: int, amount: int):
-        self.adapter = adapter
-        self.cdp_vault = cdp_vault
-        self.amount = amount
+        super().__init__()
+        self.args.adapter = adapter
+        self.args.cdp_vault = cdp_vault
+        self.args.amount = amount
 
 class DepositCollateral(Method):
     """deposit collateral in vault"""
@@ -42,9 +44,10 @@ class DepositCollateral(Method):
     target_address = ETHAddr.MakerProxy
 
     def __init__(self, adapter: Address, cdp_vault: int, amount: int):
-        self.adapter = adapter
-        self.cdp_vault = cdp_vault
-        self.amount = amount
+        super().__init__()
+        self.args.adapter = adapter
+        self.args.cdp_vault = cdp_vault
+        self.args.amount = amount
  
 class PayBack(WithdrawCollateral):
     """pay back borrowed"""
@@ -60,9 +63,10 @@ class MintDAI(Method):
     target_address = ETHAddr.MakerProxy
 
     def __init__(self, adapter: Address, cdp_vault: int, amount: int):
-        self.adapter = adapter
-        self.cdp_vault = cdp_vault
-        self.amount = amount
+        super().__init__()
+        self.args.adapter = adapter
+        self.args.cdp_vault = cdp_vault
+        self.args.amount = amount
     
 class PayBackAndWithdrawCol(Method):
     """be free"""
@@ -74,10 +78,11 @@ class PayBackAndWithdrawCol(Method):
     target_address = ETHAddr.MakerProxy  
 
     def __init__(self, adapter: Address, dai_join: Address, cdp_vault: int, amount: int):
-        self.adapter = adapter
-        self.cdp_vault = cdp_vault
-        self.amount = amount
-        self.dai_join = dai_join
+        super().__init__()
+        self.args.adapter = adapter
+        self.args.cdp_vault = cdp_vault
+        self.args.amount = amount
+        self.args.dai_join = dai_join
 
 class UndelegateMKR(Method):
     """undelegate any MKR"""
@@ -85,5 +90,6 @@ class UndelegateMKR(Method):
     in_signature = [("amount", "uint256")]
 
     def __init__(self, amount: int):
-        self.amount = amount
+        super().__init__()
+        self.args.amount = amount
    

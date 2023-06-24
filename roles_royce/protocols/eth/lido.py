@@ -10,7 +10,8 @@ class Approve(Method):
     target_address = ETHAddr.stETH
 
     def __init__(self, amount: int):
-        self.amount = amount
+        super().__init__()
+        self.args.amount = amount
 
 class ApproveWithdrawalStETH(Approve):
     """approve stETH with withdrawal contract as spender"""
@@ -30,7 +31,7 @@ class Deposit(Method):
     target_address = ETHAddr.stETH
 
     def __init__(self, eth_amount: int):
-        self.value = eth_amount
+        super().__init__(value=eth_amount)
 
 
 class Wrap(Method):
@@ -41,7 +42,8 @@ class Wrap(Method):
 
     def __init__(self, amount: int):
         """Amount of wstETH user receives after wrap"""
-        self.amount = amount
+        super().__init__()
+        self.args.amount = amount
 
 
 class Unwrap(Method):
@@ -52,7 +54,8 @@ class Unwrap(Method):
 
     def __init__(self, amount: int):
         """Amount of stETH user receives after unwrap"""
-        self.amount = amount
+        super().__init__()
+        self.args.amount = amount
 
 class RequestWithdrawals(Method):
     """sender requests a claim on his ETH from stETH"""
@@ -61,8 +64,9 @@ class RequestWithdrawals(Method):
     target_address = ETHAddr.unstETH
 
     def __init__(self, amounts: list, owner: Address):
-        self.amounts = amounts
-        self.owner = owner
+        super().__init__()
+        self.args.amounts = amounts
+        self.args.owner = owner
 
 #TODO: the amounts is a list, because it has a max of 1000 stETH per element, should built that in
 
@@ -78,5 +82,6 @@ class ClaimWithdrawals(Method):
 
     def __init__(self, requestIds: list, hints: list):
         """Amount of ETH user receives after claiming"""
-        self.requestIds = requestIds
-        self.hints = hints  
+        super().__init__()
+        self.args.requestIds = requestIds
+        self.args.hints = hints

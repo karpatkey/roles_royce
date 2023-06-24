@@ -1,4 +1,5 @@
 import json
+from types import SimpleNamespace
 from roles_royce import Operation
 from web3 import Web3
 
@@ -10,17 +11,22 @@ class InvalidArgument(Exception):
     pass
 
 
+class Args(SimpleNamespace):
+    pass
+
+
 class Method:
     name = None
     in_signature = []
     out_signature = []
     fixed_arguments = dict()
     target_address = None
-    avatar = None
-    value: int = 0  # Eg: amount of ETH in mainnet, xDai in GC
 
-    def __init__(self):
-        pass
+    def __init__(self, value: int = 0, avatar: None | str = None):
+        self.value = value  # Eg: amount of ETH in mainnet, xDai in GC
+        self.avatar = avatar
+        self.args = Args()
+        self._initialized = True
 
     @property
     def args_list(self):
@@ -28,6 +34,8 @@ class Method:
 
     @property
     def data(self):
+        if not hasattr(self, "_initialized"):
+            raise ValueError(f"Missing super().__init__() call in {self.__class__.__name__}.__init__ method")
         contract = Web3().eth.contract(address=None, abi=self.abi)
         result = contract.encodeABI(fn_name=self.name, args=self.args_list)
         return result
@@ -66,7 +74,7 @@ class Method:
                 if value is AvatarSafeAddress:
                     value = self.avatar
             else:
-                value = getattr(self, arg_name)
+                value = getattr(self.args, arg_name)
         return value
 
     def _abi_for(self, element):
