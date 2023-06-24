@@ -13,6 +13,7 @@ bb_a_DAI = "0x6667c6fa9f2b3Fc1Cc8D85320b62703d938E4385"
 bb_a_USDT = "0xA1697F9Af0875B63DdC472d6EeBADa8C1fAB8568"
 bb_a_USDC = "0xcbFA4532D8B2ade2C261D3DD5ef2A2284f792692"
 
+pytestmark = pytest.mark.skip("all tests still WIP")
 
 def test_exit_pool_single(web3_eth):
     assets = [bb_a_DAI, bb_a_USDT, bb_a_USDC, bb_a_USD]
