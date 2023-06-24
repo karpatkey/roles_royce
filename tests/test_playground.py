@@ -14,6 +14,8 @@ ethereum_client = EthereumClient(ETHEREUM_NODE_URL)
 
 test_account_addr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
 test_account_private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+test_account_addr1 = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+test_account_private_key1 = "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
 account = Account.from_key(test_account_private_key)  #
 # workarround https://github.com/ethereum/web3.py/pull/3002 / MethodUnavailable: {'code': -32601, 'message': 'Method eth_maxPriorityFeePerGas not found', 'data': {'message': 'Method eth_maxPriorityFeePerGas not found'}}
 ethereum_client.w3.eth._max_priority_fee = lambda: 0
@@ -50,6 +52,7 @@ balance_eth = 0.01
 send_tx(ethereum_client.w3, tx={"to": safe.address, "value": Web3.to_wei(balance_eth, "ether")}, account=account)
 
 safe_balance = safe.w3.eth.get_balance(safe.address)
+print("safe address is: ",safe.address)
 print(f"safe balance: {safe_balance}")
 
 ADDRESS_WITH_LOTS_OF_TOKENS = "0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8"
@@ -103,16 +106,35 @@ role_ctract = web3_local.eth.contract(abi=role_abi, bytecode=bytecode_without_de
 
 tx_receipt = role_ctract.constructor(owner, avatar, target).transact() # deploy!
 ctract_address = web3_local.eth.get_transaction_receipt(tx_receipt).contractAddress
-
+print("roles mod deployed",ctract_address)
 role_ctract = web3_local.eth.contract(ctract_address, abi=role_abi)
 assert role_ctract.functions.avatar().call() == avatar
 MULTISEND_CALL_ONLY = '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
-role_ctract.functions.setMultisend(web3_local.to_checksum_address(MULTISEND_CALL_ONLY)).transact()
 
-# TODO: deploy the roles for the Safe
-# *
-# * enableModule():
-# tx =  safe.functions.enableModule(module_address).build_transaction({"from": address, "gas": 0, "gasPrice": 0})
-# safe_tx = safe.build_multisig_tx(safe.address, 0, tx["data"])
-# safe_tx.sign(
-# safe_tx.execute(...
+# give the roles_mod to the safe
+role_ctract.functions.setMultisend(web3_local.to_checksum_address(MULTISEND_CALL_ONLY)).transact()
+role_ctract.functions.setTarget(web3_local.to_checksum_address(safe.address)).transact()
+role_ctract.functions.setAvatar(web3_local.to_checksum_address(safe.address)).transact()
+role_ctract.functions.transferOwnership(web3_local.to_checksum_address(safe.address)).transact()
+
+print("owner is now: ",role_ctract.functions.owner().call())
+print("avatar is now: ",role_ctract.functions.avatar().call())
+print("target is now: ",role_ctract.functions.target().call())
+
+#enable an EOA for setting as a role
+txEnable = role_ctract.functions.enableModule(test_account_addr1).build_transaction({"from": safe.address, "gas": 0, "gasPrice": 0})['data']
+safe_tx = safe.build_multisig_tx(to=ctract_address, value=0, data=txEnable, operation=SafeOperation.CALL.value, safe_tx_gas=500000,
+                            base_gas=500000, gas_price=1, gas_token=NULL_ADDRESS, refund_receiver=NULL_ADDRESS)
+safe_tx.sign(test_account_private_key)
+safe_tx.execute(test_account_private_key)
+
+print("is module {} enabled?".format(test_account_addr1), role_ctract.functions.isModuleEnabled(test_account_addr1).call())
+
+#assign the role
+assignRoles = role_ctract.functions.assignRoles(test_account_addr1,[1],[True]).build_transaction({"from": safe.address, "gas": 0, "gasPrice": 0})['data']
+safe_tx = safe.build_multisig_tx(to=ctract_address, value=0, data=txEnable, operation=SafeOperation.CALL.value, safe_tx_gas=500000,
+                            base_gas=500000, gas_price=1, gas_token=NULL_ADDRESS, refund_receiver=NULL_ADDRESS)
+safe_tx.sign(test_account_private_key)
+safe_tx.execute(test_account_private_key)
+
+print(w3.eth.get_transaction_receipt("0xfbb322733e20225be5b516234d8633ed2c3339bc19352b00a64e643533826cc7"))
