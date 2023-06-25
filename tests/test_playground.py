@@ -3,6 +3,9 @@ from gnosis.safe import addresses, Safe, SafeOperation
 from gnosis.eth import EthereumNetwork, EthereumClient
 from eth_account import Account
 
+from roles_royce.protocols.eth import lido
+from roles_royce import check, send, Chain
+
 ETHEREUM_NODE_URL = "http://127.0.0.1:8545"
 gnosis_safe_proxy_address = "0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2"
 gnosis_safe_proxy_factory_abi = """[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"contract GnosisSafeProxy","name":"proxy","type":"address"},{"indexed":false,"internalType":"address","name":"singleton","type":"address"}],"name":"ProxyCreation","type":"event"},{"inputs":[{"internalType":"address","name":"_singleton","type":"address"},{"internalType":"bytes","name":"initializer","type":"bytes"},{"internalType":"uint256","name":"saltNonce","type":"uint256"}],"name":"calculateCreateProxyWithNonceAddress","outputs":[{"internalType":"contract GnosisSafeProxy","name":"proxy","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"singleton","type":"address"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"createProxy","outputs":[{"internalType":"contract GnosisSafeProxy","name":"proxy","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_singleton","type":"address"},{"internalType":"bytes","name":"initializer","type":"bytes"},{"internalType":"uint256","name":"saltNonce","type":"uint256"},{"internalType":"contract IProxyCreationCallback","name":"callback","type":"address"}],"name":"createProxyWithCallback","outputs":[{"internalType":"contract GnosisSafeProxy","name":"proxy","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_singleton","type":"address"},{"internalType":"bytes","name":"initializer","type":"bytes"},{"internalType":"uint256","name":"saltNonce","type":"uint256"}],"name":"createProxyWithNonce","outputs":[{"internalType":"contract GnosisSafeProxy","name":"proxy","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"proxyCreationCode","outputs":[{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"pure","type":"function"},{"inputs":[],"name":"proxyRuntimeCode","outputs":[{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"pure","type":"function"}]"""
@@ -131,10 +134,33 @@ safe_tx.execute(test_account_private_key)
 print("is module {} enabled?".format(test_account_addr1), role_ctract.functions.isModuleEnabled(test_account_addr1).call())
 
 #assign the role
-assignRoles = role_ctract.functions.assignRoles(test_account_addr1,[1],[True]).build_transaction({"from": safe.address, "gas": 0, "gasPrice": 0})['data']
-safe_tx = safe.build_multisig_tx(to=ctract_address, value=0, data=txEnable, operation=SafeOperation.CALL.value, safe_tx_gas=500000,
+assign_roles = role_ctract.functions.assignRoles(test_account_addr1,[1],[True]).build_transaction({"from": safe.address, "gas": 0, "gasPrice": 0})['data']
+safe_tx = safe.build_multisig_tx(to=ctract_address, value=0, data=assign_roles, operation=SafeOperation.CALL.value, safe_tx_gas=500000,
                             base_gas=500000, gas_price=1, gas_token=NULL_ADDRESS, refund_receiver=NULL_ADDRESS)
 safe_tx.sign(test_account_private_key)
-safe_tx.execute(test_account_private_key)
+print(safe_tx.execute(test_account_private_key))
 
-print(w3.eth.get_transaction_receipt("0xfbb322733e20225be5b516234d8633ed2c3339bc19352b00a64e643533826cc7"))
+#approve stETH preset
+approve_steth_preset = "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ae7ab96520de3a18e5e111b5eaab095312d7fe84095ea7b3000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+
+safe_tx = safe.build_multisig_tx(to=ctract_address, value=0, data=approve_steth_preset, operation=SafeOperation.CALL.value, safe_tx_gas=500000,
+                            base_gas=500000, gas_price=1, gas_token=NULL_ADDRESS, refund_receiver=NULL_ADDRESS)
+safe_tx.sign(test_account_private_key)
+print(safe_tx.execute(test_account_private_key))
+print("approve preset send")
+
+#deposit eth preset
+deposit_steth_preset = "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ae7ab96520de3a18e5e111b5eaab095312d7fe84a1903eab000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+
+safe_tx = safe.build_multisig_tx(to=ctract_address, value=0, data=deposit_steth_preset, operation=SafeOperation.CALL.value, safe_tx_gas=500000,
+                            base_gas=500000, gas_price=1, gas_token=NULL_ADDRESS, refund_receiver=NULL_ADDRESS)
+safe_tx.sign(test_account_private_key)
+print(safe_tx.execute(test_account_private_key))
+print("deposit preset send")
+
+#approve and submit ETH
+approve_steth = lido.Approve(amount=1_000_000_000_000_000_000)
+deposit_eth = lido.Deposit(eth_amount=1_000_000_000_000_000_000)
+send_approve = send([approve_steth], role=1, private_key=test_account_private_key1,
+                  roles_mod_address=ctract_address, blockchain=Chain.ETHEREUM, web3=web3_local)
+assert send_approve
