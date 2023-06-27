@@ -6,11 +6,10 @@ from eth_account import Account
 
 from roles_royce.protocols.eth import lido
 from roles_royce import send, Chain
-from roles_royce.utils_playground import safe_abi, role_abi, role_bytecode, dai_abi, steth_contract_abi
+from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi, steth_contract_abi
 from roles_royce.utils import MULTISENDS
 from roles_royce.constants import ETHAddr
 from .utils import local_node, local_node_reset, ETH_LOCAL_NODE_URL, hardhat_unlock_account
-
 
 
 def safe_send(safe, signer_key, to, data, value=0):
@@ -76,15 +75,15 @@ def test_safe_and_roles(local_node):
 
     # Deploy a Roles contrat without using the ProxyFactory (to simplify things)
     role_constructor_bytes = "000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
-    bytecode_without_default_constructor = role_bytecode[:-len(role_constructor_bytes)]
+    bytecode_without_default_constructor = roles_bytecode[:-len(role_constructor_bytes)]
 
     owner = avatar = target = w3.to_checksum_address(test_account0_addr)
-    role_ctract = w3.eth.contract(abi=role_abi, bytecode=bytecode_without_default_constructor)
+    role_ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
 
     tx_receipt = role_ctract.constructor(owner, avatar, target).transact()  # deploy!
     roles_ctract_address = w3.eth.get_transaction_receipt(tx_receipt).contractAddress
 
-    role_ctract = w3.eth.contract(roles_ctract_address, abi=role_abi)
+    role_ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
     assert role_ctract.functions.avatar().call() == avatar
 
     # give the roles_mod to the safe
@@ -128,6 +127,7 @@ def test_safe_and_roles(local_node):
     steth_contract_address = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
     steth_contract = w3.eth.contract(address=steth_contract_address, abi=steth_contract_abi)
     assert steth_contract.functions.balanceOf(safe.address).call() == 999999999999999
+
 
 def test_simple_account_balance(local_node):
     w3 = local_node
