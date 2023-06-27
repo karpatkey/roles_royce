@@ -9,16 +9,8 @@ from roles_royce import send, Chain
 from roles_royce.utils_playground import safe_abi, role_abi, role_bytecode, dai_abi, steth_contract_abi
 from roles_royce.utils import MULTISENDS
 from roles_royce.constants import ETHAddr
+from .utils import local_node, local_node_reset, ETH_LOCAL_NODE_URL, hardhat_unlock_account
 
-ETHEREUM_NODE_URL = "http://127.0.0.1:8545"
-
-
-def hardhat_unlock_account(w3, address):
-    return w3.provider.make_request("hardhat_impersonateAccount", [address])
-
-
-def hardhat_reset_state(w3, url, block):
-    return w3.provider.make_request("hardhat_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
 
 
 def safe_send(safe, signer_key, to, data, value=0):
@@ -30,21 +22,23 @@ def safe_send(safe, signer_key, to, data, value=0):
     return safe_tx
 
 
-def test_safe_and_roles():
-    ethereum_client = EthereumClient(ETHEREUM_NODE_URL)
-    w3 = ethereum_client.w3
-    hardhat_reset_state(w3, url=os.environ.get("RR_ETH_FORK_URL"), block=17565000)
+def test_safe_and_roles(local_node):
+    w3 = local_node
+    ethereum_client = EthereumClient(ETH_LOCAL_NODE_URL)
+
+    # workarround https://github.com/ethereum/web3.py/pull/3002 / MethodUnavailable: {'code': -32601, 'message': 'Method eth_maxPriorityFeePerGas not found', 'data': {'message': 'Method eth_maxPriorityFeePerGas not found'}}
+    ethereum_client.w3.eth._max_priority_fee = lambda: 0
+    w3.eth._max_priority_fee = lambda: 0
 
     # test accounts are generated using the Mnemonic: "test test test test test test test test test test test junk"
     test_account0_addr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
     test_account0_private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
     test_account1_addr = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
     test_account1_private_key = "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
-    account = Account.from_key(test_account0_private_key)  #
-    # workarround https://github.com/ethereum/web3.py/pull/3002 / MethodUnavailable: {'code': -32601, 'message': 'Method eth_maxPriorityFeePerGas not found', 'data': {'message': 'Method eth_maxPriorityFeePerGas not found'}}
-    ethereum_client.w3.eth._max_priority_fee = lambda: 0
 
-    ethereum_tx_sent = Safe.create(ethereum_client, deployer_account=account,
+    assert w3.eth.get_balance(test_account0_addr) == 10000000000000000000000
+
+    ethereum_tx_sent = Safe.create(ethereum_client, deployer_account=Account.from_key(test_account0_private_key),
                                    master_copy_address=addresses.MASTER_COPIES[EthereumNetwork.MAINNET][0][0],
                                    owners=[test_account0_addr], threshold=1)
 
@@ -134,3 +128,11 @@ def test_safe_and_roles():
     steth_contract_address = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
     steth_contract = w3.eth.contract(address=steth_contract_address, abi=steth_contract_abi)
     assert steth_contract.functions.balanceOf(safe.address).call() == 999999999999999
+
+def test_simple_account_balance(local_node):
+    w3 = local_node
+
+    # test accounts are generated using the Mnemonic: "test test test test test test test test test test test junk"
+    test_account0_addr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+
+    assert w3.eth.get_balance(test_account0_addr) == 10000000000000000000000

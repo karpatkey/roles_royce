@@ -96,6 +96,8 @@ status = check(txs=[approve, add_liquidity],
 ...
 ```
 
+## Development
 
-
+Install the python dev dependencies: `pip install -r requirements-dev.txt`
+Install Hardhat by running `npm install` in the project's root directory.
 
