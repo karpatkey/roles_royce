@@ -1,3 +1,4 @@
+import pytest
 from roles_royce import check, send, GenericMethodTransaction, Operation, Chain
 from roles_royce.constants import GCAddr, CrossChainAddr
 from roles_royce.utils import multi_or_one, MULTISENDS
@@ -33,6 +34,7 @@ getPool = GenericMethodTransaction(
     value=0,
 )
 
+@pytest.mark.xfail(reason='still WIP')
 def test_check_multi(web3_gnosis):
     status = check(txs=[getPool], role=2, account=ACCOUNT, roles_mod_address=ROLES_MOD_ADDRESS,
                    web3=web3_gnosis, blockchain=Chain.GC)

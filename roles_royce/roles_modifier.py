@@ -69,6 +69,7 @@ class RolesMod:
                 max_fee_per_gas: int = None,
                 check: bool = True,
                 fee_multiplier: float = 1.2,
+                gas_limit_multiplier: float = 1.1
                 ) -> str:
         """Execute a role-based transaction. Returns the transaction hash as a str."""
 
@@ -81,7 +82,7 @@ class RolesMod:
         if not max_fee_per_gas:
             max_fee_per_gas = max_priority_fee + int(self.get_base_fee_per_gas() * fee_multiplier)
 
-        gas_limit = int(self.estimate_gas(contract_address, data) * 2)
+        gas_limit = int(self.estimate_gas(contract_address, data) * gas_limit_multiplier)
 
         nonce = self.nonce or self.web3.eth.get_transaction_count(self.account)
 
