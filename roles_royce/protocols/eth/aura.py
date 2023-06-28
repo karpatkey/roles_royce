@@ -19,5 +19,6 @@ class WithdrawAndUndwrapStakedBPT(Method):
     fixed_arguments = {"claim": True}
 
     def __init__(self, amount: int):
-        self.amount = amount
+        super().__init__()
+        self.args.amount = amount
 

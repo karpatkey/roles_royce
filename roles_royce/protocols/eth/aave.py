@@ -8,18 +8,14 @@ class Approve(Method):
     name = "approve"
     in_signature = [("spender", "address"), ("amount", "uint256")]
     token = None
-    eth_amount = None
 
     def __init__(self, amount: int):
-        self.amount = amount
+        super().__init__()
+        self.args.amount = amount
 
     @property
     def target_address(self):
         return self.token
-
-    @property
-    def value(self):
-        return self.eth_amount
 
 
 class ApproveForAaveLendingPoolV2(Approve):
@@ -56,9 +52,9 @@ class DepositToken(Method):
     target_address = ETHAddr.AaveLendingPoolV2
 
     def __init__(self, asset: Address, amount: int, avatar: Address):
-        self.asset = asset
-        self.amount = amount
-        self.avatar = avatar
+        super().__init__(avatar=avatar)
+        self.args.asset = asset
+        self.args.amount = amount
 
 
 class DepositETH(Method):
@@ -69,8 +65,7 @@ class DepositETH(Method):
     target_address = ETHAddr.WrappedTokenGatewayV2
 
     def __init__(self, eth_amount: int, avatar: Address):
-        self.value = eth_amount
-        self.avatar = avatar
+        super().__init__(value=eth_amount, avatar=avatar)
 
 
 class WithdrawToken(Method):
@@ -81,9 +76,9 @@ class WithdrawToken(Method):
     target_address = ETHAddr.AaveLendingPoolV2
 
     def __init__(self, asset: Address, amount: int, avatar: Address):
-        self.asset = asset
-        self.amount = amount
-        self.avatar = avatar
+        super().__init__(avatar=avatar)
+        self.args.asset = asset
+        self.args.amount = amount
 
 
 class WithdrawETH(Method):
@@ -94,8 +89,8 @@ class WithdrawETH(Method):
     target_address = ETHAddr.WrappedTokenGatewayV2
 
     def __init__(self, amount: int, avatar: Address):
-        self.amount = amount
-        self.avatar = avatar
+        super().__init__(avatar=avatar)
+        self.args.amount = amount
 
 
 class Collateralize(Method):
@@ -106,8 +101,9 @@ class Collateralize(Method):
     target_address = ETHAddr.AaveLendingPoolV2
 
     def __init__(self, asset: Address, use_as_collateral: bool):
-        self.asset = asset
-        self.use_as_collateral = use_as_collateral
+        super().__init__()
+        self.args.asset = asset
+        self.args.use_as_collateral = use_as_collateral
 
 
 class InterestRateModel(IntEnum):
@@ -124,12 +120,12 @@ class Borrow(Method):
     target_address = ETHAddr.AaveLendingPoolV2
 
     def __init__(self, asset: Address, amount: int, interest_rate_model: InterestRateModel, avatar: Address):
-        self.asset = asset
-        self.amount = amount
-        self.avatar = avatar
+        super().__init__(avatar=avatar)
+        self.args.asset = asset
+        self.args.amount = amount
         if interest_rate_model not in InterestRateModel:
             raise InvalidArgument(f"Invalid interestRateModel={interest_rate_model}")
-        self.interest_rate_model = interest_rate_model
+        self.args.interest_rate_model = interest_rate_model
 
 
 class BorrowETH(Method):
@@ -140,10 +136,11 @@ class BorrowETH(Method):
     target_address = ETHAddr.WrappedTokenGatewayV2
 
     def __init__(self, amount: int, interest_rate_model: InterestRateModel):
-        self.amount = amount
+        super().__init__()
+        self.args.amount = amount
         if interest_rate_model not in InterestRateModel:
             raise InvalidArgument(f"Invalid interestRateModel={interest_rate_model}")
-        self.interest_rate_model = interest_rate_model
+        self.args.interest_rate_model = interest_rate_model
 
 
 class StakeAAVE(Method):
@@ -153,8 +150,8 @@ class StakeAAVE(Method):
     target_address = ETHAddr.stkAAVE
 
     def __init__(self, avatar: Address, amount: int):
-        self.amount = amount
-        self.avatar = avatar
+        super().__init__(avatar=avatar)
+        self.args.amount = amount
 
 
 class StakeABPT(StakeAAVE):
@@ -169,8 +166,8 @@ class UnstakeAAVE(Method):
     target_address = ETHAddr.stkAAVE
 
     def __init__(self, avatar: Address, amount: int):
-        self.avatar = avatar
-        self.amount = amount
+        super().__init__(avatar=avatar)
+        self.args.amount = amount
 
 
 class UnstakeABPT(UnstakeAAVE):
@@ -197,8 +194,8 @@ class ClaimAAVERewards(Method):
     target_address = ETHAddr.stkAAVE
 
     def __init__(self, avatar: Address, amount: int):
-        self.avatar = avatar
-        self.amount = amount
+        super().__init__(avatar=avatar)
+        self.args.amount = amount
 
 
 class ClaimABPTRewards(ClaimAAVERewards):
@@ -213,9 +210,10 @@ class Repay(Method):
     target_address = ETHAddr.AaveLendingPoolV2
 
     def __init__(self, token: Address, amount: int, interest_rate_model: InterestRateModel):
-        self.token = token
-        self.amount = amount
-        self.interest_rate_model = interest_rate_model
+        super().__init__()
+        self.args.token = token
+        self.args.amount = amount
+        self.args.interest_rate_model = interest_rate_model
 
 
 class RepayETH(Method):
@@ -225,8 +223,9 @@ class RepayETH(Method):
     target_address = ETHAddr.WrappedTokenGatewayV2
 
     def __init__(self, amount: int, interest_rate_model: InterestRateModel):
-        self.amount = amount
-        self.interest_rate_model = interest_rate_model
+        super().__init__()
+        self.args.amount = amount
+        self.args.interest_rate_model = interest_rate_model
         raise NotImplementedError("Not yet implemented/validated")
 
 
@@ -251,6 +250,7 @@ class SwapAndRepay(Method):
     def __init__(self, collateral_asset, debt_asset, collateral_amount, debt_repay_amount, debt_rate_mode,
                  buy_all_balance_offset, paraswap_data, permit_sign_amount, permit_sign_deadline,
                  permit_sign_v, permit_sign_r, permit_sign_s):
+        super().__init__()
         self.collateral_asset, self.collateral_amount = collateral_asset, collateral_amount
         self.debt_asset, self.debt_repay_amount = debt_asset, debt_repay_amount
         self.debt_rate_mode = debt_rate_mode
@@ -259,3 +259,4 @@ class SwapAndRepay(Method):
         self.permit_sign_amount = permit_sign_amount
         self.permit_sign_deadline = permit_sign_deadline
         self.permit_sign_v, self.permit_sign_r, self.permit_sign_s = permit_sign_v, permit_sign_r, permit_sign_s
+        raise NotImplementedError("Not yet implemented/validated")
