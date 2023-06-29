@@ -18,6 +18,7 @@ REMOTE_NODE_URL = codecs.decode(b'x\x9c\x05\xc1[\x12\x80 \x08\x00\xc0\x1b\x89\x8
 ETH_FORK_NODE_URL = os.environ.get("RR_ETH_FORK_URL", "https://rpc.ankr.com/eth")
 LOCAL_NODE_PORT = 8546
 LOCAL_NODE_DEFAULT_BLOCK = 17565000
+HARDHAT_STANDALONE = os.environ.get("RR_HARDHAT_STANDALONE", False)
 ETH_LOCAL_NODE_URL = f"http://127.0.0.1:{LOCAL_NODE_PORT}"
 DIR_OF_THIS_FILE = os.path.dirname(os.path.abspath(__file__))
 
@@ -87,30 +88,33 @@ def hardhat_reset_state(w3, url, block):
 
 @pytest.fixture(scope='session')
 def local_node(request):
-    try:
-        subprocess.check_call(["npm", "--version"])
-        if "hardhat" not in json.loads(subprocess.check_output(["npm", "list", "--json"])).get("dependencies", {}):
-            raise subprocess.CalledProcessError
-    except subprocess.CalledProcessError:
-        raise RuntimeError('Hardhat is not installed properly. Check the README for instructions.')
+    if not HARDHAT_STANDALONE:
+        try:
+            subprocess.check_call(["npm", "--version"])
+            if "hardhat" not in json.loads(subprocess.check_output(["npm", "list", "--json"])).get("dependencies", {}):
+                raise subprocess.CalledProcessError
+        except subprocess.CalledProcessError:
+            raise RuntimeError('Hardhat is not installed properly. Check the README for instructions.')
 
-    log_filename = "/tmp/rr_hardhat_log.txt"
-    logger.info(f"Writing Hardhat log to {log_filename}")
-    hardhat_log = open(log_filename, "w")
-    node = SimpleDaemonRunner(
-        cmd=f"npx hardhat node --show-stack-traces --fork '{ETH_FORK_NODE_URL}' --fork-block-number {LOCAL_NODE_DEFAULT_BLOCK} --port {LOCAL_NODE_PORT}",
-        popen_kwargs={'stdout': hardhat_log, 'stderr': hardhat_log}
-    )
-    node.start()
+        log_filename = "/tmp/rr_hardhat_log.txt"
+        logger.info(f"Writing Hardhat log to {log_filename}")
+        hardhat_log = open(log_filename, "w")
+        node = SimpleDaemonRunner(
+            cmd=f"npx hardhat node --show-stack-traces --fork '{ETH_FORK_NODE_URL}' --fork-block-number {LOCAL_NODE_DEFAULT_BLOCK} --port {LOCAL_NODE_PORT}",
+            popen_kwargs={'stdout': hardhat_log, 'stderr': hardhat_log}
+        )
+        node.start()
+
+        def stop():
+            node.stop()
+
+        request.addfinalizer(stop)
 
     wait_for_port(LOCAL_NODE_PORT)
+
     w3 = Web3(HTTPProvider(f"http://localhost:{LOCAL_NODE_PORT}"))
+    hardhat_reset_state(w3, url=ETH_FORK_NODE_URL, block=LOCAL_NODE_DEFAULT_BLOCK)
     assert w3.eth.block_number == LOCAL_NODE_DEFAULT_BLOCK
-
-    def stop():
-        node.stop()
-
-    request.addfinalizer(stop)
     return w3
 
 
