@@ -97,6 +97,15 @@ status = check(txs=[approve, add_liquidity],
 ...
 ```
 
+## Development
+
+Install the python dev dependencies: `pip install -r requirements-dev.txt`
+Install Hardhat by running `npm install` in the project's root directory.
 
 
+If the tests are not working it may be due to hardhat not being correctly installed or some
+other incompatibility. In this case run hardhat manually in fork mode on port 8546 with:
 
+`npx hardhat node --show-stack-traces --fork 'URL' --port 8546`
+
+and then run the tests with `RR_HARDHAT_STANDALONE=1 pytest`.
