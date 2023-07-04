@@ -2,7 +2,7 @@ from enum import IntEnum
 
 from roles_royce.constants import ETHAddr, CrossChainAddr
 from roles_royce.protocols.base import Method, InvalidArgument, AvatarSafeAddress, Address
-from roles_royce.protocols.eth.aave import Approve
+from roles_royce.protocols.eth.aave_v2 import Approve
 
 class ApproveForBooster(Approve):
     """approve LPToken with AURABooster as spender"""
