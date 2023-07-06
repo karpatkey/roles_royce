@@ -90,8 +90,8 @@ def hardhat_reset_state(w3, url, block):
 def local_node(request):
     if not HARDHAT_STANDALONE:
         try:
-            subprocess.check_call(["npm", "--version"])
-            if "hardhat" not in json.loads(subprocess.check_output(["npm", "list", "--json"])).get("dependencies", {}):
+            subprocess.check_call(["npm", "--version"], shell=True)
+            if "hardhat" not in json.loads(subprocess.check_output(["npm", "list", "--json"]), shell=True).get("dependencies", {}):
                 raise subprocess.CalledProcessError
         except subprocess.CalledProcessError:
             raise RuntimeError('Hardhat is not installed properly. Check the README for instructions.')
@@ -101,7 +101,7 @@ def local_node(request):
         hardhat_log = open(log_filename, "w")
         node = SimpleDaemonRunner(
             cmd=f"npx hardhat node --show-stack-traces --fork '{ETH_FORK_NODE_URL}' --fork-block-number {LOCAL_NODE_DEFAULT_BLOCK} --port {LOCAL_NODE_PORT}",
-            popen_kwargs={'stdout': hardhat_log, 'stderr': hardhat_log}
+            popen_kwargs={'stdout': hardhat_log, 'stderr': hardhat_log, 'shell': True}
         )
         node.start()
 
