@@ -1,27 +1,24 @@
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, Address
+from roles_royce.protocols.base import Method, Address, AvatarSafeAddress, Approve
 
 
-class Approve(Method):
-    """approve stETH with wstETH as spender"""
-    name = "approve"
-    in_signature = [("spender", "address"), ("amount", "uint256")]
+class ApproveWithdrawalStETHwithWstETH(Approve):
+    """approve stETH withdrawal with wstETH as spender"""
     fixed_arguments = {"spender": ETHAddr.wstETH}
-    target_address = ETHAddr.stETH
+    token = ETHAddr.stETH
 
-    def __init__(self, amount: int):
-        super().__init__()
-        self.args.amount = amount
 
-class ApproveWithdrawalStETH(Approve):
-    """approve stETH with withdrawal contract as spender"""
+class ApproveWithdrawalStETHWithUnstETH(Approve):
+    """approve stETH withdrawal with unstETH as spender"""
     fixed_arguments = {"spender": ETHAddr.unstETH}
-    target_address = ETHAddr.stETH
+    token = ETHAddr.stETH
+
 
 class ApproveWithdrawalWstETH(Approve):
-    """approve wstETH with withdrawal contract as spender"""
+    """approve wstETH withdrawal with unstETH as spender"""
     fixed_arguments = {"spender": ETHAddr.unstETH}
-    target_address = ETHAddr.wstETH
+    token = ETHAddr.wstETH
+
 
 class Deposit(Method):
     """sender deposits ETH and receives stETH"""

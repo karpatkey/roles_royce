@@ -1,27 +1,7 @@
 from enum import IntEnum
 
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, InvalidArgument, AvatarSafeAddress, Address
-
-
-class Approve(Method):
-    name = "approve"
-    in_signature = [("spender", "address"), ("amount", "uint256")]
-    token = None
-
-    def __init__(self, amount: int):
-        super().__init__()
-        self.args.amount = amount
-
-    @property
-    def target_address(self):
-        return self.token
-
-
-class ApproveForToken(Approve):
-    def __init__(self, token: Address, amount: int):
-        super().__init__(amount)
-        self.token = token
+from roles_royce.protocols.base import Method, InvalidArgument, AvatarSafeAddress, Address, Approve, ApproveForToken
 
 
 class ApproveForAaveLendingPoolV2(ApproveForToken):
