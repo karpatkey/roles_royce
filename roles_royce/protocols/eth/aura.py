@@ -22,3 +22,14 @@ class WithdrawAndUndwrapStakedBPT(Method):
         super().__init__()
         self.args.amount = amount
 
+class DepositBPT(Method):
+    """deposit BPT token"""
+    name = "deposit"
+    in_signature = [("pool_id", "uint256"), ("amount", "uint256"), ("stake", "bool")]
+    fixed_arguments = {"stake": True}
+    target_address = ETHAddr.AURABooster
+
+    def __init__(self, pool_id: int, amount: int):
+        super().__init__()
+        self.args.pool_id = pool_id
+        self.args.amount = amount    
