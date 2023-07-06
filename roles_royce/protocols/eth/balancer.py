@@ -2,14 +2,14 @@ from enum import IntEnum
 import eth_abi
 from roles_royce.constants import ETHAddr, CrossChainAddr
 from roles_royce.protocols.base import Method, InvalidArgument, AvatarSafeAddress, Address
-from roles_royce.protocols.base import ApproveForToken
+from roles_royce.protocols.base import BaseApproveForToken
 
 
 # Refs
 # StablePool encoding https://github.com/balancer/balancer-v2-monorepo/blob/d2c47f13aa5f7db1b16e37f37c9631b9a38f25a4/pkg/balancer-js/src/pool-stable/encoder.ts
 
 
-class ApproveForVault(ApproveForToken):
+class ApproveForVault(BaseApproveForToken):
     """approve Token with BalancerVault as spender"""
     fixed_arguments = {"spender": CrossChainAddr.BalancerVault}
 

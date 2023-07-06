@@ -1,32 +1,32 @@
 from enum import IntEnum
 
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, InvalidArgument, AvatarSafeAddress, Address, Approve, ApproveForToken
+from roles_royce.protocols.base import Method, InvalidArgument, AvatarSafeAddress, Address, BaseApprove, BaseApproveForToken
 
 
-class ApproveForAaveLendingPoolV2(ApproveForToken):
+class ApproveForAaveLendingPoolV2(BaseApproveForToken):
     """approve Token with AaveLendingPoolV2 as spender"""
     fixed_arguments = {"spender": ETHAddr.AAVE_V2_LendingPool}
 
 
-class ApproveForStkAAVE(Approve):
+class ApproveForStkAAVE(BaseApprove):
     """Approve AAVE with stkAAVE as spender"""
     fixed_arguments = {"spender": ETHAddr.stkAAVE}
     token = ETHAddr.AAVE
 
 
-class ApproveForStkABPT(Approve):
+class ApproveForStkABPT(BaseApprove):
     """Approve ABPT with stkABPT as spender"""
     fixed_arguments = {"spender": ETHAddr.stkABPT}
     token = ETHAddr.ABPT
 
 
-class ApproveForParaSwapRepay(ApproveForToken):
+class ApproveForParaSwapRepay(BaseApproveForToken):
     """Approve aToken with ParaSwapRepayAdapter as spender"""
     fixed_arguments = {"spender": ETHAddr.AAVE_V2_ParaSwapRepayAdapter}
 
 
-class ApproveForParaSwapLiquidity(ApproveForToken):
+class ApproveForParaSwapLiquidity(BaseApproveForToken):
     """Approve aToken with ParaSwapLiquidityAdapter as spender"""
     fixed_arguments = {"spender": ETHAddr.AAVE_V2_ParaSwapLiquidityAdapter}
 

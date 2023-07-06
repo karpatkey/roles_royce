@@ -1,20 +1,20 @@
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, Address, AvatarSafeAddress, Approve
+from roles_royce.protocols.base import Method, Address, AvatarSafeAddress, BaseApprove
 
 
-class ApproveWithdrawalStETHwithWstETH(Approve):
+class ApproveWithdrawalStETHwithWstETH(BaseApprove):
     """approve stETH withdrawal with wstETH as spender"""
     fixed_arguments = {"spender": ETHAddr.wstETH}
     token = ETHAddr.stETH
 
 
-class ApproveWithdrawalStETHWithUnstETH(Approve):
+class ApproveWithdrawalStETHWithUnstETH(BaseApprove):
     """approve stETH withdrawal with unstETH as spender"""
     fixed_arguments = {"spender": ETHAddr.unstETH}
     token = ETHAddr.stETH
 
 
-class ApproveWithdrawalWstETH(Approve):
+class ApproveWithdrawalWstETH(BaseApprove):
     """approve wstETH withdrawal with unstETH as spender"""
     fixed_arguments = {"spender": ETHAddr.unstETH}
     token = ETHAddr.wstETH

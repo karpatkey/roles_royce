@@ -1,8 +1,8 @@
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, ApproveForToken
+from roles_royce.protocols.base import Method, BaseApproveForToken
 
 
-class ApproveForBooster(ApproveForToken):
+class ApproveForBooster(BaseApproveForToken):
     """approve LPToken with AURABooster as spender"""
     fixed_arguments = {"spender": ETHAddr.AURABooster}
 

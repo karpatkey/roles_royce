@@ -97,7 +97,8 @@ class Method:
             value = _type
         return value
 
-class Approve(Method):
+
+class BaseApprove(Method):
     """Inherit from this class to define an approval that the token is fixed.
 
     Specify the token using the token class attribute"""
@@ -116,8 +117,9 @@ class Approve(Method):
         return self.token
 
 
-class ApproveForToken(Approve):
+class BaseApproveForToken(BaseApprove):
     """Inherit from this class to define an approval that the token is specified dynamically."""
+
     def __init__(self, token: Address, amount: int):
         self.token = token
         super().__init__(amount)
