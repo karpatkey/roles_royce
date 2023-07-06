@@ -88,7 +88,8 @@ def test_swap_borrow_rate_mode():
 
 
 def test_repay_eth():
-    method = aave.RepayETH(eth_amount=10, amount=123, interest_rate_mode=aave.InterestRateMode.VARIABLE, avatar=AVATAR)
+    method = aave.RepayETH(eth_amount=10, interest_rate_mode=aave.InterestRateMode.VARIABLE, avatar=AVATAR)
+    assert method.args.amount == 10
     assert method.value == 10
 
 

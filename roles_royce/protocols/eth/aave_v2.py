@@ -251,9 +251,9 @@ class RepayETH(Method):
     fixed_arguments = {'address': ETHAddr.AAVE_V2_LendingPool, 'on_behalf_of': AvatarSafeAddress}
     target_address = ETHAddr.AAVE_V2_WrappedTokenGateway
 
-    def __init__(self, eth_amount: int, amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
+    def __init__(self, eth_amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
         super().__init__(value=eth_amount, avatar=avatar)
-        self.args.amount = amount
+        self.args.amount = eth_amount
         self.args.interest_rate_mode = interest_rate_mode
 
 
