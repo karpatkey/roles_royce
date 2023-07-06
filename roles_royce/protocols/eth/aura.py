@@ -17,6 +17,7 @@ class WithdrawAndUndwrapStakedBPT(Method):
         super().__init__()
         self.args.amount = amount
 
+
 class DepositBPT(Method):
     """deposit BPT token"""
     name = "deposit"
@@ -27,4 +28,4 @@ class DepositBPT(Method):
     def __init__(self, pool_id: int, amount: int):
         super().__init__()
         self.args.pool_id = pool_id
-        self.args.amount = amount    
+        self.args.amount = amount
