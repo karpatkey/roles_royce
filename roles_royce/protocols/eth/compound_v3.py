@@ -1,11 +1,11 @@
 import eth_abi
-from enum import StrEnum
+from enum import Enum
 from web3 import Web3
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApproveForToken
 
 
-class Comet(StrEnum):
+class Comet(Enum):
     cUSDCv3 = "0xc3d688B66703497DAA19211EEdff47f25384cdc3"
     cWETHv3 = "0xA17581A9E3356d9A858b789D68B4d866e593aE94"
 
@@ -23,7 +23,7 @@ class Approve(BaseApproveForToken):
 
     def __init__(self, comet: Comet, token: Address, amount: int):
         super().__init__(token=token, amount=amount)
-        self.args.spender = comet
+        self.args.spender = comet.value
 
 
 class Allow(Method):
@@ -36,7 +36,7 @@ class Allow(Method):
     fixed_arguments = {"manager": ETHAddr.COMPOUND_Bulker, "is_allowed": True}
 
     def __init__(self, comet: Comet):
-        self.target_address = comet
+        self.target_address = comet.value
         super().__init__()
 
 
@@ -51,7 +51,7 @@ class Supply(Method):
 
     def __init__(self, comet: Comet, token: Address, amount: int):
         super().__init__()
-        self.target_address = comet
+        self.target_address = comet.value
         self.args.asset = token
         self.args.amount = amount
 
@@ -68,7 +68,7 @@ class SupplyETH(_Invoke):
 
     def __init__(self, comet: Comet, avatar: Address, amount: int):
         super().__init__(value=amount)
-        self.args.data = [eth_abi.encode(types=('address', 'address', 'uint256'), args=[comet, avatar, amount])]
+        self.args.data = [eth_abi.encode(types=('address', 'address', 'uint256'), args=[comet.value, avatar, amount])]
 
 
 class Withdraw(Method):
@@ -82,7 +82,7 @@ class Withdraw(Method):
 
     def __init__(self, comet: Comet, token: Address, amount: int):
         super().__init__()
-        self.target_address = comet
+        self.target_address = comet.value
         self.args.asset = token
         self.args.amount = amount
 
@@ -93,7 +93,7 @@ class WithdrawETH(_Invoke):
 
     def __init__(self, comet: Comet, avatar: Address, amount: int):
         super().__init__()
-        self.args.data = [eth_abi.encode(types=('address', 'address', 'uint256'), args=[comet, avatar, amount])]
+        self.args.data = [eth_abi.encode(types=('address', 'address', 'uint256'), args=[comet.value, avatar, amount])]
 
 
 class Borrow(Withdraw):
@@ -113,5 +113,5 @@ class Claim(Method):
 
     def __init__(self, comet: Comet, avatar: Address, should_accrue: bool):
         super().__init__(avatar=avatar)
-        self.args.comet = comet
+        self.args.comet = comet.value
         self.args.should_accrue = should_accrue
