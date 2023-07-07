@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from roles_royce import Operation
 from web3 import Web3
 
-AvatarSafeAddress = object()
+AvatarAddress = object()
 Address = str
 
 
@@ -71,7 +71,7 @@ class Method:
         else:
             if arg_name in self.fixed_arguments:
                 value = self.fixed_arguments[arg_name]
-                if value is AvatarSafeAddress:
+                if value is AvatarAddress:
                     value = self.avatar
             else:
                 value = getattr(self.args, arg_name)

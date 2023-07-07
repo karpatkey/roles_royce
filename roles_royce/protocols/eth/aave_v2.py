@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, InvalidArgument, AvatarSafeAddress, Address, BaseApprove, BaseApproveForToken
+from roles_royce.protocols.base import Method, InvalidArgument, AvatarAddress, Address, BaseApprove, BaseApproveForToken
 
 
 class ApproveForAaveLendingPoolV2(BaseApproveForToken):
@@ -35,7 +35,7 @@ class DepositToken(Method):
     """Sender deposits Token and receives aToken in exchange"""
     name = "deposit"
     in_signature = [("asset", "address"), ("amount", "uint256"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
-    fixed_arguments = {"on_behalf_of": AvatarSafeAddress, "referral_code": 0}
+    fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
     target_address = ETHAddr.AAVE_V2_LendingPool
 
     def __init__(self, asset: Address, amount: int, avatar: Address):
@@ -48,7 +48,7 @@ class DepositETH(Method):
     """Sender deposits ETH and receives aETH in exchange"""
     name = "depositETH"
     in_signature = [("address", "address"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
-    fixed_arguments = {"address": ETHAddr.AAVE_V2_LendingPool, "on_behalf_of": AvatarSafeAddress, "referral_code": 0}
+    fixed_arguments = {"address": ETHAddr.AAVE_V2_LendingPool, "on_behalf_of": AvatarAddress, "referral_code": 0}
     target_address = ETHAddr.AAVE_V2_WrappedTokenGateway
 
     def __init__(self, eth_amount: int, avatar: Address):
@@ -59,7 +59,7 @@ class WithdrawToken(Method):
     """Sender redeems aToken and withdraws Token"""
     name = "withdraw"
     in_signature = [("asset", "address"), ("amount", "uint256"), ("to", "address")]
-    fixed_arguments = {"to": AvatarSafeAddress}
+    fixed_arguments = {"to": AvatarAddress}
     target_address = ETHAddr.AAVE_V2_LendingPool
 
     def __init__(self, asset: Address, amount: int, avatar: Address):
@@ -72,7 +72,7 @@ class WithdrawETH(Method):
     """Sender redeems aETH and withdraws ETH"""
     name = "withdrawETH"
     in_signature = [("address", "address"), ("amount", "uint256"), ("to", "address")]
-    fixed_arguments = {"address": ETHAddr.AAVE_V2_LendingPool, "to": AvatarSafeAddress}
+    fixed_arguments = {"address": ETHAddr.AAVE_V2_LendingPool, "to": AvatarAddress}
     target_address = ETHAddr.AAVE_V2_WrappedTokenGateway
 
     def __init__(self, amount: int, avatar: Address):
@@ -108,7 +108,7 @@ class Borrow(Method):
     name = "borrow"
     in_signature = [("asset", "address"), ("amount", "uint256"), ("interest_rate_mode", "uint256"),
                     ("referral_code", "uint16"), ("on_behalf_of", "address")]
-    fixed_arguments = {"referral_code": 0, "on_behalf_of": AvatarSafeAddress}
+    fixed_arguments = {"referral_code": 0, "on_behalf_of": AvatarAddress}
     target_address = ETHAddr.AAVE_V2_LendingPool
 
     def __init__(self, asset: Address, amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
@@ -150,7 +150,7 @@ class StakeAAVE(Method):
     """Stake AAVE in Aave’s safety module"""
     name = 'stake'
     in_signature = [("on_behalf_of", "address"), ("amount", "uint256")]
-    fixed_arguments = {"on_behalf_of": AvatarSafeAddress}
+    fixed_arguments = {"on_behalf_of": AvatarAddress}
     target_address = ETHAddr.stkAAVE
 
     def __init__(self, avatar: Address, amount: int):
@@ -167,7 +167,7 @@ class UnstakeAAVE(Method):
     """Unstake AAVE. Can only be called during the 2 days unstaking window after the 10 days cooldown period"""
     name = 'redeem'
     in_signature = [('to', 'address'), ('amount', 'uint256')]
-    fixed_arguments = {'to': AvatarSafeAddress}
+    fixed_arguments = {'to': AvatarAddress}
     target_address = ETHAddr.stkAAVE
 
     def __init__(self, avatar: Address, amount: int):
@@ -197,7 +197,7 @@ class ClaimAAVERewards(Method):
     """Claim AAVE rewards accrued from staking AAVE"""
     name = 'claimRewards'
     in_signature = [('to', 'address'), ('amount', 'uint256')]
-    fixed_arguments = {'to': AvatarSafeAddress}
+    fixed_arguments = {'to': AvatarAddress}
     target_address = ETHAddr.stkAAVE
 
     def __init__(self, avatar: Address, amount: int):
@@ -214,7 +214,7 @@ class Repay(Method):
     """Repay borrowed Token"""
     name = 'repay'
     in_signature = [('asset', 'address'), ('amount', 'uint256'), ('interest_rate_mode', 'uint256'), ('on_behalf_of', 'address')]
-    fixed_arguments = {'on_behalf_of': AvatarSafeAddress}
+    fixed_arguments = {'on_behalf_of': AvatarAddress}
     target_address = ETHAddr.AAVE_V2_LendingPool
 
     def __init__(self, asset: Address, amount: int, interest_rate_mode: InterestRateMode):
@@ -228,7 +228,7 @@ class RepayETH(Method):
     """Repay borrowed ETH"""
     name = 'repayETH'
     in_signature = [('address', 'address'), ('amount', 'uint256'), ('interest_rate_mode', 'uint256'), ('on_behalf_of', 'address')]
-    fixed_arguments = {'address': ETHAddr.AAVE_V2_LendingPool, 'on_behalf_of': AvatarSafeAddress}
+    fixed_arguments = {'address': ETHAddr.AAVE_V2_LendingPool, 'on_behalf_of': AvatarAddress}
     target_address = ETHAddr.AAVE_V2_WrappedTokenGateway
 
     def __init__(self, eth_amount: int, interest_rate_mode: InterestRateMode, avatar: Address):

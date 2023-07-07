@@ -1,5 +1,5 @@
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, Address, AvatarSafeAddress, BaseApprove
+from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApprove
 
 
 class ApproveWithdrawalStETHwithWstETH(BaseApprove):
@@ -61,7 +61,7 @@ class RequestWithdrawalsStETH(Method):
     Locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue"""
     name = "requestWithdrawals"
     in_signature = [("amounts", "uint256[]"), ("owner", "address")]
-    fixed_arguments = {"owner": AvatarSafeAddress}
+    fixed_arguments = {"owner": AvatarAddress}
     target_address = ETHAddr.unstETH
 
     def __init__(self, amounts: list, avatar: Address):
@@ -87,7 +87,7 @@ class RequestWithdrawalsWithPermitStETH(Method):
          ("r", "bytes32"),
          ("s", "bytes32"))
     ]
-    fixed_arguments = {"owner": AvatarSafeAddress}
+    fixed_arguments = {"owner": AvatarAddress}
     target_address = ETHAddr.unstETH
 
     def __init__(self, amounts: list, avatar: Address):
