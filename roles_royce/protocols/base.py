@@ -96,3 +96,30 @@ class Method:
         else:
             value = _type
         return value
+
+
+class BaseApprove(Method):
+    """Inherit from this class to define an approval that the token is fixed.
+
+    Specify the token using the token class attribute"""
+    name = "approve"
+    in_signature = [("spender", "address"), ("amount", "uint256")]
+    token = None
+
+    def __init__(self, amount: int):
+        if self.token is None:
+            raise NotImplementedError("Subclass must define a token")
+        super().__init__()
+        self.args.amount = amount
+
+    @property
+    def target_address(self):
+        return self.token
+
+
+class BaseApproveForToken(BaseApprove):
+    """Inherit from this class to define an approval that the token is specified dynamically."""
+
+    def __init__(self, token: Address, amount: int):
+        self.token = token
+        super().__init__(amount)
