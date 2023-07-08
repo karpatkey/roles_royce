@@ -29,7 +29,7 @@ def test_approve_method_with_roles(web3_eth):
     ROLES_MOD_ADDRESS = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
     REVOKER_ADDRESS = "0xf099e0f6604BDE0AA860B39F7da75770B34aC804"
     roles_mod = RolesMod(role=ROLE, contract_address=ROLES_MOD_ADDRESS, account=REVOKER_ADDRESS, web3=web3_eth)
-    check_transaction = roles_mod.check(method.target_address, method.data)
+    check_transaction = roles_mod.check(method.target_address, method.data, block=17603159)
     assert check_transaction
 
 
@@ -96,7 +96,7 @@ def test_repay_eth():
 def test_cooldown(web3_eth):
     method = aave.CooldownStkAAVE()
     roles_mod = RolesMod(role=1, contract_address=ROLES_MOD_ADDRESS, account=MANAGER_SAFE_ADDRESS, web3=web3_eth)
-    check_transaction = roles_mod.check(method.target_address, method.data)
+    check_transaction = roles_mod.check(method.target_address, method.data, block=17603159)
     assert check_transaction
 
 
@@ -104,7 +104,7 @@ def test_claim(web3_eth):
     method = aave.ClaimAAVERewards(avatar=AVATAR, amount=10)
 
     roles_mod = RolesMod(role=1, contract_address=ROLES_MOD_ADDRESS, account=MANAGER_SAFE_ADDRESS, web3=web3_eth)
-    check_transaction = roles_mod.check(method.target_address, method.data)
+    check_transaction = roles_mod.check(method.target_address, method.data, block=17603159)
     assert check_transaction
 
 

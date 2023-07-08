@@ -1,7 +1,7 @@
 from enum import IntEnum
 import eth_abi
 from roles_royce.constants import ETHAddr, CrossChainAddr
-from roles_royce.protocols.base import Method, InvalidArgument, AvatarSafeAddress, Address
+from roles_royce.protocols.base import Method, InvalidArgument, AvatarAddress, Address
 from roles_royce.protocols.base import BaseApproveForToken
 
 
@@ -43,7 +43,7 @@ class Exit(Method):
             ("to_internal_balance", "bool"))
          )
     )
-    fixed_arguments = {"sender": AvatarSafeAddress, "recipient": AvatarSafeAddress, "to_internal_balance": False}
+    fixed_arguments = {"sender": AvatarAddress, "recipient": AvatarAddress, "to_internal_balance": False}
     target_address = CrossChainAddr.BalancerVault
     exit_kind: StablePoolExitKind
     user_data_abi = None
