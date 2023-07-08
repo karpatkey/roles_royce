@@ -186,15 +186,19 @@ def test_safe_and_roles(local_node):
     assert send_approve
 
     # deposit tokens in balancer and stake in aura
-    deposit_balancer = balancer.SingleAssetJoin
-    deposit_aura = aura.DepositBPT
+    deposit_balancer = balancer.SingleAssetJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",avatar=safe.address,
+                                            assets=["0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0","0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"],
+                                            max_amounts_in=[0,1_000_000_000_000_000], bpt_amount_out=1_000_000_000_000_000,join_token_index=1)
+    deposit_aura = aura.DepositBPT(pool_id=115,amount=1_000_000_000_000_000)
     send_deposits = send([deposit_balancer,deposit_aura], role=1, private_key=test_account1_private_key, roles_mod_address=roles_ctract_address,
                         blockchain=Chain.ETHEREUM, web3=w3)
     assert send_deposits
 
     # withdraw tokens from aura and balancer
-    withdraw_aura = aura.WithdrawAndUndwrapStakedBPT()
-    withdraw_balancer = balancer.SingleAssetExit()
+    withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(amount=1_000_000_000_000_000)
+    withdraw_balancer = balancer.SingleAssetExit(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",avatar=safe.address,
+                                            assets=["0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0","0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"],
+                                            min_amounts_out=[0,0], bpt_amount_in=1_000_000_000_000_000,exit_token_index=1)
     send_approve = send([withdraw_aura,withdraw_balancer], role=4, private_key=test_account4_private_key, roles_mod_address=roles_ctract_address,
                         blockchain=Chain.ETHEREUM, web3=w3)
     assert send_approve
