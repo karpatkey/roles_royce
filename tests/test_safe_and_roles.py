@@ -199,7 +199,6 @@ def test_safe_and_roles(local_node):
                 to=safe.address, amount=1_000_000_000_000_000)
 
     # deposit tokens in balancer and stake in aura
-    breakpoint()
     deposit_balancer = balancer.SingleAssetQueryJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
                                                      avatar=safe.address, assets=[ETHAddr.wstETH, ETHAddr.WETH],
                                                      max_amounts_in=[0, 1_000_000_000_000_000], bpt_amount_out=0, join_token_index=1)
