@@ -6,7 +6,7 @@ from eth_account import Account
 
 from roles_royce.protocols.eth import balancer,aura
 from roles_royce import send, Chain
-from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi, steth_contract_abi
+from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi, steth_contract_abi, aura_rewards_contract_abi, bpt_contract_abi
 from roles_royce.utils import MULTISENDS
 from roles_royce.constants import ETHAddr
 from .utils import local_node, local_node_reset, ETH_LOCAL_NODE_URL, hardhat_unlock_account
@@ -180,7 +180,7 @@ def test_safe_and_roles(local_node):
 
     # approve tokens in balancer and aura
     approve_vault = balancer.ApproveForVault(token="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",amount=1_000_000_000_000_000_000)
-    approve_aura_booster = aura.ApproveForBooster(token="0x32296969ef14eb0c6d29669c550d4a0449130230",amount=1_000_000_000_000_000_000)
+    approve_aura_booster = aura.ApproveForBooster(token="0x32296969Ef14EB0c6d29669C550D4a0449130230",amount=1_000_000_000_000_000_000)
     send_approve = send([approve_vault,approve_aura_booster], role=2, private_key=test_account2_private_key, roles_mod_address=roles_ctract_address,
                         blockchain=Chain.ETHEREUM, web3=w3)
     assert send_approve
@@ -189,10 +189,25 @@ def test_safe_and_roles(local_node):
     deposit_balancer = balancer.SingleAssetJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",avatar=safe.address,
                                             assets=["0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0","0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"],
                                             max_amounts_in=[0,1_000_000_000_000_000], bpt_amount_out=1_000_000_000_000_000,join_token_index=1)
-    deposit_aura = aura.DepositBPT(pool_id=115,amount=1_000_000_000_000_000)
-    send_deposits = send([deposit_balancer,deposit_aura], role=1, private_key=test_account1_private_key, roles_mod_address=roles_ctract_address,
+
+    send_bpt_deposits = send([deposit_balancer], role=1, private_key=test_account1_private_key, roles_mod_address=roles_ctract_address,
                         blockchain=Chain.ETHEREUM, web3=w3)
-    assert send_deposits
+    assert send_bpt_deposits
+
+    # check that the BPTs are staked in AURA and are in the safe
+    bpt_contract_address = "0x32296969Ef14EB0c6d29669C550D4a0449130230"
+    bpt_contract = w3.eth.contract(address=bpt_contract_address, abi=bpt_contract_abi)
+    bpt_amount = bpt_contract.functions.balanceOf(safe.address).call()  
+
+    deposit_aura = aura.DepositBPT(pool_id=115,amount=bpt_amount)
+    send_aura_deposits = send([deposit_aura], role=1, private_key=test_account1_private_key, roles_mod_address=roles_ctract_address,
+                        blockchain=Chain.ETHEREUM, web3=w3)
+    assert send_aura_deposits
+
+    # check that the BPTs are staked in AURA and are in the safe
+    aura_rewards_contract_address = "0x59D66C58E83A26d6a0E35114323f65c3945c89c1"
+    aura_rewards_contract = w3.eth.contract(address=aura_rewards_contract_address, abi=aura_rewards_contract_abi)
+    assert aura_rewards_contract.functions.balanceOf(safe.address).call() == bpt_amount   
 
     # withdraw tokens from aura and balancer
     withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(amount=1_000_000_000_000_000)
@@ -204,8 +219,8 @@ def test_safe_and_roles(local_node):
     assert send_approve
 
     # check that the stETH tokens are in the safe
-    steth_contract_address = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
-    steth_contract = w3.eth.contract(address=steth_contract_address, abi=steth_contract_abi)
+    aura_rewards_contract_address = "0x59D66C58E83A26d6a0E35114323f65c3945c89c1"
+    steth_contract = w3.eth.contract(address=aura_rewards_contract_address, abi=aura_rewards_contract_abi)
     assert steth_contract.functions.balanceOf(safe.address).call() == 999999999999999
 
 

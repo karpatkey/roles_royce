@@ -15,7 +15,7 @@ class ApproveForVault(Approve):
 
     def __init__(self, token: Address, amount: int):
         super().__init__(amount)
-        self.args.token = token
+        self.token = token
 
 
 # There is another ExitKind that is for Weighted Pools
