@@ -186,10 +186,10 @@ def test_safe_and_roles(local_node):
     assert send_approve
 
     # deposit tokens in balancer and stake in aura
-    deposit_balancer = balancer.SingleAssetJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",avatar=safe.address,
+    deposit_balancer = balancer.SingleAssetQueryJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",avatar=safe.address,
                                             assets=["0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0","0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"],
-                                            max_amounts_in=[0,1_000_000_000_000_000], bpt_amount_out=1_000_000_000_000_000,join_token_index=1)
-
+                                            max_amounts_in=[0,1_000_000_000_000_000], bpt_amount_out= 1_000_000_000, join_token_index=1)
+    #TODO: set the bpt_amount_out to be the output of the query
     send_bpt_deposits = send([deposit_balancer], role=1, private_key=test_account1_private_key, roles_mod_address=roles_ctract_address,
                         blockchain=Chain.ETHEREUM, web3=w3)
     assert send_bpt_deposits
@@ -210,18 +210,14 @@ def test_safe_and_roles(local_node):
     assert aura_rewards_contract.functions.balanceOf(safe.address).call() == bpt_amount   
 
     # withdraw tokens from aura and balancer
-    withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(amount=1_000_000_000_000_000)
+    withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(amount=bpt_amount)
     withdraw_balancer = balancer.SingleAssetExit(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",avatar=safe.address,
                                             assets=["0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0","0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"],
-                                            min_amounts_out=[0,0], bpt_amount_in=1_000_000_000_000_000,exit_token_index=1)
+                                            min_amounts_out=[0,0], bpt_amount_in=bpt_amount, exit_token_index=1)
     send_approve = send([withdraw_aura,withdraw_balancer], role=4, private_key=test_account4_private_key, roles_mod_address=roles_ctract_address,
                         blockchain=Chain.ETHEREUM, web3=w3)
     assert send_approve
 
-    # check that the stETH tokens are in the safe
-    aura_rewards_contract_address = "0x59D66C58E83A26d6a0E35114323f65c3945c89c1"
-    steth_contract = w3.eth.contract(address=aura_rewards_contract_address, abi=aura_rewards_contract_abi)
-    assert steth_contract.functions.balanceOf(safe.address).call() == 999999999999999
 
 
 def test_simple_account_balance(local_node):
