@@ -1,21 +1,17 @@
 from enum import IntEnum
 import eth_abi
 from roles_royce.constants import ETHAddr, CrossChainAddr
-from roles_royce.protocols.base import Method, InvalidArgument, AvatarSafeAddress, Address
-from roles_royce.protocols.eth.aave import Approve
+from roles_royce.protocols.base import Method, InvalidArgument, AvatarAddress, Address
+from roles_royce.protocols.base import BaseApproveForToken
 
 
 # Refs
 # StablePool encoding https://github.com/balancer/balancer-v2-monorepo/blob/d2c47f13aa5f7db1b16e37f37c9631b9a38f25a4/pkg/balancer-js/src/pool-stable/encoder.ts
 
 
-class ApproveForVault(Approve):
+class ApproveForVault(BaseApproveForToken):
     """approve Token with BalancerVault as spender"""
     fixed_arguments = {"spender": CrossChainAddr.BalancerVault}
-
-    def __init__(self, token: Address, amount: int):
-        super().__init__(amount)
-        self.token = token
 
 
 # There is another ExitKind that is for Weighted Pools
@@ -47,7 +43,7 @@ class Exit(Method):
             ("to_internal_balance", "bool"))
          )
     )
-    fixed_arguments = {"sender": AvatarSafeAddress, "recipient": AvatarSafeAddress, "to_internal_balance": False}
+    fixed_arguments = {"sender": AvatarAddress, "recipient": AvatarAddress, "to_internal_balance": False}
     target_address = CrossChainAddr.BalancerVault
     exit_kind: StablePoolExitKind
     user_data_abi = None
@@ -119,7 +115,7 @@ class CustomExit(Exit):
 
 class QueryExitMixin:
     name = "queryExit"
-    target_address = '0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5'
+    target_address = ETHAddr.BALANCER_Queries
     out_signature = [("bpt_in", "uint256"), ("amounts_out", "uint256[]")]
 
 class SingleAssetQueryExit(QueryExitMixin, SingleAssetExit):
@@ -157,10 +153,10 @@ class Join(Method):
             ("assets", "address[]"),  # list of tokens, ordered numerically
             ("max_amounts_in", "uint256[]"),  # the higher limits for the tokens to deposit
             ("user_data", "bytes"),  # userData encodes a ExitKind to tell the pool what style of join you're performing
-            ("to_internal_balance", "bool"))
+            ("from_internal_balance", "bool"))
          )
     )
-    fixed_arguments = {"sender": AvatarSafeAddress, "recipient": AvatarSafeAddress, "to_internal_balance": False}
+    fixed_arguments = {"sender": AvatarAddress, "recipient": AvatarAddress, "from_internal_balance": False}
     target_address = CrossChainAddr.BalancerVault
     exit_kind: StablePoolJoinKind
     user_data_abi = None
@@ -171,7 +167,7 @@ class Join(Method):
         self.args.assets = assets
         self.args.max_amounts_in = max_amounts_in
         self.args.user_data = self.encode_user_data(user_data)
-        self.args.request = [self.args.assets, self.args.max_amounts_in, self.args.user_data, self.fixed_arguments['to_internal_balance']]
+        self.args.request = [self.args.assets, self.args.max_amounts_in, self.args.user_data, self.fixed_arguments['from_internal_balance']]
 
     def encode_user_data(self, user_data):
         return eth_abi.encode(self.user_data_abi, user_data)
@@ -232,7 +228,7 @@ class ExactTokensJoin(Join):
 
 class QueryJoinMixin:
     name = "queryJoin"
-    target_address = '0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5'
+    target_address = ETHAddr.BALANCER_Queries
     out_signature = [("bpt_out", "uint256"), ("amounts_in", "uint256[]")]
 
 class SingleAssetQueryJoin(QueryJoinMixin, SingleAssetJoin):

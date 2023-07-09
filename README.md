@@ -21,21 +21,19 @@ and `send` to actually send the transaction to the blockchain.
 
 ### Examples for supported protocols
 
-
 ```python 
-from roles_royce.protocols.eth import aave
+from roles_royce.protocols.eth import aave_v2
 from roles_royce import check, send, Chain
 from web3 import Web3, HTTPProvider
-
 
 claim = aave.ClaimAAVERewards(avatar="0x...", amount=10)
 
 w3 = Web3(HTTPProvider("https://..."))
-status = check([claim], 
-               role=1, 
-               account="0x...", 
-               roles_mod_address="0x...", 
-               web3=w3, 
+status = check([claim],
+               role=1,
+               account="0x...",
+               roles_mod_address="0x...",
+               web3=w3,
                blockchain=Chain.ETHEREUM)
 
 ```
@@ -99,8 +97,9 @@ status = check(txs=[approve, add_liquidity],
 
 ## Development
 
-Install the python dev dependencies: `pip install -r requirements-dev.txt`
-Install Hardhat by running `npm install` in the project's root directory.
+* Install the python dev dependencies: `pip install -r requirements-dev.txt`
+* Install rolls_royce in editable mode: `pip install -e .`
+* Install Hardhat by running `npm install` in the project's root directory.
 
 
 If the tests are not working it may be due to hardhat not being correctly installed or some

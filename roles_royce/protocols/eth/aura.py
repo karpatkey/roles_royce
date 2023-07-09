@@ -1,16 +1,11 @@
-from enum import IntEnum
+from roles_royce.constants import ETHAddr
+from roles_royce.protocols.base import Method, BaseApproveForToken
 
-from roles_royce.constants import ETHAddr, CrossChainAddr
-from roles_royce.protocols.base import Method, InvalidArgument, AvatarSafeAddress, Address
-from roles_royce.protocols.eth.aave import Approve
 
-class ApproveForBooster(Approve):
+class ApproveForBooster(BaseApproveForToken):
     """approve LPToken with AURABooster as spender"""
     fixed_arguments = {"spender": ETHAddr.AURABooster}
 
-    def __init__(self, token: Address, amount: int):
-        super().__init__(amount)
-        self.token = token
 
 class WithdrawAndUndwrapStakedBPT(Method):
     """withdraw and unwrap AURAVaultToken"""
@@ -22,6 +17,7 @@ class WithdrawAndUndwrapStakedBPT(Method):
         super().__init__()
         self.args.amount = amount
 
+
 class DepositBPT(Method):
     """deposit BPT token"""
     name = "deposit"
@@ -32,4 +28,4 @@ class DepositBPT(Method):
     def __init__(self, pool_id: int, amount: int):
         super().__init__()
         self.args.pool_id = pool_id
-        self.args.amount = amount    
+        self.args.amount = amount
