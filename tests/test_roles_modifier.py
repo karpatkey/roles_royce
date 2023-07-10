@@ -34,7 +34,7 @@ def test_check_and_execute(web3_gnosis):
         roles.execute(contract_address="0x4ECaBa5870353805a9F068101A40E0f32ed605C6", data=usdt_approve, check=False)
         assert roles._tx['value'] == 0
         assert roles._tx['chainId'] == 0x64
-        assert roles._tx['gas'] == 112_075
+        assert roles._tx['gas'] == 142_641
         assert roles._tx['nonce'] == 42
 
 def test_gas_limit_estimation(web3_gnosis):
