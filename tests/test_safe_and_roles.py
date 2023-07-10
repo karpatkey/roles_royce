@@ -6,7 +6,7 @@ from eth_account import Account
 
 from roles_royce.protocols.eth import balancer, aura
 from roles_royce import send, Chain
-from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi, ERC20_transfer_abi, aura_rewards_contract_abi, bpt_contract_abi
+from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi, erc20_abi
 from roles_royce.utils import MULTISENDS
 from roles_royce.constants import ETHAddr
 from .utils import local_node, local_node_reset, ETH_LOCAL_NODE_URL, hardhat_unlock_account
@@ -23,9 +23,14 @@ def safe_send(safe, signer_key, to, data, value=0):
 
 def steal_token(w3, token, holder, to, amount):
     hardhat_unlock_account(w3, holder)
-    ctract = w3.eth.contract(address=token, abi=ERC20_transfer_abi)
+    ctract = w3.eth.contract(address=token, abi=erc20_abi)
     tx = ctract.functions.transfer(to, amount).transact({"from": holder})
     return tx
+
+
+def get_balance(w3, token, address):
+    ctract = w3.eth.contract(address=token, abi=erc20_abi)
+    return ctract.functions.balanceOf(address).call()
 
 
 def test_safe_and_roles(local_node):
@@ -196,66 +201,69 @@ def test_safe_and_roles(local_node):
     # steal WETH
 
     steal_token(w3, token=ETHAddr.WETH, holder="0x8EB8a3b98659Cce290402893d0123abb75E3ab28",
-                to=safe.address, amount=1_000_000_000_000_000)
+                to=safe.address, amount=1_000_000_000)
 
     # deposit tokens in balancer and stake in aura
     deposit_balancer = balancer.ExactAssetQueryJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
-                                                     avatar=safe.address, assets=[ETHAddr.wstETH, ETHAddr.WETH],
-                                                     amounts_in=[0, 1_000_000_000], min_bpt_out=0)
-    
+                                                    avatar=safe.address, assets=[ETHAddr.wstETH, ETHAddr.WETH],
+                                                    amounts_in=[0, 1_000_000_000], min_bpt_out=0)
+
     bpt_out, amounts_in = deposit_balancer.call(web3=w3)
 
     deposit_balancer = balancer.ExactTokensJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
-                                                     avatar=safe.address, assets=[ETHAddr.wstETH, ETHAddr.WETH],
-                                                     amounts_in=[0, 1_000_000_000], min_bpt_out=int(bpt_out*0.99))
+                                                avatar=safe.address, assets=[ETHAddr.wstETH, ETHAddr.WETH],
+                                                amounts_in=[0, 1_000_000_000], min_bpt_out=int(bpt_out * 0.99))
 
     send_bpt_deposits = send([deposit_balancer], role=1, private_key=test_account1_private_key, roles_mod_address=roles_ctract_address,
                              blockchain=Chain.ETHEREUM, web3=w3)
     assert send_bpt_deposits
 
     # check that the BPTs are staked in AURA and are in the safe
-    bpt_contract_address = "0x32296969Ef14EB0c6d29669C550D4a0449130230"
-    bpt_contract = w3.eth.contract(address=bpt_contract_address, abi=bpt_contract_abi)
-    bpt_amount = bpt_contract.functions.balanceOf(safe.address).call()
+    bpt_wstETH_ETH = "0x32296969Ef14EB0c6d29669C550D4a0449130230"  # Balancer wstETH-WETH Stable Pool
+    bpt_amount = get_balance(w3, token=bpt_wstETH_ETH, address=safe.address)
+    assert bpt_amount == 965_271_834
 
     deposit_aura = aura.DepositBPT(pool_id=115, amount=bpt_amount)
     send_aura_deposits = send([deposit_aura], role=1, private_key=test_account1_private_key, roles_mod_address=roles_ctract_address,
                               blockchain=Chain.ETHEREUM, web3=w3)
     assert send_aura_deposits
+    assert get_balance(w3, token=bpt_wstETH_ETH, address=safe.address) == 0
 
     # check that the BPTs are staked in AURA and are in the safe
     aura_rewards_contract_address = "0x59D66C58E83A26d6a0E35114323f65c3945c89c1"
-    aura_rewards_contract = w3.eth.contract(address=aura_rewards_contract_address, abi=aura_rewards_contract_abi)
-    aura_rewards_amount = aura_rewards_contract.functions.balanceOf(safe.address).call()
+    aura_rewards_amount = get_balance(w3, token=aura_rewards_contract_address, address=safe.address)
     assert aura_rewards_amount == bpt_amount
 
     # withdraw tokens from aura and balancer
-    withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_contract_address, amount=aura_rewards_amount)
+    withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_contract_address, amount=int(aura_rewards_amount * 1))
     print(withdraw_aura.args_list)
     print(withdraw_aura.data)
     print(withdraw_aura.target_address)
 
     withdraw_balancer = balancer.SingleAssetQueryExit(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
-                                      avatar=safe.address,
-                                      assets=[ETHAddr.wstETH, ETHAddr.WETH],
-                                      min_amounts_out=[0, 0],  # Not used
-                                      bpt_amount_in=bpt_amount,
-                                      exit_token_index=1)
+                                                      avatar=safe.address,
+                                                      assets=[ETHAddr.wstETH, ETHAddr.WETH],
+                                                      min_amounts_out=[0, 0],  # Not used
+                                                      bpt_amount_in=bpt_amount,
+                                                      exit_token_index=1)
 
     bpt_in, amounts_out = withdraw_balancer.call(web3=w3)
-    print(bpt_in, amounts_out)
-    print('roles', roles_ctract_address)
     amounts_out = [int(amount * 0.99) for amount in amounts_out]
     withdraw_balancer = balancer.SingleAssetExit(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
                                                  avatar=safe.address,
                                                  assets=[ETHAddr.wstETH, ETHAddr.WETH],
                                                  min_amounts_out=amounts_out, bpt_amount_in=bpt_amount, exit_token_index=1)
     send_withdraw = send([withdraw_aura, withdraw_balancer], role=4, private_key=test_account4_private_key,
-                        roles_mod_address=roles_ctract_address,
-                        blockchain=Chain.ETHEREUM, web3=w3)
+                         roles_mod_address=roles_ctract_address,
+                         blockchain=Chain.ETHEREUM, web3=w3)
+
+    weth_balance = get_balance(w3, token=ETHAddr.WETH, address=safe.address)
+    assert weth_balance == 999_487_904
     assert send_withdraw
-    bpt_amount = bpt_contract.functions.balanceOf(safe.address).call()
-    print("bpt amount in safe = ", bpt_amount)
+
+    bpt_balance = get_balance(w3, token=bpt_wstETH_ETH, address=safe.address)
+    aura_balance = get_balance(w3, token=aura_rewards_contract_address, address=safe.address)
+    assert bpt_balance == aura_balance == 0
 
 
 def test_simple_account_balance(local_node):
