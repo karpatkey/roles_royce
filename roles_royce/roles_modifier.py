@@ -71,7 +71,7 @@ class RolesMod:
                 max_fee_per_gas: int = None,
                 check: bool = True,
                 fee_multiplier: float = 1.2,
-                gas_limit_multiplier: float = 1.1
+                gas_limit_multiplier: float = 1.4
                 ) -> str:
         """Execute a role-based transaction. Returns the transaction hash as a str."""
 
