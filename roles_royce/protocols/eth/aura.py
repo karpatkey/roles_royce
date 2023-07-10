@@ -1,5 +1,5 @@
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, BaseApproveForToken
+from roles_royce.protocols.base import Method, BaseApproveForToken, Address
 
 
 class ApproveForBooster(BaseApproveForToken):
@@ -13,8 +13,9 @@ class WithdrawAndUndwrapStakedBPT(Method):
     in_signature = [("amount", "uint256"), ("claim", "bool")]
     fixed_arguments = {"claim": True}
 
-    def __init__(self, amount: int):
+    def __init__(self, reward_address: Address, amount: int):
         super().__init__()
+        self.target_address = reward_address
         self.args.amount = amount
 
 

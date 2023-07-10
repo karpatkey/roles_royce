@@ -199,15 +199,16 @@ def test_safe_and_roles(local_node):
                 to=safe.address, amount=1_000_000_000_000_000)
 
     # deposit tokens in balancer and stake in aura
-    deposit_balancer = balancer.SingleAssetQueryJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
+    deposit_balancer = balancer.ExactAssetQueryJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
                                                      avatar=safe.address, assets=[ETHAddr.wstETH, ETHAddr.WETH],
-                                                     max_amounts_in=[0, 1_000_000_000_000_000], bpt_amount_out=0, join_token_index=1)
-
+                                                     amounts_in=[0, 1_000_000_000], min_bpt_out=0)
+    
     bpt_out, amounts_in = deposit_balancer.call(web3=w3)
 
+    deposit_balancer = balancer.ExactTokensJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
+                                                     avatar=safe.address, assets=[ETHAddr.wstETH, ETHAddr.WETH],
+                                                     amounts_in=[0, 1_000_000_000], min_bpt_out=int(bpt_out*0.99))
 
-
-    # TODO: set the bpt_amount_out to be the output of the query
     send_bpt_deposits = send([deposit_balancer], role=1, private_key=test_account1_private_key, roles_mod_address=roles_ctract_address,
                              blockchain=Chain.ETHEREUM, web3=w3)
     assert send_bpt_deposits
@@ -225,18 +226,36 @@ def test_safe_and_roles(local_node):
     # check that the BPTs are staked in AURA and are in the safe
     aura_rewards_contract_address = "0x59D66C58E83A26d6a0E35114323f65c3945c89c1"
     aura_rewards_contract = w3.eth.contract(address=aura_rewards_contract_address, abi=aura_rewards_contract_abi)
-    assert aura_rewards_contract.functions.balanceOf(safe.address).call() == bpt_amount
+    aura_rewards_amount = aura_rewards_contract.functions.balanceOf(safe.address).call()
+    assert aura_rewards_amount == bpt_amount
 
     # withdraw tokens from aura and balancer
-    withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(amount=bpt_amount)
+    withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_contract_address, amount=aura_rewards_amount)
+    print(withdraw_aura.args_list)
+    print(withdraw_aura.data)
+    print(withdraw_aura.target_address)
+
+    withdraw_balancer = balancer.SingleAssetQueryExit(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
+                                      avatar=safe.address,
+                                      assets=[ETHAddr.wstETH, ETHAddr.WETH],
+                                      min_amounts_out=[0, 0],  # Not used
+                                      bpt_amount_in=bpt_amount,
+                                      exit_token_index=1)
+
+    bpt_in, amounts_out = withdraw_balancer.call(web3=w3)
+    print(bpt_in, amounts_out)
+    print('roles', roles_ctract_address)
+    amounts_out = [int(amount * 0.99) for amount in amounts_out]
     withdraw_balancer = balancer.SingleAssetExit(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
                                                  avatar=safe.address,
                                                  assets=[ETHAddr.wstETH, ETHAddr.WETH],
-                                                 min_amounts_out=[0, 0], bpt_amount_in=bpt_amount, exit_token_index=1)
-    send_approve = send([withdraw_aura, withdraw_balancer], role=4, private_key=test_account4_private_key,
+                                                 min_amounts_out=amounts_out, bpt_amount_in=bpt_amount, exit_token_index=1)
+    send_withdraw = send([withdraw_aura, withdraw_balancer], role=4, private_key=test_account4_private_key,
                         roles_mod_address=roles_ctract_address,
                         blockchain=Chain.ETHEREUM, web3=w3)
-    assert send_approve
+    assert send_withdraw
+    bpt_amount = bpt_contract.functions.balanceOf(safe.address).call()
+    print("bpt amount in safe = ", bpt_amount)
 
 
 def test_simple_account_balance(local_node):
