@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 from enum import IntEnum
+import logging
 from typing import Optional
 
 from web3 import Web3, exceptions
 from web3.types import Address, ChecksumAddress
 from eth_account import Account
 
+logger = logging.getLogger(__name__)
 
 class TransactionWouldBeReverted(Exception):
     pass
@@ -87,6 +89,7 @@ class RolesMod:
         nonce = self.nonce or self.web3.eth.get_transaction_count(self.account)
 
         tx = self._build_transaction(contract_address, data, gas_limit, max_priority_fee, max_fee_per_gas, nonce)
+        logger.debug(f"Executing tx: {tx}")
         signed_txn = self._sign_transaction(tx)
         executed_txn = self._send_raw_transaction(signed_txn.rawTransaction)
         return executed_txn.hex()
