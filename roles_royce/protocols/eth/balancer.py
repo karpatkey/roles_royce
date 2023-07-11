@@ -115,7 +115,7 @@ class CustomExit(Exit):
 
 class QueryExitMixin:
     name = "queryExit"
-    target_address = '0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5'
+    target_address = ETHAddr.BALANCER_Queries
     out_signature = [("bpt_in", "uint256"), ("amounts_out", "uint256[]")]
 
 class SingleAssetQueryExit(QueryExitMixin, SingleAssetExit):
@@ -129,9 +129,10 @@ class CustomQueryExit(QueryExitMixin, CustomExit):
 
 # There is another JoinKind that is for Weighted Pools
 class StablePoolJoinKind(IntEnum):
-    EXACT_TOKENS_IN_FOR_BPT_OUT = 0
-    TOKEN_IN_FOR_EXACT_BPT_OUT = 1
-    ALL_TOKENS_IN_FOR_EXACT_BPT_OUT = 2
+    INIT = 0
+    EXACT_TOKENS_IN_FOR_BPT_OUT = 1
+    TOKEN_IN_FOR_EXACT_BPT_OUT = 2
+    ALL_TOKENS_IN_FOR_EXACT_BPT_OUT = 3
 
 
 class QueryJoin(Method):
@@ -153,10 +154,10 @@ class Join(Method):
             ("assets", "address[]"),  # list of tokens, ordered numerically
             ("max_amounts_in", "uint256[]"),  # the higher limits for the tokens to deposit
             ("user_data", "bytes"),  # userData encodes a ExitKind to tell the pool what style of join you're performing
-            ("to_internal_balance", "bool"))
+            ("from_internal_balance", "bool"))
          )
     )
-    fixed_arguments = {"sender": AvatarSafeAddress, "recipient": AvatarSafeAddress, "to_internal_balance": False}
+    fixed_arguments = {"sender": AvatarAddress, "recipient": AvatarAddress, "from_internal_balance": False}
     target_address = CrossChainAddr.BalancerVault
     exit_kind: StablePoolJoinKind
     user_data_abi = None
@@ -167,7 +168,7 @@ class Join(Method):
         self.args.assets = assets
         self.args.max_amounts_in = max_amounts_in
         self.args.user_data = self.encode_user_data(user_data)
-        self.args.request = [self.args.assets, self.args.max_amounts_in, self.args.user_data, self.fixed_arguments['to_internal_balance']]
+        self.args.request = [self.args.assets, self.args.max_amounts_in, self.args.user_data, self.fixed_arguments['from_internal_balance']]
 
     def encode_user_data(self, user_data):
         return eth_abi.encode(self.user_data_abi, user_data)
@@ -228,7 +229,7 @@ class ExactTokensJoin(Join):
 
 class QueryJoinMixin:
     name = "queryJoin"
-    target_address = '0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5'
+    target_address = ETHAddr.BALANCER_Queries
     out_signature = [("bpt_out", "uint256"), ("amounts_in", "uint256[]")]
 
 class SingleAssetQueryJoin(QueryJoinMixin, SingleAssetJoin):
