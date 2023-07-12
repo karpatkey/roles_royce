@@ -22,6 +22,7 @@ def deploy_roles(w3, avatar):
     ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact({"from": avatar})
     return ctract
 
+
 def setup_common_roles(safe: SimpleSafe, roles_ctract):
     # set roles_mod as module of safe
     enable_module_roles = safe.contract.functions.enableModule(roles_ctract.address).build_transaction({"from": safe.address})['data']
@@ -35,13 +36,15 @@ def setup_common_roles(safe: SimpleSafe, roles_ctract):
     # accounts[4]   |  4     | disassembler
     # accounts[5]   |  5     | swapper
 
+    txns = []
     for role_number in range(1, 6):
         account = TEST_ACCOUNTS[role_number]
         enable_module = roles_ctract.functions.enableModule(account.address).build_transaction({"from": safe.address})['data']
-        safe.send(txs=[TxData(contract_address=roles_ctract.address, data=enable_module)])
-
         assign_role = roles_ctract.functions.assignRoles(account.address, [role_number], [True]).build_transaction({"from": safe.address})['data']
-        safe.send(txs=[TxData(contract_address=roles_ctract.address, data=assign_role)])
+        txns.extend([TxData(contract_address=roles_ctract.address, data=enable_module),
+                     TxData(contract_address=roles_ctract.address, data=assign_role)])
+    safe.send(txs=txns)
+
 
 def apply_presets(safe: SimpleSafe, roles_ctract, json_data, replaces=None):
     presets_data = json.loads(json_data)
@@ -50,5 +53,3 @@ def apply_presets(safe: SimpleSafe, roles_ctract, json_data, replaces=None):
         for replacer in replaces:
             data = data.replace(replacer[0], replacer[1])
             safe.send(txs=[TxData(contract_address=roles_ctract.address, data=data)])
-
-

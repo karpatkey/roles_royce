@@ -19,10 +19,6 @@ def test_safe_and_roles(local_node):
     w3 = local_node
     ethereum_client = EthereumClient(ETH_LOCAL_NODE_URL)
 
-    # workarround https://github.com/ethereum/web3.py/pull/3002 / MethodUnavailable: {'code': -32601, 'message': 'Method eth_maxPriorityFeePerGas not found', 'data': {'message': 'Method eth_maxPriorityFeePerGas not found'}}
-    ethereum_client.w3.eth._max_priority_fee = lambda: 0
-    w3.eth._max_priority_fee = lambda: 0
-
     # test accounts are generated using the Mnemonic: "test test test test test test test test test test test junk"
     test_account0_addr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
     test_account0_private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
@@ -120,32 +116,22 @@ def test_safe_and_roles(local_node):
     assign_role_2 = role_ctract.functions.assignRoles(test_account2_addr, [2], [True]).build_transaction({"from": safe.address})['data']
     safe.send(txs=[TxData(contract_address=roles_ctract_address, data=assign_role_2)])
 
-    # enable an EOA for setting as a harvester role
+    # enable an EOA for setting as a harvester role and assign the role to the test_account3_addr
     enable_module_3 = role_ctract.functions.enableModule(test_account3_addr).build_transaction({"from": safe.address})['data']
-    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_3)])
-    assert role_ctract.functions.isModuleEnabled(test_account3_addr).call()
-
-    # assign the role to the test_account3_addr
     assign_role_3 = role_ctract.functions.assignRoles(test_account3_addr, [3], [True]).build_transaction({"from": safe.address})['data']
-    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=assign_role_3)])
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_3),
+                   TxData(contract_address=roles_ctract_address, data=assign_role_3)])
 
-    # enable an EOA for setting as a disassembler role
+    # enable an EOA for setting as a disassembler role and assign the role to the test_account4_addr
     enable_module_4 = role_ctract.functions.enableModule(test_account4_addr).build_transaction({"from": safe.address})['data']
-    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_4)])
-    assert role_ctract.functions.isModuleEnabled(test_account4_addr).call()
-
-    # assign the role to the test_account4_addr
     assign_role_4 = role_ctract.functions.assignRoles(test_account4_addr, [4], [True]).build_transaction({"from": safe.address})['data']
-    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=assign_role_4)])
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_4),
+                   TxData(contract_address=roles_ctract_address, data=assign_role_4)])
 
-    # enable an EOA for setting as a swapper role
+    # enable an EOA for setting as a swapper role and assign the role to the test_account5_addr
     enable_module_5 = role_ctract.functions.enableModule(test_account5_addr).build_transaction({"from": safe.address})['data']
-    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_5)])
-    assert role_ctract.functions.isModuleEnabled(test_account5_addr).call()
-
-    # assign the role to the test_account5_addr
     assign_role_5 = role_ctract.functions.assignRoles(test_account5_addr, [5], [True]).build_transaction({"from": safe.address})['data']
-    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=assign_role_5)])
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_5), TxData(contract_address=roles_ctract_address, data=assign_role_5)])
 
 
 def test_balancer_aura_withdraw(local_node, accounts):
