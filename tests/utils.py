@@ -18,10 +18,8 @@ from web3 import Web3, HTTPProvider
 from gnosis.safe import addresses, Safe, SafeOperation
 from gnosis.eth import EthereumNetwork, EthereumClient
 
-from roles_royce import send, Chain
 from roles_royce.constants import ETHAddr
-from roles_royce.evm_utils import roles_abi, roles_bytecode, erc20_abi
-from roles_royce.utils import MULTISENDS
+from roles_royce.evm_utils import erc20_abi
 
 REMOTE_NODE_URL = codecs.decode(b'x\x9c\x05\xc1[\x12\x80 \x08\x00\xc0\x1b\x89\x8a\xf8\xe86\xea\xc8\xc4G\xd4\x14u\xfevw\xb3\xeb\xd9\x00\x8e.'
                                 b'\xaa\xcb\x9c(\xbfwwr\xc2\x87\x10\xb9M,%\xd7\xc1\x94\x02\xcd\x91V\xf6\xdc\xb0\xc6\x91C\xf0\xf4\x03~\xaa\x12\xb1',
@@ -203,40 +201,3 @@ def safe_send(safe, signer_key, to, data, value=0):
     safe_tx.sign(signer_key)
     safe_tx.execute(signer_key)
     return safe_tx
-
-
-def deploy_roles(w3, avatar):
-    # Deploy a Roles contrat without using the ProxyFactory (to simplify things)
-    role_constructor_bytes = "000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
-    bytecode_without_default_constructor = roles_bytecode[:-len(role_constructor_bytes)]
-
-    ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
-
-    owner = avatar = target = w3.to_checksum_address(avatar)
-    tx_receipt = ctract.constructor(owner, avatar, target).transact({"from": avatar})  # deploy!
-    roles_ctract_address = w3.eth.get_transaction_receipt(tx_receipt).contractAddress
-
-    ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
-    ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact({"from": avatar})
-    return ctract
-
-def setup_common_roles(safe, roles_ctract):
-    # set roles_mod as module of safe
-    enable_module_roles = safe.contract.functions.enableModule(roles_ctract.address).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=safe.address, data=enable_module_roles, signer_key=TEST_ACCOUNTS[0].key)
-
-    # enable an asign roles to the test EOAs
-    # EOA           | ROLE N | ROLE NAME
-    # accounts[1]   |  1     | Manager
-    # accounts[2]   |  2     | revoker
-    # accounts[3]   |  3     | harvester
-    # accounts[4]   |  4     | disassembler
-    # accounts[5]   |  5     | swapper
-
-    for role_number in range(1, 6):
-        account = TEST_ACCOUNTS[role_number]
-        enable_module = roles_ctract.functions.enableModule(account.address).build_transaction({"from": safe.address})['data']
-        safe_send(safe, to=roles_ctract.address, data=enable_module, signer_key=TEST_ACCOUNTS[0].key)
-
-        assign_role = roles_ctract.functions.assignRoles(account.address, [role_number], [True]).build_transaction({"from": safe.address})['data']
-        safe_send(safe, to=roles_ctract.address, data=assign_role, signer_key=TEST_ACCOUNTS[0].key)
