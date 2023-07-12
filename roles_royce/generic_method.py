@@ -5,22 +5,19 @@ from web3.types import HexStr
 from roles_royce.roles_modifier import Operation
 
 
-@dataclass
+@dataclass(kw_only=True)
 class TxData:
     contract_address: str
     data: str
-    operation: Operation
-    value: int
+    operation: Operation = Operation.CALL
+    value: int = 0
 
 
-@dataclass
+@dataclass(kw_only=True)
 class GenericMethodTransaction(TxData):
     function_name: str
     function_args: list
-    contract_address: str
     contract_abi: str
-    operation: Operation
-    value: int
     data: str = field(init=False)
 
     def __post_init__(self):

@@ -9,8 +9,9 @@ from roles_royce import send, Chain
 from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi, erc20_abi
 from roles_royce.utils import MULTISENDS
 from roles_royce.constants import ETHAddr
+from roles_royce.generic_method import TxData
 from .utils import (local_node, local_node_reset, accounts, ETH_LOCAL_NODE_URL, hardhat_unlock_account, create_simple_safe,
-                    get_balance, steal_token, safe_send)
+                    get_balance, steal_token, SimpleSafe)
 from .roles import setup_common_roles, deploy_roles, apply_presets
 
 
@@ -42,7 +43,7 @@ def test_safe_and_roles(local_node):
                                    master_copy_address=addresses.MASTER_COPIES[EthereumNetwork.MAINNET][0][0],
                                    owners=[test_account0_addr], threshold=1)
 
-    safe = Safe(ethereum_tx_sent.contract_address, ethereum_client)
+    safe = SimpleSafe(ethereum_tx_sent.contract_address, ethereum_client, test_account0_private_key)
     safe.retrieve_all_info()
 
     # send ETH to the safe
@@ -98,58 +99,58 @@ def test_safe_and_roles(local_node):
 
     # set roles_mod as module of safe
     enable_module_roles = safe.contract.functions.enableModule(roles_ctract_address).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=safe.address, data=enable_module_roles, signer_key=test_account0_private_key)
+    safe.send(txs=[TxData(contract_address=safe.address, data=enable_module_roles)])
     assert safe.contract.functions.isModuleEnabled(roles_ctract_address).call()
 
     # enable an EOA for setting as a manager role
     enable_module_1 = role_ctract.functions.enableModule(test_account1_addr).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=roles_ctract_address, data=enable_module_1, signer_key=test_account0_private_key)
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_1)])
     assert role_ctract.functions.isModuleEnabled(test_account1_addr).call()
 
     # assign the manager role to the test_account1_addr
     assign_role_1 = role_ctract.functions.assignRoles(test_account1_addr, [1], [True]).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=roles_ctract_address, data=assign_role_1, signer_key=test_account0_private_key)
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=assign_role_1)])
 
     # enable an EOA for setting as a revoker role
     enable_module_2 = role_ctract.functions.enableModule(test_account2_addr).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=roles_ctract_address, data=enable_module_2, signer_key=test_account0_private_key)
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_2)])
     assert role_ctract.functions.isModuleEnabled(test_account2_addr).call()
 
     # assign the revoker role to the test_account2_addr
     assign_role_2 = role_ctract.functions.assignRoles(test_account2_addr, [2], [True]).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=roles_ctract_address, data=assign_role_2, signer_key=test_account0_private_key)
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=assign_role_2)])
 
     # enable an EOA for setting as a harvester role
     enable_module_3 = role_ctract.functions.enableModule(test_account3_addr).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=roles_ctract_address, data=enable_module_3, signer_key=test_account0_private_key)
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_3)])
     assert role_ctract.functions.isModuleEnabled(test_account3_addr).call()
 
     # assign the role to the test_account3_addr
     assign_role_3 = role_ctract.functions.assignRoles(test_account3_addr, [3], [True]).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=roles_ctract_address, data=assign_role_3, signer_key=test_account0_private_key)
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=assign_role_3)])
 
     # enable an EOA for setting as a disassembler role
     enable_module_4 = role_ctract.functions.enableModule(test_account4_addr).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=roles_ctract_address, data=enable_module_4, signer_key=test_account0_private_key)
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_4)])
     assert role_ctract.functions.isModuleEnabled(test_account4_addr).call()
 
     # assign the role to the test_account4_addr
     assign_role_4 = role_ctract.functions.assignRoles(test_account4_addr, [4], [True]).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=roles_ctract_address, data=assign_role_4, signer_key=test_account0_private_key)
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=assign_role_4)])
 
     # enable an EOA for setting as a swapper role
     enable_module_5 = role_ctract.functions.enableModule(test_account5_addr).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=roles_ctract_address, data=enable_module_5, signer_key=test_account0_private_key)
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_5)])
     assert role_ctract.functions.isModuleEnabled(test_account5_addr).call()
 
     # assign the role to the test_account5_addr
     assign_role_5 = role_ctract.functions.assignRoles(test_account5_addr, [5], [True]).build_transaction({"from": safe.address})['data']
-    safe_send(safe, to=roles_ctract_address, data=assign_role_5, signer_key=test_account0_private_key)
+    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=assign_role_5)])
 
 
 def test_balancer_aura_withdraw(local_node, accounts):
     w3 = local_node
-    safe = create_simple_safe(owner=accounts[0])
+    safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
 
@@ -167,8 +168,7 @@ def test_balancer_aura_withdraw(local_node, accounts):
     {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x5e8266950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c8","value":"0"},
     {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x33a0480c0000000000000000000000000000000000000000000000000000000000000004000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c88bdb391300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000002032296969ef14eb0c6d29669c550d4a04491302300002000000000000000000800000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value":"0"}
     ]}"""
-    apply_presets(safe, roles_ctract, json_data=presets, signer_key=accounts[0].key,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
+    apply_presets(safe, roles_ctract, json_data=presets, replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
 
     # approve tokens in balancer and aura
     approve_vault = balancer.ApproveForVault(token="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", amount=1_000_000_000_000_000_000)

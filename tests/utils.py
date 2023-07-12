@@ -15,11 +15,8 @@ from eth_account import Account
 from eth_account.signers.local import LocalAccount
 
 from web3 import Web3, HTTPProvider
-from gnosis.safe import addresses, Safe, SafeOperation
-from gnosis.eth import EthereumNetwork, EthereumClient
-
-from roles_royce.constants import ETHAddr
 from roles_royce.evm_utils import erc20_abi
+from .safe import SimpleSafe
 
 REMOTE_NODE_URL = codecs.decode(b'x\x9c\x05\xc1[\x12\x80 \x08\x00\xc0\x1b\x89\x8a\xf8\xe86\xea\xc8\xc4G\xd4\x14u\xfevw\xb3\xeb\xd9\x00\x8e.'
                                 b'\xaa\xcb\x9c(\xbfwwr\xc2\x87\x10\xb9M,%\xd7\xc1\x94\x02\xcd\x91V\xf6\xdc\xb0\xc6\x91C\xf0\xf4\x03~\xaa\x12\xb1',
@@ -177,27 +174,10 @@ def get_balance(w3, token, address):
     return ctract.functions.balanceOf(address).call()
 
 
-def create_simple_safe(owner: LocalAccount) -> Safe:
+def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
     """Create a Safe with one owner and 100 ETH in balance"""
-    ethereum_client = EthereumClient(ETH_LOCAL_NODE_URL)
-    # workarround https://github.com/ethereum/web3.py/pull/3002 / MethodUnavailable: {'code': -32601, 'message': 'Method eth_maxPriorityFeePerGas not found', 'data': {'message': 'Method eth_maxPriorityFeePerGas not found'}}
-    # TODO: remove workaround when web3py v6.6.0 is released
-    ethereum_client.w3.eth._max_priority_fee = lambda: 0
-    ethereum_tx_sent = Safe.create(ethereum_client, deployer_account=owner,
-                                   master_copy_address=addresses.MASTER_COPIES[EthereumNetwork.MAINNET][0][0],
-                                   owners=[owner.address], threshold=1)
 
-    safe = Safe(ethereum_tx_sent.contract_address, ethereum_client)
-
-    ethereum_client.w3.eth.send_transaction({"to": safe.address, "value": Web3.to_wei(100, "ether"), "from": SCRAPE_ACCOUNT.address})
-    hardhat_unlock_account(ethereum_client.w3, safe.address)
+    safe = SimpleSafe.build(owner, ETH_LOCAL_NODE_URL)
+    w3.eth.send_transaction({"to": safe.address, "value": Web3.to_wei(100, "ether"), "from": SCRAPE_ACCOUNT.address})
+    hardhat_unlock_account(w3, safe.address)
     return safe
-
-
-def safe_send(safe, signer_key, to, data, value=0):
-    safe_tx = safe.build_multisig_tx(to=to, value=value, data=data, operation=SafeOperation.CALL.value,
-                                     safe_tx_gas=500000,
-                                     base_gas=500000, gas_price=1, gas_token=ETHAddr.ZERO, refund_receiver=ETHAddr.ZERO)
-    safe_tx.sign(signer_key)
-    safe_tx.execute(signer_key)
-    return safe_tx
