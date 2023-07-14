@@ -19,8 +19,6 @@ ACTION_WITHDRAW_NATIVE_TOKEN = _to_hex_pad_64(b'ACTION_WITHDRAW_NATIVE_TOKEN')
 
 
 class Approve(BaseApproveForToken):
-    fixed_arguments = {"spender": ETHAddr.AURABooster}
-
     def __init__(self, comet: Comet, token: Address, amount: int):
         super().__init__(token=token, amount=amount)
         self.args.spender = comet.value
