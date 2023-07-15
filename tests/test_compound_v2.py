@@ -1,4 +1,3 @@
-from web3 import Web3
 import roles_royce.protocols.eth.compound_v2 as compound
 from roles_royce.constants import ETHAddr
 
