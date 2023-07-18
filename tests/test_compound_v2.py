@@ -43,9 +43,9 @@ def test_repay():
 
 
 def test_repay_eth():
-    m = compound.RepayETH(avatar="0x24Dd242c3c4061b1fCaA5119af608B56afBaEA95")
+    m = compound.RepayETH(avatar="0x24Dd242c3c4061b1fCaA5119af608B56afBaEA95", amount=123)
     assert m.data == "0x9f35c3d500000000000000000000000024dd242c3c4061b1fcaa5119af608b56afbaea95"
-
+    assert m.value == 123
 
 def test_claim_comp():
     m = compound.ClaimCOMP(avatar="0x24Dd242c3c4061b1fCaA5119af608B56afBaEA95", ctokens=[compound.Ctoken.cSUSHI, compound.Ctoken.cETH])
