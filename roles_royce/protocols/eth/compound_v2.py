@@ -140,8 +140,8 @@ class RepayETH(Method):
     target_address = ETHAddr.COMPOUND_V2_Maximillion
     fixed_arguments = {"borrower": AvatarAddress}
 
-    def __init__(self, avatar: Address):
-        super().__init__(avatar=avatar)
+    def __init__(self, avatar: Address, amount: int):
+        super().__init__(avatar=avatar, value=amount)
 
 
 class ClaimCOMP(Method):
