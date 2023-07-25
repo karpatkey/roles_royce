@@ -3,22 +3,44 @@ from roles_royce.constants import ETHAddr
 from .utils import local_node, accounts, get_balance, steal_token, create_simple_safe
 
 
-def test_withdrawal_with_sdai_integration(local_node, accounts):
+def test_integration(local_node, accounts):
     w3 = local_node
     safe = create_simple_safe(w3, accounts[0])
 
-    # steal DAIs from a large holder and send them to the safe
-    ADDRESS_WITH_LOTS_OF_TOKENS = "0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8"
+    ADDRESS_WITH_LOTS_OF_GNO = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
 
-    steal_token(w3, ETHAddr.DAI, holder=ADDRESS_WITH_LOTS_OF_TOKENS, to=safe.address, amount=1_000_000)
-    assert get_balance(w3, ETHAddr.DAI, safe.address) == 1_000_000
+    steal_token(w3, ETHAddr.GNO, holder=ADDRESS_WITH_LOTS_OF_GNO, to=safe.address, amount=123_000_000)
+    assert get_balance(w3, ETHAddr.GNO, safe.address) == 123_000_000
 
-    safe.send([spark.ApproveWithdrawalDAI(amount=1_000_000),
-               spark.DepositDAI(amount=1_000_000, avatar=safe.address)])
+    # Deposit GNO, receive spGNO
+    safe.send([spark.ApproveToken(token=ETHAddr.GNO, amount=123_000_000),
+               spark.DepositToken(token=ETHAddr.GNO, avatar=safe.address,
+                                  amount=123_000_000),
+               spark.ApproveToken(token=ETHAddr.GNO, amount=0)])
+    assert get_balance(w3, ETHAddr.GNO, safe.address) == 0
+    assert get_balance(w3, ETHAddr.spGNO, safe.address) == 123_000_000
+
+    # Borrow DAI using GNO as collateral
+    res = safe.send([spark.SetUserUseReserveAsCollateral(asset=ETHAddr.GNO, use=True)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
-    assert get_balance(w3, ETHAddr.sDAI, safe.address) == 976_458
+    res = safe.send([spark.Borrow(token=ETHAddr.DAI, amount=1_000,
+                                  rate_mode=spark.RateMode.VARIABLE,
+                                  avatar=safe.address)])
+    assert get_balance(w3, ETHAddr.DAI, safe.address) == 1_000
 
-    safe.send([spark.WithdrawWithSDAI(amount=976_458, avatar=safe.address)])
-    assert get_balance(w3, ETHAddr.DAI, safe.address) == 999_999
+    # Deposit DAI, get sDAI
+    safe.send([spark.ApproveWithdrawalDAI(amount=1_000),
+               spark.DepositDAI(amount=1_000, avatar=safe.address),
+               spark.ApproveWithdrawalDAI(amount=0)])
+    assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
+    assert get_balance(w3, ETHAddr.sDAI, safe.address) == 976
+
+    # Repay sDAI to get DAI
+    safe.send([spark.WithdrawWithSDAI(amount=976, avatar=safe.address)])
+    assert get_balance(w3, ETHAddr.DAI, safe.address) == 999
     assert get_balance(w3, ETHAddr.sDAI, safe.address) == 0
 
+    # Get back the original amount of GNO
+    safe.send([spark.WithdrawToken(token=ETHAddr.GNO, amount=123_000_000, avatar=safe.address)])
+    assert get_balance(w3, ETHAddr.GNO, safe.address) == 123_000_000
+    assert get_balance(w3, ETHAddr.spGNO, safe.address) == 0
