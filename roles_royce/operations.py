@@ -10,13 +10,36 @@ from .utils import multi_or_one
 logger = logging.getLogger(__name__)
 
 
+def build(txs: List[Transactable],
+          role: int,
+          account: str,
+          roles_mod_address: str,
+          blockchain: Blockchain,
+          web3: Web3,
+          tx_kwargs: dict | None = None
+          ) -> bool:
+    tx_data = multi_or_one(txs, blockchain)
+    roles_mod = RolesMod(
+        role=role,
+        contract_address=roles_mod_address,
+        account=account,
+        operation=tx_data.operation,
+        web3=web3,
+        value=tx_data.value
+    )
+    tx_kwargs = tx_kwargs or {}
+    tx = roles_mod.build(tx_data.contract_address, tx_data.data, **tx_kwargs)
+    tx['from'] = account
+    return tx
+
+
 def check(txs: List[Transactable],
           role: int,
           account: str,
           roles_mod_address: str,
           blockchain: Blockchain,
           web3: Web3,
-          block='latest'
+          block='latest',
           ) -> bool:
     """Test the transaction with static call
 
@@ -49,6 +72,7 @@ def send(txs: List[Transactable],
          roles_mod_address: str,
          blockchain: Blockchain,
          web3: Web3,
+         tx_kwargs: dict | None = None
          ) -> bool:
     """Send transactions to the blockchain.
 
@@ -72,7 +96,8 @@ def send(txs: List[Transactable],
         web3=web3,
         value=tx_data.value
     )
-    roles_mod_execute = roles_mod.execute(tx_data.contract_address, tx_data.data)
+    tx_kwargs = tx_kwargs or {}
+    roles_mod_execute = roles_mod.execute(tx_data.contract_address, tx_data.data, **tx_kwargs)
     logger.info('building receipt....')
     roles_mod_tx1 = roles_mod.get_tx_receipt(roles_mod_execute)
     logger.info(roles_mod_tx1)

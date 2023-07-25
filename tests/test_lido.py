@@ -94,8 +94,8 @@ def test_integration(local_node, accounts):
     steth_balance = get_balance(w3, ETHAddr.stETH, safe.address)
     assert steth_balance > 0
 
-    tx_hash, _ = safe.send([lido.ApproveWithdrawalStETHWithUnstETH(amount=steth_balance),
-                            lido.RequestWithdrawalsStETH(amounts=[steth_balance], avatar=safe.address)])
+    safe.send([lido.ApproveWithdrawalStETHWithUnstETH(amount=steth_balance),
+               lido.RequestWithdrawalsStETH(amounts=[steth_balance], avatar=safe.address)])
     nft_ids = lido.GetWithdrawalRequests(owner=safe.address).call(w3)
     assert len(nft_ids) == 1
 

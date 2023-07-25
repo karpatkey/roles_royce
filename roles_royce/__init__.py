@@ -1,5 +1,5 @@
 import logging
-from .operations import send, check
+from .operations import build, send, check
 from .generic_method import GenericMethodTransaction
 from .roles_modifier import Operation
 from .constants import Chain
