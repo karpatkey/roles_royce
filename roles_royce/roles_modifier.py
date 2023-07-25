@@ -9,6 +9,10 @@ from eth_account import Account
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_GAS_LIMIT_MULTIPLIER = 1.4
+DEFAULT_FEE_MULTIPLER = 1.2
+
+
 class TransactionWouldBeReverted(Exception):
     pass
 
@@ -53,6 +57,27 @@ class RolesMod:
         base_fee_per_gas = latest_block["baseFeePerGas"]
         return base_fee_per_gas
 
+    def build(self,
+              contract_address: str,
+              data: str,
+              max_priority_fee: int = None,
+              max_fee_per_gas: int = None,
+              fee_multiplier: float = DEFAULT_FEE_MULTIPLER,
+              gas_limit_multiplier: float = DEFAULT_GAS_LIMIT_MULTIPLIER):
+        """Creates a transaction ready to be sent"""
+        if not max_priority_fee:
+            max_priority_fee = self.web3.eth.max_priority_fee
+
+        if not max_fee_per_gas:
+            max_fee_per_gas = max_priority_fee + int(self.get_base_fee_per_gas() * fee_multiplier)
+
+        gas_limit = int(self.estimate_gas(contract_address, data) * gas_limit_multiplier)
+
+        nonce = self.nonce or self.web3.eth.get_transaction_count(self.account)
+
+        tx = self._build_transaction(contract_address, data, gas_limit, max_priority_fee, max_fee_per_gas, nonce)
+        return tx
+
     def check(self, contract_address: str, data: str, block='latest') -> bool:
         """make a static call to validate a transaction."""
         try:
@@ -70,25 +95,15 @@ class RolesMod:
                 max_priority_fee: int = None,
                 max_fee_per_gas: int = None,
                 check: bool = True,
-                fee_multiplier: float = 1.2,
-                gas_limit_multiplier: float = 1.4
+                fee_multiplier: float = DEFAULT_FEE_MULTIPLER,
+                gas_limit_multiplier: float = DEFAULT_GAS_LIMIT_MULTIPLIER
                 ) -> str:
         """Execute a role-based transaction. Returns the transaction hash as a str."""
 
         if check and not self.check(contract_address, data):
             raise TransactionWouldBeReverted()
 
-        if not max_priority_fee:
-            max_priority_fee = self.web3.eth.max_priority_fee
-
-        if not max_fee_per_gas:
-            max_fee_per_gas = max_priority_fee + int(self.get_base_fee_per_gas() * fee_multiplier)
-
-        gas_limit = int(self.estimate_gas(contract_address, data) * gas_limit_multiplier)
-
-        nonce = self.nonce or self.web3.eth.get_transaction_count(self.account)
-
-        tx = self._build_transaction(contract_address, data, gas_limit, max_priority_fee, max_fee_per_gas, nonce)
+        tx = self.build(contract_address, data, max_priority_fee, max_fee_per_gas, fee_multiplier, gas_limit_multiplier)
         logger.debug(f"Executing tx: {tx}")
         signed_txn = self._sign_transaction(tx)
         executed_txn = self._send_raw_transaction(signed_txn.rawTransaction)
