@@ -4,13 +4,13 @@ from typing import Dict, List
 from web3 import Web3
 from .roles_modifier import RolesMod
 from .constants import Blockchain
-from .generic_method import TxData
+from .generic_method import Transactable
 from .utils import multi_or_one
 
 logger = logging.getLogger(__name__)
 
 
-def check(txs: List[TxData],
+def check(txs: List[Transactable],
           role: int,
           account: str,
           roles_mod_address: str,
@@ -43,7 +43,7 @@ def check(txs: List[TxData],
     return roles_mod.check(tx_data.contract_address, tx_data.data, block=block)
 
 
-def send(txs: List[TxData],
+def send(txs: List[Transactable],
          role: int,
          private_key: str,
          roles_mod_address: str,

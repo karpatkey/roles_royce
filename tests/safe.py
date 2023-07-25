@@ -2,7 +2,7 @@ from gnosis.safe import addresses, Safe, SafeOperation
 from gnosis.eth import EthereumNetwork, EthereumClient
 from eth_account.signers.local import LocalAccount
 
-from roles_royce.generic_method import TxData
+from roles_royce.generic_method import Transactable
 from roles_royce.constants import ETHAddr, Chain
 from roles_royce.utils import multi_or_one
 
@@ -14,7 +14,7 @@ class SimpleSafe(Safe):
         self.signer_key = signer_key
         super().__init__(address, ethereum_client)
 
-    def send(self, txs: list[TxData]):
+    def send(self, txs: list[Transactable]):
         tx = multi_or_one(txs, Chain.ETHEREUM)
         safe_tx = self.build_multisig_tx(to=tx.contract_address, value=tx.value,
                                          data=tx.data, operation=tx.operation,

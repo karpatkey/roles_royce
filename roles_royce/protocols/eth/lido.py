@@ -109,6 +109,17 @@ class RequestWithdrawalsWithPermitWstETH(RequestWithdrawalsWithPermitStETH):
     name = "requestWithdrawalsWithPermitWstETH"
 
 
+class GetWithdrawalRequests(Method):
+    name = "getWithdrawalRequests"
+    in_signature = [("owner", "address")]
+    out_signature = [("ids", "uint256[]")]
+    target_address = ETHAddr.unstETH
+
+    def __init__(self, owner: Address):
+        super().__init__()
+        self.args.owner = owner
+
+
 class ClaimWithdrawal(Method):
     """Sender wants to claim his ETH.
 
@@ -133,3 +144,25 @@ class ClaimWithdrawals(Method):
         super().__init__()
         self.args.request_ids = request_ids
         self.args.hints = hints
+
+
+class GetWithdrawalStatus(Method):
+    name = "getWithdrawalStatus"
+    in_signature = [("request_ids", "uint256[]")]
+    out_signature = [
+        ("statuses", [
+            (  # an array of structs
+                ("amount_of_stETH", "uint256"),
+                ("amount_of_shares", "uint256"),
+                ("owner", "address"),
+                ("timestamp", "uint256"),
+                ("is_finalized", "bool"),
+                ("is_claimed", "bool"),
+            ), "tuple[]"]
+         )
+    ]
+    target_address = ETHAddr.unstETH
+
+    def __init__(self, request_ids: list[int]):
+        super().__init__()
+        self.args.request_ids = request_ids

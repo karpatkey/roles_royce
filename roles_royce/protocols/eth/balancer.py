@@ -37,10 +37,13 @@ class Exit(Method):
         ("sender", "address"),
         ("recipient", "address"),
         ("request", (
-            ("assets", "address[]"),  # list of tokens, ordered numerically
-            ("min_amounts_out", "uint256[]"),  # the lower limits for the tokens to receive
-            ("user_data", "bytes"),  # userData encodes a ExitKind to tell the pool what style of exit you're performing
-            ("to_internal_balance", "bool"))
+            (
+                ("assets", "address[]"),  # list of tokens, ordered numerically
+                ("min_amounts_out", "uint256[]"),  # the lower limits for the tokens to receive
+                ("user_data", "bytes"),  # userData encodes a ExitKind to tell the pool what style of exit you're performing
+                ("to_internal_balance", "bool")
+            ),
+            "tuple"),
          )
     )
     fixed_arguments = {"sender": AvatarAddress, "recipient": AvatarAddress, "to_internal_balance": False}
@@ -118,14 +121,18 @@ class QueryExitMixin:
     target_address = ETHAddr.BALANCER_Queries
     out_signature = [("bpt_in", "uint256"), ("amounts_out", "uint256[]")]
 
+
 class SingleAssetQueryExit(QueryExitMixin, SingleAssetExit):
     pass
+
 
 class ProportionalExitQueryExit(QueryExitMixin, ProportionalExit):
     pass
 
+
 class CustomQueryExit(QueryExitMixin, CustomExit):
     pass
+
 
 # There is another JoinKind that is for Weighted Pools
 class StablePoolJoinKind(IntEnum):
@@ -150,11 +157,12 @@ class Join(Method):
         ("pool_id", "bytes32"),
         ("sender", "address"),
         ("recipient", "address"),
-        ("request", (
-            ("assets", "address[]"),  # list of tokens, ordered numerically
-            ("max_amounts_in", "uint256[]"),  # the higher limits for the tokens to deposit
-            ("user_data", "bytes"),  # userData encodes a ExitKind to tell the pool what style of join you're performing
-            ("from_internal_balance", "bool"))
+        ("request", ((
+                         ("assets", "address[]"),  # list of tokens, ordered numerically
+                         ("max_amounts_in", "uint256[]"),  # the higher limits for the tokens to deposit
+                         ("user_data", "bytes"),  # userData encodes a ExitKind to tell the pool what style of join you're performing
+                         ("from_internal_balance", "bool")
+                     ), "tuple")
          )
     )
     fixed_arguments = {"sender": AvatarAddress, "recipient": AvatarAddress, "from_internal_balance": False}
@@ -232,11 +240,14 @@ class QueryJoinMixin:
     target_address = ETHAddr.BALANCER_Queries
     out_signature = [("bpt_out", "uint256"), ("amounts_in", "uint256[]")]
 
+
 class SingleAssetQueryJoin(QueryJoinMixin, SingleAssetJoin):
     pass
 
+
 class ProportionalExitQueryJoin(QueryJoinMixin, ProportionalJoin):
     pass
+
 
 class ExactAssetQueryJoin(QueryJoinMixin, ExactTokensJoin):
     pass
