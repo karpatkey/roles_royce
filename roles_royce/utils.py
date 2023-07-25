@@ -5,7 +5,7 @@ from web3 import Web3
 from gnosis.safe.multi_send import MultiSend, MultiSendOperation, MultiSendTx
 from .roles_modifier import Operation
 from .constants import Blockchain, Chain
-from .generic_method import TxData
+from .generic_method import Transactable, TxData
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class MultiSendOffline(MultiSend):
         ).build_transaction({"gas": 1, "gasPrice": 1, "chainId": self.chain_id})["data"]
 
 
-def _make_multisend(txs: List[TxData], blockchain: Blockchain) -> tuple:
+def _make_multisend(txs: List[Transactable], blockchain: Blockchain) -> tuple:
     multisend_address = MULTISENDS.get(blockchain)
     transactions = [
         MultiSendTx(
@@ -52,7 +52,7 @@ def _make_multisend(txs: List[TxData], blockchain: Blockchain) -> tuple:
     return multisend_address, data
 
 
-def multi_or_one(txs: List[TxData], blockchain: Blockchain) -> TxData:
+def multi_or_one(txs: List[Transactable], blockchain: Blockchain) -> TxData:
     if len(txs) > 1:
         contract_address, data = _make_multisend(txs, blockchain)
         return TxData(contract_address=contract_address,

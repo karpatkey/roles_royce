@@ -1,8 +1,17 @@
 from dataclasses import dataclass, field
-
+from typing import Protocol
 from web3 import Web3
 from web3.types import HexStr
 from roles_royce.roles_modifier import Operation
+
+
+class Transactable(Protocol):
+    contract_address: str
+    operation: Operation
+    value: int
+
+    @property
+    def data(self) -> str: return ...
 
 
 @dataclass(kw_only=True)
@@ -13,12 +22,15 @@ class TxData:
     value: int = 0
 
 
-@dataclass(kw_only=True)
-class GenericMethodTransaction(TxData):
+@dataclass
+class GenericMethodTransaction:
     function_name: str
     function_args: list
     contract_abi: str
+    contract_address: str
     data: str = field(init=False)
+    operation: Operation = Operation.CALL
+    value: int = 0
 
     def __post_init__(self):
         self.data = self._calc_data()

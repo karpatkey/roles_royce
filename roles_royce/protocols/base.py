@@ -27,13 +27,15 @@ class Method:
         self.avatar = avatar
         self.args = Args()
         self._initialized = True
+        self.operation: Operation = Operation.CALL
+        self.contract_address: str = self.target_address
 
     @property
     def args_list(self):
         return [self._get_arg_value(e) for e in self.in_signature]
 
     @property
-    def data(self):
+    def data(self) -> str:
         if not hasattr(self, "_initialized"):
             raise ValueError(f"Missing super().__init__() call in {self.__class__.__name__}.__init__ method")
         contract = Web3().eth.contract(address=None, abi=self.abi)
@@ -51,14 +53,6 @@ class Method:
         outputs = [self._abi_for(e) for e in self.out_signature]
         abi = {"name": self.name, "type": "function", "inputs": inputs, "outputs": outputs}
         return json.dumps([abi])
-
-    @property
-    def contract_address(self):
-        return self.target_address
-
-    @property
-    def operation(self):
-        return Operation.CALL
 
     def call(self, web3, *args, **kwargs):
         contract = web3.eth.contract(address=self.target_address, abi=self.abi)
@@ -113,7 +107,7 @@ class BaseApprove(Method):
         self.args.amount = amount
 
     @property
-    def target_address(self):
+    def target_address(self) -> str:
         return self.token
 
 
