@@ -1,11 +1,18 @@
+from enum import IntEnum
+
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApprove
+from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApprove, BaseApproveForToken
 
 
 class ApproveWithdrawalDAI(BaseApprove):
     """approve stETH withdrawal with wstETH as spender"""
     fixed_arguments = {"spender": ETHAddr.sDAI}
     token = ETHAddr.DAI
+
+
+class ApproveToken(BaseApproveForToken):
+    """approve Token with SparkLendingPoolV3 as spender"""
+    fixed_arguments = {"spender": ETHAddr.SparkLendingPoolV3}
 
 
 class DepositDAI(Method):
@@ -30,3 +37,54 @@ class WithdrawWithSDAI(Method):
     def __init__(self, amount: int, avatar: Address):
         super().__init__(avatar=avatar)
         self.args.amount = amount
+
+
+class SetUserUseReserveAsCollateral(Method):
+    name = "setUserUseReserveAsCollateral"
+    in_signature = [("asset", "address"), ("use_as_collateral", "bool")]
+    target_address = ETHAddr.SparkLendingPoolV3
+
+    def __init__(self, asset: Address, use: bool):
+        super().__init__()
+        self.args.asset = asset
+        self.args.use_as_collateral = use
+
+
+class RateModel(IntEnum):
+    STABLE = 1
+    VARIABLE = 2
+
+
+class Borrow(Method):
+    """Sender receives Token and receives debtToken (stable or variable debt) token"""
+    name = "borrow"
+    in_signature = (("asset", "address"),
+                    ("amount", "uint256"),
+                    ("rate_model", "uint256"),
+                    ("referral_code", "uint16"),
+                    ("on_behalf_of", "address"))
+    fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
+    target_address = ETHAddr.SparkLendingPoolV3
+
+    def __init__(self, token: Address, amount: int, rate_model: RateModel, avatar: Address):
+        super().__init__(avatar=avatar)
+        self.args.asset = token
+        self.args.amount = amount
+        self.args.rate_model = rate_model
+
+
+class Repay(Method):
+    """Repay borrowed Token"""
+    name = "repay"
+    in_signature = (("asset", "address"),
+                    ("amount", "uint256"),
+                    ("rate_model", "uint256"),
+                    ("on_behalf_of", "address"))
+    fixed_arguments = {"on_behalf_of": AvatarAddress}
+    target_address = ETHAddr.SparkLendingPoolV3
+
+    def __init__(self, token: Address, amount: int, rate_model: RateModel, avatar: Address):
+        super().__init__(avatar=avatar)
+        self.args.asset = token
+        self.args.amount = amount
+        self.args.rate_model = rate_model
