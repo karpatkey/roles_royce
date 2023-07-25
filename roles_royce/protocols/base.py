@@ -28,7 +28,10 @@ class Method:
         self.args = Args()
         self._initialized = True
         self.operation: Operation = Operation.CALL
-        self.contract_address: str = self.target_address
+
+    @property
+    def contract_address(self) -> str:
+        return self.target_address
 
     @property
     def args_list(self):
@@ -61,7 +64,7 @@ class Method:
     def _get_arg_value(self, element):
         arg_name, arg_type = element
         if type(arg_type) in (list, tuple):
-            value = tuple(self._get_arg_value(e) for e in arg_type)
+            value = tuple(self._get_arg_value(e) for e in arg_type[0])
         else:
             if arg_name in self.fixed_arguments:
                 value = self.fixed_arguments[arg_name]
@@ -75,8 +78,8 @@ class Method:
         name, _type = element
         if type(_type) in (list, tuple):
             value = {"name": name,
-                     "type": "tuple",
-                     "components": [self._abi_for(e) for e in _type]
+                     "type": _type[1],  # tuple or tuple[]
+                     "components": [self._abi_for(e) for e in _type[0]]
                      }
         else:
             value = {"name": name, "type": _type}
@@ -85,7 +88,7 @@ class Method:
     def _get_arg_type(self, element):
         _type = element[1]
         if type(_type) in (list, tuple):
-            types = ",".join([self._get_arg_type(e) for e in _type])
+            types = ",".join([self._get_arg_type(e) for e in _type[0]])
             value = f"({types})"
         else:
             value = _type

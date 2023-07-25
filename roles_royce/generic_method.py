@@ -6,12 +6,14 @@ from roles_royce.roles_modifier import Operation
 
 
 class Transactable(Protocol):
-    contract_address: str
     operation: Operation
     value: int
 
     @property
     def data(self) -> str: return ...
+
+    @property
+    def contract_address(self) -> str: return ...
 
 
 @dataclass(kw_only=True)
