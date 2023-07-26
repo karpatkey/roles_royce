@@ -29,14 +29,14 @@ def test_integration(local_node, accounts):
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 1_000
 
     # Deposit DAI, get sDAI
-    safe.send([spark.ApproveWithdrawalDAI(amount=1_000),
-               spark.DepositDAI(amount=1_000, avatar=safe.address),
-               spark.ApproveWithdrawalDAI(amount=0)])
+    safe.send([spark.ApproveDAIforSDAI(amount=1_000),
+               spark.DepositDAIforSDAI(amount=1_000, avatar=safe.address),
+               spark.ApproveDAIforSDAI(amount=0)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
     assert get_balance(w3, ETHAddr.sDAI, safe.address) == 976
 
     # Repay sDAI to get DAI
-    safe.send([spark.WithdrawWithSDAI(amount=976, avatar=safe.address)])
+    safe.send([spark.WithdrawDAIforSDAI(amount=976, avatar=safe.address)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 999
     assert get_balance(w3, ETHAddr.sDAI, safe.address) == 0
 
