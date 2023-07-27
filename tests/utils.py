@@ -28,9 +28,9 @@ from .safe import SimpleSafe
 
 REMOTE_NODE_URL = codecs.decode(b'x\x9c\x05\xc1[\x12\x80 \x08\x00\xc0\x1b\x89\x8a\xf8\xe86\xea\xc8\xc4G\xd4\x14u\xfevw\xb3\xeb\xd9\x00\x8e.'
                                 b'\xaa\xcb\x9c(\xbfwwr\xc2\x87\x10\xb9M,%\xd7\xc1\x94\x02\xcd\x91V\xf6\xdc\xb0\xc6\x91C\xf0\xf4\x03~\xaa\x12\xb1',
-                                "zlib")
+                                "zlib").decode()
 
-ETH_FORK_NODE_URL = os.environ.get("RR_ETH_FORK_URL", "https://rpc.ankr.com/eth")
+ETH_FORK_NODE_URL = os.environ.get("RR_ETH_FORK_URL", REMOTE_NODE_URL)
 LOCAL_NODE_PORT = 8546
 LOCAL_NODE_DEFAULT_BLOCK = 17565000
 HARDHAT_STANDALONE = os.environ.get("RR_HARDHAT_STANDALONE", False)
