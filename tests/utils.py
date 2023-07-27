@@ -103,7 +103,7 @@ class SimpleDaemonRunner(object):
             return
 
         self.proc.terminate()
-        stdout, stderr = self.proc.communicate()
+        stdout, stderr = self.proc.communicate(timeout=20)
         retcode = self.proc.returncode
 
         self.proc = None
