@@ -148,7 +148,7 @@ def local_node(request):
 
         request.addfinalizer(stop)
 
-    wait_for_port(LOCAL_NODE_PORT)
+    wait_for_port(LOCAL_NODE_PORT, timeout=20)
 
     w3 = Web3(HTTPProvider(f"http://localhost:{LOCAL_NODE_PORT}"))
     hardhat_reset_state(w3, url=ETH_FORK_NODE_URL, block=LOCAL_NODE_DEFAULT_BLOCK)
