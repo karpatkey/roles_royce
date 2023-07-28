@@ -4,7 +4,7 @@ from addresses_and_abis import addresses, protocol_data_provider_abi, pool_addre
 
 
 #Use an MEV blocker endpoint
-w3 = Web3(Web3.HTTPProvider('https://eth-mainnet.g.alchemy.com/v2/HblD4Hdh1e0s5Pe_7DOcdiWMfbZ2Rx1o'))
+w3 = Web3(Web3.HTTPProvider(''))
 WALLET = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
 
 def get_spark_token_addresses(w3: Web3, blockchain = 'ethereum') -> dict:
