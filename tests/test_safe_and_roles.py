@@ -10,7 +10,7 @@ from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi, erc20_abi
 from roles_royce.utils import MULTISENDS
 from roles_royce.constants import ETHAddr
 from roles_royce.generic_method import TxData
-from .utils import (local_node, local_node_reset, accounts, ETH_LOCAL_NODE_URL, hardhat_unlock_account, create_simple_safe,
+from .utils import (local_node, local_node_reset, accounts, ETH_LOCAL_NODE_URL, fork_unlock_account, create_simple_safe,
                     get_balance, steal_token, SimpleSafe)
 from .roles import setup_common_roles, deploy_roles, apply_presets
 
@@ -58,7 +58,7 @@ def test_safe_and_roles(local_node):
     dai_decimals = dai_ctract.functions.decimals().call()
     dai_amount = 5 * (10 ** dai_decimals)
 
-    hardhat_unlock_account(w3, ADDRESS_WITH_LOTS_OF_TOKENS)
+    fork_unlock_account(w3, ADDRESS_WITH_LOTS_OF_TOKENS)
     dai_ctract.functions.transfer(safe.address, dai_amount).transact({"from": ADDRESS_WITH_LOTS_OF_TOKENS})
     assert dai_ctract.functions.balanceOf(safe.address).call() == 5 * (10 ** dai_decimals)
 
