@@ -37,7 +37,8 @@ def test_safe_and_roles(local_node):
 
     ethereum_tx_sent = Safe.create(ethereum_client, deployer_account=Account.from_key(test_account0_private_key),
                                    master_copy_address=addresses.MASTER_COPIES[EthereumNetwork.MAINNET][0][0],
-                                   owners=[test_account0_addr], threshold=1)
+                                   owners=[test_account0_addr], threshold=1,
+                                   proxy_factory_address="0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2")
 
     safe = SimpleSafe(ethereum_tx_sent.contract_address, ethereum_client, test_account0_private_key)
     safe.retrieve_all_info()

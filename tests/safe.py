@@ -49,7 +49,10 @@ class SimpleSafe(Safe):
         ethereum_client = EthereumClient(node_url)
         ethereum_tx_sent = cls.create(ethereum_client, deployer_account=owner,
                                       master_copy_address=addresses.MASTER_COPIES[EthereumNetwork.MAINNET][0][0],
-                                      owners=[owner.address], threshold=1)
+                                      owners=[owner.address], threshold=1,
+                                      # using a proxy factory address as without it
+                                      # the gas estimation is too high because of a bug in gnosis/safe/safe.py
+                                      proxy_factory_address="0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2")
 
         safe = SimpleSafe(ethereum_tx_sent.contract_address, ethereum_client, signer_key=owner.key)
         return safe
