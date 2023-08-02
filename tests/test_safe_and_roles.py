@@ -79,7 +79,7 @@ def test_safe_and_roles(local_node):
     owner = avatar = target = w3.to_checksum_address(test_account0_addr)
     role_ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
 
-    tx_hash = role_ctract.constructor(owner, avatar, target).transact()  # deploy!
+    tx_hash = role_ctract.constructor(owner, avatar, target).transact({"from": test_account0_addr})  # deploy!
     roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5).contractAddress
 
     role_ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
@@ -88,8 +88,9 @@ def test_safe_and_roles(local_node):
     # give the roles_mod to the safe
     role_ctract.functions.setTarget(safe.address).transact({"from": test_account0_addr})
     role_ctract.functions.setAvatar(safe.address).transact({"from": test_account0_addr})
+    role_ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact({"from": test_account0_addr})
     role_ctract.functions.transferOwnership(safe.address).transact({"from": test_account0_addr})
-    role_ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact({"from": safe.address})
+
     assert role_ctract.functions.owner().call() == safe.address
     assert role_ctract.functions.avatar().call() == safe.address
     assert role_ctract.functions.target().call() == safe.address
