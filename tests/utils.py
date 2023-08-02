@@ -115,11 +115,12 @@ class SimpleDaemonRunner(object):
 
 
 def fork_unlock_account(w3, address):
-    asd=w3.provider.make_request("anvil_impersonateAccount", [address])
-    return
+    return w3.provider.make_request("anvil_impersonateAccount", [address])
+
 
 def fork_reset_state(w3, url, block):
-    resp = w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
+    return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
+
 
 def run_hardhat():
     try:
@@ -141,6 +142,7 @@ def run_hardhat():
     node.start()
     return node
 
+
 def run_anvil():
     log_filename = "/tmp/rr_fork_node_log.txt"
     logger.info(f"Writing Anvil log to {log_filename}")
@@ -157,6 +159,7 @@ def run_anvil():
 def local_node(request):
     if RUN_LOCAL_NODE:
         node = run_anvil()
+
         def stop():
             node.stop()
 
