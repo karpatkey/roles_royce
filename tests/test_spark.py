@@ -24,7 +24,7 @@ def test_integration(local_node, accounts):
     res = safe.send([spark.SetUserUseReserveAsCollateral(asset=ETHAddr.GNO, use=True)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
     res = safe.send([spark.Borrow(token=ETHAddr.DAI, amount=1_000,
-                                  rate_mode=spark.RateMode.VARIABLE,
+                                  rate_model=spark.RateModel.VARIABLE,
                                   avatar=safe.address)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 1_000
 
@@ -35,7 +35,7 @@ def test_integration(local_node, accounts):
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
     assert get_balance(w3, ETHAddr.sDAI, safe.address) == 976
 
-    # Repay sDAI to get DAI
+    # Redeem sDAI to get DAI
     safe.send([spark.WithdrawWithSDAI(amount=976, avatar=safe.address)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 999
     assert get_balance(w3, ETHAddr.sDAI, safe.address) == 0

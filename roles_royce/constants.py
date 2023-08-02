@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 
 class CrossChainAddr:
     BalancerVault = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
@@ -68,3 +69,10 @@ class Chain:
     ETHEREUM = Blockchain("ethereum", 0x1)
     POLYGON = Blockchain("polygon", 0x89)
     GC = Blockchain("gnosisChain", 0x64)
+
+    @classmethod
+    def get_blockchain_by_chain_id(cls, chain_id):
+        for attr_name, attr_value in cls.__dict__.items():
+            if isinstance(attr_value, Blockchain) and attr_value.chain_id == chain_id:
+                return attr_value
+        raise ValueError(f"No Blockchain with chain_id {chain_id} found in Chain.")
