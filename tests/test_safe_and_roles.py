@@ -10,7 +10,7 @@ from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi, erc20_abi
 from roles_royce.utils import MULTISENDS
 from roles_royce.constants import ETHAddr
 from roles_royce.generic_method import TxData
-from .utils import (local_node, local_node_reset, accounts, ETH_LOCAL_NODE_URL, hardhat_unlock_account, create_simple_safe,
+from .utils import (local_node, local_node_reset, accounts, ETH_LOCAL_NODE_URL, fork_unlock_account, create_simple_safe,
                     get_balance, steal_token, SimpleSafe)
 from .roles import setup_common_roles, deploy_roles, apply_presets
 
@@ -37,7 +37,8 @@ def test_safe_and_roles(local_node):
 
     ethereum_tx_sent = Safe.create(ethereum_client, deployer_account=Account.from_key(test_account0_private_key),
                                    master_copy_address=addresses.MASTER_COPIES[EthereumNetwork.MAINNET][0][0],
-                                   owners=[test_account0_addr], threshold=1)
+                                   owners=[test_account0_addr], threshold=1,
+                                   proxy_factory_address="0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2")
 
     safe = SimpleSafe(ethereum_tx_sent.contract_address, ethereum_client, test_account0_private_key)
     safe.retrieve_all_info()
@@ -57,7 +58,7 @@ def test_safe_and_roles(local_node):
     dai_decimals = dai_ctract.functions.decimals().call()
     dai_amount = 5 * (10 ** dai_decimals)
 
-    hardhat_unlock_account(w3, ADDRESS_WITH_LOTS_OF_TOKENS)
+    fork_unlock_account(w3, ADDRESS_WITH_LOTS_OF_TOKENS)
     dai_ctract.functions.transfer(safe.address, dai_amount).transact({"from": ADDRESS_WITH_LOTS_OF_TOKENS})
     assert dai_ctract.functions.balanceOf(safe.address).call() == 5 * (10 ** dai_decimals)
 
@@ -78,17 +79,18 @@ def test_safe_and_roles(local_node):
     owner = avatar = target = w3.to_checksum_address(test_account0_addr)
     role_ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
 
-    tx_receipt = role_ctract.constructor(owner, avatar, target).transact()  # deploy!
-    roles_ctract_address = w3.eth.get_transaction_receipt(tx_receipt).contractAddress
+    tx_hash = role_ctract.constructor(owner, avatar, target).transact({"from": test_account0_addr})  # deploy!
+    roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5).contractAddress
 
     role_ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
     assert role_ctract.functions.avatar().call() == avatar
 
     # give the roles_mod to the safe
-    role_ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact()
-    role_ctract.functions.setTarget(safe.address).transact()
-    role_ctract.functions.setAvatar(safe.address).transact()
-    role_ctract.functions.transferOwnership(safe.address).transact()
+    role_ctract.functions.setTarget(safe.address).transact({"from": test_account0_addr})
+    role_ctract.functions.setAvatar(safe.address).transact({"from": test_account0_addr})
+    role_ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact({"from": test_account0_addr})
+    role_ctract.functions.transferOwnership(safe.address).transact({"from": test_account0_addr})
+
     assert role_ctract.functions.owner().call() == safe.address
     assert role_ctract.functions.avatar().call() == safe.address
     assert role_ctract.functions.target().call() == safe.address

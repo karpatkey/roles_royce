@@ -26,14 +26,15 @@ from web3.contract import Contract
 from roles_royce.evm_utils import erc20_abi
 from .safe import SimpleSafe
 
-REMOTE_NODE_URL = codecs.decode(b'x\x9c\x05\xc1[\x12\x80 \x08\x00\xc0\x1b\x89\x8a\xf8\xe86\xea\xc8\xc4G\xd4\x14u\xfevw\xb3\xeb\xd9\x00\x8e.'
-                                b'\xaa\xcb\x9c(\xbfwwr\xc2\x87\x10\xb9M,%\xd7\xc1\x94\x02\xcd\x91V\xf6\xdc\xb0\xc6\x91C\xf0\xf4\x03~\xaa\x12\xb1',
-                                "zlib")
+REMOTE_NODE_URL = codecs.decode(
+    b'x\x9c\xcb())(\xb6\xd2\xd7O-\xc9\xd0\xcdM\xcc\xcc\xcbK-\xd1K\xd7K\xccI\xceH\xcd\xad\xd4K\xce\xcf\xd5/3\xd2\x0f'
+    b'u)74-6NNu\xb3\xcc\x0f\nH\n\xcb\xccq4\xd4u\xcd3(53+\xf32\n(\x06\x00Q\x92\x17X',
+    "zlib").decode()
 
-ETH_FORK_NODE_URL = os.environ.get("RR_ETH_FORK_URL", "https://rpc.ankr.com/eth")
+ETH_FORK_NODE_URL = os.environ.get("RR_ETH_FORK_URL", REMOTE_NODE_URL)
 LOCAL_NODE_PORT = 8546
 LOCAL_NODE_DEFAULT_BLOCK = 17565000
-HARDHAT_STANDALONE = os.environ.get("RR_HARDHAT_STANDALONE", False)
+RUN_LOCAL_NODE = os.environ.get("RR_RUN_LOCAL_NODE", False)
 ETH_LOCAL_NODE_URL = f"http://127.0.0.1:{LOCAL_NODE_PORT}"
 DIR_OF_THIS_FILE = os.path.dirname(os.path.abspath(__file__))
 
@@ -103,7 +104,7 @@ class SimpleDaemonRunner(object):
             return
 
         self.proc.terminate()
-        stdout, stderr = self.proc.communicate()
+        stdout, stderr = self.proc.communicate(timeout=20)
         retcode = self.proc.returncode
 
         self.proc = None
@@ -113,56 +114,72 @@ class SimpleDaemonRunner(object):
         return self.proc is not None
 
 
-def hardhat_unlock_account(w3, address):
-    return w3.provider.make_request("hardhat_impersonateAccount", [address])
+def fork_unlock_account(w3, address):
+    return w3.provider.make_request("anvil_impersonateAccount", [address])
 
 
-def hardhat_reset_state(w3, url, block):
-    resp = w3.provider.make_request("hardhat_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
-    assert resp['result']
+def fork_reset_state(w3, url, block):
+    return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
+
+
+def run_hardhat():
+    try:
+        npm = shutil.which("npm")
+        subprocess.check_call([npm, "--version"])
+        if "hardhat" not in json.loads(subprocess.check_output([npm, "list", "--json"])).get("dependencies", {}):
+            raise subprocess.CalledProcessError
+    except subprocess.CalledProcessError:
+        raise RuntimeError('Hardhat is not installed properly. Check the README for instructions.')
+
+    log_filename = "/tmp/rr_hardhat_log.txt"
+    logger.info(f"Writing Hardhat log to {log_filename}")
+    hardhat_log = open(log_filename, "w")
+    npx = shutil.which("npx")
+    node = SimpleDaemonRunner(
+        cmd=f"{npx} hardhat node --show-stack-traces --fork '{ETH_FORK_NODE_URL}' --fork-block-number {LOCAL_NODE_DEFAULT_BLOCK} --port {LOCAL_NODE_PORT}",
+        popen_kwargs={'stdout': hardhat_log, 'stderr': hardhat_log}
+    )
+    node.start()
+    return node
+
+
+def run_anvil():
+    log_filename = "/tmp/rr_fork_node_log.txt"
+    logger.info(f"Writing Anvil log to {log_filename}")
+    log = open(log_filename, "w")
+    node = SimpleDaemonRunner(
+        cmd=f"anvil --accounts 15 -f '{ETH_FORK_NODE_URL}' --fork-block-number {LOCAL_NODE_DEFAULT_BLOCK} --port {LOCAL_NODE_PORT}",
+        popen_kwargs={'stdout': log, 'stderr': log}
+    )
+    node.start()
+    return node
 
 
 @pytest.fixture(scope='session')
 def local_node(request):
-    if not HARDHAT_STANDALONE:
-        try:
-            npm = shutil.which("npm")
-            subprocess.check_call([npm, "--version"])
-            if "hardhat" not in json.loads(subprocess.check_output([npm, "list", "--json"])).get("dependencies", {}):
-                raise subprocess.CalledProcessError
-        except subprocess.CalledProcessError:
-            raise RuntimeError('Hardhat is not installed properly. Check the README for instructions.')
-
-        log_filename = "/tmp/rr_hardhat_log.txt"
-        logger.info(f"Writing Hardhat log to {log_filename}")
-        hardhat_log = open(log_filename, "w")
-        npx = shutil.which("npx")
-        node = SimpleDaemonRunner(
-            cmd=f"{npx} hardhat node --show-stack-traces --fork '{ETH_FORK_NODE_URL}' --fork-block-number {LOCAL_NODE_DEFAULT_BLOCK} --port {LOCAL_NODE_PORT}",
-            popen_kwargs={'stdout': hardhat_log, 'stderr': hardhat_log}
-        )
-        node.start()
+    if RUN_LOCAL_NODE:
+        node = run_anvil()
 
         def stop():
             node.stop()
 
         request.addfinalizer(stop)
 
-    wait_for_port(LOCAL_NODE_PORT)
+    wait_for_port(LOCAL_NODE_PORT, timeout=20)
 
     w3 = Web3(HTTPProvider(f"http://localhost:{LOCAL_NODE_PORT}"))
-    hardhat_reset_state(w3, url=ETH_FORK_NODE_URL, block=LOCAL_NODE_DEFAULT_BLOCK)
+    fork_reset_state(w3, url=ETH_FORK_NODE_URL, block=LOCAL_NODE_DEFAULT_BLOCK)
     assert w3.eth.block_number == LOCAL_NODE_DEFAULT_BLOCK
     return w3
 
 
 @pytest.fixture(autouse=True)
 def local_node_reset(local_node):
-    hardhat_reset_state(local_node, url=ETH_FORK_NODE_URL, block=LOCAL_NODE_DEFAULT_BLOCK)
+    fork_reset_state(local_node, url=ETH_FORK_NODE_URL, block=LOCAL_NODE_DEFAULT_BLOCK)
 
 
 def local_node_set_block(w3, block):
-    hardhat_reset_state(w3, url=ETH_FORK_NODE_URL, block=block)
+    fork_reset_state(w3, url=ETH_FORK_NODE_URL, block=block)
 
 
 @pytest.fixture(scope='session')
@@ -171,7 +188,7 @@ def accounts() -> list[LocalAccount]:
 
 
 def steal_token(w3, token, holder, to, amount):
-    hardhat_unlock_account(w3, holder)
+    fork_unlock_account(w3, holder)
     ctract = w3.eth.contract(address=token, abi=erc20_abi)
     tx = ctract.functions.transfer(to, amount).transact({"from": holder})
     return tx
@@ -187,7 +204,7 @@ def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
 
     safe = SimpleSafe.build(owner, ETH_LOCAL_NODE_URL)
     w3.eth.send_transaction({"to": safe.address, "value": Web3.to_wei(100, "ether"), "from": SCRAPE_ACCOUNT.address})
-    hardhat_unlock_account(w3, safe.address)
+    fork_unlock_account(w3, safe.address)
     return safe
 
 

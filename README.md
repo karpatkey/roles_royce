@@ -99,12 +99,11 @@ status = check(txs=[approve, add_liquidity],
 
 * Install the python dev dependencies: `pip install -r requirements-dev.txt`
 * Install rolls_royce in editable mode: `pip install -e .`
-* Install Hardhat by running `npm install` in the project's root directory.
+* Install anvil by downloading it from https://github.com/foundry-rs/foundry.
 
 
-If the tests are not working it may be due to hardhat not being correctly installed or some
-other incompatibility. In this case run hardhat manually in fork mode on port 8546 with:
+To run the tests start anvil in a terminal in fork mode on port 8546 with:
 
-`npx hardhat node --show-stack-traces --fork 'URL' --port 8546`
+`anvil --accounts 15 -f 'URL' --port 8546`
 
-and then run the tests with `RR_HARDHAT_STANDALONE=1 pytest`.
+and then run the tests with `pytest -vs`.
