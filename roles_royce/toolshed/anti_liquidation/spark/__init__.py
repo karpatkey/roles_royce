@@ -33,10 +33,7 @@ class SparkCDP:
         if not self.owner_address:
             raise ValueError("'owner_address' must be filled.")
         self.blockchain = Chain.get_blockchain_by_chain_id(self.w3.eth.chain_id)
-        if not self.block:
-            self.block = self.w3.eth.block_number
-        self.data = self.get_cdp_data()
-        self.health_factor = self.get_health_factor()
+        self.update_data(self.block)
 
     def get_spark_token_addresses(self) -> list[dict]:
         blockchain = Chain.get_blockchain_by_chain_id(self.w3.eth.chain_id)
@@ -51,7 +48,7 @@ class SparkCDP:
             )
         return spark_tokens
 
-    def get_cdp_data(self)->dict:
+    def get_cdp_data(self) -> dict:
         spark_tokens = self.get_spark_token_addresses()
 
         pool_addresses_provider_contract = self.w3.eth.contract(
@@ -149,8 +146,8 @@ class SparkCDP:
                 borrowed_amount_of_token_in_stable == 0 and borrowed_amount_of_token_in_variable == 0):
             raise ValueError('There is no borrowed amount of token %s.' % token_in_address)
 
-        if self.health_factor >= target_health_factor*(1 - 0.01):
-            return 0
+        if self.health_factor >= target_health_factor * (1 - 0.01):
+            return Decimal(0)
 
         collateral_sum = 0
         for element in cdp_data:
