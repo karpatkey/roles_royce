@@ -4,10 +4,11 @@ from roles_royce.evm_utils import roles_abi, roles_bytecode
 from roles_royce.generic_method import TxData
 from roles_royce import Chain
 
+from web3 import Web3
 from .utils import TEST_ACCOUNTS, SimpleSafe
 
 
-def deploy_roles(w3, avatar):
+def deploy_roles(w3: Web3, avatar):
     # Deploy a Roles contrat without using the ProxyFactory (to simplify things)
     role_constructor_bytes = "000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
     bytecode_without_default_constructor = roles_bytecode[:-len(role_constructor_bytes)]
@@ -15,8 +16,8 @@ def deploy_roles(w3, avatar):
     ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
 
     owner = avatar = target = w3.to_checksum_address(avatar)
-    tx_receipt = ctract.constructor(owner, avatar, target).transact({"from": avatar})  # deploy!
-    roles_ctract_address = w3.eth.get_transaction_receipt(tx_receipt).contractAddress
+    tx_hash = ctract.constructor(owner, avatar, target).transact({"from": avatar})  # deploy!
+    roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5).contractAddress
 
     ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
     ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact({"from": avatar})

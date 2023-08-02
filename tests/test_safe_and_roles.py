@@ -79,8 +79,8 @@ def test_safe_and_roles(local_node):
     owner = avatar = target = w3.to_checksum_address(test_account0_addr)
     role_ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
 
-    tx_receipt = role_ctract.constructor(owner, avatar, target).transact()  # deploy!
-    roles_ctract_address = w3.eth.get_transaction_receipt(tx_receipt).contractAddress
+    tx_hash = role_ctract.constructor(owner, avatar, target).transact()  # deploy!
+    roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5).contractAddress
 
     role_ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
     assert role_ctract.functions.avatar().call() == avatar
