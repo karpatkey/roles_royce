@@ -79,8 +79,8 @@ class SetUserUseReserveAsCollateral(Method):
         self.args.use_as_collateral = use
 
 
-class RateMode(IntEnum):
-    # STABLE = 1 , stable is not available at the moment
+class RateModel(IntEnum):
+    STABLE = 1 , #stable is not available at the moment
     VARIABLE = 2
 
 
@@ -89,17 +89,17 @@ class Borrow(Method):
     name = "borrow"
     in_signature = (("asset", "address"),
                     ("amount", "uint256"),
-                    ("rate_mode", "uint256"),
+                    ("rate_model", "uint256"),
                     ("referral_code", "uint16"),
                     ("on_behalf_of", "address"))
     fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
     target_address = ETHAddr.SparkLendingPoolV3
 
-    def __init__(self, token: Address, amount: int, rate_mode: RateMode, avatar: Address):
+    def __init__(self, token: Address, amount: int, rate_model: RateModel, avatar: Address):
         super().__init__(avatar=avatar)
         self.args.asset = token
         self.args.amount = amount
-        self.args.rate_mode = rate_mode
+        self.args.rate_model = rate_model
 
 
 class Repay(Method):
@@ -112,8 +112,8 @@ class Repay(Method):
     fixed_arguments = {"on_behalf_of": AvatarAddress}
     target_address = ETHAddr.SparkLendingPoolV3
 
-    def __init__(self, token: Address, amount: int, rate_model: RateMode, avatar: Address):
+    def __init__(self, token: Address, amount: int, rate_model: RateModel, avatar: Address):
         super().__init__(avatar=avatar)
         self.args.asset = token
         self.args.amount = amount
-        self.args.rate_mode = rate_model
+        self.args.rate_model = rate_model

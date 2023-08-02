@@ -38,6 +38,7 @@ class SimpleSafe(Safe):
         safe_tx.sign(self.signer_key)
         tx_hash, _ = safe_tx.execute(self.signer_key)
         receipt = self.ethereum_client.get_transaction_receipt(tx_hash, timeout=1)
+
         for log in receipt['logs']:
             for topic in log['topics']:
                 if topic == HexBytes("0x23428b18acfb3ea64b08dc0c1d296ea9c09702c09083ca5272e64d115b687d23"):
