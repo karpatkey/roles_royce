@@ -4,8 +4,8 @@ from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApprove, BaseApproveForToken
 
 
-class ApproveWithdrawalDAI(BaseApprove):
-    """approve stETH withdrawal with wstETH as spender"""
+class ApproveDAIforSDAI(BaseApprove):
+    """approve DAI with sDAI as spender"""
     fixed_arguments = {"spender": ETHAddr.sDAI}
     token = ETHAddr.DAI
 
@@ -31,7 +31,7 @@ class DepositToken(Method):
         self.args.amount = amount
 
 
-class DepositDAI(Method):
+class DepositDAIforSDAI(Method):
     """Sender deposits DAI and receives sDAI in exchange (the DAI is deposited in Maker - DSR)"""
     name = "deposit"
     in_signature = [("amount", "uint256"), ("receiver", "address")]
@@ -56,7 +56,7 @@ class WithdrawToken(Method):
         self.args.amount = amount
 
 
-class WithdrawWithSDAI(Method):
+class WithdrawDAIforSDAI(Method):
     """Sender redeems sDAI and withdraws DAI"""
     name = "redeem"
     in_signature = [("amount", "uint256"), ("receiver", "address"), ("owner", "address")]

@@ -1,7 +1,7 @@
 from roles_royce import check, send, Chain
 from roles_royce.protocols.eth import lido
 from roles_royce.constants import ETHAddr
-from .utils import web3_eth, local_node, accounts, get_balance, hardhat_unlock_account, create_simple_safe
+from .utils import web3_eth, local_node, accounts, get_balance, fork_unlock_account, create_simple_safe
 
 # Test safe
 AVATAR = "0xC01318baB7ee1f5ba734172bF7718b5DC6Ec90E1"
@@ -113,7 +113,7 @@ def test_integration(local_node, accounts):
     amount_of_stETH, shares, owner, timestamp, is_finalized, is_claimed = statuses[0]
     assert is_finalized and not is_claimed
 
-    hardhat_unlock_account(w3, owner)
+    fork_unlock_account(w3, owner)
     # TODO
     # claim = lido.ClaimWithdrawal(request_id=3002)
     # tx_hash = w3.eth.send_transaction({"to": claim.contract_address, "value": claim.value, "data": claim.data,
