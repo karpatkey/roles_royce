@@ -92,4 +92,44 @@ class UndelegateMKR(Method):
     def __init__(self, amount: int):
         super().__init__()
         self.args.amount = amount
+
+class DelegateMKR(Method):
+    """delegate MKR"""
+    name = "lock"
+    in_signature = [("amount", "uint256")]
+
+    def __init__(self, amount: int):
+        super().__init__()
+        self.args.amount = amount
+
+class JoinPot(Method):
+    """join the pot through DSR Manager"""
+    name = "join"
+    in_signature = [("destination","address"),("amount", "uint256")]
+    target_address = ETHAddr.MakerDSRManager
+
+    def __init__(self, destination: Address, amount: int):
+        super().__init__()
+        self.args.destination = destination
+        self.args.amount = amount
+
+class ExitPot(Method):
+    """exit the pot through DSR Manager"""
+    name = "exit"
+    in_signature = [("destination","address"),("amount", "uint256")]
+    target_address = ETHAddr.MakerDSRManager
+
+    def __init__(self, destination: Address, amount: int):
+        super().__init__()
+        self.args.destination = destination
+        self.args.amount = amount
+
+class DripThePot(Method):
+    """drip the pot to be able to join and exit"""
+    name = "drip"
+    in_signature = []
+    target_address = ETHAddr.MakerDSRManager
+
+    def __init__(self):
+        super().__init__()
    
