@@ -14,11 +14,10 @@ def build(txs: List[Transactable],
           role: int,
           account: str,
           roles_mod_address: str,
-          blockchain: Blockchain,
           web3: Web3,
           tx_kwargs: dict | None = None
           ) -> bool:
-    tx_data = multi_or_one(txs, blockchain)
+    tx_data = multi_or_one(txs, Chain.get_blockchain_by_chain_id(web3.eth.chain_id))
     roles_mod = RolesMod(
         role=role,
         contract_address=roles_mod_address,
@@ -38,7 +37,7 @@ def check(txs: List[Transactable],
           account: str,
           roles_mod_address: str,
           web3: Web3,
-          block='latest',
+          block: int | str ='latest',
           ) -> bool:
     """Test the transaction with static call
 

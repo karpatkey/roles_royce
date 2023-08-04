@@ -264,7 +264,7 @@ def test_build_operation(local_node, accounts):
     approve_aura_booster = aura.ApproveForBooster(token="0x32296969Ef14EB0c6d29669C550D4a0449130230", amount=1_000_000_000_000_000_000)
     approves = build([approve_vault, approve_aura_booster], role=2, account=accounts[2].address,
                      roles_mod_address=roles_ctract.address,
-                     blockchain=Chain.ETHEREUM, web3=w3)
+                     web3=w3)
 
     # here the transaction can be sent directly to the node, if it has the private key,
     #  or sign it first with web3.eth.account.sign_transaction(tx, private_key)
