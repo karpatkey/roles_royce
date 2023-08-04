@@ -13,7 +13,7 @@ ROLE = 1
 def test_methods(web3_eth):
     approve = lido.ApproveWithdrawalStETHwithWstETH(amount=100)
     status = check([approve], role=ROLE, account=MANAGER, roles_mod_address=ROLES_MOD_ADDRESS,
-                   blockchain=Chain.ETHEREUM, web3=web3_eth, block=17067157)
+                   web3=web3_eth, block=17067157)
     assert status
 
 
@@ -29,7 +29,7 @@ def test_deposit(web3_eth):
     assert deposit.value == 10
     assert deposit.target_address == ETHAddr.stETH
     status = check([deposit], role=ROLE, account=MANAGER, roles_mod_address=ROLES_MOD_ADDRESS,
-                   blockchain=Chain.ETHEREUM, web3=web3_eth, block=17067157)
+                   web3=web3_eth, block=17067157)
     assert status
 
 
@@ -37,14 +37,14 @@ def test_wrap(web3_eth):
     approve = lido.ApproveWithdrawalStETHwithWstETH(amount=100)
     wrap = lido.Wrap(amount=10)
     status = check([approve, wrap], role=ROLE, account=MANAGER, roles_mod_address=ROLES_MOD_ADDRESS,
-                   blockchain=Chain.ETHEREUM, web3=web3_eth, block=17067157)
+                   web3=web3_eth, block=17067157)
     assert status
 
 
 def test_unwrap(web3_eth):
     unwrap = lido.Unwrap(amount=1_000_000_000_000)
     status = check([unwrap], role=ROLE, account=MANAGER, roles_mod_address=ROLES_MOD_ADDRESS,
-                   blockchain=Chain.ETHEREUM, web3=web3_eth, block=17067157)
+                   web3=web3_eth, block=17067157)
     assert status
 
 

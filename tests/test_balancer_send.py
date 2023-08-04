@@ -37,5 +37,5 @@ getPool = GenericMethodTransaction(
 @pytest.mark.xfail(reason='still WIP')
 def test_check_multi(web3_gnosis):
     status = check(txs=[getPool], role=2, account=ACCOUNT, roles_mod_address=ROLES_MOD_ADDRESS,
-                   web3=web3_gnosis, blockchain=Chain.GC)
+                   web3=web3_gnosis)
     assert status

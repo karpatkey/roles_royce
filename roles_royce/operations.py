@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from web3 import Web3
 from .roles_modifier import RolesMod
-from .constants import Blockchain
+from .constants import Blockchain, Chain
 from .generic_method import Transactable
 from .utils import multi_or_one
 
@@ -37,7 +37,6 @@ def check(txs: List[Transactable],
           role: int,
           account: str,
           roles_mod_address: str,
-          blockchain: Blockchain,
           web3: Web3,
           block='latest',
           ) -> bool:
@@ -48,13 +47,12 @@ def check(txs: List[Transactable],
         role (int): role that wants to execute
         account (str): account that wants to execute
         roles_mod_address (str): address to call execTransactionWithRole
-        blockchain (Blockchain)
         web3 (Web3)
 
     Returns:
         bool: status
     """
-    tx_data = multi_or_one(txs, blockchain)
+    tx_data = multi_or_one(txs, Chain.get_blockchain_by_chain_id(web3.eth.chain_id))
     roles_mod = RolesMod(
         role=role,
         contract_address=roles_mod_address,
@@ -70,7 +68,6 @@ def send(txs: List[Transactable],
          role: int,
          private_key: str,
          roles_mod_address: str,
-         blockchain: Blockchain,
          web3: Web3,
          tx_kwargs: dict | None = None
          ) -> bool:
@@ -81,13 +78,12 @@ def send(txs: List[Transactable],
         role (int): role that wants to execute
         private_key (str): to access the EOA
         roles_mod_address (str): address to call execTransactionWithRole
-        blockchain (Blockchain)
         web3 (Web3)
 
     Returns:
-        (bool) status
+        (obj) tx_receipt
     """
-    tx_data = multi_or_one(txs, blockchain)
+    tx_data = multi_or_one(txs, Chain.get_blockchain_by_chain_id(web3.eth.chain_id))
     roles_mod = RolesMod(
         role=role,
         contract_address=roles_mod_address,
@@ -101,4 +97,4 @@ def send(txs: List[Transactable],
     logger.info('building receipt....')
     roles_mod_tx1 = roles_mod.get_tx_receipt(roles_mod_execute)
     logger.info(roles_mod_tx1)
-    return roles_mod_tx1.status == 1
+    return roles_mod_tx1

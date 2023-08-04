@@ -54,7 +54,7 @@ def test_check_one(web3_gnosis):
     ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"
     ACCOUNT = "0x7e19DE37A31E40eec58977CEA36ef7fB70e2c5CD"
     status = check(txs=[approve], role=2, account=ACCOUNT, roles_mod_address=ROLES_MOD_ADDRESS,
-                   web3=web3_gnosis, blockchain=Chain.GC, block=27586992)
+                   web3=web3_gnosis, block=27586992)
     assert status
 
 
@@ -62,5 +62,5 @@ def test_check_multi(web3_gnosis):
     ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"
     ACCOUNT = "0x7e19DE37A31E40eec58977CEA36ef7fB70e2c5CD"
     status = check(txs=[approve, add_liquidity], role=2, account=ACCOUNT, roles_mod_address=ROLES_MOD_ADDRESS,
-                   web3=web3_gnosis, blockchain=Chain.GC, block=27586992)
+                   web3=web3_gnosis, block=27586992)
     assert status
