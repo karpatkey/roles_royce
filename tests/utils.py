@@ -24,6 +24,7 @@ from web3._utils.abi import get_abi_input_names, get_abi_input_types, map_abi_da
 from web3._utils.normalizers import BASE_RETURN_NORMALIZERS
 from web3.contract import Contract
 from roles_royce.evm_utils import erc20_abi
+from roles_royce.constants import ETHAddr
 from .safe import SimpleSafe
 
 REMOTE_NODE_URL = codecs.decode(
@@ -195,8 +196,11 @@ def steal_token(w3, token, holder, to, amount):
 
 
 def get_balance(w3, token, address):
-    ctract = w3.eth.contract(address=token, abi=erc20_abi)
-    return ctract.functions.balanceOf(address).call()
+    if token == ETHAddr.ZERO:
+        return w3.eth.get_balance(address)
+    else:
+        ctract = w3.eth.contract(address=token, abi=erc20_abi)
+        return ctract.functions.balanceOf(address).call()
 
 
 def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
@@ -207,6 +211,8 @@ def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
     fork_unlock_account(w3, safe.address)
     return safe
 
+def top_up_address(w3: Web3, address: str, amount: int) -> None:
+    w3.eth.send_transaction({"to": address, "value": Web3.to_wei(amount, "ether"), "from": SCRAPE_ACCOUNT.address})
 
 class EventLogDecoder:
     def __init__(self, contract: Contract):

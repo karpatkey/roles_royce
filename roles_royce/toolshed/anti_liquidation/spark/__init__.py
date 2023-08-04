@@ -5,11 +5,8 @@ from .addresses_and_abis import addresses, protocol_data_provider_abi, pool_addr
 from roles_royce.constants import Chain
 from roles_royce.protocols.eth.spark import RateModel
 
-# Use an MEV blocker endpoint
-w3 = Web3(Web3.HTTPProvider('https://eth.llamarpc.com'))
-WALLET = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import IntEnum
 import logging
 from typing import Optional
@@ -26,6 +23,8 @@ class SparkCDP:
     w3: Web3
     owner_address: Address | ChecksumAddress | str
     block: Optional[int | str] = None
+    data: dict = field(init=False)
+    health_factor: Decimal = field(init=False)
 
     def __post_init__(self):
         if not self.w3:
@@ -129,8 +128,9 @@ class SparkCDP:
         self.health_factor = self.get_health_factor()
 
     def get_delta_of_token_to_repay(self, target_health_factor: float | Decimal, token_in_address: str,
-                                    rate_model: RateModel) -> Decimal:
+                                    rate_model: RateModel) -> int:
         cdp_data = self.data
+        token_in_decimals = self.w3.eth.contract(address=token_in_address, abi=erc20_abi).functions.decimals().call(block_identifier=self.block)
 
         borrowed_amount_of_token_in_stable = 0
         borrowed_amount_of_token_in_variable = 0
@@ -172,6 +172,6 @@ class SparkCDP:
                 collateral_sum / Decimal(target_health_factor) - other_debt_sum) / token_in_price
 
         if delta_of_token_to_repay > token_in_borrowed:
-            return token_in_borrowed
+            return int(Decimal(token_in_borrowed)*Decimal(10**token_in_decimals))
         else:
-            return delta_of_token_to_repay
+            return int(Decimal(delta_of_token_to_repay)*Decimal(10**token_in_decimals))

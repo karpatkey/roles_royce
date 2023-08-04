@@ -56,7 +56,7 @@ class WithdrawToken(Method):
         self.args.amount = amount
 
 
-class WithdrawDAIforSDAI(Method):
+class RedeemSDAIforDAI(Method):
     """Sender redeems sDAI and withdraws DAI"""
     name = "redeem"
     in_signature = [("amount", "uint256"), ("receiver", "address"), ("owner", "address")]
