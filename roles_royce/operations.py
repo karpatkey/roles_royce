@@ -1,9 +1,9 @@
 import logging
-from typing import Dict, List
+from typing import List
 
 from web3 import Web3
 from .roles_modifier import RolesMod
-from .constants import Blockchain, Chain
+from .constants import Chain
 from .generic_method import Transactable
 from .utils import multi_or_one
 
@@ -17,7 +17,7 @@ def build(txs: List[Transactable],
           web3: Web3,
           tx_kwargs: dict | None = None
           ) -> bool:
-    tx_data = multi_or_one(txs, Chain.get_blockchain_by_chain_id(web3.eth.chain_id))
+    tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(
         role=role,
         contract_address=roles_mod_address,
@@ -37,7 +37,7 @@ def check(txs: List[Transactable],
           account: str,
           roles_mod_address: str,
           web3: Web3,
-          block: int | str ='latest',
+          block: int | str = 'latest',
           ) -> bool:
     """Test the transaction with static call
 
@@ -47,11 +47,12 @@ def check(txs: List[Transactable],
         account (str): account that wants to execute
         roles_mod_address (str): address to call execTransactionWithRole
         web3 (Web3)
+        block (int | str): block number or 'latest'
 
     Returns:
         bool: status
     """
-    tx_data = multi_or_one(txs, Chain.get_blockchain_by_chain_id(web3.eth.chain_id))
+    tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(
         role=role,
         contract_address=roles_mod_address,
@@ -78,11 +79,12 @@ def send(txs: List[Transactable],
         private_key (str): to access the EOA
         roles_mod_address (str): address to call execTransactionWithRole
         web3 (Web3)
+        tx_kwargs (dict): kwargs for the transaction
 
     Returns:
         (obj) tx_receipt
     """
-    tx_data = multi_or_one(txs, Chain.get_blockchain_by_chain_id(web3.eth.chain_id))
+    tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(
         role=role,
         contract_address=roles_mod_address,
