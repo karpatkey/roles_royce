@@ -7,6 +7,12 @@ import sys
 import traceback
 from web3.exceptions import TransactionNotFound
 
+PRIVATE_KEYS = ''
+
+URL_SLACK_BOTS_NOTIFICATIONS = ''
+URL_SLACK_ALERTS_TEST = ''
+URL_TELEGRAM_TESTING_ALERTS = ''
+
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # GENERAL PARAMETERS & CONSTANTS
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -17,7 +23,6 @@ ROLES_CONTRACT_ABI = '[{"type":"constructor","stateMutability":"nonpayable","inp
 # Harvesting Bot Data
 
 BOT_ADDRESS = '0xE3ffD2B22CA1AD7D43C4F3A91BC79F98E7603E78'
-PRIVATE_KEYS = 'sOMeKeYs'
 
 # Safe Address
 SAFE_ADDRESS = '0x51D34416593a8acF4127dc4a40625A8eFAB9940c'
@@ -50,9 +55,6 @@ GAS_LIMIT = 5000000  # Maximum gas amount approved for the transaction
 MAX_FEE_PER_GAS = 2000000000  # Maximum total amount per unit of gas we are willing to pay, including base fee and priority fee
 MAX_PRIORITY_FEE_PER_GAS = 1000000000  # Maximum fee (tip) per unit of gas paid to validator for transaction prioritization
 
-URL_SLACK_BOTS_NOTIFICATIONS = ''
-URL_SLACK_ALERTS_TEST = ''
-URL_TELEGRAM_TESTING_ALERTS = ''
 
 web3 = Web3(Web3.HTTPProvider('https://rpc.gnosischain.com/'))
 
@@ -60,7 +62,7 @@ roles_contract = web3.eth.contract(address=ROLES_CONTRACT_ADDRESS, abi=ROLES_CON
 
 SLIPPAGE = 0.001
 DRIFT = 0.001
-AMOUNT = 100
+AMOUNT = 1000
 COOLDOWN = 5 # minutes
 SLACK_TEST_MODE = False
 EXEC_TRANSACTIONS = True
@@ -335,20 +337,20 @@ while True:
             msg = swap_EURe_for_WXDAI(amount_EURe)
             dict_log['Execution'] = msg
             txn_executed = True
-        except Exception as e:
+        except ValueError as e:
             traceback.print_exc()
-            requests.post(URL_TELEGRAM_TESTING_ALERTS % (str(e)))
-            send_slack_message(str(e), '', 3)
+            requests.post(URL_TELEGRAM_TESTING_ALERTS % (e.args[0]))
+            send_slack_message(e.args[0], '', 3)
 
     elif USD_to_EURe > (1 + DRIFT) * amount_WXDAI / EURe_price and lack_of_WXDAI is False and EXEC_TRANSACTIONS is True:
         try:
             msg = swap_WXDAI_for_EURe(amount_WXDAI)
             dict_log['Execution'] = msg
             txn_executed = True
-        except Exception as e:
+        except ValueError as e:
             traceback.print_exc()
-            requests.post(URL_TELEGRAM_TESTING_ALERTS % (str(e)))
-            send_slack_message(str(e), '', 3)
+            requests.post(URL_TELEGRAM_TESTING_ALERTS % (e.args[0]))
+            send_slack_message(e.args[0], '', 3)
 
     if txn_executed:
         time.sleep(5)
@@ -365,39 +367,41 @@ while True:
 
     WXDAI_contract = web3.eth.contract(address=WXDAI_ADDRESS, abi=WXDAI_ABI)
     balance = WXDAI_contract.functions.balanceOf(SAFE_ADDRESS).call()
-    if balance < amount_WXDAI * (10 ** decimalsWXDAI) and lack_of_WXDAI is False:
-        message = 'Im running outta WXDAI! Only %.5f left.' % (balance / (10 ** decimalsWXDAI))
-        send_slack_message(message, '', 2)
-        requests.post(URL_TELEGRAM_TESTING_ALERTS % message)
-        print(message)
+    if 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance and amount_WXDAI < AMOUNT:
+        while 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance and 10 * amount_WXDAI <= AMOUNT:
+            amount_WXDAI = amount_WXDAI * 10
+    elif amount_WXDAI * (10 ** decimalsWXDAI) < balance < 10 * amount_WXDAI * (10 ** decimalsWXDAI):
+        pass
+    elif balance < amount_WXDAI * (10 ** decimalsWXDAI):
+        if lack_of_WXDAI is False:
+            message = 'Im running outta WXDAI! Only %.5f left.' % (balance / (10 ** decimalsWXDAI))
+            send_slack_message(message, '', 2)
+            requests.post(URL_TELEGRAM_TESTING_ALERTS % message)
+            print(message)
         while balance < amount_WXDAI * (10 ** decimalsWXDAI) and amount_WXDAI > 1:
             amount_WXDAI = amount_WXDAI / 10
         if amount_WXDAI <= 1:
             lack_of_WXDAI = True
-    elif 100 * (10 ** decimalsWXDAI) < balance:
-        amount_WXDAI = 100
-    elif 10 * (10 ** decimalsWXDAI) < balance < 100 * (10 ** decimalsWXDAI):
-        amount_WXDAI = 10
-    elif 1 * (10 ** decimalsWXDAI) < balance < 10 * (10 ** decimalsWXDAI):
-        amount_WXDAI = 1
+
 
     EURe_contract = web3.eth.contract(address=EURe_ADDRESS, abi=EURe_ABI)
     balance = EURe_contract.functions.balanceOf(SAFE_ADDRESS).call()
-    if balance < amount_EURe * (10 ** decimalsEURe) and lack_of_EURe is False:
-        message = 'Im running outta EURe! Only %.5f left.' % (balance / (10 ** decimalsEURe))
-        send_slack_message(message, '', 2)
-        requests.post(URL_TELEGRAM_TESTING_ALERTS % message)
-        print(message)
+    if 10 * amount_EURe * (10 ** decimalsEURe) < balance and amount_EURe < AMOUNT:
+        while 10 * amount_EURe * (10 ** decimalsEURe) < balance and 10 * amount_EURe <= AMOUNT:
+            amount_EURe = amount_EURe * 10
+    elif amount_EURe * (10 ** decimalsEURe) < balance < 10 * amount_EURe * (10 ** decimalsEURe):
+        pass
+    elif balance < amount_EURe * (10 ** decimalsEURe):
+        if lack_of_EURe is False:
+            message = 'Im running outta EURe! Only %.5f left.' % (balance / (10 ** decimalsEURe))
+            send_slack_message(message, '', 2)
+            requests.post(URL_TELEGRAM_TESTING_ALERTS % message)
+            print(message)
         while balance < amount_EURe * (10 ** decimalsEURe) and amount_EURe > 1:
             amount_EURe = amount_EURe / 10
         if amount_EURe <= 1:
             lack_of_EURe = True
-    elif 100 * (10 ** decimalsEURe) < balance:
-        amount_EURe = 100
-    elif 10 * (10 ** decimalsEURe) < balance < 100 * (10 ** decimalsEURe):
-        amount_EURe = 10
-    elif 1 * (10 ** decimalsEURe) < balance < 10 * (10 ** decimalsEURe):
-        amount_EURe = 1
+
 
     balance = web3.eth.get_balance(BOT_ADDRESS)
     if balance < 0.001 and lack_of_gas_warning is False:

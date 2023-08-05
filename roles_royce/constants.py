@@ -1,8 +1,11 @@
 from dataclasses import dataclass
-from enum import Enum
+from web3 import Web3
+
+
 
 class CrossChainAddr:
     BalancerVault = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
+
 
 class ETHAddr:
     ZERO = "0x0000000000000000000000000000000000000000"
@@ -46,6 +49,7 @@ class ETHAddr:
     COMPOUND_V2_Comptroller = "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B"
     COMPOUND_V2_Maximillion = "0xf859A1AD94BcF445A406B892eF0d3082f4174088"
 
+
 class GCAddr:
     USDT = "0x4ECaBa5870353805a9F068101A40E0f32ed605C6"
 
@@ -66,9 +70,9 @@ class Blockchain:
 
 
 class Chain:
-    ETHEREUM = Blockchain("ethereum", 0x1)
-    POLYGON = Blockchain("polygon", 0x89)
-    GC = Blockchain("gnosisChain", 0x64)
+    Ethereum = Blockchain("ethereum", 0x1)
+    Polygon = Blockchain("polygon", 0x89)
+    GnosisChain = Blockchain("gnosisChain", 0x64)
 
     @classmethod
     def get_blockchain_by_chain_id(cls, chain_id):
@@ -76,3 +80,7 @@ class Chain:
             if isinstance(attr_value, Blockchain) and attr_value.chain_id == chain_id:
                 return attr_value
         raise ValueError(f"No Blockchain with chain_id {chain_id} found in Chain.")
+
+    @classmethod
+    def get_blockchain_from_web3(cls, w3: Web3):
+        return cls.get_blockchain_by_chain_id(w3.eth.chain_id)

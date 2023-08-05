@@ -30,7 +30,7 @@ class SimpleSafe(Safe):
         super().__init__(address, ethereum_client)
 
     def send(self, txs: list[Transactable]) -> TxResult:
-        tx = multi_or_one(txs, Chain.ETHEREUM)
+        tx = multi_or_one(txs, Chain.Ethereum)
         safe_tx = self.build_multisig_tx(to=tx.contract_address, value=tx.value,
                                          data=tx.data, operation=tx.operation,
                                          safe_tx_gas=500000,

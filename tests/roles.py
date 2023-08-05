@@ -20,7 +20,7 @@ def deploy_roles(w3: Web3, avatar):
     roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5).contractAddress
 
     ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
-    ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact({"from": avatar})
+    ctract.functions.setMultisend(MULTISENDS[Chain.Ethereum]).transact({"from": avatar})
     return ctract
 
 

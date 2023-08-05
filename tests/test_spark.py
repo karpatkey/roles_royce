@@ -1,7 +1,7 @@
 from roles_royce.protocols.eth import spark
 from roles_royce.constants import ETHAddr, Chain
 from .utils import local_node, accounts, get_balance, steal_token, create_simple_safe
-from roles_royce.toolshed.protocol_utils.spark import SparkUtils
+from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
 from decimal import Decimal
 
 
@@ -35,13 +35,12 @@ def test_integration(local_node, accounts):
                spark.DepositDAIforSDAI(amount=1_000, avatar=safe.address),
                spark.ApproveDAIforSDAI(amount=0)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
-    chi = SparkUtils.get_chi(w3, Chain.ETHEREUM)
-    assert get_balance(w3, ETHAddr.sDAI, safe.address) == int(Decimal(1_000)/(Decimal(chi)/Decimal(1e27)))  # 976
-
+    chi = SparkUtils.get_chi(w3)
+    assert get_balance(w3, ETHAddr.sDAI, safe.address) == int(Decimal(1_000) / (Decimal(chi) / Decimal(1e27)))  # 976
 
     # Repay sDAI to get DAI
     safe.send([spark.RedeemSDAIforDAI(amount=976, avatar=safe.address)])
-    assert get_balance(w3, ETHAddr.DAI, safe.address) == int(Decimal(chi*976)/Decimal(1e27))  # 999
+    assert get_balance(w3, ETHAddr.DAI, safe.address) == int(Decimal(chi * 976) / Decimal(1e27))  # 999
     assert get_balance(w3, ETHAddr.sDAI, safe.address) == 0
 
     # Get back the original amount of GNO
