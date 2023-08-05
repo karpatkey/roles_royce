@@ -13,6 +13,7 @@ WSTETHJOIN = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"
 VAULT = 27353
 
 
+
 def test_approve_dai():
     request = makerdao.ApproveDAI(spender=AVATAR, amount=1_000)
     assert request.data == "0x095ea7b3000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e100000000000000000000000000000000000000000000000000000000000003e8"
@@ -52,3 +53,19 @@ def test_payback_and_withdraw():
 def test_undelegate_mkr():
     request = makerdao.UndelegateMKR(amount=6_000_000_000)
     assert request.data == "0xd8ccd0f30000000000000000000000000000000000000000000000000000000165a0bc00"
+
+def test_delegate_mkr():
+    request = makerdao.DelegateMKR(amount=6_000_000_000)
+    assert request.data == "0xdd4670640000000000000000000000000000000000000000000000000000000165a0bc00"
+
+def test_join_pot():
+    request = makerdao.JoinPot(destination=AVATAR, amount=1_000)
+    assert request.data == "0x3b4da69f000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e100000000000000000000000000000000000000000000000000000000000003e8"
+
+def test_exit_pot():
+    request = makerdao.ExitPot(destination=AVATAR, amount=1_000)
+    assert request.data == "0xef693bed000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e100000000000000000000000000000000000000000000000000000000000003e8"
+
+def test_drip_pot():
+    request = makerdao.DripThePot()
+    assert request.data == "0x9f678cca"
