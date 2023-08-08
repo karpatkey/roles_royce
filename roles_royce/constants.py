@@ -62,9 +62,6 @@ class Blockchain:
     def __str__(self):
         return self.name
 
-    def __int__(self):
-        return self.chain_id
-
     def __hash__(self):
         return self.chain_id
 
