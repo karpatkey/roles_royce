@@ -123,6 +123,6 @@ def test_integration_spark_cdp_roles(local_node):
                  roles_mod_address=roles_mod_address,
                  web3=w3)
     tx_hash = w3.eth.send_transaction(txns)
-    w3.eth.wait_for_transaction_receipt(tx_hash)
+    w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)
     cdp = cdp_manager.get_cdp_data()
     assert cdp.health_factor == approx(Decimal('3'))

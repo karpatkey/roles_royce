@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from web3 import Web3
 
 
-
 class CrossChainAddr:
     BalancerVault = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
 
@@ -42,6 +41,7 @@ class ETHAddr:
     MakerJug = "0x19c0976f590D67707E62397C87829d896Dc0f1F1"
     MakerProxy = "0x82ecd135dce65fbc6dbdd0e4237e0af93ffd5038"
     MakerIOU = "0x447db3e7Cf4b4Dcf7cADE7bDBc375018408B8098"
+    MakerDSRManager = "0x373238337Bfe1146fb49989fc222523f83081dDb"
     DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
     sDAI = "0x83F20F44975D03b1b09e64809B757c47f942BEeA"
     SparkLendingPoolV3 = "0xC13e21B648A5Ee794902342038FF3aDAB66BE987"
@@ -62,9 +62,6 @@ class Blockchain:
     def __str__(self):
         return self.name
 
-    def __int__(self):
-        return self.chain_id
-
     def __hash__(self):
         return self.chain_id
 
@@ -74,12 +71,17 @@ class Chain:
     Polygon = Blockchain("polygon", 0x89)
     GnosisChain = Blockchain("gnosisChain", 0x64)
 
+    _by_id = {}
+    for attr_name, attr_value in locals().copy().items():
+        if isinstance(attr_value, Blockchain):
+            _by_id[attr_value.chain_id] = attr_value
+
     @classmethod
     def get_blockchain_by_chain_id(cls, chain_id):
-        for attr_name, attr_value in cls.__dict__.items():
-            if isinstance(attr_value, Blockchain) and attr_value.chain_id == chain_id:
-                return attr_value
-        raise ValueError(f"No Blockchain with chain_id {chain_id} found in Chain.")
+        try:
+            return cls._by_id.get(chain_id, None)
+        except KeyError:
+            raise ValueError(f"No Blockchain with chain_id {chain_id} found in Chain.")
 
     @classmethod
     def get_blockchain_from_web3(cls, w3: Web3):

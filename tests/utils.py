@@ -175,6 +175,21 @@ def local_node(request):
     wait_for_port(LOCAL_NODE_PORT, timeout=20)
 
     w3 = Web3(HTTPProvider(f"http://localhost:{LOCAL_NODE_PORT}"))
+
+    class LatencyMeasurerMiddleware:
+        def __init__(self, make_request, w3):
+            self.w3 = w3
+            self.make_request = make_request
+
+        def __call__(self, method, params):
+            import time
+            start_time = time.monotonic()
+            response = self.make_request(method, params)
+            logger.debug("Web3 time spent in %s: %f seconds", method, time.monotonic()-start_time)
+            return response
+
+    w3.middleware_onion.add(LatencyMeasurerMiddleware, "call_counter")
+
     fork_reset_state(w3, url=ETH_FORK_NODE_URL, block=LOCAL_NODE_DEFAULT_BLOCK)
     assert w3.eth.block_number == LOCAL_NODE_DEFAULT_BLOCK
     return w3
