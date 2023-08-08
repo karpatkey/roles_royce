@@ -122,7 +122,7 @@ def test_integration_spark_cdp_roles(local_node):
                               avatar=avatar_safe_address)], role=5, account=bot_address,
                  roles_mod_address=roles_mod_address,
                  web3=w3)
-    w3.eth.send_transaction(txns)
-    time.sleep(5)# We need to replace this with waiting for the transaction receipt
+    tx_hash = w3.eth.send_transaction(txns)
+    w3.eth.wait_for_transaction_receipt(tx_hash)
     cdp = cdp_manager.get_cdp_data()
     assert cdp.health_factor == approx(Decimal('3'))

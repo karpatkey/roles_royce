@@ -4,6 +4,9 @@ from .addresses_and_abis import AddressesAndAbis
 from roles_royce.constants import Chain
 from roles_royce.protocols.eth.spark import RateModel
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
+from roles_royce.constants import ETHAddr
+from roles_royce.protocols.eth import spark
+from roles_royce import send, check
 
 from dataclasses import dataclass, field
 from enum import IntEnum
@@ -34,58 +37,6 @@ class SparkCDP:
     balances_data: list[dict]
     health_factor: Decimal
 
-    @staticmethod
-    def get_delta_of_token_to_repay(self, target_health_factor: float | Decimal, token_in_address: str,
-                                    rate_model: RateModel) -> int:
-
-        token_in_decimals = self.w3.eth.contract(address=token_in_address, abi=AddressesAndAbis[
-            self.blockchain].ERC20.abi).functions.decimals().call(block_identifier=self.block)
-
-        borrowed_amount_of_token_in_stable = 0
-        borrowed_amount_of_token_in_variable = 0
-
-        for element in self.balances_data:
-            if element[CDPData.UnderlyingAddress] == token_in_address:
-                borrowed_amount_of_token_in_stable = element[CDPData.StableDebtBalance]
-                borrowed_amount_of_token_in_variable = element[CDPData.VariableDebtBalance]
-
-                break
-        if token_in_address not in [element[CDPData.UnderlyingAddress] for element in
-                                    self.balances_data] or (
-                borrowed_amount_of_token_in_stable == 0 and borrowed_amount_of_token_in_variable == 0):
-            raise ValueError('There is no borrowed amount of token %s.' % token_in_address)
-
-        if self.health_factor >= target_health_factor * (1 - 0.01):
-            return 0
-
-        collateral_sum = 0
-        for element in self.balances_data:
-            if element[CDPData.CollateralEnabled]:
-                collateral_sum += element[CDPData.InterestBearingBalance] * element[CDPData.UnderlyingPriceUSD] * element[
-                    CDPData.LiquidationThreshold]
-
-        if rate_model is RateModel.STABLE:
-            debt_type = CDPData.StableDebtBalance
-        else:
-            debt_type = CDPData.VariableDebtBalance
-
-        other_debt_sum = 0
-        for element in self.balances_data:
-            if element[CDPData.UnderlyingAddress] != token_in_address:
-                other_debt_sum += (element[CDPData.StableDebtBalance] + element[CDPData.VariableDebtBalance]) * element[
-                    CDPData.UnderlyingPriceUSD]
-            else:
-                token_in_price = element[CDPData.UnderlyingPriceUSD]
-                token_in_borrowed = element[debt_type]
-        delta_of_token_to_repay = token_in_borrowed - (
-                collateral_sum / Decimal(target_health_factor) - other_debt_sum) / token_in_price
-
-        if delta_of_token_to_repay > token_in_borrowed:
-            return int(Decimal(token_in_borrowed) * Decimal(10 ** token_in_decimals))
-        else:
-            return int(Decimal(delta_of_token_to_repay) * Decimal(10 ** token_in_decimals))
-
-
 
 @dataclass
 class SparkCDPManager:
@@ -107,6 +58,7 @@ class SparkCDPManager:
         self.token_addresses = SparkUtils.get_spark_token_addresses(self.w3, block=self.token_addresses_block)
 
     def update_spark_token_addresses(self, block: int | str = 'latest') -> None:
+        """Updates the list of Spark tokens addresses."""
         if block == 'latest':
             self.token_addresses_block = self.w3.eth.block_number
         else:
@@ -114,6 +66,7 @@ class SparkCDPManager:
         self.token_addresses = SparkUtils.get_spark_token_addresses(self.w3, block=self.token_addresses_block)
 
     def get_cdp_balances_data(self, block: int | str = 'latest') -> list[dict]:
+        """Returns a list of dictionaries with the Spark token balances data of the CDP."""
         spark_tokens = self.token_addresses
 
         if block == 'latest':
@@ -179,6 +132,7 @@ class SparkCDPManager:
         return result
 
     def get_health_factor(self, block: int | str = 'latest') -> Decimal:
+        """"""
         if block == 'latest':
             block = self.w3.eth.block_number
         pool_addresses_provider_contract = self.w3.eth.contract(
@@ -205,30 +159,47 @@ class SparkCDPManager:
             block = self.w3.eth.block_number
         balances_data = self.get_cdp_balances_data(block=block)
         health_factor = self.get_health_factor(block=block)
-        return SparkCDP(owner_address=self.owner_address, blockchain=self.blockchain, block=block,  balances_data=balances_data, health_factor=health_factor)
+        return SparkCDP(owner_address=self.owner_address, blockchain=self.blockchain, block=block,
+                        balances_data=balances_data, health_factor=health_factor)
 
-    def get_delta_of_token_to_repay(self, spark_cdp: SparkCDP, target_health_factor: float | Decimal, token_in_address: str,
-                                    rate_model: RateModel, block: int | str = 'latest', tolerance: float = 0.01) -> int:
-        if block == 'latest':
-            block = self.w3.eth.block_number
-        token_in_decimals = self.w3.eth.contract(address=token_in_address, abi=AddressesAndAbis[self.blockchain].ERC20.abi).functions.decimals().call(block_identifier=block)
-
-        health_factor = spark_cdp.health_factor
+    def check_if_token_is_in_debts(self, spark_cdp: SparkCDP, token_address: str) -> dict:
         balances_data = spark_cdp.balances_data
 
         borrowed_amount_of_token_in_stable = 0
         borrowed_amount_of_token_in_variable = 0
 
         for element in balances_data:
-            if element[CDPData.UnderlyingAddress] == token_in_address:
+            if element[CDPData.UnderlyingAddress] == token_address:
                 borrowed_amount_of_token_in_stable = element[CDPData.StableDebtBalance]
                 borrowed_amount_of_token_in_variable = element[CDPData.VariableDebtBalance]
 
                 break
-        if token_in_address not in [element[CDPData.UnderlyingAddress] for element in
-                                    balances_data] or (
-                borrowed_amount_of_token_in_stable == 0 and borrowed_amount_of_token_in_variable == 0):
+
+        return {
+            RateModel.STABLE: True if borrowed_amount_of_token_in_stable > 0 else False,
+            RateModel.VARIABLE: True if borrowed_amount_of_token_in_variable > 0 else False
+        }
+
+    def get_delta_of_token_to_repay(self, spark_cdp: SparkCDP, target_health_factor: float | Decimal,
+                                    token_in_address: str,
+                                    rate_model: RateModel, block: int | str = 'latest', tolerance: float = 0.01) -> int:
+        if block == 'latest':
+            block = self.w3.eth.block_number
+        token_in_decimals = self.w3.eth.contract(address=token_in_address, abi=AddressesAndAbis[
+            self.blockchain].ERC20.abi).functions.decimals().call(block_identifier=block)
+
+        health_factor = spark_cdp.health_factor
+        balances_data = spark_cdp.balances_data
+
+        token_in_borrowed_status = self.check_if_token_is_in_debts(spark_cdp=spark_cdp, token_address=token_in_address)
+
+        if token_in_borrowed_status[RateModel.STABLE] is False and token_in_borrowed_status[
+            RateModel.VARIABLE] is False:
             raise ValueError('There is no borrowed amount of token %s.' % token_in_address)
+        elif token_in_borrowed_status[rate_model] is False and rate_model == RateModel.STABLE:
+            raise ValueError('There is no stable borrowed amount of token %s.' % token_in_address)
+        elif token_in_borrowed_status[rate_model] is False and rate_model == RateModel.VARIABLE:
+            raise ValueError('There is no variable borrowed amount of token %s.' % token_in_address)
 
         if health_factor >= target_health_factor * (1 - tolerance):
             return 0
@@ -260,3 +231,48 @@ class SparkCDPManager:
             return int(Decimal(token_in_borrowed) * Decimal(10 ** token_in_decimals))
         else:
             return int(Decimal(delta_of_token_to_repay) * Decimal(10 ** token_in_decimals))
+
+    # TODO: the next function can be generalized so that it can repay the debts corresponding to a set of tokens
+    # def repay_debt(self, spark_cdp: SparkCDP, token_in_addresses: list[str | ChecksumAddress],
+    #                            rate_models: list[RateModel],
+    #                            token_in_amounts: [int], roles_mod_address: str | ChecksumAddress,
+    #                            role: int, private_key: str) -> object:
+    def repay_single_token_debt(self, spark_cdp: SparkCDP, token_in_address: str | ChecksumAddress,
+                                rate_model: RateModel,
+                                token_in_amount: int, roles_mod_address: str | ChecksumAddress,
+                                role: int, private_key: str) -> object:
+
+        token_in_borrowed_status = self.check_if_token_is_in_debts(spark_cdp=spark_cdp, token_address=token_in_address)
+
+        if token_in_borrowed_status[RateModel.STABLE] is False and token_in_borrowed_status[
+            RateModel.VARIABLE] is False:
+            raise ValueError('There is no borrowed amount of token %s.' % token_in_address)
+        elif token_in_borrowed_status[rate_model] is False and rate_model == RateModel.STABLE:
+            raise ValueError('There is no stable borrowed amount of token %s.' % token_in_address)
+        elif token_in_borrowed_status[rate_model] is False and rate_model == RateModel.VARIABLE:
+            raise ValueError('There is no variable borrowed amount of token %s.' % token_in_address)
+
+        token_in_contract = self.w3.eth.contract(address=token_in_address,
+                                                 abi=AddressesAndAbis[self.blockchain].ERC20.abi)
+        allowance = token_in_contract.functions.allowance(self.owner_address,
+                                                          AddressesAndAbis[self.blockchain].LendingPool.address).call()
+        token_in_amount_to_approve = token_in_amount - allowance
+        if token_in_amount_to_approve > 0:
+            tx_receipt = send([spark.ApproveToken(token=token_in_address, amount=token_in_amount_to_approve),
+                               spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
+                                           avatar=self.owner_address)], role=role, private_key=private_key,
+                              roles_mod_address=roles_mod_address,
+                              web3=self.w3)
+        elif token_in_amount_to_approve == 0:
+            tx_receipt = send([spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
+                                           avatar=self.owner_address)], role=role, private_key=private_key,
+                              roles_mod_address=roles_mod_address,
+                              web3=self.w3)
+        else:
+            tx_receipt = send([spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
+                                           avatar=self.owner_address),
+                               spark.ApproveToken(token=token_in_address, amount=0)], role=role,
+                              private_key=private_key,
+                              roles_mod_address=roles_mod_address,
+                              web3=self.w3)
+        return tx_receipt
