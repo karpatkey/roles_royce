@@ -2,21 +2,64 @@ import sys
 import requests
 import json
 from enum import Enum
+from threading import Thread
+import logging
+import time
+from queue import Queue
+from web3 import Web3
+
+logger = logging.getLogger(__name__)
 
 
 class SlackMessageIcon(Enum):
     Loudspeaker = (':loudspeaker: ', '#00FF00')
-    WarningExclamationMark = ('Warning :warning: ', '#FFF000')
-    ErrorExclamationMark = ('Error :rotating_light: ', '#FF0000')
+    WarningSign = ('Warning :warning: ', '#FFF000')
+    ErrorRotatingLight = ('Error :rotating_light: ', '#FF0000')
+
+class SlackMessenger(Thread):
+    def __init__(self, webhook):
+        super().__init__()
+        self.webhook = webhook
+        self.out_queue = Queue()
+        self.daemon = True
+
+    def run(self):
+        while True:
+            icon, title, msg = self.out_queue.get()
+            try:
+                send_slack_msg(self.webhook, icon, title, msg)
+            except Exception:
+                logger.exception("Error sending slack message.")
+
+    def send_msg(self, icon: SlackMessageIcon, title: str, msg: str):
+        self.out_queue.put((icon, title, msg))
+
+class TelegramMessenger(Thread):
+    def __init__(self, bot_token: str, chat_id: int):
+        super().__init__()
+        self.bot_token = bot_token
+        self.chat_id = chat_id
+        self.out_queue = Queue()
+        self.daemon = True
+
+    def run(self):
+        while True:
+            msg = self.out_queue.get()
+            try:
+                send_telegram_msg(self.bot_token, self.chat_id, msg)
+            except Exception:
+                logger.exception("Error sending Telegram message.")
+
+    def send_msg(self, msg: str):
+        self.out_queue.put(msg)
 
 
 
-def send_slack_message(slack_webhook: str, spark_icon: SlackMessageIcon, title: str, message: str) -> requests.Response:
+def send_slack_msg(slack_webhook: str, icon: SlackMessageIcon, title: str, message: str) -> requests.Response:
     url = slack_webhook
-    title = spark_icon.value[0] + title
-    color = spark_icon.value[1]
+    title = icon.value[0] + title
+    color = icon.value[1]
 
-    # if __name__ == '__main__':
     slack_data = {
         # 'username': 'NotificationBot',
         # 'icon_emoji': ':satellite:',
@@ -38,23 +81,22 @@ def send_slack_message(slack_webhook: str, spark_icon: SlackMessageIcon, title: 
             }
         ]
     }
+    data = json.dumps(slack_data)
+    headers = {'Content-Type': 'application/json', 'Content-Length': len(data)}
+    response = requests.post(url, data=data, headers=headers)
 
-    byte_length = str(sys.getsizeof(slack_data))
-    headers = {'Content-Type': 'application/json', 'Content-Length': byte_length}
-    response = requests.post(url, data=json.dumps(slack_data), headers=headers)
-
-    # if response.status_code != 200:
-    #    raise Exception(response.status_code, response.text)
+    if response.status_code != 200:
+       logger.error("Error sending Slack message; status: %d, message %s", response.status_code, response.text)
 
     return response
 
 
-def send_telegram_message(bot_access_token: str, chat_id: str, message: str) -> requests.Response:
-    URL_TELEGRAM = 'https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s' % (
+def send_telegram_msg(bot_access_token: str, chat_id: int, message: str) -> requests.Response:
+    URL_TELEGRAM = 'https://api.telegram.org/bot%s/sendMessage?chat_id=-%d&text=%s' % (
         bot_access_token, chat_id, message)
-    response = requests.get(URL_TELEGRAM)
+    response = requests.post(URL_TELEGRAM)
 
-    # if response.status_code != 200:
-    #    raise Exception(response.status_code, response.text)
+    if response.status_code != 200:
+        logger.error("Error sending Telegram message; status: %d, message %s", response.status_code, response.text)
 
     return response

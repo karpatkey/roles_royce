@@ -4,14 +4,11 @@ from .addresses_and_abis import AddressesAndAbis
 from roles_royce.constants import Chain
 from roles_royce.protocols.eth.spark import RateModel
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
-from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import spark
 from roles_royce import send, check
 
 from dataclasses import dataclass, field
-from enum import IntEnum
 import logging
-from typing import Optional
 from enum import Enum
 from web3 import Web3, exceptions
 from web3.types import Address, ChecksumAddress
@@ -52,6 +49,7 @@ class SparkCDPManager:
             raise ValueError("'w3' must be filled.")
         if not self.owner_address:
             raise ValueError("'owner_address' must be filled.")
+        self.owner_address = Web3.to_checksum_address(self.owner_address)
         self.blockchain = Chain.get_blockchain_from_web3(self.w3)
         if self.token_addresses_block == 'latest':
             self.token_addresses_block = self.w3.eth.block_number
@@ -162,7 +160,8 @@ class SparkCDPManager:
         return SparkCDP(owner_address=self.owner_address, blockchain=self.blockchain, block=block,
                         balances_data=balances_data, health_factor=health_factor)
 
-    def check_if_token_is_in_debts(self, spark_cdp: SparkCDP, token_address: str) -> dict:
+    def check_if_token_is_in_debts(self, spark_cdp: SparkCDP, token_address: Address | ChecksumAddress | str) -> dict:
+        token_address = self.w3.to_checksum_address(token_address)
         balances_data = spark_cdp.balances_data
 
         borrowed_amount_of_token_in_stable = 0
@@ -183,6 +182,8 @@ class SparkCDPManager:
     def get_delta_of_token_to_repay(self, spark_cdp: SparkCDP, target_health_factor: float | Decimal,
                                     token_in_address: str,
                                     rate_model: RateModel, block: int | str = 'latest', tolerance: float = 0.01) -> int:
+        token_in_address = Web3.to_checksum_address(token_in_address)
+
         if block == 'latest':
             block = self.w3.eth.block_number
         token_in_decimals = self.w3.eth.contract(address=token_in_address, abi=AddressesAndAbis[
@@ -237,10 +238,13 @@ class SparkCDPManager:
     #                            rate_models: list[RateModel],
     #                            token_in_amounts: [int], roles_mod_address: str | ChecksumAddress,
     #                            role: int, private_key: str) -> object:
-    def repay_single_token_debt(self, spark_cdp: SparkCDP, token_in_address: str | ChecksumAddress,
+    def repay_single_token_debt(self, spark_cdp: SparkCDP, token_in_address: str | ChecksumAddress | Address,
                                 rate_model: RateModel,
-                                token_in_amount: int, roles_mod_address: str | ChecksumAddress,
+                                token_in_amount: int, roles_mod_address: str | ChecksumAddress | Address,
                                 role: int, private_key: str) -> object:
+
+        token_in_address = Web3.to_checksum_address(token_in_address)
+        roles_mod_address = Web3.to_checksum_address(roles_mod_address)
 
         token_in_borrowed_status = self.check_if_token_is_in_debts(spark_cdp=spark_cdp, token_address=token_in_address)
 
@@ -276,3 +280,4 @@ class SparkCDPManager:
                               roles_mod_address=roles_mod_address,
                               web3=self.w3)
         return tx_receipt
+

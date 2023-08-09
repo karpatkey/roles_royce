@@ -3,11 +3,12 @@ from roles_royce.protocols.eth import spark
 from roles_royce.constants import ETHAddr
 from tests.utils import local_node, accounts, get_balance, steal_token, create_simple_safe, local_node_set_block, \
     top_up_address, fork_unlock_account
-from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager
+from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager, CDPData
 from decimal import Decimal
 from roles_royce import check, send, build
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
 import time
+from decimal import Decimal
 
 
 def test_integration_spark_cdp(local_node, accounts):
@@ -41,6 +42,27 @@ def test_integration_spark_cdp(local_node, accounts):
 
     # use approx as the protocol seems to depend on the timestamp of the blocks
     # and currently there is no way to fake the timestamps
+    assert cdp.balances_data == [
+        {
+            CDPData.LiquidationThreshold: approx(Decimal(0.7600000000000000088817841970012523233890533447265625)),
+            CDPData.VariableDebtBalance: Decimal(1000),
+            CDPData.UnderlyingPriceUSD: approx(Decimal(0.9997000000000000330402372128446586430072784423828125)),
+            CDPData.CollateralEnabled: False,
+            CDPData.StableDebtBalance: Decimal(0),
+            CDPData.UnderlyingAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+            CDPData.InterestBearingBalance: Decimal(0)
+        },
+        {
+            CDPData.LiquidationThreshold: Decimal(0.25),
+            CDPData.VariableDebtBalance: Decimal(0),
+            CDPData.UnderlyingPriceUSD: approx(Decimal(116.52731832000000622429070062935352325439453125)),
+            CDPData.CollateralEnabled: True,
+            CDPData.StableDebtBalance: Decimal(0),
+            CDPData.UnderlyingAddress: '0x6810e776880C02933D47DB1b9fc05908e5386b96',
+            CDPData.InterestBearingBalance: Decimal(123)
+        }
+    ]
+
     assert cdp.health_factor == approx(Decimal('3.584290325437631289'))
     target_health_factor = 5
     amount_to_repay = cdp_manager.get_delta_of_token_to_repay(spark_cdp=cdp,
