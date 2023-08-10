@@ -10,6 +10,7 @@ from decouple import config
 
 BOT_ADDRESS = config('BOT_ADDRESS')
 PRIVATE_KEYS = config('PRIVATE_KEYS')
+FIXER_API_ACCESS_KEY = config('FIXER_ACCESS_API_KEY')
 
 URL_SLACK_BOTS_NOTIFICATIONS = config('URL_SLACK_BOTS_NOTIFICATIONS')
 URL_SLACK_ALERTS_TEST = config('URL_SLACK_ALERTS_TEST')
@@ -133,10 +134,16 @@ def send_slack_message(txn_message, txn_hash_message, status):
         raise Exception(response.status_code, response.text)
 
 
-def get_EUR_chainlink_price():
+def get_EUR_oracle_price():
+    data_from_api = requests.get(
+        'https://data.fixer.io/api/latest?access_key=%s&base=EUR&symbols=USD' % FIXER_API_ACCESS_KEY)
+    if data_from_api.status_code == 200:
+        response = json.loads(data_from_api.content.decode('utf-8'))
+        if response['success']:
+            return response['rates']['USD']
     contract = web3.eth.contract(address=CHAINLINK_FEED_ADDRESS, abi=CHAINLINK_FEED_ABI)
-    price = contract.functions.latestAnswer().call()/ (10 ** 8)
-    return price
+    chainlink_price = contract.functions.latestAnswer().call() / (10 ** 8)
+    return chainlink_price
 
 
 def get_EURe_to_USD(amount):
@@ -319,11 +326,11 @@ while True:
     txn_executed = False
     EURe_to_USD = get_EURe_to_USD(amount_EURe)
     USD_to_EURe = get_USD_to_EURe(amount_WXDAI)
-    EURe_price = get_EUR_chainlink_price()
+    EURe_price = get_EUR_oracle_price()
     dict_log = {
         'Date': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-        'EURe to USD ChainLink': '%.3f EURe ---> %.3f USD' % (amount_EURe, amount_EURe * EURe_price),
-        'USD to EURe Chainlink': '%.3f USD ---> %.3f EURe' % (amount_WXDAI, amount_WXDAI / EURe_price),
+        'EURe to USD oracle': '%.3f EURe ---> %.3f USD' % (amount_EURe, amount_EURe * EURe_price),
+        'USD to EURe oracle': '%.3f USD ---> %.3f EURe' % (amount_WXDAI, amount_WXDAI / EURe_price),
         'EURe to WXDAI Curve': '%.3f EURe ---> %.3f WXDAI' % (amount_EURe, EURe_to_USD),
         'WXDAI to EURe Curve': '%.3f WXDAI ---> %.3f EURe' % (amount_WXDAI, USD_to_EURe),
         'EURe to WXDAI drift': '%.5f' % (EURe_to_USD / (EURe_price * amount_EURe) - 1),
