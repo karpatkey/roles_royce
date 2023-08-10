@@ -32,20 +32,26 @@ prometheus_port = config('PROMETHEUS_PORT')
 
 cooldown_minutes = config('COOLDOWN_MINUTES')
 
-w3 = Web3(Web3.HTTPProvider(RPC_endpoint))
-cdp_manager = SparkCDPManager(w3, avatar_safe_address)
-cdp = cdp_manager.get_cdp_data()
+test_mode = config('TEST_MODE')
 
-slack_messenger = SlackMessenger(webhook=slack_webhook_url)
-slack_messenger.start()
-telegram_messenger = TelegramMessenger(bot_token=telegram_bot_token, chat_id=telegram_chat_id)
-telegram_messenger.start()
+slack_messenger_thread = False
+if slack_webhook_url != '':
+    slack_messenger = SlackMessenger(webhook=slack_webhook_url)
+    slack_messenger.start()
+    slack_messenger_thread = True
+
+telegram_messenger_thread = False
+if telegram_bot_token != '' and telegram_chat_id != '':
+    telegram_messenger = TelegramMessenger(bot_token=telegram_bot_token, chat_id=telegram_chat_id)
+    telegram_messenger.start()
+    telegram_messenger_thread = True
 
 prometheus_start_http_server(prometheus_port)
 logger = logging.getLogger(__name__)
 
 
-def bot_do():
+def bot_do(w3: Web3, test_mode: bool = False):
+    cdp_manager = SparkCDPManager(w3, avatar_safe_address)
     cdp = cdp_manager.get_cdp_data()
     if threshold_health_factor < cdp.health_factor <= alerting_health_factor:
         logger.info()
@@ -78,9 +84,11 @@ def bot_do():
                            f'Amount of sDAI needed to redeem: {amount_of_sDAI_to_redeem}. '
                            f'Current sDAI balance: {sDAI_balance}.')
 
-            slack_messenger.send_msg(SlackMessageIcon.WarningSign, title, message)
-            telegram_messenger.send_msg('Warning: not enough sDAI to redeem.\n' + message)
 
+            slack_messenger.send_msg(SlackMessageIcon.WarningSign, title, message) if slack_messenger_thread else None
+            telegram_messenger.send_msg('Warning: not enough sDAI to redeem.\n' + message) if telegram_messenger_thread else None
+
+        logger.info(f'Redeeming {amount_of_sDAI_to_redeem} sDAI for DAI...')
         tx_receipt_sDAI_redeemed = send(
             [spark.RedeemSDAIforDAI(amount=amount_of_sDAI_to_redeem, avatar=avatar_safe_address)], role=role,
             private_key=private_key, roles_mod_address=roles_mod_address, web3=w3)
@@ -114,8 +122,10 @@ def bot_do():
                            f'Target health factor: {target_health_factor}. '
                            f'Amount of DAI to repay: {amount_of_DAI_to_repay}. '
                            f'Current DAI balance: {DAI_balance}.')
-            slack_messenger.send_msg(SlackMessageIcon.WarningSign, title=title, msg=message)
-            telegram_messenger.send_msg('Warning: not enough DAI to repay.\n' + message)
+            if slack_messenger_thread:
+                slack_messenger.send_msg(SlackMessageIcon.WarningSign, title=title, msg=message)
+            if telegram_messenger_thread:
+                telegram_messenger.send_msg('Warning: not enough DAI to repay.\n' + message)
 
         tx_receipt_debt_repayed = cdp_manager.repay_single_token_debt(spark_cdp=cdp, token_in_address=ETHAddr.DAI,
                                                          token_in_amount=amount_of_DAI_to_repay,
@@ -134,15 +144,16 @@ def bot_do():
         if bot_ETH_balance < 0.1:
             title = 'Lack of ETH for gas'
             message = 'Im running outta ETH for gas! Only %.5f left.' % (bot_ETH_balance / (10 ** 18))
-            slack_messenger.send_msg(SlackMessageIcon.WarningSign, title=title, msg=message)
-            telegram_messenger.send_msg('Warning: lack of ETH for gas. ' + message)
+            slack_messenger.send_msg(SlackMessageIcon.WarningSign, title=title, msg=message) if slack_messenger_thread else None
+            telegram_messenger.send_msg('Warning: lack of ETH for gas. ' + message) if telegram_messenger_thread else None
             logger.warning('Warning: lack of ETH for gas. ' + message)
 
 
 
 while True:
+    w3 = Web3(Web3.HTTPProvider(RPC_endpoint))
     try:
-        bot_do()
+        bot_do(w3=w3, test_mode=test_mode)
 
     except Exception:
         logger.exception("Error")

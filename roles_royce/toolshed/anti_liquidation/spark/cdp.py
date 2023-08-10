@@ -258,18 +258,22 @@ class SparkCDPManager:
 
         token_in_contract = self.w3.eth.contract(address=token_in_address,
                                                  abi=AddressesAndAbis[self.blockchain].ERC20.abi)
-        allowance = token_in_contract.functions.allowance(self.owner_address,
-                                                          AddressesAndAbis[self.blockchain].LendingPool.address).call()
-        token_in_amount_to_approve = token_in_amount - allowance
-        if token_in_amount_to_approve > 0:
-            tx_receipt = send([spark.ApproveToken(token=token_in_address, amount=token_in_amount_to_approve),
+        pool_addresses_provider_contract = self.w3.eth.contract(
+            address=AddressesAndAbis[self.blockchain].PoolAddressesProvider.address,
+            abi=AddressesAndAbis[self.blockchain].PoolAddressesProvider.abi)
+        lending_pool_address = pool_addresses_provider_contract.functions.getPool().call()
+        allowance = token_in_contract.functions.allowance(self.owner_address, lending_pool_address).call()
+
+        if token_in_amount > allowance:
+            tx_receipt = send([spark.ApproveToken(token=token_in_address, amount=token_in_amount),
                                spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
                                            avatar=self.owner_address)], role=role, private_key=private_key,
                               roles_mod_address=roles_mod_address,
                               web3=self.w3)
-        elif token_in_amount_to_approve == 0:
+        elif token_in_amount == allowance:
             tx_receipt = send([spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
-                                           avatar=self.owner_address)], role=role, private_key=private_key,
+                                           avatar=self.owner_address),], role=role,
+                              private_key=private_key,
                               roles_mod_address=roles_mod_address,
                               web3=self.w3)
         else:
