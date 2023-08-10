@@ -258,8 +258,11 @@ class SparkCDPManager:
 
         token_in_contract = self.w3.eth.contract(address=token_in_address,
                                                  abi=AddressesAndAbis[self.blockchain].ERC20.abi)
-        allowance = token_in_contract.functions.allowance(self.owner_address,
-                                                          AddressesAndAbis[self.blockchain].LendingPool.address).call()
+        pool_addresses_provider_contract = self.w3.eth.contract(
+            address=AddressesAndAbis[self.blockchain].PoolAddressesProvider.address,
+            abi=AddressesAndAbis[self.blockchain].PoolAddressesProvider.abi)
+        lending_pool_address = pool_addresses_provider_contract.functions.getPool().call()
+        allowance = token_in_contract.functions.allowance(self.owner_address, lending_pool_address).call()
 
         if token_in_amount > allowance:
             tx_receipt = send([spark.ApproveToken(token=token_in_address, amount=token_in_amount),

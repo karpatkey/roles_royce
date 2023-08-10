@@ -185,7 +185,7 @@ def local_node(request):
             import time
             start_time = time.monotonic()
             response = self.make_request(method, params)
-            logger.debug("Web3 time spent in %s: %f seconds", method, time.monotonic()-start_time)
+            logger.debug("Web3 time spent in %s: %f seconds", method, time.monotonic() - start_time)
             return response
 
     w3.middleware_onion.add(LatencyMeasurerMiddleware, "call_counter")
@@ -228,11 +228,17 @@ def get_balance(w3, token, address):
         return ctract.functions.balanceOf(address).call()
 
 
+def get_allowance(w3, token, owner_address, spender_address):
+    """Get the token allowance of an address"""
+    ctract = w3.eth.contract(address=token, abi=erc20_abi)
+    return ctract.functions.allowance(owner_address,spender_address).call()
+
+
 def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
     """Create a Safe with one owner and 100 ETH in balance"""
 
     safe = SimpleSafe.build(owner, ETH_LOCAL_NODE_URL)
-    w3.eth.send_transaction({"to": safe.address, "value": Web3.to_wei(100, "ether"), "from": SCRAPE_ACCOUNT.address})
+    top_up_address(w3=w3, address=safe.address, amount=100)
     fork_unlock_account(w3, safe.address)
     return safe
 
