@@ -129,7 +129,6 @@ def test_integration_spark_cdp(local_node, accounts):
 
     cdp = cdp_manager.get_cdp_data()
 
-    print(cdp)
     # use approx as the protocol seems to depend on the timestamp of the blocks
     # and currently there is no way to fake the timestamps
 

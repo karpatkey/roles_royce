@@ -1,19 +1,14 @@
-from web3 import Web3
 from decimal import Decimal
 from .addresses_and_abis import AddressesAndAbis
 from roles_royce.constants import Chain
 from roles_royce.protocols.eth.spark import RateModel
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 from roles_royce.protocols.eth import spark
-from roles_royce import send, check
-
+from roles_royce import send
 from dataclasses import dataclass, field
-import logging
 from enum import Enum
-from web3 import Web3, exceptions
+from web3 import Web3
 from web3.types import Address, ChecksumAddress
-
-logger = logging.getLogger(__name__)
 
 
 class CDPData(Enum):
@@ -57,6 +52,9 @@ class SparkCDP:
             result = result + f"    }},\n" if element != self.balances_data[-1] else result + f"    }}\n"
         result = result + f"  ]\n)"
         return result
+
+    def __repr__(self):
+        return f'SparkCDP dataclass for ownwer address {self.owner_address}.'
 
 
 @dataclass
