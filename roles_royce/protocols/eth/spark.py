@@ -83,6 +83,9 @@ class RateModel(IntEnum):
     STABLE = 1 , #stable is not available at the moment
     VARIABLE = 2
 
+    def __str__(self):
+        return self.name
+
 
 class Borrow(Method):
     """Sender receives Token and receives debtToken (stable or variable debt) token"""

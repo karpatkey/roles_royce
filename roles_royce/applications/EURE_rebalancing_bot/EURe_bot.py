@@ -146,7 +146,7 @@ def get_EUR_oracle_price():
     return chainlink_price
 
 
-def get_EURe_to_USD(amount):
+def get_EURe_to_USD_curve(amount):
     contract = web3.eth.contract(address=CURVE_ZAP_ADDRESS, abi=CURVE_ZAP_ABI)
     amount_int = int(amount * (10 ** decimalsEURe))
     if amount_int == 0:
@@ -155,7 +155,7 @@ def get_EURe_to_USD(amount):
     return rate / (10 ** decimalsEURe)
 
 
-def get_USD_to_EURe(amount):
+def get_USD_to_EURe_curve(amount):
     contract = web3.eth.contract(address=CURVE_ZAP_ADDRESS, abi=CURVE_ZAP_ABI)
     amount_int = int(amount * (10 ** decimalsWXDAI))
     if amount_int == 0:

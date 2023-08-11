@@ -25,6 +25,9 @@ class CDPData(Enum):
     CollateralEnabled = "collateral_enabled",
     LiquidationThreshold = "liquidation_threshold"
 
+    def __str__(self):
+        return self.name
+
 
 @dataclass
 class SparkCDP:
@@ -33,6 +36,27 @@ class SparkCDP:
     block: int
     balances_data: list[dict]
     health_factor: Decimal
+
+    def __str__(self):
+        result = (f"SparkCDP(\n"
+                  f"  owner_address: {self.owner_address},\n"
+                  f"  blockchain: {self.blockchain},\n"
+                  f"  block: {self.block},\n"
+                  f"  health_factor: {self.health_factor},\n"
+                  f"  tokens_data: [\n")
+        for element in self.balances_data:
+            result = result + \
+                     (f"    {{\n"
+                      f"      {CDPData.UnderlyingAddress}: {element[CDPData.UnderlyingAddress]},\n"
+                      f"      {CDPData.InterestBearingBalance}: {element[CDPData.InterestBearingBalance]},\n"
+                      f"      {CDPData.StableDebtBalance}: {element[CDPData.StableDebtBalance]},\n"
+                      f"      {CDPData.VariableDebtBalance}: {element[CDPData.VariableDebtBalance]},\n"
+                      f"      {CDPData.UnderlyingPriceUSD}: {element[CDPData.UnderlyingPriceUSD]},\n"
+                      f"      {CDPData.CollateralEnabled}: {element[CDPData.CollateralEnabled]},\n"
+                      f"      {CDPData.LiquidationThreshold}: {element[CDPData.LiquidationThreshold]}\n")
+            result = result + f"    }},\n" if element != self.balances_data[-1] else result + f"    }}\n"
+        result = result + f"  ]\n)"
+        return result
 
 
 @dataclass
@@ -272,7 +296,7 @@ class SparkCDPManager:
                               web3=self.w3)
         elif token_in_amount == allowance:
             tx_receipt = send([spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
-                                           avatar=self.owner_address),], role=role,
+                                           avatar=self.owner_address), ], role=role,
                               private_key=private_key,
                               roles_mod_address=roles_mod_address,
                               web3=self.w3)
@@ -284,4 +308,3 @@ class SparkCDPManager:
                               roles_mod_address=roles_mod_address,
                               web3=self.w3)
         return tx_receipt
-

@@ -8,8 +8,8 @@ from roles_royce.evm_utils import get_token_amounts_from_transfer_event
 from decimal import Decimal
 from roles_royce import send
 from roles_royce.evm_utils import erc20_abi
-from roles_royce.toolshed.alerting_and_monitoring.alerting import SlackMessenger, SlackMessageIcon, TelegramMessenger
-from prometheus_client import Gauge, start_http_server as prometheus_start_http_server
+from roles_royce.toolshed.alerting import SlackMessenger, SlackMessageIcon, TelegramMessenger
+from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
 import time
 
@@ -23,36 +23,37 @@ RPC_endpoint = config('RPC_ENDPOINT')
 target_health_factor = config('TARGET_HEALTH_FACTOR')
 alerting_health_factor = config('ALERTING_HEALTH_FACTOR')
 threshold_health_factor = config('THRESHOLD_HEALTH_FACTOR')
-tolerance = config('TOLERANCE')
+tolerance = int(config('TOLERANCE', default=0.01))
 
-slack_webhook_url = config('SLACK_WEBHOOK_URL')
-telegram_bot_token = config('TELEGRAM_BOT_TOKEN')
-telegram_chat_id = config('TELEGRAM_CHAT_ID')
-prometheus_port = config('PROMETHEUS_PORT')
+slack_webhook_url = config('SLACK_WEBHOOK_URL', default='')
+telegram_bot_token = config('TELEGRAM_BOT_TOKEN', default='')
+telegram_chat_id = config('TELEGRAM_CHAT_ID', default='')
+prometheus_port = int(config('PROMETHEUS_PORT', default=8000))
 
-cooldown_minutes = config('COOLDOWN_MINUTES')
+cooldown_minutes = int(config('COOLDOWN_MINUTES', default=5))
 
 test_mode = config('TEST_MODE')
 
-slack_messenger_thread = False
-if slack_webhook_url != '':
-    slack_messenger = SlackMessenger(webhook=slack_webhook_url)
-    slack_messenger.start()
-    slack_messenger_thread = True
-
-telegram_messenger_thread = False
-if telegram_bot_token != '' and telegram_chat_id != '':
-    telegram_messenger = TelegramMessenger(bot_token=telegram_bot_token, chat_id=telegram_chat_id)
-    telegram_messenger.start()
-    telegram_messenger_thread = True
+slack_messenger = SlackMessenger(webhook=slack_webhook_url)
+slack_messenger.start()
+telegram_messenger = TelegramMessenger(bot_token=telegram_bot_token, chat_id=telegram_chat_id)
+telegram_messenger.start()
 
 prometheus_start_http_server(prometheus_port)
+# Configure logging settings
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Create a logger instance
 logger = logging.getLogger(__name__)
 
 
+
 def bot_do(w3: Web3, test_mode: bool = False):
+    logger.info(f"Target health factor: {target_health_factor}, Alerting health factor: {alerting_health_factor}, Health factor threshold: {threshold_health_factor}")
     cdp_manager = SparkCDPManager(w3, avatar_safe_address)
     cdp = cdp_manager.get_cdp_data()
+    logger.info("SparK CDP data retrieved:\n"
+        f"{cdp}")
     if threshold_health_factor < cdp.health_factor <= alerting_health_factor:
         logger.info()
     elif cdp.health_factor <= target_health_factor:
@@ -73,7 +74,7 @@ def bot_do(w3: Web3, test_mode: bool = False):
             title = 'Not enough sDAI to redeem'
             message = (f'Current health factor: {cdp.health_factor}.\n'
                        f'Target health factor: {target_health_factor}.\n'
-                       f'Amount of DAI to repay: {amount_of_DAI_to_repay}.\n'
+                       f'Amount of DAI to repay: {amount_of_DAI_to_repay/1e18:.5f}.\n'
                        f'Amount of sDAI needed to redeem: {amount_of_sDAI_to_redeem}.\n'
                        f'Current sDAI balance: {sDAI_balance}.')
 

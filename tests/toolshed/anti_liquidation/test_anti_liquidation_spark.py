@@ -2,41 +2,18 @@ from pytest import approx
 from roles_royce.protocols.eth import spark
 from roles_royce.constants import ETHAddr
 from tests.utils import local_node, accounts, get_balance, get_allowance, steal_token, create_simple_safe, \
-    local_node_set_block, \
-    top_up_address, fork_unlock_account
+    local_node_set_block, top_up_address, fork_unlock_account, web3_eth
 from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager, CDPData
 from roles_royce import check, send, build
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 from decimal import Decimal
 
 
-def test_integration_spark_cdp(local_node, accounts):
-    w3 = local_node
-
-    safe = create_simple_safe(w3, accounts[0])
-
-    ADDRESS_WITH_LOTS_OF_GNO = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
-
-    steal_token(w3, ETHAddr.GNO, holder=ADDRESS_WITH_LOTS_OF_GNO, to=safe.address, amount=int(123e18))
-    assert get_balance(w3, ETHAddr.GNO, safe.address) == int(123e18)
-
-    # Deposit GNO, receive spGNO
-    safe.send([spark.ApproveToken(token=ETHAddr.GNO, amount=int(123e18)),
-               spark.DepositToken(token=ETHAddr.GNO, avatar=safe.address,
-                                  amount=int(123e18)),
-               spark.ApproveToken(token=ETHAddr.GNO, amount=0)])
-    assert get_balance(w3, ETHAddr.GNO, safe.address) == 0
-    assert get_balance(w3, ETHAddr.spGNO, safe.address) == int(123e18)
-
-    # Borrow DAI using GNO as collateral
-    safe.send([spark.SetUserUseReserveAsCollateral(asset=ETHAddr.GNO, use=True)])
-    assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
-    safe.send([spark.Borrow(token=ETHAddr.DAI, amount=int(1_000e18),
-                            rate_model=spark.RateModel.VARIABLE,
-                            avatar=safe.address)])
-    assert get_balance(w3, ETHAddr.DAI, safe.address) == int(1_000e18)
-
-    cdp_manager = SparkCDPManager(w3, safe.address)
+def test_spark_cdp_manager_token_addresses(web3_eth):
+    w3 = web3_eth
+    block = 17837956
+    owner_address = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
+    cdp_manager = SparkCDPManager(w3, owner_address, token_addresses_block=block)
     assert cdp_manager.token_addresses == [{SparkToken.VARIABLE_DEBT: '0xf705d2B7e92B3F38e6ae7afaDAA2fEE110fE5914',
                                             SparkToken.STABLE_DEBT: '0xfe2B7a7F4cC0Fb76f7Fc1C6518D586F1e4559176',
                                             SparkToken.INTEREST_BEARING: '0x4DEDf26112B3Ec8eC46e7E31EA5e123490B05B8B',
@@ -69,30 +46,92 @@ def test_integration_spark_cdp(local_node, accounts):
                                             SparkToken.STABLE_DEBT: '0xa9a4037295Ea3a168DC3F65fE69FdA524d52b3e1',
                                             SparkToken.INTEREST_BEARING: '0x9985dF20D7e9103ECBCeb16a84956434B6f06ae8',
                                             SparkToken.UNDERLYING: '0xae78736Cd615f374D3085123A210448E74Fc6393'}]
-    cdp = cdp_manager.get_cdp_data()
 
-    # use approx as the protocol seems to depend on the timestamp of the blocks
-    # and currently there is no way to fake the timestamps
+
+def test_spark_cdp_manager_balances_data(web3_eth):
+    w3 = web3_eth
+    block = 17837956
+    owner_address = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
+    cdp_manager = SparkCDPManager(w3, owner_address, token_addresses_block=block)
+    cdp = cdp_manager.get_cdp_data(block=block)
     assert cdp.balances_data == [
         {
-            CDPData.LiquidationThreshold: approx(Decimal(0.7600000000000000088817841970012523233890533447265625)),
-            CDPData.VariableDebtBalance: Decimal(1000),
-            CDPData.UnderlyingPriceUSD: approx(Decimal(0.9997000000000000330402372128446586430072784423828125)),
+            CDPData.LiquidationThreshold: Decimal('0.76'),
+            CDPData.VariableDebtBalance: Decimal('1000824.038165527779863585'),
+            CDPData.UnderlyingPriceUSD: Decimal('1.00106418'),
             CDPData.CollateralEnabled: False,
             CDPData.StableDebtBalance: Decimal(0),
             CDPData.UnderlyingAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
             CDPData.InterestBearingBalance: Decimal(0)
         },
         {
-            CDPData.LiquidationThreshold: Decimal(0.25),
+            CDPData.LiquidationThreshold: Decimal('0.25'),
             CDPData.VariableDebtBalance: Decimal(0),
-            CDPData.UnderlyingPriceUSD: approx(Decimal(116.52731832000000622429070062935352325439453125)),
+            CDPData.UnderlyingPriceUSD: Decimal('111.74296612'),
             CDPData.CollateralEnabled: True,
             CDPData.StableDebtBalance: Decimal(0),
             CDPData.UnderlyingAddress: '0x6810e776880C02933D47DB1b9fc05908e5386b96',
-            CDPData.InterestBearingBalance: Decimal(123)
+            CDPData.InterestBearingBalance: Decimal('88000')
         }
     ]
+
+
+def test_spark_cdp_manager_health_factor(web3_eth):
+    w3 = web3_eth
+    block = 17837956
+    owner_address = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
+    cdp_manager = SparkCDPManager(w3, owner_address, token_addresses_block=block)
+    cdp = cdp_manager.get_cdp_data(block=block)
+    assert cdp.health_factor == Decimal('2.45370996319511532')
+
+
+def test_spark_cdp_manager_get_delta(web3_eth):
+    w3 = web3_eth
+    block = 17837956
+    owner_address = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
+    cdp_manager = SparkCDPManager(w3, owner_address, token_addresses_block=block)
+    cdp = cdp_manager.get_cdp_data(block=block)
+    target_health_factor = 5
+    amount_to_repay = cdp_manager.get_delta_of_token_to_repay(spark_cdp=cdp,
+                                                              target_health_factor=target_health_factor,
+                                                              token_in_address=ETHAddr.DAI,
+                                                              rate_model=spark.RateModel.VARIABLE)
+    assert amount_to_repay == 509677655395144366484434
+
+
+def test_integration_spark_cdp(local_node, accounts):
+    w3 = local_node
+
+    safe = create_simple_safe(w3, accounts[0])
+
+    ADDRESS_WITH_LOTS_OF_GNO = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
+
+    steal_token(w3, ETHAddr.GNO, holder=ADDRESS_WITH_LOTS_OF_GNO, to=safe.address, amount=int(123e18))
+    assert get_balance(w3, ETHAddr.GNO, safe.address) == int(123e18)
+
+    # Deposit GNO, receive spGNO
+    safe.send([spark.ApproveToken(token=ETHAddr.GNO, amount=int(123e18)),
+               spark.DepositToken(token=ETHAddr.GNO, avatar=safe.address,
+                                  amount=int(123e18)),
+               spark.ApproveToken(token=ETHAddr.GNO, amount=0)])
+    assert get_balance(w3, ETHAddr.GNO, safe.address) == 0
+    assert get_balance(w3, ETHAddr.spGNO, safe.address) == int(123e18)
+
+    # Borrow DAI using GNO as collateral
+    safe.send([spark.SetUserUseReserveAsCollateral(asset=ETHAddr.GNO, use=True)])
+    assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
+    safe.send([spark.Borrow(token=ETHAddr.DAI, amount=int(1_000e18),
+                            rate_model=spark.RateModel.VARIABLE,
+                            avatar=safe.address)])
+    assert get_balance(w3, ETHAddr.DAI, safe.address) == int(1_000e18)
+
+    cdp_manager = SparkCDPManager(w3, safe.address)
+
+    cdp = cdp_manager.get_cdp_data()
+
+    print(cdp)
+    # use approx as the protocol seems to depend on the timestamp of the blocks
+    # and currently there is no way to fake the timestamps
 
     assert cdp.health_factor == approx(Decimal('3.584290325437631289'))
     target_health_factor = 5
