@@ -34,7 +34,7 @@ jobs:
         run: cat /tmp/rr_fork_node_log.txt
 
   docker-spark:
-    
+    needs: Test
     runs-on: self-hosted
 
     steps:
@@ -68,7 +68,7 @@ jobs:
           file: ./docker/Dockerfile.spark
 
   docker-eur:
-    
+    needs: Test
     runs-on: self-hosted
 
     steps:
