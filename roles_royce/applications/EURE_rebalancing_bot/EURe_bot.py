@@ -7,10 +7,11 @@ import sys
 import traceback
 from web3.exceptions import TransactionNotFound
 from decouple import config
+import math
 
 BOT_ADDRESS = config('BOT_ADDRESS')
 PRIVATE_KEYS = config('PRIVATE_KEYS')
-FIXER_API_ACCESS_KEY = config('FIXER_ACCESS_API_KEY')
+FIXER_API_ACCESS_KEY = config('FIXER_API_ACCESS_KEY')
 
 URL_SLACK_BOTS_NOTIFICATIONS = config('URL_SLACK_BOTS_NOTIFICATIONS')
 URL_SLACK_ALERTS_TEST = config('URL_SLACK_ALERTS_TEST')
@@ -49,6 +50,25 @@ EURe_ABI = '[{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{
 OPERATION = 0
 ROLE = 1
 SHOULD_REVERT = False
+
+
+VAULT = '0xBA12222222228d8Ba445958a75a0704d566BF2C8'
+# ABI Vault - batchSwap
+ABI_VAULT = '[{"inputs":[{"internalType":"enum IVault.SwapKind","name":"kind","type":"uint8"},{"components":[{"internalType":"bytes32","name":"poolId","type":"bytes32"},{"internalType":"uint256","name":"assetInIndex","type":"uint256"},{"internalType":"uint256","name":"assetOutIndex","type":"uint256"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"bytes","name":"userData","type":"bytes"}],"internalType":"struct IVault.BatchSwapStep[]","name":"swaps","type":"tuple[]"},{"internalType":"contract IAsset[]","name":"assets","type":"address[]"},{"components":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"bool","name":"fromInternalBalance","type":"bool"},{"internalType":"address payable","name":"recipient","type":"address"},{"internalType":"bool","name":"toInternalBalance","type":"bool"}],"internalType":"struct IVault.FundManagement","name":"funds","type":"tuple"},{"internalType":"int256[]","name":"limits","type":"int256[]"},{"internalType":"uint256","name":"deadline","type":"uint256"}],"name":"batchSwap","outputs":[{"internalType":"int256[]","name":"assetDeltas","type":"int256[]"}],"stateMutability":"payable","type":"function"}]'
+
+BALANCER_QUERIES = '0x0F3e0c4218b7b0108a3643cFe9D3ec0d4F57c54e'
+# ABI Balancer Queries - queryExit, queryJoin, querySwap, queryBatchSwap
+ABI_BALANCER_QUERIES = '[{"inputs":[{"internalType":"contract IVault","name":"_vault","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"enum IVault.SwapKind","name":"kind","type":"uint8"},{"components":[{"internalType":"bytes32","name":"poolId","type":"bytes32"},{"internalType":"uint256","name":"assetInIndex","type":"uint256"},{"internalType":"uint256","name":"assetOutIndex","type":"uint256"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"bytes","name":"userData","type":"bytes"}],"internalType":"struct IVault.BatchSwapStep[]","name":"swaps","type":"tuple[]"},{"internalType":"contract IAsset[]","name":"assets","type":"address[]"},{"components":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"bool","name":"fromInternalBalance","type":"bool"},{"internalType":"address payable","name":"recipient","type":"address"},{"internalType":"bool","name":"toInternalBalance","type":"bool"}],"internalType":"struct IVault.FundManagement","name":"funds","type":"tuple"}],"name":"queryBatchSwap","outputs":[{"internalType":"int256[]","name":"assetDeltas","type":"int256[]"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"poolId","type":"bytes32"},{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"components":[{"internalType":"contract IAsset[]","name":"assets","type":"address[]"},{"internalType":"uint256[]","name":"minAmountsOut","type":"uint256[]"},{"internalType":"bytes","name":"userData","type":"bytes"},{"internalType":"bool","name":"toInternalBalance","type":"bool"}],"internalType":"struct IVault.ExitPoolRequest","name":"request","type":"tuple"}],"name":"queryExit","outputs":[{"internalType":"uint256","name":"bptIn","type":"uint256"},{"internalType":"uint256[]","name":"amountsOut","type":"uint256[]"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"poolId","type":"bytes32"},{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"components":[{"internalType":"contract IAsset[]","name":"assets","type":"address[]"},{"internalType":"uint256[]","name":"maxAmountsIn","type":"uint256[]"},{"internalType":"bytes","name":"userData","type":"bytes"},{"internalType":"bool","name":"fromInternalBalance","type":"bool"}],"internalType":"struct IVault.JoinPoolRequest","name":"request","type":"tuple"}],"name":"queryJoin","outputs":[{"internalType":"uint256","name":"bptOut","type":"uint256"},{"internalType":"uint256[]","name":"amountsIn","type":"uint256[]"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"components":[{"internalType":"bytes32","name":"poolId","type":"bytes32"},{"internalType":"enum IVault.SwapKind","name":"kind","type":"uint8"},{"internalType":"contract IAsset","name":"assetIn","type":"address"},{"internalType":"contract IAsset","name":"assetOut","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"bytes","name":"userData","type":"bytes"}],"internalType":"struct IVault.SingleSwap","name":"singleSwap","type":"tuple"},{"components":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"bool","name":"fromInternalBalance","type":"bool"},{"internalType":"address payable","name":"recipient","type":"address"},{"internalType":"bool","name":"toInternalBalance","type":"bool"}],"internalType":"struct IVault.FundManagement","name":"funds","type":"tuple"}],"name":"querySwap","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"vault","outputs":[{"internalType":"contract IVault","name":"","type":"address"}],"stateMutability":"view","type":"function"}]'
+
+EURe = "0xcB444e90D8198415266c6a2724b7900fb12FC56E"
+bb_ag_USD = "0xFEdb19Ec000d38d92Af4B21436870F115db22725"
+bb_ag_WXDAI = "0x41211BBa6d37F5a74b22e667533F080C7C7f3F13"
+WXDAI = "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"
+EURe_bb_ag_USD_POOL_ID = '0xa611a551b95b205ccd9490657acf7899daee5db700000000000000000000002e'
+bb_ag_USD_POOL_ID = '0xfedb19ec000d38d92af4b21436870f115db22725000000000000000000000010'
+bb_ag_WXDAI_POOL_ID = '0x41211bba6d37f5a74b22e667533f080c7c7f3f1300000000000000000000000b'
+XDAI = 'xdai'
+
 
 
 # Transactions Gas Parameters
@@ -144,6 +164,84 @@ def get_EUR_oracle_price():
     contract = web3.eth.contract(address=CHAINLINK_FEED_ADDRESS, abi=CHAINLINK_FEED_ABI)
     chainlink_price = contract.functions.latestAnswer().call() / (10 ** 8)
     return chainlink_price
+
+def get_EURe_to_USD_balancer(amount):
+
+    amount = int(amount * 10 ** decimalsEURe)
+
+    batch_swap_steps = []
+
+    swap_kind = 0 # 0 = "Out Given Exact In" or 1 = "In Given Exact Out"
+    user_data = '0x'
+
+    # Step 1: Swap EURe for bb-ag-USD
+    index_asset_in = 0
+    index_asset_out = 1
+    batch_swap_steps.append([EURe_bb_ag_USD_POOL_ID, index_asset_in, index_asset_out, amount, user_data])
+
+    # Step 2: Swap bb-ag-USD for bb-ag-WXDAI
+    index_asset_in = 1
+    index_asset_out = 2
+    batch_swap_steps.append([bb_ag_USD_POOL_ID, index_asset_in, index_asset_out, 0, user_data])
+
+    # Step 3: Swap bb-ag-WXDAI for WXDAI
+    index_asset_in = 2
+    index_asset_out = 3
+    batch_swap_steps.append([bb_ag_WXDAI_POOL_ID, index_asset_in, index_asset_out, 0, user_data])
+
+    # Assets
+    assets = [EURe, bb_ag_USD, bb_ag_WXDAI, WXDAI]
+
+    # FundsManagement
+    funds_management = [SAFE_ADDRESS, False, SAFE_ADDRESS, False]
+
+    balancer_queries = web3.eth.contract(BALANCER_QUERIES, abi=ABI_BALANCER_QUERIES)
+
+    # try:
+    swap = balancer_queries.functions.queryBatchSwap(int(swap_kind), batch_swap_steps, assets, funds_management).call()
+
+    amount_out = abs(swap[3]) / 10 ** decimalsEURe
+
+    return amount_out
+
+def get_USD_to_EURe_balancer(amount):
+
+    amount = int(amount * 10 ** decimalsWXDAI)
+
+    batch_swap_steps = []
+
+    swap_kind = 0 # 0 = "Out Given Exact In" or 1 = "In Given Exact Out"
+    user_data = '0x'
+
+    # Step 1: Swap WXDAI for bb-ag-WXDAI  
+    index_asset_in = 0
+    index_asset_out = 1
+    batch_swap_steps.append([bb_ag_WXDAI_POOL_ID, index_asset_in, index_asset_out, amount, user_data])
+
+    # Step 2: Swap bb-ag-WXDAI for bb-ag-USD 
+    index_asset_in = 1
+    index_asset_out = 2
+    batch_swap_steps.append([bb_ag_USD_POOL_ID, index_asset_in, index_asset_out, 0, user_data])
+
+    # Step 1: Swap bb-ag-USD for EURe
+    index_asset_in = 2
+    index_asset_out = 3
+    batch_swap_steps.append([EURe_bb_ag_USD_POOL_ID, index_asset_in, index_asset_out, 0, user_data])
+
+    # Assets
+    assets = [WXDAI, bb_ag_WXDAI, bb_ag_USD, EURe]
+
+    # FundsManagement
+    funds_management = [SAFE_ADDRESS, False, SAFE_ADDRESS, False]
+
+    balancer_queries = web3.eth.contract(BALANCER_QUERIES, abi=ABI_BALANCER_QUERIES)
+
+    # try:
+    swap = balancer_queries.functions.queryBatchSwap(int(swap_kind), batch_swap_steps, assets, funds_management).call()
+
+    amount_out = abs(swap[0]) / 10 ** decimalsWXDAI
+
+    return amount_out
 
 
 def get_EURe_to_USD_curve(amount):
@@ -243,6 +341,146 @@ def unwrap_xDAI(amount):
         send_slack_message('Failed to wrap%.2f XDAI' % amount, txn_hash_message_slack, txn_receipt.status)
 
 
+def swap_EURe_for_WXDAI_balancer(amount):
+
+    EURe_contract = web3.eth.contract(address=EURe_ADDRESS, abi=EURe_ABI)
+    balance = EURe_contract.functions.balanceOf(SAFE_ADDRESS).call()
+    if balance < amount * (10 ** decimalsEURe):
+        raise ValueError('Not enough EURe to swap. Current EURe balance: %.3f.' % (balance / (10 ** decimalsEURe)))
+    vault = web3.eth.contract(address=VAULT, abi=ABI_VAULT)
+    amount_int = int(amount * (10 ** decimalsEURe))
+    if amount_int == 0:
+        raise ValueError('Amount to swap is too small. Amount of EURe to swap: %f.' % (amount * (10 ** decimalsEURe)))
+    
+    amount_out = get_EURe_to_USD_balancer(amount)
+    min_amount_out = ((1 - float(SLIPPAGE)) * amount_out) * -1
+
+    batch_swap_steps = []
+
+    swap_kind = 0 # 0 = "Out Given Exact In" or 1 = "In Given Exact Out"
+    user_data = '0x'
+
+    # Step 1: Swap EURe for bb-ag-USD
+    index_asset_in = 0
+    index_asset_out = 1
+    batch_swap_steps.append([EURe_bb_ag_USD_POOL_ID, index_asset_in, index_asset_out, amount_int, user_data])
+
+    # Step 2: Swap bb-ag-USD for bb-ag-WXDAI
+    index_asset_in = 1
+    index_asset_out = 2
+    batch_swap_steps.append([bb_ag_USD_POOL_ID, index_asset_in, index_asset_out, 0, user_data])
+
+    # Step 3: Swap bb-ag-WXDAI for WXDAI
+    index_asset_in = 2
+    index_asset_out = 3
+    batch_swap_steps.append([bb_ag_WXDAI_POOL_ID, index_asset_in, index_asset_out, 0, user_data])
+
+    # Assets
+    assets = [EURe, bb_ag_USD, bb_ag_WXDAI, WXDAI]
+
+    # FundsManagement
+    funds_management = [SAFE_ADDRESS, False, SAFE_ADDRESS, False]
+
+    # Limits
+    limits = [int(amount * (10 ** decimalsEURe)), 0, 0, int(min_amount_out * (10 ** decimalsWXDAI))]
+
+    # Deadline
+    deadline = math.floor(datetime.now().timestamp()+1800)
+
+    data = vault.encodeABI(fn_name='batchSwap', args=[swap_kind, batch_swap_steps, assets, funds_management, limits, deadline])
+    to_address = VAULT
+    txn_receipt, txn_hash_message_slack, txn_hash_message = exec(to_address, data, 0)
+    logs = txn_receipt.logs
+    amount_received = 0
+    if txn_receipt is not None:
+        for element in logs:
+            if element['topics'] == [bytes.fromhex('ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'),
+                                     bytes.fromhex('000000000000000000000000e3fff29d4dc930ebb787fecd49ee5963dadf60b6'),
+                                     bytes.fromhex('00000000000000000000000051d34416593a8acf4127dc4a40625a8efab9940c')]:
+                amount_received = int(element['data'].hex(), base=16) / (10 ** decimalsWXDAI)
+        if txn_receipt.status == 1 and amount_received != 0:
+            msg = '%.2f EURe was swapped for %.2f WXDAI' % (amount, amount_received)
+            status = 1
+        else:
+            msg = 'Failed to swap %.2f EURe' % amount
+            status = 0
+        send_slack_message(msg, txn_hash_message_slack, status)
+        return msg + '.' + txn_hash_message
+    else:
+        send_slack_message('', txn_hash_message_slack, 3)
+        return txn_hash_message
+
+
+def swap_WXDAI_for_EURe_balancer(amount):
+
+    WXDAI_contract = web3.eth.contract(address=WXDAI_ADDRESS, abi=WXDAI_ABI)
+    balance = WXDAI_contract.functions.balanceOf(SAFE_ADDRESS).call()
+    if balance < amount * (10 ** decimalsWXDAI):
+        raise ValueError('Not enough WXDAI to swap. Current WXDAI balance: %.3f.' % (balance / (10 ** decimalsWXDAI)))
+    vault = web3.eth.contract(address=VAULT, abi=ABI_VAULT)
+    amount_int = int(amount * (10 ** decimalsWXDAI))
+    if amount_int == 0:
+        raise ValueError('Amount to swap is too small. Amount of WXDAI to swap: %f.' % amount)
+    
+    amount_out = get_USD_to_EURe_balancer(amount)
+    min_amount_out = ((1 - float(SLIPPAGE)) * amount_out) * -1
+
+    batch_swap_steps = []
+
+    swap_kind = 0 # 0 = "Out Given Exact In" or 1 = "In Given Exact Out"
+    user_data = '0x'
+
+    # Step 1: Swap WXDAI for bb-ag-WXDAI  
+    index_asset_in = 0
+    index_asset_out = 1
+    batch_swap_steps.append([bb_ag_WXDAI_POOL_ID, index_asset_in, index_asset_out, amount_int, user_data])
+
+    # Step 2: Swap bb-ag-WXDAI for bb-ag-USD 
+    index_asset_in = 1
+    index_asset_out = 2
+    batch_swap_steps.append([bb_ag_USD_POOL_ID, index_asset_in, index_asset_out, 0, user_data])
+
+    # Step 1: Swap bb-ag-USD for EURe
+    index_asset_in = 2
+    index_asset_out = 3
+    batch_swap_steps.append([EURe_bb_ag_USD_POOL_ID, index_asset_in, index_asset_out, 0, user_data])
+
+    # Assets
+    assets = [WXDAI, bb_ag_WXDAI, bb_ag_USD, EURe]
+
+    # FundsManagement
+    funds_management = [SAFE_ADDRESS, False, SAFE_ADDRESS, False]
+
+    # Limits
+    limits = [int(amount * (10 ** decimalsWXDAI)), 0, 0, int(min_amount_out * (10 ** decimalsEURe))]
+
+    # Deadline
+    deadline = math.floor(datetime.now().timestamp()+1800)
+
+    data = vault.encodeABI(fn_name='batchSwap', args=[swap_kind, batch_swap_steps, assets, funds_management, limits, deadline])
+    to_address = VAULT
+    txn_receipt, txn_hash_message_slack, txn_hash_message = exec(to_address, data, 0)
+    logs = txn_receipt.logs
+    amount_received = 0
+    if txn_receipt is not None:
+        for element in logs:
+            if element['topics'] == [bytes.fromhex('ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'),
+                                     bytes.fromhex('000000000000000000000000e3fff29d4dc930ebb787fecd49ee5963dadf60b6'),
+                                     bytes.fromhex('00000000000000000000000051d34416593a8acf4127dc4a40625a8efab9940c')]:
+                amount_received = int(element['data'].hex(), base=16) / (10 ** decimalsWXDAI)
+        if txn_receipt.status == 1 and amount_received != 0:
+            msg = '%.2f EURe was swapped for %.2f WXDAI' % (amount, amount_received)
+            status = 1
+        else:
+            msg = 'Failed to swap %.2f EURe' % amount
+            status = 0
+        send_slack_message(msg, txn_hash_message_slack, status)
+        return msg + '.' + txn_hash_message
+    else:
+        send_slack_message('', txn_hash_message_slack, 3)
+        return txn_hash_message
+
+
 def swap_EURe_for_WXDAI_curve(amount):
     EURe_contract = web3.eth.contract(address=EURe_ADDRESS, abi=EURe_ABI)
     balance = EURe_contract.functions.balanceOf(SAFE_ADDRESS).call()
@@ -316,6 +554,8 @@ def swap_WXDAI_for_EURe_curve(amount):
 # swap_WXDAI_for_EURe(0.00000001)
 # swap_EURe_for_WXDAI(0.00000001)
 # unwrap_xDAI(0.00000001)
+
+swap_WXDAI_for_EURe_balancer(1)
 
 amount_WXDAI = AMOUNT
 amount_EURe = AMOUNT
