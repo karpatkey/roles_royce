@@ -555,8 +555,6 @@ def swap_WXDAI_for_EURe_curve(amount):
 # swap_EURe_for_WXDAI(0.00000001)
 # unwrap_xDAI(0.00000001)
 
-swap_WXDAI_for_EURe_balancer(1)
-
 amount_WXDAI = AMOUNT
 amount_EURe = AMOUNT
 lack_of_gas_warning = False
