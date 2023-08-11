@@ -108,8 +108,7 @@ def send_slack_msg(slack_webhook: str, icon: SlackMessageIcon, title: str, messa
 
 
 def send_telegram_msg(bot_access_token: str, chat_id: int, message: str) -> requests.Response:
-    URL_TELEGRAM = 'https://api.telegram.org/bot%s/sendMessage?chat_id=-%d&text=%s' % (
-        bot_access_token, chat_id, message)
+    URL_TELEGRAM = f'https://api.telegram.org/bot{bot_access_token}/sendMessage?chat_id=-{chat_id}&text={message}'
     response = requests.post(URL_TELEGRAM)
 
     if response.status_code != 200:
@@ -123,17 +122,26 @@ class Messenger:
         self.slack_messenger = slack_messenger
         self.telegram_messenger = telegram_messenger
 
-    def log_and_alert(self, logging_level: LoggingLevel, title: str, message: str):
+    def log_and_alert(self, logging_level: LoggingLevel, title: str, message: str, slack_msg=None):
         if logging_level == LoggingLevel.Info:
-            logger.info(title + '. ' + message)
-            self.slack_messenger.send_msg(SlackMessageIcon.Loudspeaker, title, message)
+            logger.info(title + '.\n' + message)
+            if slack_msg is not None:
+                self.slack_messenger.send_msg(SlackMessageIcon.Loudspeaker, title, slack_msg)
+            else:
+                self.slack_messenger.send_msg(SlackMessageIcon.Loudspeaker, title, message)
             self.telegram_messenger.send_msg('Info: ' + title + '\n' + message)
         if logging_level == LoggingLevel.Warning:
-            logger.warning(title + '. ' + message)
-            self.slack_messenger.send_msg(SlackMessageIcon.WarningSign, title, message)
+            logger.warning(title + '.\n' + message)
+            if slack_msg is not None:
+                self.slack_messenger.send_msg(SlackMessageIcon.WarningSign, title, slack_msg)
+            else:
+                self.slack_messenger.send_msg(SlackMessageIcon.WarningSign, title, message)
             self.telegram_messenger.send_msg('Warning: ' + title + '\n' + message)
         if logging_level == LoggingLevel.Error:
-            logger.exception(title + '. ' + message)
-            self.slack_messenger.send_msg(SlackMessageIcon.ErrorRotatingLight, title, message)
+            logger.exception(title + '.\n' + message)
+            if slack_msg is not None:
+                self.slack_messenger.send_msg(SlackMessageIcon.ErrorRotatingLight, title, slack_msg)
+            else:
+                self.slack_messenger.send_msg(SlackMessageIcon.ErrorRotatingLight, title, message)
             self.telegram_messenger.send_msg('Error: ' + title + '\n' + message)
 

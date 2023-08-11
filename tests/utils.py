@@ -11,8 +11,6 @@ import subprocess
 import shlex
 import time
 
-
-
 from eth_account import Account
 from eth_account.signers.local import LocalAccount
 
@@ -225,7 +223,7 @@ def get_balance(w3, token, address):
 def get_allowance(w3, token, owner_address, spender_address):
     """Get the token allowance of an address"""
     ctract = w3.eth.contract(address=token, abi=erc20_abi)
-    return ctract.functions.allowance(owner_address,spender_address).call()
+    return ctract.functions.allowance(owner_address, spender_address).call()
 
 
 def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
