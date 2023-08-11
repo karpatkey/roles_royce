@@ -10,6 +10,8 @@ from web3 import Web3
 from eth_typing import HexStr
 from eth_utils import event_abi_to_log_topic
 from hexbytes import HexBytes
+
+
 @dataclass
 class Event:
     name: str
@@ -19,6 +21,7 @@ class Event:
 
 class EventLogDecoder:
     """Helper to decode events from tx receipts."""
+
     def __init__(self, contract: Contract):
         self.contract = contract
         self.event_abis = [abi for abi in self.contract.abi if abi['type'] == 'event']
@@ -53,9 +56,8 @@ class EventLogDecoder:
 erc20_event_log_decoder = EventLogDecoder(Web3().eth.contract(abi=erc20_abi))
 
 
-def get_token_amounts_from_transfer_event(tx_receipt: object, token_address: str | ChecksumAddress | Address,
-                                          target_address: str | ChecksumAddress | Address, w3: Web3) -> list[dict]:
-
+def get_token_amounts_from_transfer_events(tx_receipt: object, target_address: str | ChecksumAddress | Address,
+                                           w3: Web3) -> (list[dict], str):
     transfers = []
     message = ''
     for element in tx_receipt.logs:
@@ -64,7 +66,8 @@ def get_token_amounts_from_transfer_event(tx_receipt: object, token_address: str
         if not event:
             continue
 
-        if event.name == "Transfer" and (event.values["to"] == target_address or event.values["from"] == target_address):
+        if event.name == "Transfer" and (
+                event.values["to"] == target_address or event.values["from"] == target_address):
             token_address = Web3.to_checksum_address(address)
             target_address = Web3.to_checksum_address(target_address)
             token_contract = w3.eth.contract(address=token_address, abi=erc20_abi)
@@ -77,15 +80,14 @@ def get_token_amounts_from_transfer_event(tx_receipt: object, token_address: str
             transfers.append(transfer)
 
             if transfer['from'] == target_address:
-                message = message + f"Address {target_address} transferred {transfer['amount']:.3f} {token_symbol} to address {transfer['to']}."
+                message = message + f"  Address {target_address} transferred {transfer['amount']:.3f} {token_symbol} to address {transfer['to']}."
             else:
-                message = message + f"Address {target_address} received {transfer['amount']:.3f} {token_symbol} from address {transfer['from']}."
+                message = message + f"  Address {target_address} received {transfer['amount']:.3f} {token_symbol} from address {transfer['from']}."
             if element != transfers[-1]:
-                message = message + '\n'
+                message = message + '\n\n'
 
     message = message[:-1]
     return transfers, message
-
 
 
 ExplorerTxUrls = {
@@ -94,12 +96,24 @@ ExplorerTxUrls = {
 }
 
 
-def get_tx_executed_msg(tx_receipt: object, chain: Blockchain):
+def get_tx_executed_msg(tx_receipt: object, chain: Blockchain) -> (str, str):
     if tx_receipt.status == 1:
-        message_slack = f'*Txn hash (Success):* <{ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}|{tx_receipt.transactionHash.hex()}>.'
-        message = f'Txn hash (Success): {ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}.'
+        message_slack = f'  *Txn hash (Success):* <{ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}|{tx_receipt.transactionHash.hex()}>.'
+        message = f'  Txn hash (Success): {ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}.'
     else:
-        message_slack = f'*Txn hash (Success):* <{ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}|{tx_receipt.transactionHash.hex()}>.'
-        message = f'Txn hash (Success): {ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}.'
+        message_slack = f'  *Txn hash (Failure):* <{ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}|{tx_receipt.transactionHash.hex()}>.'
+        message = f'  Txn hash (Failure): {ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}.'
+
+    return message, message_slack
+
+
+def get_tx_receipt_message_with_transfers(tx_receipt: object, target_address: str | ChecksumAddress | Address,
+                                          w3: Web3) -> (str, str):
+    chain = Chain.get_blockchain_from_web3(w3)
+    tx_executed_message, tx_executed_message_slack = get_tx_executed_msg(tx_receipt, chain)
+    transfers, transfers_message = get_token_amounts_from_transfer_events(tx_receipt, target_address, w3)
+
+    message = tx_executed_message + '\n\n' + transfers_message
+    message_slack = tx_executed_message_slack + '\n\n' + transfers_message
 
     return message, message_slack
