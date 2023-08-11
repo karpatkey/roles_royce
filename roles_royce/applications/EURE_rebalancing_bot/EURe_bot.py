@@ -243,7 +243,7 @@ def unwrap_xDAI(amount):
         send_slack_message('Failed to wrap%.2f XDAI' % amount, txn_hash_message_slack, txn_receipt.status)
 
 
-def swap_EURe_for_WXDAI(amount):
+def swap_EURe_for_WXDAI_curve(amount):
     EURe_contract = web3.eth.contract(address=EURe_ADDRESS, abi=EURe_ABI)
     balance = EURe_contract.functions.balanceOf(SAFE_ADDRESS).call()
     if balance < amount * (10 ** decimalsEURe):
@@ -277,7 +277,7 @@ def swap_EURe_for_WXDAI(amount):
         send_slack_message('', txn_hash_message_slack, 3)
         return txn_hash_message
 
-def swap_WXDAI_for_EURe(amount):
+def swap_WXDAI_for_EURe_curve(amount):
     WXDAI_contract = web3.eth.contract(address=WXDAI_ADDRESS, abi=WXDAI_ABI)
     balance = WXDAI_contract.functions.balanceOf(SAFE_ADDRESS).call()
     if balance < amount * (10 ** decimalsWXDAI):
@@ -324,8 +324,8 @@ lack_of_WXDAI = False
 lack_of_EURe = False
 while True:
     txn_executed = False
-    EURe_to_USD = get_EURe_to_USD(amount_EURe)
-    USD_to_EURe = get_USD_to_EURe(amount_WXDAI)
+    EURe_to_USD = get_EURe_to_USD_curve(amount_EURe)
+    USD_to_EURe = get_USD_to_EURe_curve(amount_WXDAI)
     EURe_price = get_EUR_oracle_price()
     dict_log = {
         'Date': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
@@ -339,7 +339,7 @@ while True:
     }
     if EURe_to_USD > (1 + DRIFT) * EURe_price * amount_EURe and lack_of_EURe is False and EXEC_TRANSACTIONS is True:
         try:
-            msg = swap_EURe_for_WXDAI(amount_EURe)
+            msg = swap_EURe_for_WXDAI_curve(amount_EURe)
             dict_log['Execution'] = msg
             txn_executed = True
         except ValueError as e:
@@ -349,7 +349,7 @@ while True:
 
     elif USD_to_EURe > (1 + DRIFT) * amount_WXDAI / EURe_price and lack_of_WXDAI is False and EXEC_TRANSACTIONS is True:
         try:
-            msg = swap_WXDAI_for_EURe(amount_WXDAI)
+            msg = swap_WXDAI_for_EURe_curve(amount_WXDAI)
             dict_log['Execution'] = msg
             txn_executed = True
         except ValueError as e:
@@ -359,8 +359,8 @@ while True:
 
     if txn_executed:
         time.sleep(5)
-        EURe_to_USD = get_EURe_to_USD(amount_EURe)
-        USD_to_EURe = get_USD_to_EURe(amount_WXDAI)
+        EURe_to_USD = get_EURe_to_USD_curve(amount_EURe)
+        USD_to_EURe = get_USD_to_EURe_curve(amount_WXDAI)
         dict_log['New EURe to WXDAI Curve'] = '%.3f EURe ---> %.3f WXDAI' % (amount_EURe, EURe_to_USD)
         dict_log['New WXDAI to EURe Curve'] = '%.3f WXDAI ---> %.3f EURe' % (amount_WXDAI, USD_to_EURe)
         dict_log['New EURe to WXDAI drift'] = '%.5f' % (EURe_to_USD / (EURe_price * amount_EURe) - 1)
