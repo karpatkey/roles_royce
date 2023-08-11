@@ -1,5 +1,14 @@
+from dataclasses import dataclass
+from typing import Any, Dict, cast, Union
+
 from web3.types import Address, ChecksumAddress
+from web3._utils.abi import get_abi_input_names, get_abi_input_types, map_abi_data
+from web3._utils.normalizers import BASE_RETURN_NORMALIZERS
+from web3.contract import Contract
 from web3 import Web3
+from eth_typing import HexStr
+from eth_utils import event_abi_to_log_topic
+from hexbytes import HexBytes
 
 dai_abi = """[{"inputs":[{"internalType":"uint256","name":"chainId_","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"src","type":"address"},{"indexed":true,"internalType":"address","name":"guy","type":"address"},{"indexed":false,"internalType":"uint256","name":"wad","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":true,"inputs":[{"indexed":true,"internalType":"bytes4","name":"sig","type":"bytes4"},{"indexed":true,"internalType":"address","name":"usr","type":"address"},{"indexed":true,"internalType":"bytes32","name":"arg1","type":"bytes32"},{"indexed":true,"internalType":"bytes32","name":"arg2","type":"bytes32"},{"indexed":false,"internalType":"bytes","name":"data","type":"bytes"}],"name":"LogNote","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"src","type":"address"},{"indexed":true,"internalType":"address","name":"dst","type":"address"},{"indexed":false,"internalType":"uint256","name":"wad","type":"uint256"}],"name":"Transfer","type":"event"},{"constant":true,"inputs":[],"name":"DOMAIN_SEPARATOR","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"PERMIT_TYPEHASH","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"address","name":"","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"usr","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"usr","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"burn","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"guy","type":"address"}],"name":"deny","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"usr","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"mint","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"src","type":"address"},{"internalType":"address","name":"dst","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"move","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"nonces","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"holder","type":"address"},{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"nonce","type":"uint256"},{"internalType":"uint256","name":"expiry","type":"uint256"},{"internalType":"bool","name":"allowed","type":"bool"},{"internalType":"uint8","name":"v","type":"uint8"},{"internalType":"bytes32","name":"r","type":"bytes32"},{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"permit","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"usr","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"pull","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"usr","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"push","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"guy","type":"address"}],"name":"rely","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"dst","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"src","type":"address"},{"internalType":"address","name":"dst","type":"address"},{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"version","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"wards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]"""
 
@@ -17,22 +26,68 @@ bpt_contract_abi = """[{"inputs":[{"components":[{"internalType":"contract IVaul
 
 erc20_abi = """[{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}]"""
 
-def get_token_amounts_from_transfer_event(tx_receipt: object, token_address: str | ChecksumAddress | Address, target_address: str | ChecksumAddress | Address, w3: Web3)->list[dict]:
+
+@dataclass
+class Event:
+    name: str
+    topic: HexBytes
+    values: dict
+
+
+class EventLogDecoder:
+    """Helper to decode events from tx receipts."""
+    def __init__(self, contract: Contract):
+        self.contract = contract
+        self.event_abis = [abi for abi in self.contract.abi if abi['type'] == 'event']
+        self._sign_abis = {event_abi_to_log_topic(abi): abi for abi in self.event_abis}
+
+    def decode_log(self, result: Dict[str, Any]):
+        data = b""
+        for t in result['topics']:
+            data += t
+        data += result['data']
+        return self.decode_event_input(data)
+
+    def decode_event_input(self, data: Union[HexStr, str, bytes]) -> Event | None:
+        # type ignored b/c expects data arg to be HexBytes
+        data = HexBytes(data)  # type: ignore
+        selector, params = data[:32], data[32:]
+
+        try:
+            func_abi = self._sign_abis[selector]
+        except KeyError:
+            return None
+
+        names = get_abi_input_names(func_abi)
+        types = get_abi_input_types(func_abi)
+
+        decoded = self.contract.w3.codec.decode(types, cast(HexBytes, params))
+        normalized = map_abi_data(BASE_RETURN_NORMALIZERS, types, decoded)
+        values = dict(zip(names, normalized))
+        return Event(name=func_abi['name'], topic=selector, values=values)
+
+
+erc20_event_log_decoder = EventLogDecoder(Web3().eth.contract(abi=erc20_abi))
+
+
+def get_token_amounts_from_transfer_event(tx_receipt: object, token_address: str | ChecksumAddress | Address,
+                                          target_address: str | ChecksumAddress | Address, w3: Web3) -> list[dict]:
     token_address = Web3.to_checksum_address(token_address)
     target_address = Web3.to_checksum_address(target_address)
     token_contract = w3.eth.contract(address=token_address, abi=erc20_abi)
     token_decimals = token_contract.functions.decimals().call(block_identifier=tx_receipt.blockNumber)
-    logs = tx_receipt.logs
-    a = target_address[2:]
-    print(a)
     transfers = []
-    for element in logs:
-            if element.address == token_address:
-                if element.topics[0] == bytes.fromhex('ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') and (element.topics[1] == bytes.fromhex(f'000000000000000000000000{target_address[2:]}') or element.topics[2] == bytes.fromhex(f'000000000000000000000000{target_address[2:]}')):
-                    amount_transferred = int(element['data'].hex(), base=16) / (10 ** token_decimals)
-                    transfers.append({"from": '0x' + element.topics[1].hex()[26:66], "to": '0x'+ element.topics[2].hex()[26:66], "amount": amount_transferred})
-    return transfers
+    for element in tx_receipt.logs:
+        if element.address == token_address:
 
-w3 = Web3(Web3.HTTPProvider('https://eth.llamarpc.com'))
-tx_receipt = w3.eth.get_transaction_receipt('0xfe5e7f623deceea833e7300f1a9b637afcb253cebca0d3968e9190faf1c2cbc4')
-print(get_token_amounts_from_transfer_event(tx_receipt, '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', '0x65389F6FFe361C0C27Ea5D9691616a2060f8a167', w3))
+            event = erc20_event_log_decoder.decode_log(element)
+            if not event:
+                continue
+
+            if event.name == "Transfer" and event.values["to"] == target_address:
+                transfer = event.values.copy()
+                amount = transfer.pop("value") / (10 ** token_decimals)
+                transfer['amount'] = amount
+                transfers.append(transfer)
+
+    return transfers
