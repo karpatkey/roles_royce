@@ -4,7 +4,6 @@ import json
 import logging
 import os
 import shutil
-from typing import Any, Dict, cast, Union
 
 import pytest
 import socket
@@ -12,17 +11,12 @@ import subprocess
 import shlex
 import time
 
-from eth_typing import HexStr
-from eth_utils import event_abi_to_log_topic
-from hexbytes import HexBytes
+
 
 from eth_account import Account
 from eth_account.signers.local import LocalAccount
 
 from web3 import Web3, HTTPProvider
-from web3._utils.abi import get_abi_input_names, get_abi_input_types, map_abi_data
-from web3._utils.normalizers import BASE_RETURN_NORMALIZERS
-from web3.contract import Contract
 from roles_royce.evm_utils import erc20_abi
 from roles_royce.constants import ETHAddr
 from .safe import SimpleSafe
@@ -246,48 +240,3 @@ def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
 def top_up_address(w3: Web3, address: str, amount: int) -> None:
     """Top up an address with ETH"""
     w3.eth.send_transaction({"to": address, "value": Web3.to_wei(amount, "ether"), "from": SCRAPE_ACCOUNT.address})
-
-
-class EventLogDecoder:
-    def __init__(self, contract: Contract):
-        self.contract = contract
-        self.event_abis = [abi for abi in self.contract.abi if abi['type'] == 'event']
-        self._sign_abis = {event_abi_to_log_topic(abi): abi for abi in self.event_abis}
-        self._name_abis = {abi['name']: abi for abi in self.event_abis}
-
-    def decode_log(self, result: Dict[str, Any]):
-        data = b""
-        for t in result['topics']:
-            data += t
-        data += result['data']
-        return self.decode_event_input(data)
-
-    def decode_event_input(self, data: Union[HexStr, str, bytes], name: str = None) -> tuple:
-        # type ignored b/c expects data arg to be HexBytes
-        data = HexBytes(data)  # type: ignore
-        selector, params = data[:32], data[32:]
-
-        if name:
-            func_abi = self._get_event_abi_by_name(event_name=name)
-        else:
-            func_abi = self._get_event_abi_by_selector(selector)
-
-        names = get_abi_input_names(func_abi)
-        types = get_abi_input_types(func_abi)
-
-        decoded = self.contract.w3.codec.decode(types, cast(HexBytes, params))
-        normalized = map_abi_data(BASE_RETURN_NORMALIZERS, types, decoded)
-        event_str = func_abi['name'] + "(" + ", ".join(names) + ")"
-        return (event_str, dict(zip(names, normalized)))
-
-    def _get_event_abi_by_selector(self, selector: HexBytes) -> Dict[str, Any]:
-        try:
-            return self._sign_abis[selector]
-        except KeyError:
-            raise ValueError("Event is not presented in contract ABI.")
-
-    def _get_event_abi_by_name(self, event_name: str) -> Dict[str, Any]:
-        try:
-            return self._name_abis[event_name]
-        except KeyError:
-            raise KeyError(f"Event named '{event_name}' was not found in contract ABI.")
