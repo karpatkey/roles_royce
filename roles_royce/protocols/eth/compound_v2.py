@@ -1,5 +1,5 @@
 from roles_royce.constants import StrEnum, ETHAddr
-from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApproveForToken
+from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApproveForToken
 
 
 class Ctoken(StrEnum):
@@ -31,7 +31,7 @@ class Approve(BaseApproveForToken):
         self.args.spender = ctoken
 
 
-class Mint(Method):
+class Mint(ContractMethod):
     """Deposit asset.
 
     Sender deposits a specified amount of underlying asset in exchange for cTokens
@@ -45,7 +45,7 @@ class Mint(Method):
         self.args.amount = amount
 
 
-class Redeem(Method):
+class Redeem(ContractMethod):
     """Withdraw asset.
 
     It is called when MAX underlying amount is withdrawn
@@ -59,7 +59,7 @@ class Redeem(Method):
         self.args.amount = amount
 
 
-class RedeemUnderlying(Method):
+class RedeemUnderlying(ContractMethod):
     """Withdraw asset.
 
     It is called when MAX underlying amount is withdrawn
@@ -73,7 +73,7 @@ class RedeemUnderlying(Method):
         self.args.amount = amount
 
 
-class EnterMarkets(Method):
+class EnterMarkets(ContractMethod):
     """
 
     Set asset as collateral
@@ -87,7 +87,7 @@ class EnterMarkets(Method):
         self.args.ctokens = ctokens
 
 
-class ExitMarket(Method):
+class ExitMarket(ContractMethod):
     """
 
     Unset asset as collateral
@@ -101,7 +101,7 @@ class ExitMarket(Method):
         self.args.ctoken = ctoken
 
 
-class Borrow(Method):
+class Borrow(ContractMethod):
     """
 
     Borrow underlying asset amount.
@@ -115,7 +115,7 @@ class Borrow(Method):
         self.args.amount = amount
 
 
-class Repay(Method):
+class Repay(ContractMethod):
     """
 
     Repay underlying asset amount.
@@ -129,7 +129,7 @@ class Repay(Method):
         self.args.amount = amount
 
 
-class RepayETH(Method):
+class RepayETH(ContractMethod):
     """
 
     Repay ETH amount
@@ -143,7 +143,7 @@ class RepayETH(Method):
         super().__init__(avatar=avatar, value=amount)
 
 
-class ClaimCOMP(Method):
+class ClaimCOMP(ContractMethod):
     """
 
     Claim COMP rewards.

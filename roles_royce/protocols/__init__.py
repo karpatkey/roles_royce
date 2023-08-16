@@ -1,1 +1,1 @@
-from .base import Method
+from .base import ContractMethod

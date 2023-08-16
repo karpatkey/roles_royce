@@ -1,5 +1,5 @@
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, BaseApproveForToken, BaseApprove, Address
+from roles_royce.protocols.base import ContractMethod, BaseApproveForToken, BaseApprove, Address
 
 
 class ApproveForBooster(BaseApproveForToken):
@@ -35,7 +35,7 @@ class ApproveAURA(BaseApprove):
     fixed_arguments = {"spender": ETHAddr.AURALocker}
     token = ETHAddr.AURA
 
-class WithdrawAndUndwrapStakedBPT(Method):
+class WithdrawAndUndwrapStakedBPT(ContractMethod):
     """withdraw and unwrap AURAVaultToken"""
     name = "withdrawAndUnwrap"
     in_signature = [("amount", "uint256"), ("claim", "bool")]
@@ -47,7 +47,7 @@ class WithdrawAndUndwrapStakedBPT(Method):
         self.args.amount = amount
 
 
-class DepositBPT(Method):
+class DepositBPT(ContractMethod):
     """deposit BPT token"""
     name = "deposit"
     in_signature = [("pool_id", "uint256"), ("amount", "uint256"), ("stake", "bool")]
@@ -59,7 +59,7 @@ class DepositBPT(Method):
         self.args.pool_id = pool_id
         self.args.amount = amount
 
-class StakeAURABal(Method):
+class StakeAURABal(ContractMethod):
     """stake aurabal"""
     name = "stake"
     in_signature = [("amount", "uint256")]
@@ -69,7 +69,7 @@ class StakeAURABal(Method):
         super().__init__()
         self.args.amount = amount
 
-class Deposit80BAL20WETH(Method):
+class Deposit80BAL20WETH(ContractMethod):
     """deposit 80% BAL and 20% WETH"""
     name = "deposit"
     in_signature = [("amount", "uint256"), ("lock", "bool"), ("stake_address", "address")]
@@ -81,7 +81,7 @@ class Deposit80BAL20WETH(Method):
         self.args.amount = amount
         self.args.stake_address = stake_address
 
-class DepositBAL(Method):
+class DepositBAL(ContractMethod):
     """deposit BAL"""
     name = "deposit"
     in_signature = [("amount", "uint256"), ("min_out", "uint256"), ("lock", "bool"), ("stake_address", "address")]
@@ -94,7 +94,7 @@ class DepositBAL(Method):
         self.args.min_out = min_out
         self.args.stake_address = stake_address
 
-class WithdrawAuraBAL(Method):
+class WithdrawAuraBAL(ContractMethod):
     """withdraw aurabal"""
     name = "withdraw"
     in_signature = [("amount", "uint256"), ("claim", "bool")]
@@ -105,7 +105,7 @@ class WithdrawAuraBAL(Method):
         self.args.amount = amount
         self.args.claim = claim
 
-class CompounderStaking(Method):
+class CompounderStaking(ContractMethod):
     """compounder staking"""
     name = "deposit"
     in_signature = [("amount", "uint256"), ("avatar", "address")]
@@ -116,7 +116,7 @@ class CompounderStaking(Method):
         self.args.amount = amount
         self.args.avatar = avatar
 
-class CompounderWithdraw(Method):
+class CompounderWithdraw(ContractMethod):
     """compounder withdraw unsaking"""
     name = "withdraw"
     in_signature = [("amount", "uint256"), ("receiver", "address"), ("avatar", "address")]
@@ -128,7 +128,7 @@ class CompounderWithdraw(Method):
         self.args.receiver = receiver
         self.args.avatar = avatar
 
-class CompounderRedeem(Method):
+class CompounderRedeem(ContractMethod):
     """compounder redeem"""
     name = "redeem"
     in_signature = [("amount", "uint256"), ("receiver", "address"), ("avatar", "address")]
@@ -140,7 +140,7 @@ class CompounderRedeem(Method):
         self.args.receiver = receiver
         self.args.avatar = avatar
 
-class LockAURA(Method):
+class LockAURA(ContractMethod):
     """lock aura"""
     name = "lock"
     in_signature = [("receiver", "address"), ("amount", "uint256")]
@@ -151,7 +151,7 @@ class LockAURA(Method):
         self.args.receiver = receiver
         self.args.amount = amount
 
-class ProcessExpiredLocks(Method):
+class ProcessExpiredLocks(ContractMethod):
     """process expired locks"""
     name = "processExpiredLocks"
     in_signature = [("relock", "bool")]

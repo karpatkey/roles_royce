@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, InvalidArgument, AvatarAddress, Address, BaseApprove, BaseApproveForToken
+from roles_royce.protocols.base import ContractMethod, InvalidArgument, AvatarAddress, Address, BaseApprove, BaseApproveForToken
 
 
 class InterestRateModel(IntEnum):
@@ -44,7 +44,7 @@ class ApproveForParaSwapLiquidity(BaseApproveForToken):
     fixed_arguments = {"spender": ETHAddr.AAVE_V2_ParaSwapLiquidityAdapter}
 
 
-class DepositToken(Method):
+class DepositToken(ContractMethod):
     """Sender deposits Token and receives aToken in exchange."""
     name = "deposit"
     in_signature = [("asset", "address"), ("amount", "uint256"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
@@ -57,7 +57,7 @@ class DepositToken(Method):
         self.args.amount = amount
 
 
-class DepositETH(Method):
+class DepositETH(ContractMethod):
     """Sender deposits ETH and receives aETH in exchange."""
     name = "depositETH"
     in_signature = [("address", "address"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
@@ -68,7 +68,7 @@ class DepositETH(Method):
         super().__init__(value=eth_amount, avatar=avatar)
 
 
-class WithdrawToken(Method):
+class WithdrawToken(ContractMethod):
     """Sender redeems aToken and withdraws Token."""
     name = "withdraw"
     in_signature = [("asset", "address"), ("amount", "uint256"), ("to", "address")]
@@ -81,7 +81,7 @@ class WithdrawToken(Method):
         self.args.amount = amount
 
 
-class WithdrawETH(Method):
+class WithdrawETH(ContractMethod):
     """Sender redeems aETH and withdraws ETH."""
     name = "withdrawETH"
     in_signature = [("address", "address"), ("amount", "uint256"), ("to", "address")]
@@ -93,7 +93,7 @@ class WithdrawETH(Method):
         self.args.amount = amount
 
 
-class Collateralize(Method):
+class Collateralize(ContractMethod):
     """Set/unset asset as collateral."""
     name = "setUserUseReserveAsCollateral"
     in_signature = [("asset", "address"), ("use_as_collateral", "bool")]
@@ -106,7 +106,7 @@ class Collateralize(Method):
         self.args.use_as_collateral = use_as_collateral
 
 
-class Borrow(Method):
+class Borrow(ContractMethod):
     """Sender receives Token and receives debtToken (stable or variable debt) token."""
     name = "borrow"
     in_signature = [("asset", "address"), ("amount", "uint256"), ("interest_rate_model", "uint256"),
@@ -122,7 +122,7 @@ class Borrow(Method):
         self.args.interest_rate_model = interest_rate_model
 
 
-class BorrowETH(Method):
+class BorrowETH(ContractMethod):
     """Sender receives ETH and debtETH (stable or variable debt) token."""
     name = "borrowETH"
     in_signature = [("address", "address"), ("amount", "uint256"), ("interest_rate_model", "uint256"), ("referral_code", "uint16")]
@@ -136,7 +136,7 @@ class BorrowETH(Method):
         self.args.interest_rate_model = interest_rate_model
 
 
-class SwapBorrowRateMode(Method):
+class SwapBorrowRateMode(ContractMethod):
     """Swaps the borrow rate mode."""
     name = "swapBorrowRateMode"
     in_signature = [("asset", "address"), ("interest_rate_model", "uint256")]
@@ -149,7 +149,7 @@ class SwapBorrowRateMode(Method):
         self.args.interest_rate_model = interest_rate_model
 
 
-class StakeAAVE(Method):
+class StakeAAVE(ContractMethod):
     """Stake AAVE in Aave’s safety module."""
     name = 'stake'
     in_signature = [("on_behalf_of", "address"), ("amount", "uint256")]
@@ -166,7 +166,7 @@ class StakeABPT(StakeAAVE):
     target_address = ETHAddr.stkABPT
 
 
-class UnstakeAAVE(Method):
+class UnstakeAAVE(ContractMethod):
     """Unstake AAVE. Can only be called during the 2 days unstaking window after the 10 days cooldown period."""
     name = 'redeem'
     in_signature = [('to', 'address'), ('amount', 'uint256')]
@@ -183,7 +183,7 @@ class UnstakeABPT(UnstakeAAVE):
     target_address = ETHAddr.stkABPT
 
 
-class CooldownStkAAVE(Method):
+class CooldownStkAAVE(ContractMethod):
     """Initiates a 10 days cooldown period, once this is over the 2 days unstaking window opens."""
     name = 'cooldown'
     in_signature = []
@@ -196,7 +196,7 @@ class CooldownStkABPT(CooldownStkAAVE):
     target_address = ETHAddr.stkABPT
 
 
-class ClaimAAVERewards(Method):
+class ClaimAAVERewards(ContractMethod):
     """Claim AAVE rewards accrued from staking AAVE."""
     name = 'claimRewards'
     in_signature = [('to', 'address'), ('amount', 'uint256')]
@@ -213,7 +213,7 @@ class ClaimABPTRewards(ClaimAAVERewards):
     target_address = ETHAddr.stkABPT
 
 
-class Repay(Method):
+class Repay(ContractMethod):
     """Repay borrowed Token."""
     name = 'repay'
     in_signature = [('asset', 'address'), ('amount', 'uint256'), ('interest_rate_model', 'uint256'), ('on_behalf_of', 'address')]
@@ -227,7 +227,7 @@ class Repay(Method):
         self.args.interest_rate_model = interest_rate_model
 
 
-class RepayETH(Method):
+class RepayETH(ContractMethod):
     """Repay borrowed ETH."""
     name = 'repayETH'
     in_signature = [('address', 'address'), ('amount', 'uint256'), ('interest_rate_model', 'uint256'), ('on_behalf_of', 'address')]
@@ -240,7 +240,7 @@ class RepayETH(Method):
         self.args.interest_rate_model = interest_rate_model
 
 
-class SwapAndRepay(Method):
+class SwapAndRepay(ContractMethod):
     """Repay debt using collateral."""
     name = 'swapAndRepay'
     in_signature = [
@@ -274,7 +274,7 @@ class SwapAndRepay(Method):
         self.args.permit = [permit_amount, permit_deadline, permit_v, permit_r, permit_s]
 
 
-class SwapAndDeposit(Method):
+class SwapAndDeposit(ContractMethod):
     """Swaps an existing amount of a given collateral asset for another one."""
     name = "swapAndDeposit"
     in_signature = [
@@ -308,7 +308,7 @@ class SwapAndDeposit(Method):
         self.args.permit = [permit_amount, permit_deadline, permit_v, permit_r, permit_s]
 
 
-class DelegateAAVE(Method):
+class DelegateAAVE(ContractMethod):
     """Delegate the AAVE voting power for all type of actions (Voting and Proposition)."""
     name = "delegate"
     in_signature = [("delegatee", "address")]
@@ -319,7 +319,7 @@ class DelegateAAVE(Method):
         self.args.delegatee = delegatee
 
 
-class DelegateAAVEByType(Method):
+class DelegateAAVEByType(ContractMethod):
     """Delegate the AAVE voting power by type of action."""
     name = "delegateByType"
     in_signature = [("delegatee", "address"), ("delegation_type", "uint8")]
@@ -339,7 +339,7 @@ class DelegatestkAAVEByType(DelegateAAVEByType):
     target_address = ETHAddr.stkAAVE
 
 
-class SubmitVote(Method):
+class SubmitVote(ContractMethod):
     """Submit vote for a specific snapshot."""
     name = "submitVote"
     in_signature = [("proposal_id", "uint256"), ("support", "bool")]

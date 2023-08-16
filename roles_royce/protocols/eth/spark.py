@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApprove, BaseApproveForToken
+from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApprove, BaseApproveForToken
 
 
 class RateModel(IntEnum):
@@ -20,7 +20,7 @@ class ApproveToken(BaseApproveForToken):
     fixed_arguments = {"spender": ETHAddr.SparkLendingPoolV3}
 
 
-class DepositToken(Method):
+class DepositToken(ContractMethod):
     """Sender deposits Token and receives spToken in exchange"""
     name = "deposit"
     in_signature = (("asset", "address"),
@@ -36,7 +36,7 @@ class DepositToken(Method):
         self.args.amount = amount
 
 
-class DepositDAIforSDAI(Method):
+class DepositDAIforSDAI(ContractMethod):
     """Sender deposits DAI and receives sDAI in exchange (the DAI is deposited in Maker - DSR)"""
     name = "deposit"
     in_signature = [("amount", "uint256"), ("receiver", "address")]
@@ -48,7 +48,7 @@ class DepositDAIforSDAI(Method):
         self.args.amount = amount
 
 
-class WithdrawToken(Method):
+class WithdrawToken(ContractMethod):
     """Sender redeems spToken and withdraws Token"""
     name = "withdraw"
     in_signature = [("asset", "address"), ("amount", "uint256"), ("receiver", "address")]
@@ -61,7 +61,7 @@ class WithdrawToken(Method):
         self.args.amount = amount
 
 
-class RedeemSDAIforDAI(Method):
+class RedeemSDAIforDAI(ContractMethod):
     """Sender redeems sDAI and withdraws DAI"""
     name = "redeem"
     in_signature = [("amount", "uint256"), ("receiver", "address"), ("owner", "address")]
@@ -73,7 +73,7 @@ class RedeemSDAIforDAI(Method):
         self.args.amount = amount
 
 
-class SetUserUseReserveAsCollateral(Method):
+class SetUserUseReserveAsCollateral(ContractMethod):
     name = "setUserUseReserveAsCollateral"
     in_signature = [("asset", "address"), ("use_as_collateral", "bool")]
     target_address = ETHAddr.SparkLendingPoolV3
@@ -84,7 +84,7 @@ class SetUserUseReserveAsCollateral(Method):
         self.args.use_as_collateral = use
 
 
-class Borrow(Method):
+class Borrow(ContractMethod):
     """Sender receives Token and receives debtToken (stable or variable debt) token"""
     name = "borrow"
     in_signature = (("asset", "address"),
@@ -102,7 +102,7 @@ class Borrow(Method):
         self.args.rate_model = rate_model
 
 
-class Repay(Method):
+class Repay(ContractMethod):
     """Repay borrowed Token"""
     name = "repay"
     in_signature = (("asset", "address"),

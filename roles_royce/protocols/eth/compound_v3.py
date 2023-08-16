@@ -1,6 +1,6 @@
 import eth_abi
 from roles_royce.constants import ETHAddr, StrEnum
-from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApproveForToken
+from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApproveForToken
 
 
 class Comet(StrEnum):
@@ -22,7 +22,7 @@ class Approve(BaseApproveForToken):
         self.args.spender = comet.value
 
 
-class Allow(Method):
+class Allow(ContractMethod):
     """Allow
 
     The approval for the MainnetBulker is done once per wallet.
@@ -36,7 +36,7 @@ class Allow(Method):
         super().__init__()
 
 
-class Supply(Method):
+class Supply(ContractMethod):
     """Supply token.
 
     If the supplied asset is the underlying token of the Comet then you get in exchange approximately
@@ -52,7 +52,7 @@ class Supply(Method):
         self.args.amount = amount
 
 
-class _Invoke(Method):
+class _Invoke(ContractMethod):
     name = "invoke"
     in_signature = [("actions", "bytes32[]"), ("data", "bytes[]")]
     target_address = ETHAddr.COMPOUND_Bulker
@@ -67,7 +67,7 @@ class SupplyETH(_Invoke):
         self.args.data = [eth_abi.encode(types=('address', 'address', 'uint256'), args=[comet.value, avatar, amount])]
 
 
-class Withdraw(Method):
+class Withdraw(ContractMethod):
     """Withdraw asset.
 
     If the withdrawn asset is the underlying token of the Comet then you burn the amount of
@@ -100,7 +100,7 @@ class Repay(Supply):
     """Repay. Same as Deposit, but you can ONLY repay the Comets’ underlying token"""
 
 
-class Claim(Method):
+class Claim(ContractMethod):
     """Claim COMP rewards"""
     name = "claim"
     in_signature = [("comet", "address"), ("src", "address"), ("should_accrue", "bool")]

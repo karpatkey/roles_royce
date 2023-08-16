@@ -1,5 +1,5 @@
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApprove
+from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApprove
 
 
 class ApproveWithdrawalStETHwithWstETH(BaseApprove):
@@ -20,7 +20,7 @@ class ApproveWithdrawalWstETH(BaseApprove):
     token = ETHAddr.wstETH
 
 
-class Deposit(Method):
+class Deposit(ContractMethod):
     """sender deposits ETH and receives stETH"""
     name = "submit"
     in_signature = [("referral", "address")]
@@ -31,7 +31,7 @@ class Deposit(Method):
         super().__init__(value=eth_amount)
 
 
-class Wrap(Method):
+class Wrap(ContractMethod):
     """sender deposits stETH and receives wstETH"""
     name = "wrap"
     in_signature = [("amount", "uint256")]
@@ -43,7 +43,7 @@ class Wrap(Method):
         self.args.amount = amount
 
 
-class Unwrap(Method):
+class Unwrap(ContractMethod):
     """sender redeems wstETH and receives stETH"""
     name = "unwrap"
     in_signature = [("amount", "uint256")]
@@ -55,7 +55,7 @@ class Unwrap(Method):
         self.args.amount = amount
 
 
-class RequestWithdrawalsStETH(Method):
+class RequestWithdrawalsStETH(ContractMethod):
     """Sender requests a claim on his ETH from stETH
 
     Locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue"""
@@ -71,7 +71,7 @@ class RequestWithdrawalsStETH(Method):
 
 # TODO: the amounts is a list, because it has a max of 1000 stETH per element, should built that in
 
-class RequestWithdrawalsWithPermitStETH(Method):
+class RequestWithdrawalsWithPermitStETH(ContractMethod):
     """sender requests a claim on his ETH from wstETH
 
     When the unstETH has no allowance over the owner's stETH locks your stETH in the queue.
@@ -109,7 +109,7 @@ class RequestWithdrawalsWithPermitWstETH(RequestWithdrawalsWithPermitStETH):
     name = "requestWithdrawalsWithPermitWstETH"
 
 
-class GetWithdrawalRequests(Method):
+class GetWithdrawalRequests(ContractMethod):
     name = "getWithdrawalRequests"
     in_signature = [("owner", "address")]
     out_signature = [("ids", "uint256[]")]
@@ -120,7 +120,7 @@ class GetWithdrawalRequests(Method):
         self.args.owner = owner
 
 
-class ClaimWithdrawal(Method):
+class ClaimWithdrawal(ContractMethod):
     """Sender wants to claim his ETH.
 
     Once the request is finalized by the oracle report and becomes claimable, this function claims your ether and burns the NFT
@@ -134,7 +134,7 @@ class ClaimWithdrawal(Method):
         self.args.request_id = request_id
 
 
-class ClaimWithdrawals(Method):
+class ClaimWithdrawals(ContractMethod):
     """sender wants to claim his ETH in batches or optimize on hint search"""
     name = "claimWithdrawals"
     in_signature = [("request_ids", "uint256[]"), ("hints", "uint256[]")]
@@ -146,7 +146,7 @@ class ClaimWithdrawals(Method):
         self.args.hints = hints
 
 
-class GetWithdrawalStatus(Method):
+class GetWithdrawalStatus(ContractMethod):
     name = "getWithdrawalStatus"
     in_signature = [("request_ids", "uint256[]")]
     out_signature = [

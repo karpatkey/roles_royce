@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from roles_royce.protocols.base import Method
+from roles_royce.protocols.base import ContractMethod
 from roles_royce.constants import StrEnum
 from typing import Any
 
@@ -20,7 +20,7 @@ class MethodDocumenter(ClassDocumenter):
                             member: Any, membername: str,
                             isattr: bool, parent: Any) -> bool:
         try:
-            return issubclass(member, Method)
+            return issubclass(member, ContractMethod)
         except TypeError:
             return False
 
@@ -31,7 +31,7 @@ class MethodDocumenter(ClassDocumenter):
         super().add_content(more_content)
 
         source_name = self.get_sourcename()
-        method_object: Method = self.object
+        method_object: ContractMethod = self.object
         self.add_line('', source_name)
 
         if isinstance(method_object.target_address, property):

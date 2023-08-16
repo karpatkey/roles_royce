@@ -1,7 +1,7 @@
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, Address
+from roles_royce.protocols.base import ContractMethod, Address
 
-class ApproveDAI(Method):
+class ApproveDAI(ContractMethod):
     """approve DAI with CDP manager as spender"""
     name = "approve"
     in_signature = [("spender", "address"), ("amount", "uint256")]
@@ -20,7 +20,7 @@ class ApproveIOU(ApproveDAI):
     """approve IOU to get MKR undelegated"""
     target_address = ETHAddr.MakerIOU
 
-class WithdrawCollateral(Method):
+class WithdrawCollateral(ContractMethod):
     """withdraw collateral from vault"""
     name = "freeGem"
     in_signature = [("cdp_manager", "address"), ("adapter", "address"),
@@ -34,7 +34,7 @@ class WithdrawCollateral(Method):
         self.args.cdp_vault = cdp_vault
         self.args.amount = amount
 
-class DepositCollateral(Method):
+class DepositCollateral(ContractMethod):
     """deposit collateral in vault"""
     name = "lockGem"
     in_signature = [("cdp_manager", "address"), ("adapter", "address"),
@@ -53,7 +53,7 @@ class PayBack(WithdrawCollateral):
     """pay back borrowed"""
     name = "wipe"
 
-class MintDAI(Method):
+class MintDAI(ContractMethod):
     """mint DAI to borrow"""
     name = "draw"
     in_signature = [("cdp_manager", "address"), ("jug", "address"),
@@ -68,7 +68,7 @@ class MintDAI(Method):
         self.args.cdp_vault = cdp_vault
         self.args.amount = amount
     
-class PayBackAndWithdrawCol(Method):
+class PayBackAndWithdrawCol(ContractMethod):
     """be free"""
     name = "wipeAllAndFreeGem"
     in_signature = [("cdp_manager", "address"), ("adapter", "address"),
@@ -84,7 +84,7 @@ class PayBackAndWithdrawCol(Method):
         self.args.amount = amount
         self.args.dai_join = dai_join
 
-class UndelegateMKR(Method):
+class UndelegateMKR(ContractMethod):
     """undelegate any MKR"""
     name = "free"
     in_signature = [("amount", "uint256")]
@@ -93,7 +93,7 @@ class UndelegateMKR(Method):
         super().__init__()
         self.args.amount = amount
 
-class DelegateMKR(Method):
+class DelegateMKR(ContractMethod):
     """delegate MKR"""
     name = "lock"
     in_signature = [("amount", "uint256")]
@@ -102,7 +102,7 @@ class DelegateMKR(Method):
         super().__init__()
         self.args.amount = amount
 
-class JoinPot(Method):
+class JoinPot(ContractMethod):
     """join the pot through DSR Manager"""
     name = "join"
     in_signature = [("destination","address"),("amount", "uint256")]
@@ -113,7 +113,7 @@ class JoinPot(Method):
         self.args.destination = destination
         self.args.amount = amount
 
-class ExitPot(Method):
+class ExitPot(ContractMethod):
     """exit the pot through DSR Manager"""
     name = "exit"
     in_signature = [("destination","address"),("amount", "uint256")]
@@ -124,7 +124,7 @@ class ExitPot(Method):
         self.args.destination = destination
         self.args.amount = amount
 
-class DripThePot(Method):
+class DripThePot(ContractMethod):
     """drip the pot to be able to join and exit"""
     name = "drip"
     in_signature = []

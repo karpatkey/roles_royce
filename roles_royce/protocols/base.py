@@ -21,7 +21,7 @@ class Args(SimpleNamespace):
     pass
 
 
-class Method:
+class ContractMethod:
     name = None
     in_signature = []
     out_signature = []
@@ -101,7 +101,7 @@ class Method:
         return value
 
 
-class BaseApprove(Method):
+class BaseApprove(ContractMethod):
     """Inherit from this class to define an approval that the token is fixed.
 
     Specify the token using the token class attribute"""

@@ -1,7 +1,7 @@
 from enum import IntEnum
 import eth_abi
 from roles_royce.constants import ETHAddr, CrossChainAddr
-from roles_royce.protocols.base import Method, InvalidArgument, AvatarAddress, Address
+from roles_royce.protocols.base import ContractMethod, InvalidArgument, AvatarAddress, Address
 from roles_royce.protocols.base import BaseApproveForToken
 
 
@@ -27,7 +27,7 @@ class ApproveForVault(BaseApproveForToken):
     fixed_arguments = {"spender": CrossChainAddr.BalancerVault}
 
 
-class QueryExit(Method):
+class QueryExit(ContractMethod):
     """calculate amounts out for certain BPTin"""
     name = "queryExit"
 
@@ -36,7 +36,7 @@ class QueryExit(Method):
 # It's also important to note that the values in minAmountsOut correspond to the same index value in assets,
 # so these arrays must be made in parallel after sorting.
 
-class Exit(Method):
+class Exit(ContractMethod):
     name = "exitPool"
     in_signature = (
         ("pool_id", "bytes32"),
@@ -140,7 +140,7 @@ class CustomQueryExit(QueryExitMixin, CustomExit):
     pass
 
 
-class QueryJoin(Method):
+class QueryJoin(ContractMethod):
     """calculate BPT out for certain tokens in"""
     name = "queryJoin"
 
@@ -149,7 +149,7 @@ class QueryJoin(Method):
 # It's also important to note that the values in maxAmountsIn correspond to the same index value in assets,
 # so these arrays must be made in parallel after sorting.
 
-class Join(Method):
+class Join(ContractMethod):
     name = "joinPool"
     in_signature = (
         ("pool_id", "bytes32"),
