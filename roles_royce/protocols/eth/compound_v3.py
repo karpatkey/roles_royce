@@ -1,11 +1,9 @@
 import eth_abi
-from enum import Enum
-from web3 import Web3
-from roles_royce.constants import ETHAddr
+from roles_royce.constants import ETHAddr, StrEnum
 from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApproveForToken
 
 
-class Comet(Enum):
+class Comet(StrEnum):
     cUSDCv3 = "0xc3d688B66703497DAA19211EEdff47f25384cdc3"
     cWETHv3 = "0xA17581A9E3356d9A858b789D68B4d866e593aE94"
 

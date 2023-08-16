@@ -8,17 +8,23 @@ from roles_royce.protocols.base import BaseApproveForToken
 # Refs
 # StablePool encoding https://github.com/balancer/balancer-v2-monorepo/blob/d2c47f13aa5f7db1b16e37f37c9631b9a38f25a4/pkg/balancer-js/src/pool-stable/encoder.ts
 
-
-class ApproveForVault(BaseApproveForToken):
-    """approve Token with BalancerVault as spender"""
-    fixed_arguments = {"spender": CrossChainAddr.BalancerVault}
-
-
 # There is another ExitKind that is for Weighted Pools
 class StablePoolExitKind(IntEnum):
     EXACT_BPT_IN_FOR_ONE_TOKEN_OUT = 0
     BPT_IN_FOR_EXACT_TOKENS_OUT = 1
     EXACT_BPT_IN_FOR_ALL_TOKENS_OUT = 2
+
+# There is another JoinKind that is for Weighted Pools
+class StablePoolJoinKind(IntEnum):
+    INIT = 0
+    EXACT_TOKENS_IN_FOR_BPT_OUT = 1
+    TOKEN_IN_FOR_EXACT_BPT_OUT = 2
+    ALL_TOKENS_IN_FOR_EXACT_BPT_OUT = 3
+
+
+class ApproveForVault(BaseApproveForToken):
+    """approve Token with BalancerVault as spender"""
+    fixed_arguments = {"spender": CrossChainAddr.BalancerVault}
 
 
 class QueryExit(Method):
@@ -132,14 +138,6 @@ class ProportionalExitQueryExit(QueryExitMixin, ProportionalExit):
 
 class CustomQueryExit(QueryExitMixin, CustomExit):
     pass
-
-
-# There is another JoinKind that is for Weighted Pools
-class StablePoolJoinKind(IntEnum):
-    INIT = 0
-    EXACT_TOKENS_IN_FOR_BPT_OUT = 1
-    TOKEN_IN_FOR_EXACT_BPT_OUT = 2
-    ALL_TOKENS_IN_FOR_EXACT_BPT_OUT = 3
 
 
 class QueryJoin(Method):
