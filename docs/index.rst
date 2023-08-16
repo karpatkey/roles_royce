@@ -20,7 +20,7 @@ Protocols supported
 .. toctree::
    :maxdepth: 2
 
-   protocols
+   protocols/index
 
 
 Indices and tables

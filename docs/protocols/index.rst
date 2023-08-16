@@ -1,22 +1,20 @@
 Protocols
 =========
 
-AAVEv2
-------
-
-.. module:: roles_royce.protocols.eth.aave_v2
-
-.. automodule:: roles_royce.protocols.eth.aave_v2
-    :members:
 
 
-Lido
-------
+.. toctree::
+    :caption: Contents:
+    :maxdepth: 1
 
-.. module:: roles_royce.protocols.eth.lido
-
-.. automodule:: roles_royce.protocols.eth.lido
-    :members:
+    aave_v2
+    aura
+    balancer
+    compound_v2
+    compund_v3
+    lido
+    makerdao
+    spark
 
 
 
