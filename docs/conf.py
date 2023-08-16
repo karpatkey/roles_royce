@@ -2,6 +2,8 @@
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
+import os
+import sys
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -13,8 +15,11 @@ author = 'Karpatkey'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
+sys.path.append(os.path.abspath("./_ext"))
+
 extensions = [
     "sphinx.ext.autodoc",
+    "autodoc_method",
 ]
 
 #autodoc_typehints = "signature"
@@ -39,11 +44,3 @@ html_theme_options = {
 autodoc_default_options = {
     'member-order': 'bysource',
 }
-
-def maybe_skip_member(app, what, name, obj, skip, options):
-    print(app, what, name, obj, skip, options)
-    if name in ["fixed_arguments", "target_address"]:
-        return False
-
-def setup(app):
-    app.connect('autodoc-skip-member', maybe_skip_member)
