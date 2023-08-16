@@ -2,9 +2,17 @@ from dataclasses import dataclass
 from enum import Enum
 from web3 import Web3
 
-class StrEnum(Enum):
-    def __str__(self) -> str:
-        return self.value
+
+class StrEnum(str, Enum):
+    def __new__(cls, value):
+        # values must already be of type `str`
+        if not isinstance(value, str):
+            raise TypeError('%r is not a string' % (value,))
+        value = str(value)
+        member = str.__new__(cls, value)
+        member._value_ = value
+        return member
+
 
 class CrossChainAddr(StrEnum):
     BalancerVault = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
