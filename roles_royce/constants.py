@@ -2,14 +2,13 @@ from dataclasses import dataclass
 from enum import Enum
 from web3 import Web3
 
-
-class CrossChainAddr:
-    BalancerVault = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
-
-
-class StrEnum(str, Enum):
+class StrEnum(Enum):
     def __str__(self) -> str:
         return self.value
+
+class CrossChainAddr(StrEnum):
+    BalancerVault = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
+
 
 class ETHAddr(StrEnum):
     ZERO = "0x0000000000000000000000000000000000000000"
@@ -55,7 +54,7 @@ class ETHAddr(StrEnum):
     COMPOUND_V2_Maximillion = "0xf859A1AD94BcF445A406B892eF0d3082f4174088"
 
 
-class GCAddr:
+class GCAddr(StrEnum):
     USDT = "0x4ECaBa5870353805a9F068101A40E0f32ed605C6"
 
 

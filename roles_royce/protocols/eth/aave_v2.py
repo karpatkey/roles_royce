@@ -1,13 +1,21 @@
-"""
-
-"""
-
 from enum import IntEnum
 
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import Method, InvalidArgument, AvatarAddress, Address, BaseApprove, BaseApproveForToken
 
 
+class InterestRateModel(IntEnum):
+    STABLE = 1
+    VARIABLE = 2
+
+    @staticmethod
+    def check(value):
+        if value not in InterestRateModel:
+            raise InvalidArgument(f"Invalid interestRateModel={value}")
+
+class DelegationType(IntEnum):
+    VOTING = 0
+    PROPOSITION = 1
 
 class ApproveForAaveLendingPoolV2(BaseApproveForToken):
     """Approve Token with AaveLendingPoolV2 as spender."""
@@ -98,16 +106,6 @@ class Collateralize(Method):
         self.args.use_as_collateral = use_as_collateral
 
 
-class InterestRateModel(IntEnum):
-    STABLE = 1
-    VARIABLE = 2
-
-    @staticmethod
-    def check(value):
-        if value not in InterestRateModel:
-            raise InvalidArgument(f"Invalid interestRateModel={value}")
-
-
 class Borrow(Method):
     """Sender receives Token and receives debtToken (stable or variable debt) token."""
     name = "borrow"
@@ -130,7 +128,6 @@ class BorrowETH(Method):
     in_signature = [("address", "address"), ("amount", "uint256"), ("interest_rate_model", "uint256"), ("referral_code", "uint16")]
     fixed_arguments = {"address": ETHAddr.AAVE_V2_LendingPool, "referral_code": 0}
     target_address: str = ETHAddr.AAVE_V2_WrappedTokenGateway
-    """This is a class attribute with typing. This comment is ignored."""
 
     def __init__(self, amount: int, interest_rate_model: InterestRateModel):
         super().__init__()
@@ -320,11 +317,6 @@ class DelegateAAVE(Method):
     def __init__(self, delegatee: Address):
         super().__init__()
         self.args.delegatee = delegatee
-
-
-class DelegationType(IntEnum):
-    VOTING = 0
-    PROPOSITION = 1
 
 
 class DelegateAAVEByType(Method):

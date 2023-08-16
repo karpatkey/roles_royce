@@ -3,11 +3,15 @@ from types import SimpleNamespace
 from roles_royce import Operation
 from web3 import Web3
 
-class AvatarAddress:
-    pass
 
 Address = str
 
+class SimpleRepr(type):
+    def __repr__(cls):
+        return cls.__name__
+
+class AvatarAddress(metaclass=SimpleRepr):
+    pass
 
 class InvalidArgument(Exception):
     pass
@@ -113,6 +117,7 @@ class BaseApprove(Method):
 
     @property
     def target_address(self) -> str:
+        """The token address."""
         return self.token
 
 
