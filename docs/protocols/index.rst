@@ -11,7 +11,7 @@ Protocols
     aura
     balancer
     compound_v2
-    compund_v3
+    compound_v3
     lido
     makerdao
     spark
