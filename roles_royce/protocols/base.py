@@ -3,7 +3,9 @@ from types import SimpleNamespace
 from roles_royce import Operation
 from web3 import Web3
 
-AvatarAddress = object()
+class AvatarAddress:
+    pass
+
 Address = str
 
 

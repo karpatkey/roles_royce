@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 from web3 import Web3
 
 
@@ -6,7 +7,11 @@ class CrossChainAddr:
     BalancerVault = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
 
 
-class ETHAddr:
+class StrEnum(str, Enum):
+    def __str__(self) -> str:
+        return self.value
+
+class ETHAddr(StrEnum):
     ZERO = "0x0000000000000000000000000000000000000000"
     AAVE = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9"
     AAVE_V2_LendingPool = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9"
