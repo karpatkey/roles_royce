@@ -1,20 +1,16 @@
 # Roles Royce
 
+Roles Royce is a Python library designed to execute transactions using Zodiac
+Roles Modifier contracts (https://github.com/gnosis/zodiac-modifier-roles-v1).
+With support for many DeFi protocols this library serves as a versatile toolkit
+for securing your decentralized finance operations through the use of the
+Roles Modifier contracts.
 
-The `roles_royce` package is a DeFi library that allows you to easily execute 
-transactions using Zodiac Roles Modifier contracts (https://github.com/gnosis/zodiac-modifier-roles-v1)
-for mulitple DeFi protocols. 
+The project is currently undergoing active development, so we expect some backward
+incompatibility changes until we stabilize the API. We encourage you to stay engaged
+with the project’s updates and contribute to its evolution.
 
-This project is currently being actively developed and it is in alpha state 
-so expect backwards incompatible changes.
-
-Some protocols supported:
-
-* AAVEv2
-* Lido
-* Compound v2, v3
-* Balancer
-
+Some protocols supported: AAVEv2, Lido, Compound v2 and v3, Balancer, and more.
 
 ## Documentation
 
@@ -26,16 +22,16 @@ Send a tx to the blockchain through a Roles Modifier contract:
 
 ```python 
 from roles_royce.protocols.eth import aave_v2
-from roles_royce import send
+from roles_royce import roles
 from web3 import Web3, HTTPProvider
 
 w3 = Web3(HTTPProvider("https://..."))
 claim = aave_v2.ClaimAAVERewards(avatar="0x...", amount=10)
-status = send([claim],
-               role=1,
-               private_key="xxx",
-               roles_mod_address="0x...",
-               web3=w3)
+status = roles.send([claim],
+                    role=1,
+                    private_key="xxx",
+                    roles_mod_address="0x...",
+                    web3=w3)
 
 ```
 
@@ -45,7 +41,6 @@ status = send([claim],
 * Install rolls_royce in editable mode: `pip install -e .`
 * Install anvil by downloading it from https://github.com/foundry-rs/foundry.
 
-
 To run the tests start anvil in a terminal in fork mode on port 8546 with:
 
 `anvil --accounts 15 -f 'URL' --port 8546`
@@ -54,4 +49,4 @@ and then run the tests with `pytest -vs`.
 
 ### Building the docs
 
-With sphinx installed run `sphinx-build  -b html docs/ docs/_build/`
+With sphinx installed `cd` into the `docs` dir and run `make html`. The output will be in `_build`.

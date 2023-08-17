@@ -23,12 +23,13 @@ extensions = [
     "sphinx_autodoc_typehints",
 ]
 
+autoclass_content = 'both'
 #autodoc_typehints = "signature"
 #autodoc_typehints_description_target = "documented_params"
 #autodoc_typehints_format = "short"
 #python_use_unqualified_type_names = True
 autodoc_member_order = 'bysource'
-add_module_names = False
+add_module_names = True
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
