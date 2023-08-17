@@ -4,12 +4,14 @@ from roles_royce.protocols.base import ContractMethod
 from roles_royce.constants import StrEnum
 from typing import Any
 
-from sphinx.ext.autodoc import ObjectMember
-from sphinx.ext.autodoc import ClassDocumenter, get_class_members
+from enum import IntEnum
+
+from docutils.statemachine import StringList
+from sphinx.ext.autodoc import ClassDocumenter, get_class_members, bool_option
 from sphinx.application import Sphinx
 
 
-class MethodDocumenter(ClassDocumenter):
+class ContractMethodDocumenter(ClassDocumenter):
     objtype = 'evmmethod'
     directivetype = ClassDocumenter.objtype
     priority = 10 + ClassDocumenter.priority
@@ -41,17 +43,6 @@ class MethodDocumenter(ClassDocumenter):
         self.add_line(f"**target_address**: {target_addres_text}", source_name)
         self.add_line('', source_name)
         self.add_line(f"**fixed_arguments**: {method_object.fixed_arguments}", source_name)
-
-
-from enum import IntEnum
-from typing import TYPE_CHECKING, Any
-
-from sphinx.ext.autodoc import ClassDocumenter, bool_option
-
-if TYPE_CHECKING:
-    from docutils.statemachine import StringList
-
-    from sphinx.application import Sphinx
 
 
 class IntEnumDocumenter(ClassDocumenter):
@@ -90,6 +81,7 @@ class IntEnumDocumenter(ClassDocumenter):
             self.add_line(f"**{the_member_name}**: {the_member_value}", source_name)
             self.add_line('', source_name)
 
+
 class StrEnumDocumenter(ClassDocumenter):
     objtype = 'strenum'
     directivetype = ClassDocumenter.objtype
@@ -122,14 +114,9 @@ class StrEnumDocumenter(ClassDocumenter):
             self.add_line(f"**{the_member_name}**: {the_member_value}", source_name)
             self.add_line('', source_name)
 
+
 def setup(app: Sphinx) -> None:
     app.setup_extension('sphinx.ext.autodoc')  # Require autodoc extension
-    app.add_autodocumenter(MethodDocumenter)
+    app.add_autodocumenter(ContractMethodDocumenter)
     app.add_autodocumenter(IntEnumDocumenter)
     app.add_autodocumenter(StrEnumDocumenter)
-
-
-
-
-
-
