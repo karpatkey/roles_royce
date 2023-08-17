@@ -32,19 +32,21 @@ class Deposit(ContractMethod):
 
 
 class Wrap(ContractMethod):
-    """sender deposits stETH and receives wstETH"""
     name = "wrap"
     in_signature = [("amount", "uint256")]
     target_address = ETHAddr.wstETH
 
     def __init__(self, amount: int):
-        """Amount of wstETH user receives after wrap"""
+        """Sender deposits stETH and receives wstETH.
+
+        :param amount: amount of wstETH user receives after wrap.
+        """
         super().__init__()
         self.args.amount = amount
 
 
 class Unwrap(ContractMethod):
-    """sender redeems wstETH and receives stETH"""
+    """Sender redeems wstETH and receives stETH."""
     name = "unwrap"
     in_signature = [("amount", "uint256")]
     target_address = ETHAddr.wstETH
@@ -56,7 +58,7 @@ class Unwrap(ContractMethod):
 
 
 class RequestWithdrawalsStETH(ContractMethod):
-    """Sender requests a claim on his ETH from stETH
+    """Sender requests a claim on his ETH from stETH.
 
     Locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue"""
     name = "requestWithdrawals"
@@ -72,7 +74,7 @@ class RequestWithdrawalsStETH(ContractMethod):
 # TODO: the amounts is a list, because it has a max of 1000 stETH per element, should built that in
 
 class RequestWithdrawalsWithPermitStETH(ContractMethod):
-    """sender requests a claim on his ETH from wstETH
+    """Sender requests a claim on his ETH from wstETH.
 
     When the unstETH has no allowance over the owner's stETH locks your stETH in the queue.
     In exchange, you receive an NFT that represents your position in the queue"""
@@ -123,7 +125,8 @@ class GetWithdrawalRequests(ContractMethod):
 class ClaimWithdrawal(ContractMethod):
     """Sender wants to claim his ETH.
 
-    Once the request is finalized by the oracle report and becomes claimable, this function claims your ether and burns the NFT
+    Once the request is finalized by the oracle report and becomes claimable,
+    this function claims your ether and burns the NFT.
     """
     name = "claimWithdrawals"
     in_signature = [("request_id", "uint256")]

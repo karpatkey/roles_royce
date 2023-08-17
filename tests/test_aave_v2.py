@@ -1,5 +1,3 @@
-import pytest
-from eth_abi import abi
 from roles_royce.roles_modifier import RolesMod
 from roles_royce.constants import ETHAddr, GCAddr
 

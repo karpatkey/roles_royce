@@ -1,8 +1,5 @@
-import pytest
-from eth_abi import abi
-from web3 import Web3
 from roles_royce.roles_modifier import RolesMod
-from roles_royce.constants import ETHAddr, GCAddr
+from roles_royce.constants import ETHAddr
 
 from roles_royce.protocols.eth import aura
 from .utils import web3_eth
