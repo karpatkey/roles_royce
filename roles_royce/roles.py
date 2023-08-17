@@ -22,12 +22,12 @@ def build(txs: List[Transactable],
     Create a transaction to later be sent to the blockchain or other uses
     such as studying it or composing it with other contracts.
 
-    :param txs: list of transactable items, usually :class:`~roles_royce.protocols.base.ContractMethod` instances.
-    :param role: role number of the execution.
-    :param account: account that wants to execute.
-    :param roles_mod_address: address to call execTransactionWithRole.
+    :param txs: List of transactable items, usually :class:`~roles_royce.protocols.base.ContractMethod` instances.
+    :param role: Role number of the execution.
+    :param account: Account that wants to execute.
+    :param roles_mod_address: Address to call execTransactionWithRole.
     :param web3: Web3 object.
-    :param tx_kwargs: kwargs for the transaction, for example ``max_priority_fee``.
+    :param tx_kwargs: Kwargs for the transaction, for example ``max_priority_fee``.
     :return:
     """
     tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
@@ -54,13 +54,13 @@ def check(txs: List[Transactable],
           ) -> bool:
     """Test the transaction with static call.
 
-    :param txs: list of transactions.
-    :param role: role that wants to execute.
-    :param account: account that wants to execute.
-    :param roles_mod_address: address to call execTransactionWithRole.
+    :param txs: List of transactions.
+    :param role: Role that wants to execute.
+    :param account: Account that wants to execute.
+    :param roles_mod_address: Address to call execTransactionWithRole.
     :param web3: Web3 object.
-    :param block: block number or 'latest'.
-    :return: status
+    :param block: Block number or 'latest'.
+    :return: Status.
     """
     tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(
@@ -83,13 +83,13 @@ def send(txs: List[Transactable],
          ) -> TxReceipt:
     """Send Transactables to the blockchain.
 
-    :param txs: list of transactables.
-    :param role: role that wants to execute.
-    :param private_key: the private key.
-    :param roles_mod_address: address to call execTransactionWithRole.
+    :param txs: List of transactables.
+    :param role: Role that wants to execute.
+    :param private_key: The private key.
+    :param roles_mod_address: Address to call execTransactionWithRole.
     :param web3: Web3 object.
-    :param tx_kwargs: kwargs for the transaction, for example ``max_priority_fee``.
-    :return: tx receipt
+    :param tx_kwargs: Kwargs for the transaction, for example ``max_priority_fee``.
+    :return: Tx receipt.
     """
     tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(
