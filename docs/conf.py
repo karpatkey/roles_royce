@@ -20,6 +20,7 @@ sys.path.append(os.path.abspath("./_ext"))
 extensions = [
     "sphinx.ext.autodoc",
     "autodoc_method",
+    "sphinx_autodoc_typehints",
 ]
 
 #autodoc_typehints = "signature"
