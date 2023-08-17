@@ -1,18 +1,22 @@
-Welcome to Roles Royce's documentation!
-=======================================
+Welcome to Roles Royce's docs!
+==============================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-The ``roles_royce`` package is a DeFi library that allows you to easily execute
-transactions using Zodiac Roles Modifier contracts `ZodiacRoles`_
-for mulitple DeFi protocols.
+Roles Royce is a Python library designed to execute transactions using Zodiac
+`Roles Modifier contracts <https://github.com/gnosis/zodiac-modifier-roles-v1>`_.
+With support for many DeFi protocols this library serves as a versatile toolkit
+for securing your decentralized finance operations through the use of the
+Roles Modifier contracts.
 
-This project is currently being actively developed and it is in alpha state
-so expect backwards incompatible changes.
+.. warning::
+    The project is currently undergoing active development so we expect some
+    backward incompatibility changes until we stabilize the API.
+    We encourage you to stay engaged with the project's updates and contribute
+    to its evolution.
 
-.. _ZodiacRoles: https://github.com/gnosis/zodiac-modifier-roles-v1
 
 Usage
 -----

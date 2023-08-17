@@ -39,7 +39,14 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'alabaster'
 html_static_path = ['_static']
 html_theme_options = {
+    'description': 'Execute transactions using Zodiac Roles Modifier contracts.',
     'page_width': '1200px',
+    #'canonical_url': ,
+    "extra_nav_links": {
+        "Source code": 'https://github.com/KarpatkeyDAO/roles_royce/',
+        "Issue tracker": "https://github.com/KarpatkeyDAO/roles_royce/issues",
+        "Karpatkey": 'https://www.karpatkey.com/',
+    }
 }
 
 autodoc_default_options = {
