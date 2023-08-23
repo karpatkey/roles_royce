@@ -1,7 +1,12 @@
 from enum import IntEnum
 
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApprove, BaseApproveForToken
+from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApprove, BaseApproveForToken
+
+
+class RateModel(IntEnum):
+    STABLE = 1  # stable is not available at the moment
+    VARIABLE = 2
 
 
 class ApproveDAIforSDAI(BaseApprove):
@@ -15,7 +20,7 @@ class ApproveToken(BaseApproveForToken):
     fixed_arguments = {"spender": ETHAddr.SparkLendingPoolV3}
 
 
-class DepositToken(Method):
+class DepositToken(ContractMethod):
     """Sender deposits Token and receives spToken in exchange"""
     name = "deposit"
     in_signature = (("asset", "address"),
@@ -31,7 +36,7 @@ class DepositToken(Method):
         self.args.amount = amount
 
 
-class DepositDAIforSDAI(Method):
+class DepositDAIforSDAI(ContractMethod):
     """Sender deposits DAI and receives sDAI in exchange (the DAI is deposited in Maker - DSR)"""
     name = "deposit"
     in_signature = [("amount", "uint256"), ("receiver", "address")]
@@ -43,7 +48,7 @@ class DepositDAIforSDAI(Method):
         self.args.amount = amount
 
 
-class WithdrawToken(Method):
+class WithdrawToken(ContractMethod):
     """Sender redeems spToken and withdraws Token"""
     name = "withdraw"
     in_signature = [("asset", "address"), ("amount", "uint256"), ("receiver", "address")]
@@ -56,7 +61,7 @@ class WithdrawToken(Method):
         self.args.amount = amount
 
 
-class WithdrawDAIforSDAI(Method):
+class RedeemSDAIforDAI(ContractMethod):
     """Sender redeems sDAI and withdraws DAI"""
     name = "redeem"
     in_signature = [("amount", "uint256"), ("receiver", "address"), ("owner", "address")]
@@ -68,7 +73,7 @@ class WithdrawDAIforSDAI(Method):
         self.args.amount = amount
 
 
-class SetUserUseReserveAsCollateral(Method):
+class SetUserUseReserveAsCollateral(ContractMethod):
     name = "setUserUseReserveAsCollateral"
     in_signature = [("asset", "address"), ("use_as_collateral", "bool")]
     target_address = ETHAddr.SparkLendingPoolV3
@@ -79,30 +84,25 @@ class SetUserUseReserveAsCollateral(Method):
         self.args.use_as_collateral = use
 
 
-class RateMode(IntEnum):
-    # STABLE = 1 , stable is not available at the moment
-    VARIABLE = 2
-
-
-class Borrow(Method):
+class Borrow(ContractMethod):
     """Sender receives Token and receives debtToken (stable or variable debt) token"""
     name = "borrow"
     in_signature = (("asset", "address"),
                     ("amount", "uint256"),
-                    ("rate_mode", "uint256"),
+                    ("rate_model", "uint256"),
                     ("referral_code", "uint16"),
                     ("on_behalf_of", "address"))
     fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
     target_address = ETHAddr.SparkLendingPoolV3
 
-    def __init__(self, token: Address, amount: int, rate_mode: RateMode, avatar: Address):
+    def __init__(self, token: Address, amount: int, rate_model: RateModel, avatar: Address):
         super().__init__(avatar=avatar)
         self.args.asset = token
         self.args.amount = amount
-        self.args.rate_mode = rate_mode
+        self.args.rate_model = rate_model
 
 
-class Repay(Method):
+class Repay(ContractMethod):
     """Repay borrowed Token"""
     name = "repay"
     in_signature = (("asset", "address"),
@@ -112,8 +112,8 @@ class Repay(Method):
     fixed_arguments = {"on_behalf_of": AvatarAddress}
     target_address = ETHAddr.SparkLendingPoolV3
 
-    def __init__(self, token: Address, amount: int, rate_model: RateMode, avatar: Address):
+    def __init__(self, token: Address, amount: int, rate_model: RateModel, avatar: Address):
         super().__init__(avatar=avatar)
         self.args.asset = token
         self.args.amount = amount
-        self.args.rate_mode = rate_model
+        self.args.rate_model = rate_model

@@ -1,6 +1,6 @@
 from roles_royce.protocols.eth.spark import WithdrawDAIforSDAI, Repay
 from web3 import Web3
-from roles_royce.operations import build
+from roles_royce.roles import build
 from decimal import Decimal
 
 # Protocol Data Provider - Ethereum

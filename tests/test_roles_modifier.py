@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch
 from roles_royce.roles_modifier import RolesMod
 from .utils import web3_gnosis

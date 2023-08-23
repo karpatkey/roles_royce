@@ -1,9 +1,8 @@
-from enum import Enum
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Method, Address, AvatarAddress, BaseApproveForToken
+from roles_royce.constants import StrEnum, ETHAddr
+from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApproveForToken
 
 
-class Ctoken(Enum):
+class Ctoken(StrEnum):
     cAAVE = "0xe65cdB6479BaC1e22340E4E755fAE7E509EcD06c"
     cBAT = "0x6C8c6b02E7b2BE14d4fA6022Dfd6d75921D90E4E"
     cCOMP = "0x70e36f6BF80a52b3B46b3aF8e106CC0ed743E8e4"
@@ -29,10 +28,10 @@ class Ctoken(Enum):
 class Approve(BaseApproveForToken):
     def __init__(self, ctoken: Ctoken, token: Address, amount: int):
         super().__init__(token=token, amount=amount)
-        self.args.spender = ctoken.value
+        self.args.spender = ctoken
 
 
-class Mint(Method):
+class Mint(ContractMethod):
     """Deposit asset.
 
     Sender deposits a specified amount of underlying asset in exchange for cTokens
@@ -42,11 +41,11 @@ class Mint(Method):
 
     def __init__(self, ctoken: Ctoken, amount: int):
         super().__init__()
-        self.target_address = ctoken.value
+        self.target_address = ctoken
         self.args.amount = amount
 
 
-class Redeem(Method):
+class Redeem(ContractMethod):
     """Withdraw asset.
 
     It is called when MAX underlying amount is withdrawn
@@ -56,11 +55,11 @@ class Redeem(Method):
 
     def __init__(self, ctoken: Ctoken, amount: int):
         super().__init__()
-        self.target_address = ctoken.value
+        self.target_address = ctoken
         self.args.amount = amount
 
 
-class RedeemUnderlying(Method):
+class RedeemUnderlying(ContractMethod):
     """Withdraw asset.
 
     It is called when MAX underlying amount is withdrawn
@@ -70,11 +69,11 @@ class RedeemUnderlying(Method):
 
     def __init__(self, ctoken: Ctoken, amount: int):
         super().__init__()
-        self.target_address = ctoken.value
+        self.target_address = ctoken
         self.args.amount = amount
 
 
-class EnterMarkets(Method):
+class EnterMarkets(ContractMethod):
     """
 
     Set asset as collateral
@@ -85,10 +84,10 @@ class EnterMarkets(Method):
 
     def __init__(self, ctokens: list[Ctoken]):
         super().__init__()
-        self.args.ctokens = [ctoken.value for ctoken in ctokens]
+        self.args.ctokens = ctokens
 
 
-class ExitMarket(Method):
+class ExitMarket(ContractMethod):
     """
 
     Unset asset as collateral
@@ -99,10 +98,10 @@ class ExitMarket(Method):
 
     def __init__(self, ctoken: Ctoken):
         super().__init__()
-        self.args.ctoken = ctoken.value
+        self.args.ctoken = ctoken
 
 
-class Borrow(Method):
+class Borrow(ContractMethod):
     """
 
     Borrow underlying asset amount.
@@ -112,11 +111,11 @@ class Borrow(Method):
 
     def __init__(self, ctoken: Ctoken, amount: int):
         super().__init__()
-        self.target_address = ctoken.value
+        self.target_address = ctoken
         self.args.amount = amount
 
 
-class Repay(Method):
+class Repay(ContractMethod):
     """
 
     Repay underlying asset amount.
@@ -126,11 +125,11 @@ class Repay(Method):
 
     def __init__(self, ctoken: Ctoken, amount: int):
         super().__init__()
-        self.target_address = ctoken.value
+        self.target_address = ctoken
         self.args.amount = amount
 
 
-class RepayETH(Method):
+class RepayETH(ContractMethod):
     """
 
     Repay ETH amount
@@ -144,7 +143,7 @@ class RepayETH(Method):
         super().__init__(avatar=avatar, value=amount)
 
 
-class ClaimCOMP(Method):
+class ClaimCOMP(ContractMethod):
     """
 
     Claim COMP rewards.
@@ -156,5 +155,4 @@ class ClaimCOMP(Method):
 
     def __init__(self, avatar: Address, ctokens: list[Ctoken]):
         super().__init__(avatar=avatar)
-        self.args.ctokens = [ctoken.value for ctoken in ctokens]
-
+        self.args.ctokens = ctokens

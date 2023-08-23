@@ -12,12 +12,19 @@ logger = logging.getLogger(__name__)
 DEFAULT_GAS_LIMIT_MULTIPLIER = 1.4
 DEFAULT_FEE_MULTIPLER = 1.2
 
+ROLES_ABI = (
+    '[{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},'
+    '{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"},'
+    '{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"bool","name":"shouldRevert","type":"bool"}],"name":"execTransactionWithRole",'
+    '"outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]'
+)
 
 class TransactionWouldBeReverted(Exception):
-    pass
+    """It is used to indicate that if a transaction is executed, it will be reverted."""
 
 
 class Operation(IntEnum):
+    """Types of operations."""
     CALL = 0
     DELEGATE_CALL = 1
 
@@ -32,12 +39,7 @@ class RolesMod:
     value: int = 0
     private_key: Optional[str] = None
     account: Optional[str] = None
-    contract_abi: str = (
-        '[{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},'
-        '{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"},'
-        '{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"bool","name":"shouldRevert","type":"bool"}],"name":"execTransactionWithRole",'
-        '"outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]'
-    )
+    contract_abi: str = ROLES_ABI
     operation: Operation = Operation.CALL
     should_revert: bool = True
     nonce: Optional[int] = None
@@ -79,7 +81,7 @@ class RolesMod:
         return tx
 
     def check(self, contract_address: str, data: str, block='latest') -> bool:
-        """make a static call to validate a transaction."""
+        """Make a static call to validate a transaction."""
         try:
             self._build_exec_transaction(contract_address, data).call({"from": self.account}, block_identifier=block)
             return True
@@ -87,6 +89,7 @@ class RolesMod:
             return False
 
     def estimate_gas(self, contract_address: str, data: str, block='latest') -> int:
+        """Estimate the gas that would be needed."""
         return self._build_exec_transaction(contract_address, data).estimate_gas({"from": self.account}, block_identifier=block)
 
     def execute(self,

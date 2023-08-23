@@ -2,6 +2,7 @@ import logging
 from typing import List
 
 from web3 import Web3
+from web3.types import TxReceipt
 from .roles_modifier import RolesMod
 from .constants import Chain
 from .generic_method import Transactable
@@ -16,7 +17,19 @@ def build(txs: List[Transactable],
           roles_mod_address: str,
           web3: Web3,
           tx_kwargs: dict | None = None
-          ) -> bool:
+          ):
+    """
+    Create a transaction to later be sent to the blockchain or other uses
+    such as studying it or composing it with other contracts.
+
+    :param txs: List of transactable items, usually :class:`~roles_royce.protocols.base.ContractMethod` instances.
+    :param role: Role number of the execution.
+    :param account: Account that wants to execute.
+    :param roles_mod_address: Address to call execTransactionWithRole.
+    :param web3: Web3 object.
+    :param tx_kwargs: Kwargs for the transaction, for example ``max_priority_fee``.
+    :return:
+    """
     tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(
         role=role,
@@ -39,18 +52,15 @@ def check(txs: List[Transactable],
           web3: Web3,
           block: int | str = 'latest',
           ) -> bool:
-    """Test the transaction with static call
+    """Test the transaction with static call.
 
-    Args:
-        txs (List[GenericMethodTransaction]): list of transactions
-        role (int): role that wants to execute
-        account (str): account that wants to execute
-        roles_mod_address (str): address to call execTransactionWithRole
-        web3 (Web3)
-        block (int | str): block number or 'latest'
-
-    Returns:
-        bool: status
+    :param txs: List of transactions.
+    :param role: Role that wants to execute.
+    :param account: Account that wants to execute.
+    :param roles_mod_address: Address to call execTransactionWithRole.
+    :param web3: Web3 object.
+    :param block: Block number or 'latest'.
+    :return: Status.
     """
     tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(
@@ -70,19 +80,16 @@ def send(txs: List[Transactable],
          roles_mod_address: str,
          web3: Web3,
          tx_kwargs: dict | None = None
-         ) -> bool:
-    """Send transactions to the blockchain.
+         ) -> TxReceipt:
+    """Send Transactables to the blockchain.
 
-    Args:
-        txs (List[TxData]): list of transactions
-        role (int): role that wants to execute
-        private_key (str): to access the EOA
-        roles_mod_address (str): address to call execTransactionWithRole
-        web3 (Web3)
-        tx_kwargs (dict): kwargs for the transaction
-
-    Returns:
-        (obj) tx_receipt
+    :param txs: List of transactables.
+    :param role: Role that wants to execute.
+    :param private_key: The private key.
+    :param roles_mod_address: Address to call execTransactionWithRole.
+    :param web3: Web3 object.
+    :param tx_kwargs: Kwargs for the transaction, for example ``max_priority_fee``.
+    :return: Tx receipt.
     """
     tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(
