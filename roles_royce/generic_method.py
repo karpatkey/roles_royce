@@ -6,14 +6,24 @@ from roles_royce.roles_modifier import Operation
 
 
 class Transactable(Protocol):
+    """
+    Base interface for operations that can be sent to the blockchain.
+    """
+
+    #: the operation type
     operation: Operation
+    #: the value quantity, eg: `value = 1` is one Wei in Mainnet.
     value: int
 
     @property
-    def data(self) -> str: return ...
+    def data(self) -> str:
+        """The calldata of the operation"""
+        return ...
 
     @property
-    def contract_address(self) -> str: return ...
+    def contract_address(self) -> str:
+        """Contract address to be called"""
+        return ...
 
 
 @dataclass(kw_only=True)

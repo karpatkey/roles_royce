@@ -4,7 +4,7 @@ from roles_royce.constants import ETHAddr
 from tests.utils import local_node, accounts, get_balance, get_allowance, steal_token, create_simple_safe, \
     local_node_set_block, top_up_address, fork_unlock_account, web3_eth
 from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager, CDPData
-from roles_royce import check, send, build
+from roles_royce import roles
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 from decimal import Decimal
 
@@ -189,24 +189,24 @@ def test_integration_spark_cdp_roles_1(local_node):
     assert amount_of_sDAI_to_redeem == approx(177339831130276946729207)
 
     redeem_sDAI = spark.RedeemSDAIforDAI(amount=amount_of_sDAI_to_redeem, avatar=avatar_safe_address)
-    status_simulation = check([redeem_sDAI], role=role, account=bot_address, roles_mod_address=roles_mod_address,
-                              web3=w3)
+    status_simulation = roles.check([redeem_sDAI], role=role, account=bot_address, roles_mod_address=roles_mod_address,
+                                    web3=w3)
     assert status_simulation
 
     fork_unlock_account(w3, bot_address)
 
-    redeem_sDAI_tx = build([redeem_sDAI], role=role, account=bot_address, roles_mod_address=roles_mod_address,
-                           web3=w3)
+    redeem_sDAI_tx = roles.build([redeem_sDAI], role=role, account=bot_address, roles_mod_address=roles_mod_address,
+                                 web3=w3)
     w3.eth.send_transaction(redeem_sDAI_tx)
 
     delta_in_DAI_balance = get_balance(w3, ETHAddr.DAI, avatar_safe_address) - initial_DAI_balance
     assert delta_in_DAI_balance == approx(amount_of_DAI_to_repay)
 
-    txns = build([spark.ApproveToken(token=ETHAddr.DAI, amount=delta_in_DAI_balance),
-                  spark.Repay(token=ETHAddr.DAI, amount=delta_in_DAI_balance, rate_model=spark.RateModel.VARIABLE,
-                              avatar=avatar_safe_address)], role=role, account=bot_address,
-                 roles_mod_address=roles_mod_address,
-                 web3=w3)
+    txns = roles.build([spark.ApproveToken(token=ETHAddr.DAI, amount=delta_in_DAI_balance),
+                        spark.Repay(token=ETHAddr.DAI, amount=delta_in_DAI_balance, rate_model=spark.RateModel.VARIABLE,
+                                    avatar=avatar_safe_address)], role=role, account=bot_address,
+                       roles_mod_address=roles_mod_address,
+                       web3=w3)
     tx_hash = w3.eth.send_transaction(txns)
     w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)
     cdp = cdp_manager.get_cdp_data()
@@ -257,11 +257,11 @@ def test_integration_spark_cdp_roles_2(local_node, accounts):
     assert amount_of_sDAI_to_redeem == approx(177339831130276946729207)
 
     redeem_sDAI = spark.RedeemSDAIforDAI(amount=amount_of_sDAI_to_redeem, avatar=avatar_safe_address)
-    status_simulation = check([redeem_sDAI], role=role, account=bot_address, roles_mod_address=roles_mod_address,
-                              web3=w3)
+    status_simulation = roles.check([redeem_sDAI], role=role, account=bot_address, roles_mod_address=roles_mod_address,
+                                    web3=w3)
     assert status_simulation
 
-    send([redeem_sDAI], role=role, private_key=private_key, roles_mod_address=roles_mod_address, web3=w3)
+    roles.send([redeem_sDAI], role=role, private_key=private_key, roles_mod_address=roles_mod_address, web3=w3)
 
     DAI_balance = get_balance(w3, ETHAddr.DAI, avatar_safe_address)
     delta_in_DAI_balance = DAI_balance - initial_DAI_balance
@@ -270,10 +270,10 @@ def test_integration_spark_cdp_roles_2(local_node, accounts):
     amount_of_DAI_to_repay = amount_of_DAI_to_repay if amount_of_DAI_to_repay < DAI_balance else DAI_balance
     pre_allowance = get_allowance(w3, ETHAddr.DAI, avatar_safe_address, '0xC13e21B648A5Ee794902342038FF3aDAB66BE987')
     assert pre_allowance == 0
-    send([spark.ApproveToken(token=ETHAddr.DAI, amount=amount_of_DAI_to_repay + int(1000e18))], role=role,
-         private_key=private_key,
-         roles_mod_address=roles_mod_address,
-         web3=w3)
+    roles.send([spark.ApproveToken(token=ETHAddr.DAI, amount=amount_of_DAI_to_repay + int(1000e18))], role=role,
+               private_key=private_key,
+               roles_mod_address=roles_mod_address,
+               web3=w3)
     cdp_manager.repay_single_token_debt(cdp, token_in_address=ETHAddr.DAI,
                                         rate_model=spark.RateModel.VARIABLE,
                                         token_in_amount=amount_of_DAI_to_repay,
@@ -324,14 +324,14 @@ def test_integration_spark_cdp_roles_3(local_node, accounts):
     amount_of_sDAI_to_redeem = int(Decimal(amount_of_DAI_to_repay) / (Decimal(chi) / Decimal(1e27)))
 
     redeem_sDAI = spark.RedeemSDAIforDAI(amount=amount_of_sDAI_to_redeem, avatar=avatar_safe_address)
-    send([redeem_sDAI], role=role, private_key=private_key, roles_mod_address=roles_mod_address, web3=w3)
+    roles.send([redeem_sDAI], role=role, private_key=private_key, roles_mod_address=roles_mod_address, web3=w3)
 
     DAI_balance = get_balance(w3, ETHAddr.DAI, avatar_safe_address)
     amount_of_DAI_to_repay = amount_of_DAI_to_repay if amount_of_DAI_to_repay < DAI_balance else DAI_balance
-    send([spark.ApproveToken(token=ETHAddr.DAI, amount=amount_of_DAI_to_repay - int(1000e18))], role=role,
-         private_key=private_key,
-         roles_mod_address=roles_mod_address,
-         web3=w3)
+    roles.send([spark.ApproveToken(token=ETHAddr.DAI, amount=amount_of_DAI_to_repay - int(1000e18))], role=role,
+               private_key=private_key,
+               roles_mod_address=roles_mod_address,
+               web3=w3)
     cdp_manager.repay_single_token_debt(cdp, token_in_address=ETHAddr.DAI,
                                         rate_model=spark.RateModel.VARIABLE,
                                         token_in_amount=amount_of_DAI_to_repay,

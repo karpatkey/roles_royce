@@ -3,9 +3,15 @@ from types import SimpleNamespace
 from roles_royce import Operation
 from web3 import Web3
 
-AvatarAddress = object()
+
 Address = str
 
+class SimpleRepr(type):
+    def __repr__(cls):
+        return cls.__name__
+
+class AvatarAddress(metaclass=SimpleRepr):
+    pass
 
 class InvalidArgument(Exception):
     pass
@@ -15,14 +21,29 @@ class Args(SimpleNamespace):
     pass
 
 
-class Method:
-    name = None
-    in_signature = []
-    out_signature = []
+class ContractMethod:
+    """Inherit this class to declare a contract function.
+
+    At least ``name`` and ``target_address`` must be defined in the
+    inherited class.
+    """
+
+    #: The name of the contract function
+    name: str = ""
+    #: The address of the contract
+    target_address: str = ""
+    #: The input signature
+    in_signature: list[tuple[str, str]] = []
+    #: The output signature. Only used to do a read call.
+    out_signature: list[tuple[str, str]] = []
+    #: Provide fixed defaults to some function attributes.
     fixed_arguments = dict()
-    target_address = None
 
     def __init__(self, value: int = 0, avatar: None | str = None):
+        """
+        :param value: The value of the tx, eg: amount of Wei in mainnet, xDai Weis in GC.
+        :param avatar: Avatar address, usually a Safe address.
+        """
         self.value = value  # Eg: amount of ETH in mainnet, xDai in GC
         self.avatar = avatar
         self.args = Args()
@@ -39,6 +60,7 @@ class Method:
 
     @property
     def data(self) -> str:
+        """Calldata of the method."""
         if not hasattr(self, "_initialized"):
             raise ValueError(f"Missing super().__init__() call in {self.__class__.__name__}.__init__ method")
         contract = Web3().eth.contract(address=None, abi=self.abi)
@@ -47,17 +69,23 @@ class Method:
 
     @property
     def short_signature(self):
+        """Something like 'deposit(address,uint256,address,uint16)'"""
         types = ",".join([self._get_arg_type(e) for e in self.in_signature])
         return f"{self.name}({types})"
 
     @property
     def abi(self):
+        """The abi of the method, for example to be used with Web3."""
         inputs = [self._abi_for(e) for e in self.in_signature]
         outputs = [self._abi_for(e) for e in self.out_signature]
         abi = {"name": self.name, "type": "function", "inputs": inputs, "outputs": outputs}
         return json.dumps([abi])
 
     def call(self, web3, *args, **kwargs):
+        """Does a read call on the method.
+
+        To use it the ``out_signature`` must be defined.
+        """
         contract = web3.eth.contract(address=self.target_address, abi=self.abi)
         return contract.functions[self.name](*self.args_list).call(*args, **kwargs)
 
@@ -95,7 +123,7 @@ class Method:
         return value
 
 
-class BaseApprove(Method):
+class BaseApprove(ContractMethod):
     """Inherit from this class to define an approval that the token is fixed.
 
     Specify the token using the token class attribute"""
@@ -111,6 +139,7 @@ class BaseApprove(Method):
 
     @property
     def target_address(self) -> str:
+        """The token address."""
         return self.token
 
 

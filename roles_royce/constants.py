@@ -1,12 +1,24 @@
 from dataclasses import dataclass
+from enum import Enum
 from web3 import Web3
 
 
-class CrossChainAddr:
+class StrEnum(str, Enum):
+    def __new__(cls, value):
+        # values must already be of type `str`
+        if not isinstance(value, str):
+            raise TypeError('%r is not a string' % (value,))
+        value = str(value)
+        member = str.__new__(cls, value)
+        member._value_ = value
+        return member
+
+
+class CrossChainAddr(StrEnum):
     BalancerVault = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
 
 
-class ETHAddr:
+class ETHAddr(StrEnum):
     ZERO = "0x0000000000000000000000000000000000000000"
     AAVE = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9"
     AAVE_V2_LendingPool = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9"
@@ -50,7 +62,7 @@ class ETHAddr:
     COMPOUND_V2_Maximillion = "0xf859A1AD94BcF445A406B892eF0d3082f4174088"
 
 
-class GCAddr:
+class GCAddr(StrEnum):
     USDT = "0x4ECaBa5870353805a9F068101A40E0f32ed605C6"
 
 

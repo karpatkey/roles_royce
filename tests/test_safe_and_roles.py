@@ -5,7 +5,7 @@ from gnosis.eth import EthereumNetwork, EthereumClient
 from eth_account import Account
 
 from roles_royce.protocols.eth import balancer, aura
-from roles_royce import send, Chain, build
+from roles_royce import roles, Chain
 from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi, erc20_abi
 from roles_royce.utils import MULTISENDS
 from roles_royce.constants import ETHAddr
@@ -162,9 +162,9 @@ def test_balancer_aura_withdraw(local_node, accounts):
     # approve tokens in balancer and aura
     approve_vault = balancer.ApproveForVault(token="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", amount=1_000_000_000_000_000_000)
     approve_aura_booster = aura.ApproveForBooster(token="0x32296969Ef14EB0c6d29669C550D4a0449130230", amount=1_000_000_000_000_000_000)
-    send_approve = send([approve_vault, approve_aura_booster], role=2, private_key=accounts[2].key,
-                        roles_mod_address=roles_ctract.address,
-                        web3=w3)
+    send_approve = roles.send([approve_vault, approve_aura_booster], role=2, private_key=accounts[2].key,
+                              roles_mod_address=roles_ctract.address,
+                              web3=w3)
     assert send_approve
 
     # steal WETH
@@ -182,8 +182,8 @@ def test_balancer_aura_withdraw(local_node, accounts):
                                                 avatar=safe.address, assets=[ETHAddr.wstETH, ETHAddr.WETH],
                                                 amounts_in=[0, 1_000_000_000], min_bpt_out=int(bpt_out * 0.99))
 
-    send_bpt_deposits = send([deposit_balancer], role=1, private_key=accounts[1].key, roles_mod_address=roles_ctract.address,
-                             web3=w3)
+    send_bpt_deposits = roles.send([deposit_balancer], role=1, private_key=accounts[1].key, roles_mod_address=roles_ctract.address,
+                                   web3=w3)
     assert send_bpt_deposits
 
     # check that the BPTs are staked in AURA and are in the safe
@@ -192,8 +192,8 @@ def test_balancer_aura_withdraw(local_node, accounts):
     assert bpt_amount == 965_271_834
 
     deposit_aura = aura.DepositBPT(pool_id=115, amount=bpt_amount)
-    send_aura_deposits = send([deposit_aura], role=1, private_key=accounts[1].key, roles_mod_address=roles_ctract.address,
-                              web3=w3)
+    send_aura_deposits = roles.send([deposit_aura], role=1, private_key=accounts[1].key, roles_mod_address=roles_ctract.address,
+                                    web3=w3)
     assert send_aura_deposits
     assert get_balance(w3, token=bpt_wstETH_ETH, address=safe.address) == 0
 
@@ -218,9 +218,9 @@ def test_balancer_aura_withdraw(local_node, accounts):
                                                  avatar=safe.address,
                                                  assets=[ETHAddr.wstETH, ETHAddr.WETH],
                                                  min_amounts_out=amounts_out, bpt_amount_in=bpt_amount, exit_token_index=1)
-    send_withdraw = send([withdraw_aura, withdraw_balancer], role=4, private_key=accounts[4].key,
-                         roles_mod_address=roles_ctract.address,
-                         web3=w3)
+    send_withdraw = roles.send([withdraw_aura, withdraw_balancer], role=4, private_key=accounts[4].key,
+                               roles_mod_address=roles_ctract.address,
+                               web3=w3)
 
     weth_balance = get_balance(w3, token=ETHAddr.WETH, address=safe.address)
     assert weth_balance == 999_487_904
@@ -262,9 +262,9 @@ def test_build_operation(local_node, accounts):
     # approve tokens in balancer and aura
     approve_vault = balancer.ApproveForVault(token="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", amount=1_000_000_000_000_000_000)
     approve_aura_booster = aura.ApproveForBooster(token="0x32296969Ef14EB0c6d29669C550D4a0449130230", amount=1_000_000_000_000_000_000)
-    approves = build([approve_vault, approve_aura_booster], role=2, account=accounts[2].address,
-                     roles_mod_address=roles_ctract.address,
-                     web3=w3)
+    approves = roles.build([approve_vault, approve_aura_booster], role=2, account=accounts[2].address,
+                           roles_mod_address=roles_ctract.address,
+                           web3=w3)
 
     # here the transaction can be sent directly to the node, if it has the private key,
     #  or sign it first with web3.eth.account.sign_transaction(tx, private_key)

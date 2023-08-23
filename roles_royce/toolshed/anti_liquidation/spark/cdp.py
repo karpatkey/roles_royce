@@ -4,7 +4,7 @@ from roles_royce.constants import Chain
 from roles_royce.protocols.eth.spark import RateModel
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 from roles_royce.protocols.eth import spark
-from roles_royce import send
+from roles_royce import roles
 from dataclasses import dataclass, field
 from enum import Enum
 from web3 import Web3
@@ -287,22 +287,22 @@ class SparkCDPManager:
         allowance = token_in_contract.functions.allowance(self.owner_address, lending_pool_address).call()
 
         if token_in_amount > allowance:
-            tx_receipt = send([spark.ApproveToken(token=token_in_address, amount=token_in_amount),
-                               spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
-                                           avatar=self.owner_address)], role=role, private_key=private_key,
-                              roles_mod_address=roles_mod_address,
-                              web3=self.w3)
+            tx_receipt = roles.send([spark.ApproveToken(token=token_in_address, amount=token_in_amount),
+                                     spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
+                                                 avatar=self.owner_address)], role=role, private_key=private_key,
+                                    roles_mod_address=roles_mod_address,
+                                    web3=self.w3)
         elif token_in_amount == allowance:
-            tx_receipt = send([spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
-                                           avatar=self.owner_address), ], role=role,
-                              private_key=private_key,
-                              roles_mod_address=roles_mod_address,
-                              web3=self.w3)
+            tx_receipt = roles.send([spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
+                                                 avatar=self.owner_address), ], role=role,
+                                    private_key=private_key,
+                                    roles_mod_address=roles_mod_address,
+                                    web3=self.w3)
         else:
-            tx_receipt = send([spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
-                                           avatar=self.owner_address),
-                               spark.ApproveToken(token=token_in_address, amount=0)], role=role,
-                              private_key=private_key,
-                              roles_mod_address=roles_mod_address,
-                              web3=self.w3)
+            tx_receipt = roles.send([spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
+                                                 avatar=self.owner_address),
+                                     spark.ApproveToken(token=token_in_address, amount=0)], role=role,
+                                    private_key=private_key,
+                                    roles_mod_address=roles_mod_address,
+                                    web3=self.w3)
         return tx_receipt

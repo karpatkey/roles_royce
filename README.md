@@ -1,98 +1,38 @@
 # Roles Royce
 
+Roles Royce is a Python library designed to execute transactions using Zodiac
+Roles Modifier contracts (https://github.com/gnosis/zodiac-modifier-roles-v1).
+With support for many DeFi protocols this library serves as a versatile toolkit
+for securing your decentralized finance operations through the use of the
+Roles Modifier contracts.
 
-The `roles_royce` package is a DeFi library that allows you to easily execute 
-transactions using Zodiac Roles Modifier contracts (https://github.com/gnosis/zodiac-modifier-roles-v1)
-for mulitple DeFi protocols. 
+The project is currently undergoing active development, so we expect some backward
+incompatibility changes until we stabilize the API. We encourage you to stay engaged
+with the project’s updates and contribute to its evolution.
 
-This project is currently being actively developed and it is in alpha state 
-so expect backwards incompatible changes.
+Some protocols supported: AAVEv2, Lido, Compound v2 and v3, Balancer, and more.
 
-## Protocols supported
+## Documentation
 
-* AAVE
-* Lido
+Check the docs in TODO
 
+### Quick usage example
 
-## Usage
-
-Two main functions are provided: `check` to statically check if a transaction will go through or will fail 
-and `send` to actually send the transaction to the blockchain.
-
-### Examples for supported protocols
+Send a tx to the blockchain through a Roles Modifier contract:
 
 ```python 
 from roles_royce.protocols.eth import aave_v2
-from roles_royce import check, send, Chain
+from roles_royce import roles
 from web3 import Web3, HTTPProvider
 
-claim = aave.ClaimAAVERewards(avatar="0x...", amount=10)
-
 w3 = Web3(HTTPProvider("https://..."))
-status = check([claim],
-               role=1,
-               account="0x...",
-               roles_mod_address="0x...",
-               web3=w3,
-               blockchain=Chain.ETHEREUM)
+claim = aave_v2.ClaimAAVERewards(avatar="0x...", amount=10)
+status = roles.send([claim],
+                    role=1,
+                    private_key="xxx",
+                    roles_mod_address="0x...",
+                    web3=w3)
 
-```
-
-Send the tx to the blockchain
-```python
-
-send([claim], 
-     role=1, 
-     private_key="xxx", 
-     roles_mod_address="0x...", 
-     web3=w3, 
-     blockchain=Chain.ETHEREUM)
-```
-
-### Multisend transactions
-
-Multisend transactions are supported: `send([tx1, tx2, tx3], ...)`
-
-### Generic calls
-
-Beside the provided protocol methods, generic calls can be performed:
-
-```python
-
-from roles_royce import check, send, GenericMethodTransaction, Operation, Chain
-
-CURVE_USDC_USDT_REWARD_GAUGE = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
-
-approve = GenericMethodTransaction(
-    function_name="approve",
-    function_args=[CURVE_USDC_USDT_REWARD_GAUGE, 1000],
-    contract_address=GCAddr.USDT,
-    contract_abi='[{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve",'
-                 '"outputs":[{"name":"result","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"}]',
-    operation=Operation.CALL,
-    value=0,
-)
-add_liquidity = GenericMethodTransaction(
-    function_name="add_liquidity",
-    function_args=[[0, 0, 100], 0],
-    contract_address=CURVE_USDC_USDT_REWARD_GAUGE,
-    contract_abi='[{"stateMutability":"nonpayable","type":"function","name":"add_liquidity","inputs":[{"name":"_amounts","type":"uint256[3]"},'
-                 '{"name":"_min_mint_amount","type":"uint256"}],"outputs":[{"name":"","type":"uint256"}],"gas":7295966}]',
-    operation=Operation.CALL,
-    value=0,
-)
-
-
-ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"
-ACCOUNT = "0x7e19DE37A31E40eec58977CEA36ef7fB70e2c5CD"
-status = check(txs=[approve, add_liquidity], 
-               role=2, 
-               account=ACCOUNT, 
-               roles_mod_address=ROLES_MOD_ADDRESS,
-               web3=w3, 
-               blockchain=Chain.GC)
-
-...
 ```
 
 ## Development
@@ -101,9 +41,12 @@ status = check(txs=[approve, add_liquidity],
 * Install rolls_royce in editable mode: `pip install -e .`
 * Install anvil by downloading it from https://github.com/foundry-rs/foundry.
 
-
 To run the tests start anvil in a terminal in fork mode on port 8546 with:
 
 `anvil --accounts 15 -f 'URL' --port 8546`
 
 and then run the tests with `pytest -vs`.
+
+### Building the docs
+
+With sphinx installed `cd` into the `docs` dir and run `make html`. The output will be in `_build`.

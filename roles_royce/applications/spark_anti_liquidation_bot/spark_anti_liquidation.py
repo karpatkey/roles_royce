@@ -5,7 +5,7 @@ from roles_royce.constants import ETHAddr
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
 from decimal import Decimal
-from roles_royce import send
+from roles_royce import roles
 from roles_royce.constants import Chain
 from roles_royce.evm_utils import erc20_abi
 from roles_royce.toolshed.alerting.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
@@ -126,9 +126,9 @@ def bot_do():
             messenger.log_and_alert(LoggingLevel.Warning, title, message)
 
         logger.info(f'Redeeming {amount_of_sDAI_to_redeem} sDAI for DAI...')
-        tx_receipt_sDAI_redeemed = send(
-            [spark.RedeemSDAIforDAI(amount=amount_of_sDAI_to_redeem, avatar=ENV.AVATAR_SAFE_ADDRESS)], role=ENV.ROLE,
-            private_key=ENV.PRIVATE_KEY, roles_mod_address=ENV.ROLES_MOD_ADDRESS, web3=w3)
+        tx_receipt_sDAI_redeemed = roles.send(
+            [spark.RedeemSDAIforDAI(amount=amount_of_sDAI_to_redeem, avatar=ENV.AVATAR_SAFE_ADDRESS)],
+            role=ENV.ROLE, private_key=ENV.PRIVATE_KEY, roles_mod_address=ENV.ROLES_MOD_ADDRESS, web3=w3)
 
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt_sDAI_redeemed,
                                                                        ENV.AVATAR_SAFE_ADDRESS, w3)

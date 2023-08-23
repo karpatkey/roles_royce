@@ -1,18 +1,12 @@
 from enum import IntEnum
 import eth_abi
 from roles_royce.constants import ETHAddr, CrossChainAddr
-from roles_royce.protocols.base import Method, InvalidArgument, AvatarAddress, Address
+from roles_royce.protocols.base import ContractMethod, InvalidArgument, AvatarAddress, Address
 from roles_royce.protocols.base import BaseApproveForToken
 
 
 # Refs
 # StablePool encoding https://github.com/balancer/balancer-v2-monorepo/blob/d2c47f13aa5f7db1b16e37f37c9631b9a38f25a4/pkg/balancer-js/src/pool-stable/encoder.ts
-
-
-class ApproveForVault(BaseApproveForToken):
-    """approve Token with BalancerVault as spender"""
-    fixed_arguments = {"spender": CrossChainAddr.BalancerVault}
-
 
 # There is another ExitKind that is for Weighted Pools
 class StablePoolExitKind(IntEnum):
@@ -20,8 +14,20 @@ class StablePoolExitKind(IntEnum):
     BPT_IN_FOR_EXACT_TOKENS_OUT = 1
     EXACT_BPT_IN_FOR_ALL_TOKENS_OUT = 2
 
+# There is another JoinKind that is for Weighted Pools
+class StablePoolJoinKind(IntEnum):
+    INIT = 0
+    EXACT_TOKENS_IN_FOR_BPT_OUT = 1
+    TOKEN_IN_FOR_EXACT_BPT_OUT = 2
+    ALL_TOKENS_IN_FOR_EXACT_BPT_OUT = 3
 
-class QueryExit(Method):
+
+class ApproveForVault(BaseApproveForToken):
+    """approve Token with BalancerVault as spender"""
+    fixed_arguments = {"spender": CrossChainAddr.BalancerVault}
+
+
+class QueryExit(ContractMethod):
     """calculate amounts out for certain BPTin"""
     name = "queryExit"
 
@@ -30,7 +36,7 @@ class QueryExit(Method):
 # It's also important to note that the values in minAmountsOut correspond to the same index value in assets,
 # so these arrays must be made in parallel after sorting.
 
-class Exit(Method):
+class Exit(ContractMethod):
     name = "exitPool"
     in_signature = (
         ("pool_id", "bytes32"),
@@ -134,15 +140,7 @@ class CustomQueryExit(QueryExitMixin, CustomExit):
     pass
 
 
-# There is another JoinKind that is for Weighted Pools
-class StablePoolJoinKind(IntEnum):
-    INIT = 0
-    EXACT_TOKENS_IN_FOR_BPT_OUT = 1
-    TOKEN_IN_FOR_EXACT_BPT_OUT = 2
-    ALL_TOKENS_IN_FOR_EXACT_BPT_OUT = 3
-
-
-class QueryJoin(Method):
+class QueryJoin(ContractMethod):
     """calculate BPT out for certain tokens in"""
     name = "queryJoin"
 
@@ -151,7 +149,7 @@ class QueryJoin(Method):
 # It's also important to note that the values in maxAmountsIn correspond to the same index value in assets,
 # so these arrays must be made in parallel after sorting.
 
-class Join(Method):
+class Join(ContractMethod):
     name = "joinPool"
     in_signature = (
         ("pool_id", "bytes32"),
