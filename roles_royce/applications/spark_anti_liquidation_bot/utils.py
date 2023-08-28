@@ -1,4 +1,8 @@
 from dataclasses import dataclass, field
+import threading
+
+import schedule
+import time
 from decouple import config
 from web3.types import Address, ChecksumAddress
 from web3 import Web3
@@ -6,6 +10,7 @@ from roles_royce.toolshed.alerting.alerting import Messenger, LoggingLevel
 from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDP
 import logging
 
+logger = logging.getLogger(__name__)
 
 # The next helper function allows to leave variables unfilled in the .env file
 def custom_config(variable, default, cast):
@@ -79,9 +84,6 @@ class ENV:
         return 'Environment variables'
 
 
-logger = logging.getLogger(__name__)
-
-
 def log_initial_data(env: ENV, messenger: Messenger):
     title = "Spark Anti-Liquidation Bot started"
     message = (f"  Avatar safe address: {env.AVATAR_SAFE_ADDRESS}\n"
@@ -104,4 +106,16 @@ def send_status(env: ENV, messenger: Messenger, cdp: SparkCDP, bot_ETH_balance: 
     messenger.log_and_alert(LoggingLevel.Info, title, message)
 
 
+class SchedulerThread(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.daemon = True
+        self.running = True
 
+    def run(self):
+        while self.running:
+            schedule.run_pending()
+            time.sleep(1)
+
+    def stop(self):
+        self.running = False

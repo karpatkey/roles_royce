@@ -6,14 +6,13 @@ from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
 from decimal import Decimal
 from roles_royce import roles
-from roles_royce.constants import Chain
 from roles_royce.evm_utils import erc20_abi
 from roles_royce.toolshed.alerting.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
 from prometheus_client import start_http_server as prometheus_start_http_server, Gauge, Enum
 import logging
-from utils import ENV, log_initial_data, send_status
+from utils import ENV, log_initial_data, send_status, SchedulerThread
 import time
-from tests.utils import local_node, top_up_address
+from threading import Event
 import sys
 import schedule
 import datetime
@@ -23,10 +22,13 @@ ENV = ENV()
 
 test_mode = ENV.TEST_MODE
 if test_mode:
+    from tests.utils import top_up_address
     w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
     top_up_address(w3, ENV.BOT_ADDRESS, 100)
 else:
     w3 = Web3(Web3.HTTPProvider(ENV.RPC_ENDPOINT))
+
+send_status_flag = Event()
 
 slack_messenger = SlackMessenger(webhook=ENV.SLACK_WEBHOOK_URL)
 slack_messenger.start()
@@ -76,7 +78,9 @@ def bot_do():
     cdp_manager = SparkCDPManager(w3, ENV.AVATAR_SAFE_ADDRESS)
     cdp = cdp_manager.get_cdp_data()
 
-    schedule.every().day.at(str(status_run_time)).do(send_status, ENV, messenger, cdp, bot_ETH_balance)
+    if send_status_flag.is_set():
+        send_status_flag.clear()
+        send_status(ENV, messenger, cdp, bot_ETH_balance)
 
     bot_ETH_balance_gauge.set(bot_ETH_balance / 1e18)
     health_factor_gauge.set(float(cdp.health_factor))
