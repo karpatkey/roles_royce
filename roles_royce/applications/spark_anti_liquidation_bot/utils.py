@@ -40,32 +40,8 @@ class ENV:
 
     BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
 
-    ATTRIBUTE_NAMES = {
-        'RPC_ENDPOINT': 'RPC_ENDPOINT',
-        'AVATAR_SAFE_ADDRESS': 'AVATAR_SAFE_ADDRESS',
-        'ROLES_MOD_ADDRESS': 'ROLES_MOD_ADDRESS',
-        'ROLE': 'ROLE',
-        'PRIVATE_KEY': 'PRIVATE_KEY',
-        'TARGET_HEALTH_FACTOR': 'TARGET_HEALTH_FACTOR',
-        'ALERTING_HEALTH_FACTOR': 'ALERTING_HEALTH_FACTOR',
-        'THRESHOLD_HEALTH_FACTOR': 'THRESHOLD_HEALTH_FACTOR',
-        'TOLERANCE': 'TOLERANCE',
-        'COOLDOWN_MINUTES': 'COOLDOWN_MINUTES',
-        'SLACK_WEBHOOK_URL': 'SLACK_WEBHOOK_URL',
-        'TELEGRAM_BOT_TOKEN': 'TELEGRAM_BOT_TOKEN',
-        'TELEGRAM_CHAT_ID': 'TELEGRAM_CHAT_ID',
-        'PROMETHEUS_PORT': 'PROMETHEUS_PORT',
-        'TEST_MODE': 'TEST_MODE',
-        'LOCAL_FORK_PORT': 'LOCAL_FORK_PORT',
-        'STATUS_NOTIFICATION_HOUR': 'STATUS_NOTIFICATION_HOUR'
-    }
-
     MANDATORY_ATTRIBUTES = ['RPC_ENDPOINT', 'AVATAR_SAFE_ADDRESS', 'ROLES_MOD_ADDRESS', 'ROLE', 'PRIVATE_KEY',
                             'TARGET_HEALTH_FACTOR', 'THRESHOLD_HEALTH_FACTOR']
-
-    @classmethod
-    def get_attribute_name(cls, attribute):
-        return cls.ATTRIBUTE_NAMES.get(attribute, 'Unknown')
 
     def __post_init__(self):
         for attr_name in self.MANDATORY_ATTRIBUTES:
