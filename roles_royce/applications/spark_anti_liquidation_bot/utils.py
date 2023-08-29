@@ -21,6 +21,7 @@ def custom_config(variable, default, cast):
 @dataclass
 class ENV:
     RPC_ENDPOINT: str = config('RPC_ENDPOINT')
+    FALLBACK_RPC_ENDPOINT: str = config('FALLBACK_RPC_ENDPOINT', default='')
     AVATAR_SAFE_ADDRESS: Address | ChecksumAddress | str = config('AVATAR_SAFE_ADDRESS')
     ROLES_MOD_ADDRESS: Address | ChecksumAddress | str = config('ROLES_MOD_ADDRESS')
     ROLE: int = config('ROLE', cast=int)
@@ -47,11 +48,14 @@ class ENV:
         for attr_name in self.MANDATORY_ATTRIBUTES:
             attr_value = getattr(self, attr_name)
             if not attr_value:
-                raise ValueError(f"{attr_name} is cannot be empty in .env file.")
+                raise ValueError(f"{attr_name} cannot be empty in .env file.")
         self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
         self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
         if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).is_connected():
             raise ValueError(f"RPC_ENDPOINT is not valid or not active: {self.RPC_ENDPOINT}.")
+        if self.FALLBACK_RPC_ENDPOINT != '':
+            if not Web3(Web3.HTTPProvider(self.FALLBACK_RPC_ENDPOINT)).is_connected():
+                raise ValueError(f"FALLBACK_RPC_ENDPOINT is not valid or not active: {self.FALLBACK_RPC_ENDPOINT}.")
         self.BOT_ADDRESS = Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).eth.account.from_key(self.PRIVATE_KEY).address
         if not self.ALERTING_HEALTH_FACTOR:
             self.ALERTING_HEALTH_FACTOR = (self.TARGET_HEALTH_FACTOR + self.THRESHOLD_HEALTH_FACTOR) / 2
@@ -74,7 +78,7 @@ def log_initial_data(env: ENV, messenger: Messenger):
                          f"  Cooldown Minutes: {env.COOLDOWN_MINUTES}\n")
     messenger.log_and_alert(LoggingLevel.Info, title, message)
 
-def send_status(env: ENV, messenger: Messenger, cdp: SparkCDP, bot_ETH_balance: float):
+def send_status(messenger: Messenger, cdp: SparkCDP, bot_ETH_balance: float):
     title = "Spark CDP status update"
     message = (f"  Current health factor: {cdp.health_factor}\n"
                f"{cdp}\n"
