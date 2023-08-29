@@ -10,11 +10,12 @@ from roles_royce.evm_utils import erc20_abi
 from roles_royce.toolshed.alerting.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
 from prometheus_client import start_http_server as prometheus_start_http_server, Gauge, Enum, Info
 import logging
-from utils import ENV, log_initial_data, send_status
+from utils import ENV, log_initial_data, send_status, SchedulerThread
 import time
 from threading import Event
 import sys
 import datetime
+import schedule
 
 # Importing the environment variables from the .env file
 ENV = ENV()
@@ -191,6 +192,11 @@ def bot_do():
 
 
 # -----------------------------MAIN LOOP-----------------------------------------
+
+schedule.every().day.at(str(status_run_time)).do(lambda: send_status_flag.set())
+scheduler_thread = SchedulerThread()
+scheduler_thread.start()
+
 
 while True:
 
