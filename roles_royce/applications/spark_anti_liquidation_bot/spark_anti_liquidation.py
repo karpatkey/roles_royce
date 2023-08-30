@@ -1,4 +1,4 @@
-from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager, CDPData
+from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager
 from web3 import Web3
 from roles_royce.protocols.eth import spark
 from roles_royce.constants import ETHAddr
@@ -7,7 +7,7 @@ from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_tran
 from decimal import Decimal
 from roles_royce import roles
 from roles_royce.evm_utils import erc20_abi
-from roles_royce.toolshed.alerting.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
+from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
 from prometheus_client import start_http_server as prometheus_start_http_server, Gauge, Enum, Info
 import logging
 from utils import ENV, log_initial_data, send_status, SchedulerThread
@@ -24,18 +24,21 @@ test_mode = ENV.TEST_MODE
 if test_mode:
     from tests.utils import top_up_address
     w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
-    top_up_address(w3, ENV.BOT_ADDRESS, 100)
+    top_up_address(w3, ENV.BOT_ADDRESS, 1)
 else:
     w3 = Web3(Web3.HTTPProvider(ENV.RPC_ENDPOINT))
 
+#Alert flags
 send_status_flag = Event()
+lack_of_gas_warning_flag = Event()
+alerting_health_factor_flag = Event()
+threshold_health_factor_flag = Event()
 
+#Messenger system
 slack_messenger = SlackMessenger(webhook=ENV.SLACK_WEBHOOK_URL)
 slack_messenger.start()
 telegram_messenger = TelegramMessenger(bot_token=ENV.TELEGRAM_BOT_TOKEN, chat_id=ENV.TELEGRAM_CHAT_ID)
 telegram_messenger.start()
-
-prometheus_start_http_server(ENV.PROMETHEUS_PORT)
 
 # Configure logging settings
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -44,11 +47,10 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 messenger = Messenger(slack_messenger, telegram_messenger)
 
-status_run_time = datetime.time(hour=ENV.STATUS_NOTIFICATION_HOUR, minute=0, second=0)
-
 #Prometheus metricsfrom prometheus_client import Info
-i = Info('my_build_version', 'Description of info')
-i.info({'version': '1.2.3', 'buildhost': 'foo@bar'})
+prometheus_start_http_server(ENV.PROMETHEUS_PORT)
+#i = Info('my_build_version', 'Description of info')
+#i.info({'version': '1.2.3', 'buildhost': 'foo@bar'})
 health_factor_gauge = Gauge('health_factor', 'Spark CDP health factor')
 is_running_timestamp_gauge = Gauge('is_running_timestamp', 'Updated timestamp to check the bot is running')
 # TODO: This should be generalized for any Spark CDP with any tokens
@@ -58,6 +60,8 @@ bot_ETH_balance_gauge = Gauge('bot_ETH_balance', 'ETH balance of the bot')
 lack_of_gas_warning = Enum('lack_of_gas_warning', 'Bool to track whether warning has already been sent',
                            states=['True', 'False'])
 lack_of_gas_warning.state('False')
+
+#Exception and RPC endpoint failure counters
 exception_counter = 0
 rpc_endpoint_failure_counter = 0
 
@@ -69,9 +73,6 @@ log_initial_data(ENV, messenger)
 
 def bot_do():
     global w3
-    #global test_mode
-
-    global lack_of_gas_warning
     global health_factor_gauge
     global is_running_timestamp_gauge
     global GNO_balance_gauge
@@ -101,14 +102,15 @@ def bot_do():
         message = (f"  Current health factor: ({cdp.health_factor}).\n"
                    f"  Alerting health factor: ({ENV.ALERTING_HEALTH_FACTOR})\n."
                    f"{cdp}")
-        messenger.log_and_alert(LoggingLevel.Warning, title, message)
+        messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=alerting_health_factor_flag.is_set())
+        alerting_health_factor_flag.set()
 
     elif cdp.health_factor <= ENV.THRESHOLD_HEALTH_FACTOR:
         title = "Health factor dropped below the critical threshold"
         message = (f"  Current health factor: ({cdp.health_factor}).\n"
                    f"  Health factor threshold: ({ENV.ALERTING_HEALTH_FACTOR}).\n"
                    f"{cdp}")
-        messenger.log_and_alert(LoggingLevel.Warning, title, message)
+        messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=threshold_health_factor_flag.is_set())
 
         logger.info('Attempting to repay debt...')
         amount_of_DAI_to_repay = cdp_manager.get_delta_of_token_to_repay(spark_cdp=cdp,
@@ -184,15 +186,22 @@ def bot_do():
         health_factor_gauge.set(float(cdp.health_factor))
         is_running_timestamp_gauge.set_to_current_time()
 
-        if bot_ETH_balance < 0.1 and lack_of_gas_warning._value == 0:
+        if bot_ETH_balance < 0.1:
             title = 'Lack of ETH for gas'
             message = 'Im running outta ETH for gas! Only %.5f ETH left.' % (bot_ETH_balance / (10 ** 18))
-            messenger.log_and_alert(LoggingLevel.Warning, title, message)
+            messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=lack_of_gas_warning_flag.is_set())
             lack_of_gas_warning.state('True')
+            lack_of_gas_warning_flag.set()
+
+        if bot_ETH_balance >= 0.1 and lack_of_gas_warning_flag.is_set():
+            lack_of_gas_warning.state('False')
+            lack_of_gas_warning_flag.clear()
 
 
 # -----------------------------MAIN LOOP-----------------------------------------
 
+#Status notification scheduling
+status_run_time = datetime.time(hour=ENV.STATUS_NOTIFICATION_HOUR, minute=0, second=0)
 schedule.every().day.at(str(status_run_time)).do(lambda: send_status_flag.set())
 scheduler_thread = SchedulerThread()
 scheduler_thread.start()
@@ -221,7 +230,7 @@ while True:
 
         if rpc_endpoint_failure_counter == 5:#TODO: this can be added as an environment variable
             messenger.log_and_alert(LoggingLevel.Error, title= 'Too many RPC endpoint failures, exiting...', message='')
-            time.sleep(5) # Time for the messenger system to send messages in queue
+            time.sleep(5) # Cooldown time for the messenger system to send messages in queue
             sys.exit(1)
 
         bot_do()
@@ -231,6 +240,6 @@ while True:
         exception_counter += 1
         if exception_counter == 5:#TODO: this can be added as an environment variable
             messenger.log_and_alert(LoggingLevel.Error, title= 'Too many exceptions, exiting...', message='')
-            time.sleep(5) # Time for the messenger system to send messages in queue
+            time.sleep(5) # Cooldown time for the messenger system to send messages in queue
             sys.exit(1)
     time.sleep(ENV.COOLDOWN_MINUTES * 60)
