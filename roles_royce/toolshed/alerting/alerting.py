@@ -122,7 +122,7 @@ class Messenger:
         self.slack_messenger = slack_messenger
         self.telegram_messenger = telegram_messenger
 
-    def log_and_alert(self, logging_level: LoggingLevel, title: str, message: str, slack_msg: str | None = None, alert_flag: bool = True):
+    def log_and_alert(self, logging_level: LoggingLevel, title: str, message: str, slack_msg: str | None = None, alert_flag: bool = False):
         if logging_level == LoggingLevel.Info:
             logger.info(title + '.\n' + message)
             if not alert_flag:
