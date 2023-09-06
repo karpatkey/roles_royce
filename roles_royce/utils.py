@@ -8,7 +8,8 @@ from .roles_modifier import Operation
 from .constants import Blockchain, Chain
 from .generic_method import Transactable, TxData
 
-API_URL = "https://api.tenderly.co/api/v1/"
+TENDERLY_API_URL = "https://api.tenderly.co/api/v1/"
+TENDERLY_DASHBOARD_URL = "https://dashboard.tenderly.co/"
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +116,7 @@ def tenderly_simulate(account_id: str,
 
     :return: Simulation data as returned by Tenderly
     """
-    url = API_URL + f"account/{account_id}/project/{project}/simulate"
+    url = TENDERLY_API_URL + f"account/{account_id}/project/{project}/simulate"
     headers = {"X-Access-Key": api_token}
     data = {
         "network_id": network_id,
@@ -145,7 +146,8 @@ def tenderly_simulate(account_id: str,
     return data
 
 
-def simulate_tx(tx: dict, block: int, account_id: str, project: str, api_token: str, sim_type: str = 'full', **kwargs) -> dict:
+def simulate_tx(tx: dict, block: int, account_id: str, project: str, api_token: str, sim_type: str = 'full',
+                share: bool = False, **kwargs) -> dict:
     """
     Helper function to simulate an already built transaction
 
@@ -156,7 +158,8 @@ def simulate_tx(tx: dict, block: int, account_id: str, project: str, api_token: 
     :param block: Number of the block to be used for the simulation.
     :param sim_type: One of 'quick', 'abi' or 'full'.
     :param kwargs: Other parameters to pass to tenderly_simulate.
-    :return:
+    :param share: If true the simulation will be public and a link will be retrieved in result['share_url']
+    :return: Return the simulation data.
     """
     sim_data = tenderly_simulate(account_id=account_id, project=project, api_token=api_token,
                                  from_addr=tx['from'],
@@ -169,4 +172,31 @@ def simulate_tx(tx: dict, block: int, account_id: str, project: str, api_token: 
                                  sim_type=sim_type,
                                  **kwargs,
                                  )
+    if share:
+        url = tenderly_share_simulation(account_id=account_id, project=project, api_token=api_token,
+                                        simulation_id=sim_data['simulation']['id'])
+        sim_data['share_url'] = url
     return sim_data
+
+
+def tenderly_share_simulation(account_id: str,
+                              project: str,
+                              api_token: str,
+                              simulation_id: str,
+                              share=True):
+    """
+    Publicly share a simulatation.
+
+    :param account_id: Something like  2ae12345-d123-9876-abcd-123456123456. Get it using tenderly-cli whoami.
+    :param project: project slug. It is the name that is in the url of the dashboard.
+    :param api_token: the API token. Something like abIcb3qwhdPSPasd-asdfgA-foobarbaz.
+    :param simulation_id: Get it from the simulated data 'id' field.
+    :param share: Use False to unshare a shared simulation.
+    """
+    url = TENDERLY_API_URL + f"account/{account_id}/project/{project}/simulations/{simulation_id}/"
+    url += "share" if share else "unshare"
+    headers = {"X-Access-Key": api_token}
+    response = requests.post(url=url, headers=headers)
+    response.raise_for_status()
+
+    return f"{TENDERLY_DASHBOARD_URL}shared/simulation/{simulation_id}"
