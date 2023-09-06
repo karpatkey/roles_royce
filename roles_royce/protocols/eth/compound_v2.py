@@ -31,46 +31,49 @@ class Approve(BaseApproveForToken):
         self.args.spender = ctoken
 
 
-class Mint(ContractMethod):
+class CtokenBaseMethod(ContractMethod):
+    in_signature = [("amount", "uint256")]
+
+    def __init__(self, ctoken: Ctoken, amount: int):
+        """
+        :param ctoken: a Ctoken instance.
+        :param amount: the amount.
+        """
+        super().__init__()
+        self.token = ctoken
+        self.args.amount = amount
+
+    @property
+    def target_address(self) -> str:
+        """The address of the specified Ctoken."""
+        return self.token
+
+
+class Mint(CtokenBaseMethod):
     """Deposit asset.
 
     Sender deposits a specified amount of underlying asset in exchange for cTokens
     """
     name = "mint"
-    in_signature = [("amount", "uint256")]
 
     def __init__(self, ctoken: Ctoken, amount: int):
-        super().__init__()
-        self.target_address = ctoken
-        self.args.amount = amount
+        super().__init__(ctoken, amount)
 
 
-class Redeem(ContractMethod):
+class Redeem(CtokenBaseMethod):
     """Withdraw asset.
 
     It is called when MAX underlying amount is withdrawn
     """
     name = "redeem"
-    in_signature = [("amount", "uint256")]
-
-    def __init__(self, ctoken: Ctoken, amount: int):
-        super().__init__()
-        self.target_address = ctoken
-        self.args.amount = amount
 
 
-class RedeemUnderlying(ContractMethod):
+class RedeemUnderlying(CtokenBaseMethod):
     """Withdraw asset.
 
     It is called when MAX underlying amount is withdrawn
     """
     name = "redeemUnderlying"
-    in_signature = [("amount", "uint256")]
-
-    def __init__(self, ctoken: Ctoken, amount: int):
-        super().__init__()
-        self.target_address = ctoken
-        self.args.amount = amount
 
 
 class EnterMarkets(ContractMethod):
@@ -101,32 +104,20 @@ class ExitMarket(ContractMethod):
         self.args.ctoken = ctoken
 
 
-class Borrow(ContractMethod):
+class Borrow(CtokenBaseMethod):
     """
 
     Borrow underlying asset amount.
     """
     name = "borrow"
-    in_signature = [("amount", "uint256")]
-
-    def __init__(self, ctoken: Ctoken, amount: int):
-        super().__init__()
-        self.target_address = ctoken
-        self.args.amount = amount
 
 
-class Repay(ContractMethod):
+class Repay(CtokenBaseMethod):
     """
 
     Repay underlying asset amount.
     """
     name = "repayBorrow"
-    in_signature = [("amount", "uint256")]
-
-    def __init__(self, ctoken: Ctoken, amount: int):
-        super().__init__()
-        self.target_address = ctoken
-        self.args.amount = amount
 
 
 class RepayETH(ContractMethod):
