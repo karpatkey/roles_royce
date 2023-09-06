@@ -154,6 +154,44 @@ Beside the provided protocol methods, generic calls can be performed.
 
    generic_calls
 
+Simulation
+----------
+
+Transactions can be simulated using Tenderly.
+Example:
+
+.. code-block:: python
+
+    from roles_royce import roles
+    from roles_royce.protocols.eth import aura
+    from roles_royce.utils import simulate_tx
+
+    ROLES_MOD = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
+    REVOKER_ROLE = "0xf099e0f6604BDE0AA860B39F7da75770B34aC804"
+    LP80GNO20WETH = "0x32296969Ef14EB0c6d29669C550D4a0449130230"
+
+    method = aura.ApproveForBooster(token=LP80GNO20WETH, amount=1000)
+
+    tx = roles.build(txs=[method], role=1, account=REVOKER_ROLE, roles_mod_address=ROLES_MOD, web3=web3_eth)
+
+    sim_data = simulate_tx(tx,
+                           block=17994590,
+                           account_id="foobarbaz-d123-4140-adfb-123978bc0ab9",
+                           project="project",
+                           api_token="MyAPiToken123123123",
+                           sim_type='quick')
+
+    assert sim_data['transaction']['status']  # False if transaction fails
+    assert sim_data['simulation']['block_number'] == 17994590
+    assert sim_data['transaction']['call_trace'][0] == {
+        'call_type': 'CALL', 'from': '0xf099e0f6604bde0aa860b39f7da75770b34ac804',
+        'to': '0x1cfb0cd7b1111bf2054615c7c491a15c4a3303cc',
+        'gas': 96760, 'gas_used': 61660, 'subtraces': 1, 'type': 'CALL',
+        'input': '0x6928e74b00000000000000000000000032296969ef14eb0c6d29669c550d4a0449130230000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000044095ea7b3000000000000000000000000a57b8d98dae62b26ec3bcc4a365338157060b23400000000000000000000000000000000000000000000000000000000000003e800000000000000000000000000000000000000000000000000000000',
+        'output': '0x0000000000000000000000000000000000000000000000000000000000000001'
+    }
+
+
 
 Api
 ---
