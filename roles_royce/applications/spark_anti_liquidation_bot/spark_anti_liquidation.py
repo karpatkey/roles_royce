@@ -1,8 +1,8 @@
-from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager
+from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager, CDPData
 from web3 import Web3
 from roles_royce.protocols.eth import spark
 from roles_royce.constants import ETHAddr
-from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
+from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
 from decimal import Decimal
 from roles_royce import roles
@@ -49,13 +49,15 @@ messenger = Messenger(slack_messenger, telegram_messenger)
 
 #Prometheus metricsfrom prometheus_client import Info
 prometheus_start_http_server(ENV.PROMETHEUS_PORT)
-#i = Info('my_build_version', 'Description of info')
-#i.info({'version': '1.2.3', 'buildhost': 'foo@bar'})
+DAI_balances_data = Info('DAI_balances_data', 'DAI token metrics in Spark CDP')
+GNO_balances_data = Info('GNO_balances_data', 'GNO token metrics in Spark CDP')
 health_factor_gauge = Gauge('health_factor', 'Spark CDP health factor')
 is_running_timestamp_gauge = Gauge('is_running_timestamp', 'Updated timestamp to check the bot is running')
 # TODO: This should be generalized for any Spark CDP with any tokens
 GNO_balance_gauge = Gauge('GNO_balance', 'GNO deposited balance of the Spark CDP')
 DAI_borrowed_gauge = Gauge('DAI_borrowed', 'DAI borrowed balance of the Spark CDP')
+GNO_price_gauge = Gauge('GNO_price', 'GNO price')
+DAI_price_gauge = Gauge('DAI_price', 'DAI price')
 bot_ETH_balance_gauge = Gauge('bot_ETH_balance', 'ETH balance of the bot')
 lack_of_gas_warning = Enum('lack_of_gas_warning', 'Bool to track whether warning has already been sent',
                            states=['True', 'False'])
@@ -85,11 +87,21 @@ def bot_do():
 
     if send_status_flag.is_set():
         send_status_flag.clear()
-        send_status(messenger, cdp, bot_ETH_balance)
+        send_status(messenger, cdp, bot_ETH_balance/1e18)
 
     bot_ETH_balance_gauge.set(bot_ETH_balance / 1e18)
     health_factor_gauge.set(float(cdp.health_factor))
     is_running_timestamp_gauge.set_to_current_time()
+    for element in cdp.balances_data:
+        if element[CDPData.UnderlyingAddress] == ETHAddr.GNO:
+            GNO_balance_gauge.set(element[CDPData.InterestBearingBalance])
+            GNO_price_gauge.set(element[CDPData.UnderlyingPriceUSD])
+        if element[CDPData.UnderlyingAddress] == ETHAddr.DAI:
+            DAI_borrowed_gauge.set(element[CDPData.VariableDebtBalance])
+            DAI_price_gauge.set(element[CDPData.UnderlyingPriceUSD])
+
+    DAI_balances_data.info(cdp.balances_data[0])
+    GNO_balances_data.info(cdp.balances_data[1])
 
     logger.info(
         f"Target health factor: {ENV.TARGET_HEALTH_FACTOR}, Alerting health factor: {ENV.ALERTING_HEALTH_FACTOR}, "
