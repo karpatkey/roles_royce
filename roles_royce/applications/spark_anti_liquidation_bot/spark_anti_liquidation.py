@@ -100,8 +100,8 @@ def bot_do():
             DAI_borrowed_gauge.set(element[CDPData.VariableDebtBalance])
             DAI_price_gauge.set(element[CDPData.UnderlyingPriceUSD])
 
-    DAI_balances_data.info(cdp.balances_data[0])
-    GNO_balances_data.info(cdp.balances_data[1])
+    #DAI_balances_data.info(cdp.balances_data[0])
+    #GNO_balances_data.info(cdp.balances_data[1])
 
     logger.info(
         f"Target health factor: {ENV.TARGET_HEALTH_FACTOR}, Alerting health factor: {ENV.ALERTING_HEALTH_FACTOR}, "
