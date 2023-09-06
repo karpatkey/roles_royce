@@ -37,7 +37,7 @@ class ENV:
     PROMETHEUS_PORT: int = custom_config('PROMETHEUS_PORT', default=8000, cast=int)
     TEST_MODE: bool = config('TEST_MODE', default=False, cast=bool)
     LOCAL_FORK_PORT: int = custom_config('LOCAL_FORK_PORT', default=8545, cast=int)
-    STATUS_NOTIFICATION_HOUR: int = custom_config('STATUS_NOTIFICATION_HOUR', default=12, cast=int)
+    STATUS_NOTIFICATION_HOUR: int = custom_config('STATUS_NOTIFICATION_HOUR', default='', cast=int)
 
     BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
 

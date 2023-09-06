@@ -201,10 +201,12 @@ def bot_do():
 # -----------------------------MAIN LOOP-----------------------------------------
 
 #Status notification scheduling
-status_run_time = datetime.time(hour=ENV.STATUS_NOTIFICATION_HOUR, minute=0, second=0)
-schedule.every().day.at(str(status_run_time)).do(lambda: send_status_flag.set())
-scheduler_thread = SchedulerThread()
-scheduler_thread.start()
+if ENV.STATUS_NOTIFICATION_HOUR != '':
+    #FIXME: make sure the scheduling job is set at UTC time
+    status_run_time = datetime.time(hour=ENV.STATUS_NOTIFICATION_HOUR, minute=0, second=0)
+    schedule.every().day.at(str(status_run_time)).do(lambda: send_status_flag.set())
+    scheduler_thread = SchedulerThread()
+    scheduler_thread.start()
 
 
 while True:
