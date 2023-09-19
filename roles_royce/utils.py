@@ -21,8 +21,8 @@ def to_data_input(name, signature, args):
 
 
 MULTISENDS = {
-    Chain.ETHEREUM: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
-    Chain.GC: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
+    Chain.Ethereum: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
+    Chain.GnosisChain: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
 }
 
 

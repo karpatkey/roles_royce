@@ -88,7 +88,7 @@ def test_safe_and_roles(local_node):
     # give the roles_mod to the safe
     role_ctract.functions.setTarget(safe.address).transact({"from": test_account0_addr})
     role_ctract.functions.setAvatar(safe.address).transact({"from": test_account0_addr})
-    role_ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact({"from": test_account0_addr})
+    role_ctract.functions.setMultisend(MULTISENDS[Chain.Ethereum]).transact({"from": test_account0_addr})
     role_ctract.functions.transferOwnership(safe.address).transact({"from": test_account0_addr})
 
     assert role_ctract.functions.owner().call() == safe.address

@@ -4,7 +4,6 @@ import json
 import logging
 import os
 import shutil
-from typing import Any, Dict, cast, Union
 
 import pytest
 import socket
@@ -12,18 +11,12 @@ import subprocess
 import shlex
 import time
 
-from eth_typing import HexStr
-from eth_utils import event_abi_to_log_topic
-from hexbytes import HexBytes
-
 from eth_account import Account
 from eth_account.signers.local import LocalAccount
 
 from web3 import Web3, HTTPProvider
-from web3._utils.abi import get_abi_input_names, get_abi_input_types, map_abi_data
-from web3._utils.normalizers import BASE_RETURN_NORMALIZERS
-from web3.contract import Contract
 from roles_royce.evm_utils import erc20_abi
+from roles_royce.constants import ETHAddr
 from .safe import SimpleSafe
 
 REMOTE_NODE_URL = codecs.decode(
@@ -73,6 +66,7 @@ def web3_eth() -> Web3:
 
 
 def wait_for_port(port, host='localhost', timeout=5.0):
+    """Wait until a port starts accepting TCP connections."""
     start_time = time.time()
     while True:
         try:
@@ -115,14 +109,17 @@ class SimpleDaemonRunner(object):
 
 
 def fork_unlock_account(w3, address):
+    """Unlock the given address on the forked node."""
     return w3.provider.make_request("anvil_impersonateAccount", [address])
 
 
 def fork_reset_state(w3, url, block):
+    """Reset the state of the forked node to the state of the mainnet node at the given block."""
     return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
 
 
 def run_hardhat():
+    """Run hardhat node in the background."""
     try:
         npm = shutil.which("npm")
         subprocess.check_call([npm, "--version"])
@@ -144,6 +141,7 @@ def run_hardhat():
 
 
 def run_anvil():
+    """Run anvil node in the background"""
     log_filename = "/tmp/rr_fork_node_log.txt"
     logger.info(f"Writing Anvil log to {log_filename}")
     log = open(log_filename, "w")
@@ -157,6 +155,7 @@ def run_anvil():
 
 @pytest.fixture(scope='session')
 def local_node(request):
+    """Run a local node for testing"""
     if RUN_LOCAL_NODE:
         node = run_anvil()
 
@@ -178,7 +177,7 @@ def local_node(request):
             import time
             start_time = time.monotonic()
             response = self.make_request(method, params)
-            logger.debug("Web3 time spent in %s: %f seconds", method, time.monotonic()-start_time)
+            logger.debug("Web3 time spent in %s: %f seconds", method, time.monotonic() - start_time)
             return response
 
     w3.middleware_onion.add(LatencyMeasurerMiddleware, "call_counter")
@@ -190,10 +189,12 @@ def local_node(request):
 
 @pytest.fixture(autouse=True)
 def local_node_reset(local_node):
+    """Reset the local node state after each test"""
     fork_reset_state(local_node, url=ETH_FORK_NODE_URL, block=LOCAL_NODE_DEFAULT_BLOCK)
 
 
 def local_node_set_block(w3, block):
+    """Set the local node to a specific block"""
     fork_reset_state(w3, url=ETH_FORK_NODE_URL, block=block)
 
 
@@ -203,6 +204,7 @@ def accounts() -> list[LocalAccount]:
 
 
 def steal_token(w3, token, holder, to, amount):
+    """Steal tokens from a holder to another address"""
     fork_unlock_account(w3, holder)
     ctract = w3.eth.contract(address=token, abi=erc20_abi)
     tx = ctract.functions.transfer(to, amount).transact({"from": holder})
@@ -210,59 +212,29 @@ def steal_token(w3, token, holder, to, amount):
 
 
 def get_balance(w3, token, address):
+    """Get the token or ETH balance of an address"""
+    if token == ETHAddr.ZERO:
+        return w3.eth.get_balance(address)
+    else:
+        ctract = w3.eth.contract(address=token, abi=erc20_abi)
+        return ctract.functions.balanceOf(address).call()
+
+
+def get_allowance(w3, token, owner_address, spender_address):
+    """Get the token allowance of an address"""
     ctract = w3.eth.contract(address=token, abi=erc20_abi)
-    return ctract.functions.balanceOf(address).call()
+    return ctract.functions.allowance(owner_address, spender_address).call()
 
 
 def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
     """Create a Safe with one owner and 100 ETH in balance"""
 
     safe = SimpleSafe.build(owner, ETH_LOCAL_NODE_URL)
-    w3.eth.send_transaction({"to": safe.address, "value": Web3.to_wei(100, "ether"), "from": SCRAPE_ACCOUNT.address})
+    top_up_address(w3=w3, address=safe.address, amount=100)
     fork_unlock_account(w3, safe.address)
     return safe
 
 
-class EventLogDecoder:
-    def __init__(self, contract: Contract):
-        self.contract = contract
-        self.event_abis = [abi for abi in self.contract.abi if abi['type'] == 'event']
-        self._sign_abis = {event_abi_to_log_topic(abi): abi for abi in self.event_abis}
-        self._name_abis = {abi['name']: abi for abi in self.event_abis}
-
-    def decode_log(self, result: Dict[str, Any]):
-        data = b""
-        for t in result['topics']:
-            data += t
-        data += result['data']
-        return self.decode_event_input(data)
-
-    def decode_event_input(self, data: Union[HexStr, str, bytes], name: str = None) -> tuple:
-        # type ignored b/c expects data arg to be HexBytes
-        data = HexBytes(data)  # type: ignore
-        selector, params = data[:32], data[32:]
-
-        if name:
-            func_abi = self._get_event_abi_by_name(event_name=name)
-        else:
-            func_abi = self._get_event_abi_by_selector(selector)
-
-        names = get_abi_input_names(func_abi)
-        types = get_abi_input_types(func_abi)
-
-        decoded = self.contract.w3.codec.decode(types, cast(HexBytes, params))
-        normalized = map_abi_data(BASE_RETURN_NORMALIZERS, types, decoded)
-        event_str = func_abi['name'] + "(" + ", ".join(names) + ")"
-        return (event_str, dict(zip(names, normalized)))
-
-    def _get_event_abi_by_selector(self, selector: HexBytes) -> Dict[str, Any]:
-        try:
-            return self._sign_abis[selector]
-        except KeyError:
-            raise ValueError("Event is not presented in contract ABI.")
-
-    def _get_event_abi_by_name(self, event_name: str) -> Dict[str, Any]:
-        try:
-            return self._name_abis[event_name]
-        except KeyError:
-            raise KeyError(f"Event named '{event_name}' was not found in contract ABI.")
+def top_up_address(w3: Web3, address: str, amount: int) -> None:
+    """Top up an address with ETH"""
+    w3.eth.send_transaction({"to": address, "value": Web3.to_wei(amount, "ether"), "from": SCRAPE_ACCOUNT.address})

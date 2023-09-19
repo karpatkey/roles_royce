@@ -8,7 +8,7 @@ Example
 
 .. code-block:: python
 
-    from roles_royce import check, send, GenericMethodTransaction, Operation, Chain
+    from roles_royce import roles, GenericMethodTransaction, Operation, Chain
 
     CURVE_USDC_USDT_REWARD_GAUGE = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
 
@@ -34,12 +34,12 @@ Example
 
     ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"
     ACCOUNT = "0x7e19DE37A31E40eec58977CEA36ef7fB70e2c5CD"
-    status = check(txs=[approve, add_liquidity],
-                   role=2,
-                   account=ACCOUNT,
-                   roles_mod_address=ROLES_MOD_ADDRESS,
-                   web3=w3,
-                   blockchain=Chain.GC)
+    status = roles.check(txs=[approve, add_liquidity],
+						 role=2,
+						 account=ACCOUNT,
+						 roles_mod_address=ROLES_MOD_ADDRESS,
+						 web3=w3,
+						 blockchain=Chain.GC)
 
     ...
 

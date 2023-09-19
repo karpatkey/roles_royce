@@ -74,24 +74,26 @@ class Blockchain:
     def __str__(self):
         return self.name
 
-    def __int__(self):
-        return self.chain_id
-
     def __hash__(self):
         return self.chain_id
 
 
 class Chain:
-    ETHEREUM = Blockchain("ethereum", 0x1)
-    POLYGON = Blockchain("polygon", 0x89)
-    GC = Blockchain("gnosisChain", 0x64)
+    Ethereum = Blockchain("ethereum", 0x1)
+    Polygon = Blockchain("polygon", 0x89)
+    GnosisChain = Blockchain("gnosisChain", 0x64)
+
+    _by_id = {}
+    for attr_name, attr_value in locals().copy().items():
+        if isinstance(attr_value, Blockchain):
+            _by_id[attr_value.chain_id] = attr_value
 
     @classmethod
     def get_blockchain_by_chain_id(cls, chain_id):
-        for attr_name, attr_value in cls.__dict__.items():
-            if isinstance(attr_value, Blockchain) and attr_value.chain_id == chain_id:
-                return attr_value
-        raise ValueError(f"No Blockchain with chain_id {chain_id} found in Chain.")
+        try:
+            return cls._by_id.get(chain_id, None)
+        except KeyError:
+            raise ValueError(f"No Blockchain with chain_id {chain_id} found in Chain.")
 
     @classmethod
     def get_blockchain_from_web3(cls, w3: Web3):

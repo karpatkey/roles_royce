@@ -133,9 +133,6 @@ def send_slack_message(txn_message, txn_hash_message, status):
 def get_EUR_chainlink_price():
     contract = web3.eth.contract(address=CHAINLINK_FEED_ADDRESS, abi=CHAINLINK_FEED_ABI)
     price = contract.functions.latestAnswer().call()/ (10 ** 8)
-    #a = requests.get(
-    #    'https://api.freecurrencyapi.com/v1/latest?apikey=yeyC80D3MgnGdukMsOimsSmHG43lTCGuzsAJ3GSJ&currencies=USD&base_currency=EUR')
-    #price = float(a.text[15:-2])
     return price
 
 
