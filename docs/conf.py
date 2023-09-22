@@ -23,7 +23,7 @@ extensions = [
     "sphinx_autodoc_typehints",
 ]
 
-autoclass_content = 'both'
+autoclass_content = 'class'
 #autodoc_typehints = "signature"
 #autodoc_typehints_description_target = "documented_params"
 #autodoc_typehints_format = "short"

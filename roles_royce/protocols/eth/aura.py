@@ -43,9 +43,12 @@ class WithdrawAndUndwrapStakedBPT(ContractMethod):
 
     def __init__(self, reward_address: Address, amount: int):
         super().__init__()
-        self.target_address = reward_address
+        self.reward_address = reward_address
         self.args.amount = amount
-
+    @property
+    def target_address(self) -> str:
+        """The reward_address."""
+        return self.reward_address
 
 class DepositBPT(ContractMethod):
     """deposit BPT token"""
