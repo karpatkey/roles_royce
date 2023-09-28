@@ -1,6 +1,6 @@
 from roles_royce.protocols.eth import maker
-from tests.utils import (gen_test_accounts, local_node, accounts, LOCAL_NODE_PORT, get_balance, steal_token, create_simple_safe)
-from tests.roles import setup_common_roles, deploy_roles, apply_presets
+from .utils import (gen_test_accounts, local_node, accounts, LOCAL_NODE_PORT, get_balance, steal_token, create_simple_safe)
+from .roles import setup_common_roles, deploy_roles, apply_presets
 from roles_royce import roles
 from web3 import Web3, HTTPProvider
 from roles_royce.constants import ETHAddr
