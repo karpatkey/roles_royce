@@ -42,7 +42,7 @@ def test_maker_cdp_module_proxy(local_node, accounts):
     steal_token(w3, token=ETHAddr.wstETH, holder="0x6cE0F913F035ec6195bC3cE885aec4C66E485BC4",
                 to=safe.address, amount=1000_000_000_000_000_000_000)
     # approve gem
-    approve_gem = maker.ApproveGem(gem=gem, proxy=proxy_address, amount=1000_000_000_000_000_000_000)
+    approve_gem = maker.ApproveGem(gem=gem, spender=proxy_address, amount=1000_000_000_000_000_000_000)
     # send gem approval
     roles.send([approve_gem], role=1, private_key=accounts[1].key,
                 roles_mod_address=roles_ctract.address,
@@ -87,7 +87,7 @@ def test_maker_cdp_module_proxy(local_node, accounts):
     assert dai_balance == 100_000_000_000_000_000_000_000
 
     # approve DAI
-    approve_dai = maker.ApproveDAI(proxy=proxy_address, amount=100_000_000_000_000_000_000_000)
+    approve_dai = maker.ApproveDAI(spender=proxy_address, amount=100_000_000_000_000_000_000_000)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                 roles_mod_address=roles_ctract.address,
                 web3=w3)
