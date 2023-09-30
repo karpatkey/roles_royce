@@ -2,6 +2,7 @@ from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress
 import eth_abi
 
+
 #-----------------------------------------------------#
 """Approvals"""
 #-----------------------------------------------------#
@@ -139,7 +140,7 @@ class Open(ContractMethod):
 class Join(ContractMethod):
     """join token to the Vat"""
     name = "join"
-    in_signature = [("usr", "bytes32"), ("wad", "uint256")]
+    in_signature = [("usr", "address"), ("wad", "uint256")]
 
     def __init__(self, assetJoin: Address, usr: Address, wad: int):
         super().__init__()
