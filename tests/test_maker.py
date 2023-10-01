@@ -3,12 +3,14 @@ from .utils import (local_node, accounts, get_balance, steal_token, create_simpl
 from .roles import setup_common_roles, deploy_roles, apply_presets
 from roles_royce import roles
 from roles_royce.constants import ETHAddr
+from decimal import Decimal
 
 wstETH_JOIN = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2" # GemJoin wstETH
 ABI_GEM_JOIN = '[{"constant":true,"inputs":[],"name":"gem","outputs":[{"internalType":"contract GemLike_3","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"ilk","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"}]'
 ABI_TOKEN = '[{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]'
 ABI_CDP_MANAGER = '[{"constant":true,"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"urns","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"}]'
-ABI_VAT = '[{"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"address","name":"","type":"address"}],"name":"urns","outputs":[{"internalType":"uint256","name":"ink","type":"uint256"},{"internalType":"uint256","name":"art","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]'
+ABI_VAT = '[{"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"address","name":"","type":"address"}],"name":"urns","outputs":[{"internalType":"uint256","name":"ink","type":"uint256"},{"internalType":"uint256","name":"art","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"ilks","outputs":[{"internalType":"uint256","name":"Art","type":"uint256"},{"internalType":"uint256","name":"rate","type":"uint256"},{"internalType":"uint256","name":"spot","type":"uint256"},{"internalType":"uint256","name":"line","type":"uint256"},{"internalType":"uint256","name":"dust","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"dai","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]'
+ABI_JUG = '[{"constant":false,"inputs":[{"internalType":"bytes32","name":"ilk","type":"bytes32"}],"name":"drip","outputs":[{"internalType":"uint256","name":"rate","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"}]'
 
 
 def test_integration_maker_cdp_module_proxy(local_node, accounts):
@@ -43,7 +45,6 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
                 to=safe.address, amount=1000_000_000_000_000_000_000)
     # approve gem
     approve_gem = maker.ApproveGem(gem=gem, spender=proxy_address, amount=1000_000_000_000_000_000_000)
-    # send gem approval
     roles.send([approve_gem], role=1, private_key=accounts[1].key,
                 roles_mod_address=roles_ctract.address,
                 web3=w3)
@@ -150,7 +151,6 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
                 to=safe.address, amount=1000_000_000_000_000_000_000)
     # approve gem
     approve_gem = maker.ApproveGem(gem=gem, spender=gem_join_contract.address, amount=1000_000_000_000_000_000_000)
-    # send gem approval
     roles.send([approve_gem], role=1, private_key=accounts[1].key,
                 roles_mod_address=roles_ctract.address,
                 web3=w3)
@@ -173,3 +173,131 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
             break
     
     assert cdp_id
+
+    # lockGem
+    wad_gem = 1000_000_000_000_000_000_000
+    cdp_manager_contract = w3.eth.contract(address=ETHAddr.MakerCDPManager, abi=ABI_CDP_MANAGER)
+    urn_handler = cdp_manager_contract.functions.urns(cdp_id).call()
+    join_lock_gem = maker.Join(assetJoin=gem_join_contract.address, usr=urn_handler, wad=wad_gem)
+    roles.send([join_lock_gem], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    frob_lock_gem = maker.Frob(cdp_id=cdp_id, dink=wad_gem, dart=0)
+    roles.send([frob_lock_gem], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    vat_contract = w3.eth.contract(address=ETHAddr.MakerVat, abi=ABI_VAT)
+    locked_gem = vat_contract.functions.urns(ilk, urn_handler).call()[0]
+    assert locked_gem == wad_gem
+
+    # draw DAI
+    RAY = 10**27
+    wad_dai = 100_000_000_000_000_000_000_000
+    jug_contract = w3.eth.contract(address=ETHAddr.MakerJug, abi=ABI_JUG)
+    drip = maker.Drip(ilk=ilk)
+    roles.send([drip], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    rate_jug = jug_contract.functions.drip(ilk).call()
+    rate_vat = vat_contract.functions.ilks(ilk).call()[1]
+    assert rate_jug == rate_vat
+
+    urn_dai = vat_contract.functions.dai(urn_handler).call()
+
+    if urn_dai < (RAY * wad_dai):
+        dart = int(((Decimal(RAY) * Decimal(wad_dai)) - urn_dai) / Decimal(rate_jug))
+        if dart * rate_jug < RAY * wad_dai:
+            dart += 1
+    
+    frob_draw = maker.Frob(cdp_id=cdp_id, dink=0, dart=dart)
+    roles.send([frob_draw], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    # variable that has 45 decimal places
+    rad = wad_dai * 10**27 # 45 = 18 + 27
+    move = maker.Move(cdp_id=cdp_id, avatar=safe.address, rad=rad)
+    roles.send([move], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    hope = maker.Hope()
+    roles.send([hope], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    exit_draw = maker.Exit(assetJoin=ETHAddr.MakerDaiJoin, avatar=safe.address, wad=wad_dai)
+    roles.send([exit_draw], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == wad_dai
+
+    # wipeDAI / repayDAI
+    wad_dai = 50_000_000_000_000_000_000_000
+    approve_dai = maker.ApproveDAI(spender=ETHAddr.MakerDaiJoin, amount=wad_dai)
+    roles.send([approve_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    join_wipe = maker.Join(assetJoin=ETHAddr.MakerDaiJoin, usr=urn_handler, wad=wad_dai)
+    roles.send([join_wipe], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    rate = vat_contract.functions.ilks(ilk).call()[1]
+    art = vat_contract.functions.urns(ilk, urn_handler).call()[1]
+    urn_dai = vat_contract.functions.dai(urn_handler).call()
+
+    dart = int(Decimal(urn_dai) / Decimal(rate))
+    if dart < art:
+        dart = -dart
+    else:
+        dart = -int(art)
+    
+    frob_wipe = maker.Frob(cdp_id=cdp_id, dink=0, dart=dart)
+    roles.send([frob_wipe], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == wad_dai
+
+    # wipeAll / repayAllDAI
+    rate = vat_contract.functions.ilks(ilk).call()[1]
+    art = vat_contract.functions.urns(ilk, urn_handler).call()[1]
+    urn_dai = vat_contract.functions.dai(urn_handler).call()
+    rad = int((Decimal(art) * Decimal(rate)) - Decimal(urn_dai))
+    wad_dai = int(Decimal(rad) / Decimal(RAY))
+
+    if (wad_dai * RAY) < rad:
+        wad_dai += 1
+
+    approve_dai = maker.ApproveDAI(spender=ETHAddr.MakerDaiJoin, amount=wad_dai)
+    roles.send([approve_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    join_wipe_all = maker.Join(assetJoin=ETHAddr.MakerDaiJoin, usr=urn_handler, wad=wad_dai)
+    roles.send([join_wipe_all], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    art = vat_contract.functions.urns(ilk, urn_handler).call()[1]
+    frob_wipe_all = maker.Frob(cdp_id=cdp_id, dink=0, dart=-art)
+    roles.send([frob_wipe_all], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == 0
+
+    # freeGem
+    wad_gem = 1000_000_000_000_000_000_000
+    frob_free_gem = maker.Frob(cdp_id=cdp_id, dink=-wad_gem, dart=0)
+    roles.send([frob_free_gem], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    flux = maker.Flux(cdp_id=cdp_id, avatar=safe.address, wad=wad_gem)
+    roles.send([flux], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    exit_free_gem = maker.Exit(assetJoin=gem_join_contract.address, avatar=safe.address, wad=wad_gem)
+    roles.send([exit_free_gem], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    locked_gem = vat_contract.functions.urns(ilk, urn_handler).call()[0]
+    gem_balance = get_balance(w3=w3, token=gem, address=safe.address)
+    assert locked_gem == 0
+    assert gem_balance == wad_gem

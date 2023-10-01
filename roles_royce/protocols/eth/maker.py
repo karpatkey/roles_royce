@@ -1,6 +1,7 @@
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress
 import eth_abi
+from defi_protocols.functions import get_contract
 
 
 #-----------------------------------------------------#
@@ -154,7 +155,7 @@ class Frob(ContractMethod):
     in the cdp depositing the generated DAI or collateral freed 
     in the cdp address"""
     name = "frob"
-    in_signature = [("cdp", "uint256"), ("dink", "uint256"), ("dart", "uint256")]
+    in_signature = [("cdp", "uint256"), ("dink", "int256"), ("dart", "int256")]
     target_address = ETHAddr.MakerCDPManager
 
     def __init__(self, cdp_id: int, dink: int, dart: int):
@@ -191,10 +192,10 @@ class Move(ContractMethod):
     target_address = ETHAddr.MakerCDPManager
     fixed_arguments = {"dst": AvatarAddress}
 
-    def __init__(self, cdp_id: int, avatar: Address, wad: int):
+    def __init__(self, cdp_id: int, avatar: Address, rad: int):
         super().__init__(avatar=avatar)
         self.args.cdp = cdp_id
-        self.args.wad = wad
+        self.args.rad = rad
 
 class Hope(ContractMethod):
     """enable wish for a pair of addresses, where wish checks whether an address
@@ -229,3 +230,25 @@ class Flux(ContractMethod):
         super().__init__(avatar=avatar)
         self.args.cdp = cdp_id
         self.args.wad = wad
+
+# gem_join = get_contract('0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2', 'ethereum')
+# # ilk = bytes.fromhex(gem_join.functions.ilk().call().hex())
+# ilk = gem_join.functions.ilk().call()
+# open = ProxyActionOpen('0xD758500ddEc05172aaA035911387C8E0e789CF6a',  ilk)
+
+# print(open.data)
+
+# eth_join = get_contract('0x2F0b23f53734252Bda2277357e97e1517d6B042A', 'ethereum')
+# ilk = eth_join.functions.ilk().call()
+# lock_eth = ProxyActionLockETH('0xD758500ddEc05172aaA035911387C8E0e789CF6a',  eth_join.address, 31010, 1000000000000000000)
+
+# print(lock_eth.data)
+
+# build = Build()
+# print(build.data)
+
+
+# gem_join = get_contract('0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2', 'ethereum')
+# ilk = gem_join.functions.ilk().call()
+# open = Open(ilk, "0x6cE0F913F035ec6195bC3cE885aec4C66E485BC4")
+# print(open)
