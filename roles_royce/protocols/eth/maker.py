@@ -1,7 +1,6 @@
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress
 import eth_abi
-from defi_protocols.functions import get_contract
 
 
 #-----------------------------------------------------#
@@ -34,7 +33,7 @@ class ApproveDAI(ContractMethod):
         self.args.amount = amount
 
 #-----------------------------------------------------#
-"""CDP Module - Proxy Actions"""
+"""Proxy"""
 #-----------------------------------------------------#
 class Build(ContractMethod):
     """build DSProxy"""
@@ -49,11 +48,11 @@ class ProxyExecute(ContractMethod):
     """execute proxy action"""
     name = "execute"
     in_signature = [("target", "address"), ("data", "bytes")]
-    fixed_arguments = {"target": ETHAddr.MakerProxyActions}
 
-    def __init__(self, proxy: Address, selector: str, action_abi: list, parameters: list, value:int = 0):
+    def __init__(self, proxy: Address, target: Address, selector: str, action_abi: list, parameters: list, value:int = 0):
         super().__init__(value=value)
         self.target_address = proxy
+        self.args.target = target
         self.args.data = self.get_call_data(selector, action_abi, parameters)
 
     def get_call_data(self, selector: str, action_abi: list, parameters: list):
@@ -65,16 +64,19 @@ class _ProxyAction(ProxyExecute):
     selector = None
     action_abi = None
 
-    def __init__(self, proxy: Address, parameters:list, value:int = 0):
-        super().__init__(proxy, self.selector, self.action_abi, parameters, value=value)
+    def __init__(self, proxy: Address, target: Address, parameters:list, value:int = 0):
+        super().__init__(proxy, target, self.selector, self.action_abi, parameters, value=value)
 
+#-----------------------------------------------------#
+"""CDP Module - Proxy Actions"""
+#-----------------------------------------------------#
 class ProxyActionOpen(_ProxyAction):
     """open CDP"""
     selector = "0x6aa3ee11" # open(address,address,bytes32)
     action_abi = ["address", "bytes32", "address"]
 
     def __init__(self, proxy: Address, ilk: str):
-        super().__init__(proxy, [ETHAddr.MakerCDPManager, ilk , proxy])
+        super().__init__(proxy, ETHAddr.MakerProxyActions, [ETHAddr.MakerCDPManager, ilk , proxy])
 
 class ProxyActionLockGem(_ProxyAction):
     """lock gem"""
@@ -82,7 +84,7 @@ class ProxyActionLockGem(_ProxyAction):
     action_abi = ["address", "address", "uint256", "uint256", "bool"]
 
     def __init__(self, proxy: Address, gem_join: Address, cdp_id: int, wad: int, transfer_from: bool = True):
-        super().__init__(proxy, [ETHAddr.MakerCDPManager, gem_join, cdp_id, wad, transfer_from])
+        super().__init__(proxy, ETHAddr.MakerProxyActions, [ETHAddr.MakerCDPManager, gem_join, cdp_id, wad, transfer_from])
 
 class ProxyActionLockETH(_ProxyAction):
     """lock ETH"""
@@ -90,7 +92,7 @@ class ProxyActionLockETH(_ProxyAction):
     action_abi = ["address", "address", "uint256"]
 
     def __init__(self, proxy: Address, eth_join: Address, cdp_id: int, value: int):
-        super().__init__(proxy, [ETHAddr.MakerCDPManager, eth_join, cdp_id], value=value)
+        super().__init__(proxy, ETHAddr.MakerProxyActions, [ETHAddr.MakerCDPManager, eth_join, cdp_id], value=value)
 
 class ProxyActionFreeGem(_ProxyAction):
     """free gem"""
@@ -98,7 +100,7 @@ class ProxyActionFreeGem(_ProxyAction):
     action_abi = ["address", "address", "uint256", "uint256"]
 
     def __init__(self, proxy: Address, gem_join: Address, cdp_id: int, wad: int):
-        super().__init__(proxy, [ETHAddr.MakerCDPManager, gem_join, cdp_id, wad])
+        super().__init__(proxy, ETHAddr.MakerProxyActions, [ETHAddr.MakerCDPManager, gem_join, cdp_id, wad])
 
 class ProxyActionFreeETH(_ProxyAction):
     """free ETH"""
@@ -106,7 +108,7 @@ class ProxyActionFreeETH(_ProxyAction):
     action_abi = ["address", "address", "uint256", "uint256"]
 
     def __init__(self, proxy: Address, eth_join: Address, cdp_id: int, wad: int):
-        super().__init__(proxy, [ETHAddr.MakerCDPManager, eth_join, cdp_id, wad])
+        super().__init__(proxy, ETHAddr.MakerProxyActions, [ETHAddr.MakerCDPManager, eth_join, cdp_id, wad])
 
 class ProxyActionDraw(_ProxyAction):
     """draw DAI (borrow)"""
@@ -114,7 +116,7 @@ class ProxyActionDraw(_ProxyAction):
     action_abi = ["address", "address", "address", "uint256", "uint256"]
 
     def __init__(self, proxy: Address, cdp_id: int, wad: int):
-        super().__init__(proxy, [ETHAddr.MakerCDPManager, ETHAddr.MakerJug, ETHAddr.MakerDaiJoin, cdp_id, wad])
+        super().__init__(proxy, ETHAddr.MakerProxyActions, [ETHAddr.MakerCDPManager, ETHAddr.MakerJug, ETHAddr.MakerDaiJoin, cdp_id, wad])
 
 class ProxyActionWipe(_ProxyAction):
     """wipe DAI (repay)"""
@@ -122,7 +124,7 @@ class ProxyActionWipe(_ProxyAction):
     action_abi = ["address", "address", "uint256", "uint256"]
 
     def __init__(self, proxy: Address, cdp_id: int, wad: int):
-        super().__init__(proxy, [ETHAddr.MakerCDPManager, ETHAddr.MakerDaiJoin, cdp_id, wad])
+        super().__init__(proxy, ETHAddr.MakerProxyActions, [ETHAddr.MakerCDPManager, ETHAddr.MakerDaiJoin, cdp_id, wad])
 
 #-----------------------------------------------------#
 """CDP Module - CDPManager (no Proxy)"""
@@ -231,24 +233,68 @@ class Flux(ContractMethod):
         self.args.cdp = cdp_id
         self.args.wad = wad
 
-# gem_join = get_contract('0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2', 'ethereum')
-# # ilk = bytes.fromhex(gem_join.functions.ilk().call().hex())
-# ilk = gem_join.functions.ilk().call()
-# open = ProxyActionOpen('0xD758500ddEc05172aaA035911387C8E0e789CF6a',  ilk)
+#-----------------------------------------------------#
+"""DSR Module - Proxy Actions DSR"""
+#-----------------------------------------------------#
+class ProxyActionJoinDrs(_ProxyAction):
+    """joins wad amount of DAI token to DaiJoin adapter (burning it) 
+    and moves the balance to Pot for DSR"""
+    selector = "0x9f6c3dbd" # join(address,address,uint256)
+    action_abi = ["address", "address", "uint256"]
 
-# print(open.data)
+    def __init__(self, proxy: Address, wad: str):
+        super().__init__(proxy, ETHAddr.MakerProxyActionsDsr, [ETHAddr.MakerDaiJoin, ETHAddr.MakerPot, wad])
 
-# eth_join = get_contract('0x2F0b23f53734252Bda2277357e97e1517d6B042A', 'ethereum')
-# ilk = eth_join.functions.ilk().call()
-# lock_eth = ProxyActionLockETH('0xD758500ddEc05172aaA035911387C8E0e789CF6a',  eth_join.address, 31010, 1000000000000000000)
+class ProxyActionExitDsr(_ProxyAction):
+    """retrieves wad amount of DAI from Pot and exits DAI token from 
+    DaiJoin adapter (minting it)"""
+    selector = "0x71006c09" # exit(address,address,uint256)
+    action_abi = ["address", "address", "uint256"]
 
-# print(lock_eth.data)
+    def __init__(self, proxy: Address, wad: str):
+        super().__init__(proxy, ETHAddr.MakerProxyActionsDsr, [ETHAddr.MakerDaiJoin, ETHAddr.MakerPot, wad])
 
-# build = Build()
-# print(build.data)
+class ProxyActionExitAllDsr(_ProxyAction):
+    """performs the same actions as exit but for all of the available amount"""
+    selector = "0xc77843b3" # exitAll(address,address)
+    action_abi = ["address", "address"]
 
+    def __init__(self, proxy: Address):
+        super().__init__(proxy, ETHAddr.MakerProxyActionsDsr, [ETHAddr.MakerDaiJoin, ETHAddr.MakerPot])
 
-# gem_join = get_contract('0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2', 'ethereum')
-# ilk = gem_join.functions.ilk().call()
-# open = Open(ilk, "0x6cE0F913F035ec6195bC3cE885aec4C66E485BC4")
-# print(open)
+#-----------------------------------------------------#
+"""DSR Module - DSRManager (no Proxy)"""
+#-----------------------------------------------------#
+class JoinDsr(ContractMethod):
+    """joins wad amount of DAI token to DaiJoin adapter (burning it) 
+    and moves the balance to Pot for DSR"""
+    name = "join"
+    in_signature = [("dst", "address"), ("wad", "uint256")]
+    target_address = ETHAddr.MakerDSRManager
+    fixed_arguments = {"dst": AvatarAddress}
+
+    def __init__(self, avatar: Address, wad: int):
+        super().__init__(avatar=avatar)
+        self.args.wad = wad
+
+class ExitDsr(ContractMethod):
+    """retrieves wad amount of DAI from Pot and exits DAI token from
+    DaiJoin adapter (minting it)"""
+    name = "exit"
+    in_signature = [("dst", "address"), ("wad", "uint256")]
+    target_address = ETHAddr.MakerDSRManager
+    fixed_arguments = {"dst": AvatarAddress}
+
+    def __init__(self, avatar: Address, wad: int):
+        super().__init__(avatar=avatar)
+        self.args.wad = wad
+
+class ExitAllDsr(ContractMethod):
+    """performs the same actions as exit but for all of the available amount"""
+    name = "exitAll"
+    in_signature = [("dst", "address")]
+    target_address = ETHAddr.MakerDSRManager
+    fixed_arguments = {"dst": AvatarAddress}
+
+    def __init__(self, avatar: Address):
+        super().__init__(avatar=avatar)

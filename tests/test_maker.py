@@ -4,6 +4,7 @@ from .roles import setup_common_roles, deploy_roles, apply_presets
 from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from decimal import Decimal
+from pytest import approx
 
 wstETH_JOIN = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2" # GemJoin wstETH
 ABI_GEM_JOIN = '[{"constant":true,"inputs":[],"name":"gem","outputs":[{"internalType":"contract GemLike_3","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"ilk","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"}]'
@@ -11,6 +12,9 @@ ABI_TOKEN = '[{"inputs":[{"internalType":"address","name":"owner","type":"addres
 ABI_CDP_MANAGER = '[{"constant":true,"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"urns","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"}]'
 ABI_VAT = '[{"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"address","name":"","type":"address"}],"name":"urns","outputs":[{"internalType":"uint256","name":"ink","type":"uint256"},{"internalType":"uint256","name":"art","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"ilks","outputs":[{"internalType":"uint256","name":"Art","type":"uint256"},{"internalType":"uint256","name":"rate","type":"uint256"},{"internalType":"uint256","name":"spot","type":"uint256"},{"internalType":"uint256","name":"line","type":"uint256"},{"internalType":"uint256","name":"dust","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"dai","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]'
 ABI_JUG = '[{"constant":false,"inputs":[{"internalType":"bytes32","name":"ilk","type":"bytes32"}],"name":"drip","outputs":[{"internalType":"uint256","name":"rate","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"}]'
+ABI_ROLES = '[{"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"address","name":"_avatar","type":"address"},{"internalType":"address","name":"_target","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"ArraysDifferentLength","type":"error"},{"inputs":[],"name":"ModuleTransactionFailed","type":"error"},{"inputs":[],"name":"NoMembership","type":"error"},{"inputs":[],"name":"SetUpModulesAlreadyCalled","type":"error"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"module","type":"address"},{"indexed":false,"internalType":"uint16[]","name":"roles","type":"uint16[]"},{"indexed":false,"internalType":"bool[]","name":"memberOf","type":"bool[]"}],"name":"AssignRoles","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousAvatar","type":"address"},{"indexed":true,"internalType":"address","name":"newAvatar","type":"address"}],"name":"AvatarSet","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"guard","type":"address"}],"name":"ChangedGuard","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"module","type":"address"}],"name":"DisabledModule","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"module","type":"address"}],"name":"EnabledModule","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"initiator","type":"address"},{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"avatar","type":"address"},{"indexed":false,"internalType":"address","name":"target","type":"address"}],"name":"RolesModSetup","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"module","type":"address"},{"indexed":false,"internalType":"uint16","name":"defaultRole","type":"uint16"}],"name":"SetDefaultRole","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"multisendAddress","type":"address"}],"name":"SetMultisendAddress","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousTarget","type":"address"},{"indexed":true,"internalType":"address","name":"newTarget","type":"address"}],"name":"TargetSet","type":"event"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"enum ExecutionOptions","name":"options","type":"uint8"}],"name":"allowTarget","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"module","type":"address"},{"internalType":"uint16[]","name":"_roles","type":"uint16[]"},{"internalType":"bool[]","name":"memberOf","type":"bool[]"}],"name":"assignRoles","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"avatar","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"defaultRoles","outputs":[{"internalType":"uint16","name":"","type":"uint16"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"prevModule","type":"address"},{"internalType":"address","name":"module","type":"address"}],"name":"disableModule","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"module","type":"address"}],"name":"enableModule","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"}],"name":"execTransactionFromModule","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"}],"name":"execTransactionFromModuleReturnData","outputs":[{"internalType":"bool","name":"","type":"bool"},{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"},{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"bool","name":"shouldRevert","type":"bool"}],"name":"execTransactionWithRole","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"},{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"bool","name":"shouldRevert","type":"bool"}],"name":"execTransactionWithRoleReturnData","outputs":[{"internalType":"bool","name":"success","type":"bool"},{"internalType":"bytes","name":"returnData","type":"bytes"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getGuard","outputs":[{"internalType":"address","name":"_guard","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"start","type":"address"},{"internalType":"uint256","name":"pageSize","type":"uint256"}],"name":"getModulesPaginated","outputs":[{"internalType":"address[]","name":"array","type":"address[]"},{"internalType":"address","name":"next","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"guard","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_module","type":"address"}],"name":"isModuleEnabled","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"multisend","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"}],"name":"revokeTarget","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"enum ExecutionOptions","name":"options","type":"uint8"}],"name":"scopeAllowFunction","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"bool[]","name":"isParamScoped","type":"bool[]"},{"internalType":"enum ParameterType[]","name":"paramType","type":"uint8[]"},{"internalType":"enum Comparison[]","name":"paramComp","type":"uint8[]"},{"internalType":"bytes[]","name":"compValue","type":"bytes[]"},{"internalType":"enum ExecutionOptions","name":"options","type":"uint8"}],"name":"scopeFunction","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"enum ExecutionOptions","name":"options","type":"uint8"}],"name":"scopeFunctionExecutionOptions","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"uint256","name":"paramIndex","type":"uint256"},{"internalType":"enum ParameterType","name":"paramType","type":"uint8"},{"internalType":"enum Comparison","name":"paramComp","type":"uint8"},{"internalType":"bytes","name":"compValue","type":"bytes"}],"name":"scopeParameter","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"uint256","name":"paramIndex","type":"uint256"},{"internalType":"enum ParameterType","name":"paramType","type":"uint8"},{"internalType":"bytes[]","name":"compValues","type":"bytes[]"}],"name":"scopeParameterAsOneOf","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"}],"name":"scopeRevokeFunction","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"}],"name":"scopeTarget","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_avatar","type":"address"}],"name":"setAvatar","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"module","type":"address"},{"internalType":"uint16","name":"role","type":"uint16"}],"name":"setDefaultRole","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_guard","type":"address"}],"name":"setGuard","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_multisend","type":"address"}],"name":"setMultisend","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_target","type":"address"}],"name":"setTarget","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes","name":"initParams","type":"bytes"}],"name":"setUp","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"target","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"uint8","name":"paramIndex","type":"uint8"}],"name":"unscopeParameter","outputs":[],"stateMutability":"nonpayable","type":"function"}]'
+ABI_POT = '[{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"pie","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[],"name":"chi","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]'
+ABI_DSR_MANAGER = '[{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"pieOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]'
 
 
 def test_integration_maker_cdp_module_proxy(local_node, accounts):
@@ -301,3 +305,135 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
     gem_balance = get_balance(w3=w3, token=gem, address=safe.address)
     assert locked_gem == 0
     assert gem_balance == wad_gem
+
+def test_integration_maker_dsr_module_proxy(local_node, accounts):
+    w3 = local_node
+    safe = create_simple_safe(w3=w3, owner=accounts[0])
+    roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
+    setup_common_roles(safe, roles_ctract)
+
+    # Build proxy
+    build_receipt = safe.send([maker.Build()]).receipt
+    for log in build_receipt["logs"]:
+        if log["topics"][0].hex() == "0x259b30ca39885c6d801a0b5dbc988640f3c25e2f37531fe138c5c5af8955d41b": # Created
+            proxy_address = w3.to_checksum_address('0x' + log["data"].hex()[26:66])
+            break
+
+    presets = """{"version": "1.0","chainId": "1","meta":{ "description": "","txBuilderVersion": "1.8.0"},"createdAt": 1695904723785,"transactions": [
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x5e82669500000000000000000000000000000000000000000000000000000000000000010000000000000000000000006b175474e89094c44da98b954eedeac495271d0f","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c00000000000000000000000000000000000000000000000000000000000000010000000000000000000000006b175474e89094c44da98b954eedeac495271d0f095ea7b30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a1cff79cd0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c0000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000007ee93aeea0a36fff2a9b95dd22bd6049ee54f26","value": "0"}
+    ]}"""
+    apply_presets(safe, roles_ctract, json_data=presets, replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:]), ("d758500ddec05172aaa035911387c8e0e789cf6a", proxy_address[2:])])
+
+    # steal DAI
+    steal_token(w3, token=ETHAddr.DAI, holder="0x60FaAe176336dAb62e284Fe19B885B095d29fB7F",
+                to=safe.address, amount=100_000_000_000_000_000_000_000)
+    
+    pot_contract = w3.eth.contract(address=ETHAddr.MakerPot, abi=ABI_POT)
+
+    # approve DAI
+    approve_dai = maker.ApproveDAI(spender=proxy_address, amount=100_000_000_000_000_000_000_000)
+    roles.send([approve_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=ABI_TOKEN)
+    dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
+    assert dai_allowance == 100_000_000_000_000_000_000_000
+
+    # join DAI
+    join_dai = maker.ProxyActionJoinDrs(proxy=proxy_address, wad=100_000_000_000_000_000_000_000)
+    roles.send([join_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == 0
+    pie = pot_contract.functions.pie(proxy_address).call()
+    chi = pot_contract.functions.chi().call() / (10**27)
+    assert pie * chi == approx(100_000_000_000_000_000_000_000)
+
+    # exit DAI
+    exit_dai = maker.ProxyActionExitDsr(proxy=proxy_address, wad=50_000_000_000_000_000_000_000)
+    roles.send([exit_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == approx(50_000_000_000_000_000_000_000)
+    pie = pot_contract.functions.pie(proxy_address).call()
+    chi = pot_contract.functions.chi().call() / (10**27)
+    assert pie * chi == approx(50_000_000_000_000_000_000_000)
+
+    # exitAll DAI
+    exit_all_dai = maker.ProxyActionExitAllDsr(proxy=proxy_address)
+    roles.send([exit_all_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == approx(100_000_000_000_000_000_000_000)
+    pie = pot_contract.functions.pie(proxy_address).call()
+    assert pie == 0
+
+def test_integration_maker_dsr_module_no_proxy(local_node, accounts):
+    w3 = local_node
+    safe = create_simple_safe(w3=w3, owner=accounts[0])
+    roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
+    setup_common_roles(safe, roles_ctract)
+
+    presets = """{"version": "1.0","chainId": "1","meta":{ "description": "","txBuilderVersion": "1.8.0"},"createdAt": 1695904723785,"transactions": [
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x5e82669500000000000000000000000000000000000000000000000000000000000000010000000000000000000000006b175474e89094c44da98b954eedeac495271d0f","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c00000000000000000000000000000000000000000000000000000000000000010000000000000000000000006b175474e89094c44da98b954eedeac495271d0f095ea7b30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000373238337bfe1146fb49989fc222523f83081ddb","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000373238337bfe1146fb49989fc222523f83081ddb","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000373238337bfe1146fb49989fc222523f83081ddb3b4da69f0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000373238337bfe1146fb49989fc222523f83081ddbef693bed0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000373238337bfe1146fb49989fc222523f83081ddbeb0dff660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value": "0"}
+    ]}"""
+    apply_presets(safe, roles_ctract, json_data=presets, replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
+
+    # steal DAI
+    steal_token(w3, token=ETHAddr.DAI, holder="0x60FaAe176336dAb62e284Fe19B885B095d29fB7F",
+                to=safe.address, amount=100_000_000_000_000_000_000_000)
+    
+    dsr_manager_contract = w3.eth.contract(address=ETHAddr.MakerDSRManager, abi=ABI_DSR_MANAGER)
+    pot_contract = w3.eth.contract(address=ETHAddr.MakerPot, abi=ABI_POT)
+
+    # approve DAI
+    approve_dai = maker.ApproveDAI(spender=ETHAddr.MakerDSRManager, amount=100_000_000_000_000_000_000_000)
+    roles.send([approve_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=ABI_TOKEN)
+    dai_allowance = dai_contract.functions.allowance(safe.address, ETHAddr.MakerDSRManager).call()
+    assert dai_allowance == 100_000_000_000_000_000_000_000
+
+    # join DAI
+    join_dai = maker.JoinDsr(avatar=safe.address, wad=100_000_000_000_000_000_000_000)
+    roles.send([join_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == 0
+    pie = dsr_manager_contract.functions.pieOf(safe.address).call()
+    chi = pot_contract.functions.chi().call() / (10**27)
+    assert pie * chi == approx(100_000_000_000_000_000_000_000)
+
+    # exit DAI
+    exit_dai = maker.ExitDsr(avatar=safe.address, wad=50_000_000_000_000_000_000_000)
+    roles.send([exit_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == approx(50_000_000_000_000_000_000_000)
+    pie = dsr_manager_contract.functions.pieOf(safe.address).call()
+    chi = pot_contract.functions.chi().call() / (10**27)
+    assert pie * chi == approx(50_000_000_000_000_000_000_000)
+
+    # exitAll DAI
+    exit_all_dai = maker.ExitAllDsr(avatar=safe.address)
+    roles.send([exit_all_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == approx(100_000_000_000_000_000_000_000)
+    pie = dsr_manager_contract.functions.pieOf(safe.address).call()
+    assert pie == 0
