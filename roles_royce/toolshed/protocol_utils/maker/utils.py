@@ -11,6 +11,16 @@ class MakerUtils:
 
     @staticmethod
     def get_chi(w3: Web3, block: int | str = 'latest') -> int:
+        """
+        Get the chi value from Maker's Pot contract.
+
+        Args:
+            w3 (Web3): Web3 instance.
+            block (int | str, optional): Block number or 'latest'. Defaults to 'latest'.
+
+        Returns:
+            int: chi value.
+        """
         blockchain = Chain.get_blockchain_from_web3(w3)
         maker_pot_contract = w3.eth.contract(address=AddressesAndAbis[blockchain].Pot.address, abi=AddressesAndAbis[blockchain].Pot.abi)
         ts = w3.eth.get_block(block)['timestamp']

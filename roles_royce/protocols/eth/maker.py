@@ -45,7 +45,7 @@ class Build(ContractMethod):
         super().__init__()
 
 class ProxyExecute(ContractMethod):
-    """execute proxy action"""
+    """Execute proxy action"""
     name = "execute"
     in_signature = [("target", "address"), ("data", "bytes")]
 
@@ -56,6 +56,21 @@ class ProxyExecute(ContractMethod):
         self.args.data = self.get_call_data(selector, action_abi, parameters)
 
     def get_call_data(self, selector: str, action_abi: list, parameters: list):
+        """
+        Returns the call data for the proxy action
+
+        Args:
+            selector (str): selector of the action
+            action_abi (list): abi of the action
+            parameters (list): parameters of the action
+
+            e.g.:
+            selector = "0xe205c108" # lockETH(address,address,uint256)
+            action_abi = ["address", "address", "uint256"]
+
+        Returns:
+            str: call data
+        """
         abi_encoded = eth_abi.encode(action_abi, parameters)
         return selector + abi_encoded.hex()
 
