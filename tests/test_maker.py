@@ -9,14 +9,6 @@ from roles_royce.toolshed.protocol_utils.maker.addresses_and_abis import Address
 from roles_royce.constants import Chain
 
 wstETH_JOIN = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH
-ABI_GEM_JOIN = '[{"constant":true,"inputs":[],"name":"gem","outputs":[{"internalType":"contract GemLike_3","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"ilk","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"}]'
-ABI_TOKEN = '[{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]'
-ABI_CDP_MANAGER = '[{"constant":true,"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"urns","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"}]'
-ABI_VAT = '[{"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"address","name":"","type":"address"}],"name":"urns","outputs":[{"internalType":"uint256","name":"ink","type":"uint256"},{"internalType":"uint256","name":"art","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"ilks","outputs":[{"internalType":"uint256","name":"Art","type":"uint256"},{"internalType":"uint256","name":"rate","type":"uint256"},{"internalType":"uint256","name":"spot","type":"uint256"},{"internalType":"uint256","name":"line","type":"uint256"},{"internalType":"uint256","name":"dust","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"dai","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]'
-ABI_JUG = '[{"constant":false,"inputs":[{"internalType":"bytes32","name":"ilk","type":"bytes32"}],"name":"drip","outputs":[{"internalType":"uint256","name":"rate","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"}]'
-ABI_ROLES = '[{"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"address","name":"_avatar","type":"address"},{"internalType":"address","name":"_target","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"ArraysDifferentLength","type":"error"},{"inputs":[],"name":"ModuleTransactionFailed","type":"error"},{"inputs":[],"name":"NoMembership","type":"error"},{"inputs":[],"name":"SetUpModulesAlreadyCalled","type":"error"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"module","type":"address"},{"indexed":false,"internalType":"uint16[]","name":"roles","type":"uint16[]"},{"indexed":false,"internalType":"bool[]","name":"memberOf","type":"bool[]"}],"name":"AssignRoles","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousAvatar","type":"address"},{"indexed":true,"internalType":"address","name":"newAvatar","type":"address"}],"name":"AvatarSet","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"guard","type":"address"}],"name":"ChangedGuard","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"module","type":"address"}],"name":"DisabledModule","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"module","type":"address"}],"name":"EnabledModule","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"initiator","type":"address"},{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"avatar","type":"address"},{"indexed":false,"internalType":"address","name":"target","type":"address"}],"name":"RolesModSetup","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"module","type":"address"},{"indexed":false,"internalType":"uint16","name":"defaultRole","type":"uint16"}],"name":"SetDefaultRole","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"multisendAddress","type":"address"}],"name":"SetMultisendAddress","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousTarget","type":"address"},{"indexed":true,"internalType":"address","name":"newTarget","type":"address"}],"name":"TargetSet","type":"event"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"enum ExecutionOptions","name":"options","type":"uint8"}],"name":"allowTarget","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"module","type":"address"},{"internalType":"uint16[]","name":"_roles","type":"uint16[]"},{"internalType":"bool[]","name":"memberOf","type":"bool[]"}],"name":"assignRoles","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"avatar","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"defaultRoles","outputs":[{"internalType":"uint16","name":"","type":"uint16"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"prevModule","type":"address"},{"internalType":"address","name":"module","type":"address"}],"name":"disableModule","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"module","type":"address"}],"name":"enableModule","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"}],"name":"execTransactionFromModule","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"}],"name":"execTransactionFromModuleReturnData","outputs":[{"internalType":"bool","name":"","type":"bool"},{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"},{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"bool","name":"shouldRevert","type":"bool"}],"name":"execTransactionWithRole","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"},{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"bool","name":"shouldRevert","type":"bool"}],"name":"execTransactionWithRoleReturnData","outputs":[{"internalType":"bool","name":"success","type":"bool"},{"internalType":"bytes","name":"returnData","type":"bytes"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getGuard","outputs":[{"internalType":"address","name":"_guard","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"start","type":"address"},{"internalType":"uint256","name":"pageSize","type":"uint256"}],"name":"getModulesPaginated","outputs":[{"internalType":"address[]","name":"array","type":"address[]"},{"internalType":"address","name":"next","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"guard","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_module","type":"address"}],"name":"isModuleEnabled","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"multisend","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"}],"name":"revokeTarget","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"enum ExecutionOptions","name":"options","type":"uint8"}],"name":"scopeAllowFunction","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"bool[]","name":"isParamScoped","type":"bool[]"},{"internalType":"enum ParameterType[]","name":"paramType","type":"uint8[]"},{"internalType":"enum Comparison[]","name":"paramComp","type":"uint8[]"},{"internalType":"bytes[]","name":"compValue","type":"bytes[]"},{"internalType":"enum ExecutionOptions","name":"options","type":"uint8"}],"name":"scopeFunction","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"enum ExecutionOptions","name":"options","type":"uint8"}],"name":"scopeFunctionExecutionOptions","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"uint256","name":"paramIndex","type":"uint256"},{"internalType":"enum ParameterType","name":"paramType","type":"uint8"},{"internalType":"enum Comparison","name":"paramComp","type":"uint8"},{"internalType":"bytes","name":"compValue","type":"bytes"}],"name":"scopeParameter","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"uint256","name":"paramIndex","type":"uint256"},{"internalType":"enum ParameterType","name":"paramType","type":"uint8"},{"internalType":"bytes[]","name":"compValues","type":"bytes[]"}],"name":"scopeParameterAsOneOf","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"}],"name":"scopeRevokeFunction","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"}],"name":"scopeTarget","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_avatar","type":"address"}],"name":"setAvatar","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"module","type":"address"},{"internalType":"uint16","name":"role","type":"uint16"}],"name":"setDefaultRole","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_guard","type":"address"}],"name":"setGuard","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_multisend","type":"address"}],"name":"setMultisend","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_target","type":"address"}],"name":"setTarget","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes","name":"initParams","type":"bytes"}],"name":"setUp","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"target","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"address","name":"targetAddress","type":"address"},{"internalType":"bytes4","name":"functionSig","type":"bytes4"},{"internalType":"uint8","name":"paramIndex","type":"uint8"}],"name":"unscopeParameter","outputs":[],"stateMutability":"nonpayable","type":"function"}]'
-ABI_POT = '[{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"pie","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[],"name":"chi","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]'
-ABI_DSR_MANAGER = '[{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"pieOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]'
 
 
 def test_integration_maker_cdp_module_proxy(local_node, accounts):
@@ -32,7 +24,7 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
             proxy_address = w3.to_checksum_address('0x' + log["data"].hex()[26:66])
             break
 
-    gem_join_contract = w3.eth.contract(address=wstETH_JOIN, abi=ABI_GEM_JOIN)
+    gem_join_contract = w3.eth.contract(address=wstETH_JOIN, abi=AddressesAndAbis[Chain.Ethereum].GemJoin.abi)
     gem = gem_join_contract.functions.gem().call()
     ilk = gem_join_contract.functions.ilk().call()
 
@@ -58,7 +50,7 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
                roles_mod_address=roles_ctract.address,
                web3=w3)
 
-    gem_contract = w3.eth.contract(address=gem, abi=ABI_TOKEN)
+    gem_contract = w3.eth.contract(address=gem, abi=AddressesAndAbis[Chain.Ethereum].ERC20.abi)
     gem_allowance = gem_contract.functions.allowance(safe.address, proxy_address).call()
     assert gem_allowance == 1000_000_000_000_000_000_000
 
@@ -83,9 +75,9 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
     roles.send([lock_gem], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    cdp_manager_contract = w3.eth.contract(address=ETHAddr.MakerCDPManager, abi=ABI_CDP_MANAGER)
+    cdp_manager_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].CdpManager.address, abi=AddressesAndAbis[Chain.Ethereum].CdpManager.abi)
     urn_handler = cdp_manager_contract.functions.urns(cdp_id).call()
-    vat_contract = w3.eth.contract(address=ETHAddr.MakerVat, abi=ABI_VAT)
+    vat_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].Vat.address, abi=AddressesAndAbis[Chain.Ethereum].Vat.abi)
     locked_gem = vat_contract.functions.urns(ilk, urn_handler).call()[0]
     assert locked_gem == 1000_000_000_000_000_000_000
 
@@ -102,7 +94,7 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=ABI_TOKEN)
+    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=AddressesAndAbis[Chain.Ethereum].ERC20.abi)
     dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
 
@@ -130,7 +122,7 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
 
-    gem_join_contract = w3.eth.contract(address=wstETH_JOIN, abi=ABI_GEM_JOIN)
+    gem_join_contract = w3.eth.contract(address=wstETH_JOIN, abi=AddressesAndAbis[Chain.Ethereum].GemJoin.abi)
     gem = gem_join_contract.functions.gem().call()
     ilk = gem_join_contract.functions.ilk().call()
 
@@ -169,7 +161,7 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
                roles_mod_address=roles_ctract.address,
                web3=w3)
 
-    gem_contract = w3.eth.contract(address=gem, abi=ABI_TOKEN)
+    gem_contract = w3.eth.contract(address=gem, abi=AddressesAndAbis[Chain.Ethereum].ERC20.abi)
     gem_allowance = gem_contract.functions.allowance(safe.address, gem_join_contract.address).call()
     assert gem_allowance == 1000_000_000_000_000_000_000
 
@@ -190,7 +182,7 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
 
     # lockGem
     wad_gem = 1000_000_000_000_000_000_000
-    cdp_manager_contract = w3.eth.contract(address=ETHAddr.MakerCDPManager, abi=ABI_CDP_MANAGER)
+    cdp_manager_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].CdpManager.address, abi=AddressesAndAbis[Chain.Ethereum].CdpManager.abi)
     urn_handler = cdp_manager_contract.functions.urns(cdp_id).call()
     join_lock_gem = maker.Join(assetJoin=gem_join_contract.address, usr=urn_handler, wad=wad_gem)
     roles.send([join_lock_gem], role=1, private_key=accounts[1].key,
@@ -200,14 +192,14 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
     roles.send([frob_lock_gem], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    vat_contract = w3.eth.contract(address=ETHAddr.MakerVat, abi=ABI_VAT)
+    vat_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].Vat.address, abi=AddressesAndAbis[Chain.Ethereum].Vat.abi)
     locked_gem = vat_contract.functions.urns(ilk, urn_handler).call()[0]
     assert locked_gem == wad_gem
 
     # draw DAI
     RAY = 10 ** 27
     wad_dai = 100_000_000_000_000_000_000_000
-    jug_contract = w3.eth.contract(address=ETHAddr.MakerJug, abi=ABI_JUG)
+    jug_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].Jug.address, abi=AddressesAndAbis[Chain.Ethereum].Jug.abi)
     drip = maker.Drip(ilk=ilk)
     roles.send([drip], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
@@ -237,7 +229,7 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
     roles.send([hope], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    exit_draw = maker.Exit(assetJoin=ETHAddr.MakerDaiJoin, avatar=safe.address, wad=wad_dai)
+    exit_draw = maker.Exit(assetJoin=AddressesAndAbis[Chain.Ethereum].DaiJoin.address, avatar=safe.address, wad=wad_dai)
     roles.send([exit_draw], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
@@ -246,11 +238,11 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
 
     # wipeDAI / repayDAI
     wad_dai = 50_000_000_000_000_000_000_000
-    approve_dai = maker.ApproveDAI(spender=ETHAddr.MakerDaiJoin, amount=wad_dai)
+    approve_dai = maker.ApproveDAI(spender=AddressesAndAbis[Chain.Ethereum].DaiJoin.address, amount=wad_dai)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    join_wipe = maker.Join(assetJoin=ETHAddr.MakerDaiJoin, usr=urn_handler, wad=wad_dai)
+    join_wipe = maker.Join(assetJoin=AddressesAndAbis[Chain.Ethereum].DaiJoin.address, usr=urn_handler, wad=wad_dai)
     roles.send([join_wipe], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
@@ -281,11 +273,11 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
     if (wad_dai * RAY) < rad:
         wad_dai += 1
 
-    approve_dai = maker.ApproveDAI(spender=ETHAddr.MakerDaiJoin, amount=wad_dai)
+    approve_dai = maker.ApproveDAI(spender=AddressesAndAbis[Chain.Ethereum].DaiJoin.address, amount=wad_dai)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    join_wipe_all = maker.Join(assetJoin=ETHAddr.MakerDaiJoin, usr=urn_handler, wad=wad_dai)
+    join_wipe_all = maker.Join(assetJoin=AddressesAndAbis[Chain.Ethereum].DaiJoin.address, usr=urn_handler, wad=wad_dai)
     roles.send([join_wipe_all], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
@@ -344,14 +336,14 @@ def test_integration_maker_dsr_module_proxy(local_node, accounts):
     steal_token(w3, token=ETHAddr.DAI, holder="0x60FaAe176336dAb62e284Fe19B885B095d29fB7F",
                 to=safe.address, amount=100_000_000_000_000_000_000_000)
 
-    pot_contract = w3.eth.contract(address=ETHAddr.MakerPot, abi=ABI_POT)
+    pot_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].Pot.address, abi=AddressesAndAbis[Chain.Ethereum].Pot.abi)
 
     # approve DAI
     approve_dai = maker.ApproveDAI(spender=proxy_address, amount=100_000_000_000_000_000_000_000)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=ABI_TOKEN)
+    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=AddressesAndAbis[Chain.Ethereum].ERC20.abi)
     dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
 
@@ -411,15 +403,15 @@ def test_integration_maker_dsr_module_no_proxy(local_node, accounts):
 
     dsr_manager_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].DsrManager.address,
                                            abi=AddressesAndAbis[Chain.Ethereum].DsrManager.abi)
-    pot_contract = w3.eth.contract(address=ETHAddr.MakerPot, abi=ABI_POT)
+    pot_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].Pot.address, abi=AddressesAndAbis[Chain.Ethereum].Pot.abi)
 
     # approve DAI
-    approve_dai = maker.ApproveDAI(spender=ETHAddr.MakerDSRManager, amount=100_000_000_000_000_000_000_000)
+    approve_dai = maker.ApproveDAI(spender=AddressesAndAbis[Chain.Ethereum].DsrManager.address, amount=100_000_000_000_000_000_000_000)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=ABI_TOKEN)
-    dai_allowance = dai_contract.functions.allowance(safe.address, ETHAddr.MakerDSRManager).call()
+    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=AddressesAndAbis[Chain.Ethereum].ERC20.abi)
+    dai_allowance = dai_contract.functions.allowance(safe.address, AddressesAndAbis[Chain.Ethereum].DsrManager.address).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
 
     # join DAI
