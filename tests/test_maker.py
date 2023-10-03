@@ -5,8 +5,10 @@ from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from decimal import Decimal
 from pytest import approx
+from roles_royce.toolshed.protocol_utils.maker.addresses_and_abis import AddressesAndAbis
+from roles_royce.constants import Chain
 
-wstETH_JOIN = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2" # GemJoin wstETH
+wstETH_JOIN = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH
 ABI_GEM_JOIN = '[{"constant":true,"inputs":[],"name":"gem","outputs":[{"internalType":"contract GemLike_3","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"ilk","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"}]'
 ABI_TOKEN = '[{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]'
 ABI_CDP_MANAGER = '[{"constant":true,"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"urns","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"}]'
@@ -26,7 +28,7 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
     # Build proxy
     build_receipt = safe.send([maker.Build()]).receipt
     for log in build_receipt["logs"]:
-        if log["topics"][0].hex() == "0x259b30ca39885c6d801a0b5dbc988640f3c25e2f37531fe138c5c5af8955d41b": # Created
+        if log["topics"][0].hex() == "0x259b30ca39885c6d801a0b5dbc988640f3c25e2f37531fe138c5c5af8955d41b":  # Created
             proxy_address = w3.to_checksum_address('0x' + log["data"].hex()[26:66])
             break
 
@@ -42,7 +44,10 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a","value": "0"},
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a1cff79cd0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c0000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000082ecd135dce65fbc6dbdd0e4237e0af93ffd5038","value": "0"}
     ]}"""
-    apply_presets(safe, roles_ctract, json_data=presets, replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:]), ("c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", gem[2:]), ("d758500ddec05172aaa035911387c8e0e789cf6a", proxy_address[2:])])
+    apply_presets(safe, roles_ctract, json_data=presets,
+                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:]),
+                            ("c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", gem[2:]),
+                            ("d758500ddec05172aaa035911387c8e0e789cf6a", proxy_address[2:])])
 
     # steal wstETH
     steal_token(w3, token=ETHAddr.wstETH, holder="0x6cE0F913F035ec6195bC3cE885aec4C66E485BC4",
@@ -50,9 +55,9 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
     # approve gem
     approve_gem = maker.ApproveGem(gem=gem, spender=proxy_address, amount=1000_000_000_000_000_000_000)
     roles.send([approve_gem], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
-    
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
+
     gem_contract = w3.eth.contract(address=gem, abi=ABI_TOKEN)
     gem_allowance = gem_contract.functions.allowance(safe.address, proxy_address).call()
     assert gem_allowance == 1000_000_000_000_000_000_000
@@ -60,23 +65,24 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
     # open cdp
     open_cdp = maker.ProxyActionOpen(proxy=proxy_address, ilk=ilk)
     send_open_cdp = roles.send([open_cdp], role=1, private_key=accounts[1].key,
-                                roles_mod_address=roles_ctract.address,
-                                web3=w3)
+                               roles_mod_address=roles_ctract.address,
+                               web3=w3)
 
     cdp_id = None
     for log in send_open_cdp["logs"]:
-        if log["topics"][0].hex() == "0xd6be0bc178658a382ff4f91c8c68b542aa6b71685b8fe427966b87745c3ea7a2": # NewCdp
+        if log["topics"][0].hex() == "0xd6be0bc178658a382ff4f91c8c68b542aa6b71685b8fe427966b87745c3ea7a2":  # NewCdp
             cdp_id = int(log["topics"][3].hex(), 16)
             # print('CDP ID: ', cdp_id)
             break
-    
+
     assert cdp_id
 
     # lockGem
-    lock_gem = maker.ProxyActionLockGem(proxy=proxy_address, gem_join=wstETH_JOIN, cdp_id=cdp_id, wad=1000_000_000_000_000_000_000)
+    lock_gem = maker.ProxyActionLockGem(proxy=proxy_address, gem_join=wstETH_JOIN, cdp_id=cdp_id,
+                                        wad=1000_000_000_000_000_000_000)
     roles.send([lock_gem], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     cdp_manager_contract = w3.eth.contract(address=ETHAddr.MakerCDPManager, abi=ABI_CDP_MANAGER)
     urn_handler = cdp_manager_contract.functions.urns(cdp_id).call()
     vat_contract = w3.eth.contract(address=ETHAddr.MakerVat, abi=ABI_VAT)
@@ -86,16 +92,16 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
     # draw DAI
     draw_dai = maker.ProxyActionDraw(proxy=proxy_address, cdp_id=cdp_id, wad=100_000_000_000_000_000_000_000)
     roles.send([draw_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     assert dai_balance == 100_000_000_000_000_000_000_000
 
     # approve DAI
     approve_dai = maker.ApproveDAI(spender=proxy_address, amount=100_000_000_000_000_000_000_000)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=ABI_TOKEN)
     dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
@@ -103,16 +109,17 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
     # wipe DAI
     wipe_dai = maker.ProxyActionWipe(proxy=proxy_address, cdp_id=cdp_id, wad=100_000_000_000_000_000_000_000)
     roles.send([wipe_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     assert dai_balance == 0
 
     # freeGem
-    free_gem = maker.ProxyActionFreeGem(proxy=proxy_address, gem_join=wstETH_JOIN, cdp_id=cdp_id, wad=1000_000_000_000_000_000_000)
+    free_gem = maker.ProxyActionFreeGem(proxy=proxy_address, gem_join=wstETH_JOIN, cdp_id=cdp_id,
+                                        wad=1000_000_000_000_000_000_000)
     roles.send([free_gem], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     locked_gem = vat_contract.functions.urns(ilk, urn_handler).call()[0]
     assert locked_gem == 0
 
@@ -148,7 +155,10 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x5e826695000000000000000000000000000000000000000000000000000000000000000100000000000000000000000035d1b3f3d7966a1dfe207aa4514c12a259a0492b","value": "0"},
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c000000000000000000000000000000000000000000000000000000000000000100000000000000000000000035d1b3f3d7966a1dfe207aa4514c12a259a0492ba3b22fc40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000200000000000000000000000009759a6ac90977b93b58547b4a71c78317f391a28","value": "0"}
     ]}"""
-    apply_presets(safe, roles_ctract, json_data=presets, replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:]), ("7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0", gem[2:]), ("10cd5fbe1b404b7e19ef964b63939907bdaf42e2", gem_join_contract.address[2:])])
+    apply_presets(safe, roles_ctract, json_data=presets,
+                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:]),
+                            ("7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0", gem[2:]),
+                            ("10cd5fbe1b404b7e19ef964b63939907bdaf42e2", gem_join_contract.address[2:])])
 
     # steal wstETH
     steal_token(w3, token=ETHAddr.wstETH, holder="0x6cE0F913F035ec6195bC3cE885aec4C66E485BC4",
@@ -156,26 +166,26 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
     # approve gem
     approve_gem = maker.ApproveGem(gem=gem, spender=gem_join_contract.address, amount=1000_000_000_000_000_000_000)
     roles.send([approve_gem], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
-    
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
+
     gem_contract = w3.eth.contract(address=gem, abi=ABI_TOKEN)
     gem_allowance = gem_contract.functions.allowance(safe.address, gem_join_contract.address).call()
     assert gem_allowance == 1000_000_000_000_000_000_000
-    
+
     # open cdp
     open_cdp = maker.Open(ilk=ilk, avatar=safe.address)
     send_open_cdp = roles.send([open_cdp], role=1, private_key=accounts[1].key,
-                                roles_mod_address=roles_ctract.address,
-                                web3=w3)
+                               roles_mod_address=roles_ctract.address,
+                               web3=w3)
 
     cdp_id = None
     for log in send_open_cdp["logs"]:
-        if log["topics"][0].hex() == "0xd6be0bc178658a382ff4f91c8c68b542aa6b71685b8fe427966b87745c3ea7a2": # NewCdp
+        if log["topics"][0].hex() == "0xd6be0bc178658a382ff4f91c8c68b542aa6b71685b8fe427966b87745c3ea7a2":  # NewCdp
             cdp_id = int(log["topics"][3].hex(), 16)
             # print('CDP ID: ', cdp_id)
             break
-    
+
     assert cdp_id
 
     # lockGem
@@ -184,24 +194,24 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
     urn_handler = cdp_manager_contract.functions.urns(cdp_id).call()
     join_lock_gem = maker.Join(assetJoin=gem_join_contract.address, usr=urn_handler, wad=wad_gem)
     roles.send([join_lock_gem], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     frob_lock_gem = maker.Frob(cdp_id=cdp_id, dink=wad_gem, dart=0)
     roles.send([frob_lock_gem], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     vat_contract = w3.eth.contract(address=ETHAddr.MakerVat, abi=ABI_VAT)
     locked_gem = vat_contract.functions.urns(ilk, urn_handler).call()[0]
     assert locked_gem == wad_gem
 
     # draw DAI
-    RAY = 10**27
+    RAY = 10 ** 27
     wad_dai = 100_000_000_000_000_000_000_000
     jug_contract = w3.eth.contract(address=ETHAddr.MakerJug, abi=ABI_JUG)
     drip = maker.Drip(ilk=ilk)
     roles.send([drip], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     rate_jug = jug_contract.functions.drip(ilk).call()
     rate_vat = vat_contract.functions.ilks(ilk).call()[1]
     assert rate_jug == rate_vat
@@ -212,25 +222,25 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
         dart = int(((Decimal(RAY) * Decimal(wad_dai)) - urn_dai) / Decimal(rate_jug))
         if dart * rate_jug < RAY * wad_dai:
             dart += 1
-    
+
     frob_draw = maker.Frob(cdp_id=cdp_id, dink=0, dart=dart)
     roles.send([frob_draw], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     # variable that has 45 decimal places
-    rad = wad_dai * 10**27 # 45 = 18 + 27
+    rad = wad_dai * 10 ** 27  # 45 = 18 + 27
     move = maker.Move(cdp_id=cdp_id, avatar=safe.address, rad=rad)
     roles.send([move], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     hope = maker.Hope()
     roles.send([hope], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     exit_draw = maker.Exit(assetJoin=ETHAddr.MakerDaiJoin, avatar=safe.address, wad=wad_dai)
     roles.send([exit_draw], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     assert dai_balance == wad_dai
 
@@ -238,12 +248,12 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
     wad_dai = 50_000_000_000_000_000_000_000
     approve_dai = maker.ApproveDAI(spender=ETHAddr.MakerDaiJoin, amount=wad_dai)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     join_wipe = maker.Join(assetJoin=ETHAddr.MakerDaiJoin, usr=urn_handler, wad=wad_dai)
     roles.send([join_wipe], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     rate = vat_contract.functions.ilks(ilk).call()[1]
     art = vat_contract.functions.urns(ilk, urn_handler).call()[1]
     urn_dai = vat_contract.functions.dai(urn_handler).call()
@@ -253,11 +263,11 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
         dart = -dart
     else:
         dart = -int(art)
-    
+
     frob_wipe = maker.Frob(cdp_id=cdp_id, dink=0, dart=dart)
     roles.send([frob_wipe], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     assert dai_balance == wad_dai
 
@@ -273,17 +283,17 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
 
     approve_dai = maker.ApproveDAI(spender=ETHAddr.MakerDaiJoin, amount=wad_dai)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     join_wipe_all = maker.Join(assetJoin=ETHAddr.MakerDaiJoin, usr=urn_handler, wad=wad_dai)
     roles.send([join_wipe_all], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     art = vat_contract.functions.urns(ilk, urn_handler).call()[1]
     frob_wipe_all = maker.Frob(cdp_id=cdp_id, dink=0, dart=-art)
     roles.send([frob_wipe_all], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     assert dai_balance == 0
 
@@ -291,20 +301,21 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
     wad_gem = 1000_000_000_000_000_000_000
     frob_free_gem = maker.Frob(cdp_id=cdp_id, dink=-wad_gem, dart=0)
     roles.send([frob_free_gem], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     flux = maker.Flux(cdp_id=cdp_id, avatar=safe.address, wad=wad_gem)
     roles.send([flux], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     exit_free_gem = maker.Exit(assetJoin=gem_join_contract.address, avatar=safe.address, wad=wad_gem)
     roles.send([exit_free_gem], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     locked_gem = vat_contract.functions.urns(ilk, urn_handler).call()[0]
     gem_balance = get_balance(w3=w3, token=gem, address=safe.address)
     assert locked_gem == 0
     assert gem_balance == wad_gem
+
 
 def test_integration_maker_dsr_module_proxy(local_node, accounts):
     w3 = local_node
@@ -315,7 +326,7 @@ def test_integration_maker_dsr_module_proxy(local_node, accounts):
     # Build proxy
     build_receipt = safe.send([maker.Build()]).receipt
     for log in build_receipt["logs"]:
-        if log["topics"][0].hex() == "0x259b30ca39885c6d801a0b5dbc988640f3c25e2f37531fe138c5c5af8955d41b": # Created
+        if log["topics"][0].hex() == "0x259b30ca39885c6d801a0b5dbc988640f3c25e2f37531fe138c5c5af8955d41b":  # Created
             proxy_address = w3.to_checksum_address('0x' + log["data"].hex()[26:66])
             break
 
@@ -325,19 +336,21 @@ def test_integration_maker_dsr_module_proxy(local_node, accounts):
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a","value": "0"},
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a1cff79cd0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c0000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000007ee93aeea0a36fff2a9b95dd22bd6049ee54f26","value": "0"}
     ]}"""
-    apply_presets(safe, roles_ctract, json_data=presets, replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:]), ("d758500ddec05172aaa035911387c8e0e789cf6a", proxy_address[2:])])
+    apply_presets(safe, roles_ctract, json_data=presets,
+                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:]),
+                            ("d758500ddec05172aaa035911387c8e0e789cf6a", proxy_address[2:])])
 
     # steal DAI
     steal_token(w3, token=ETHAddr.DAI, holder="0x60FaAe176336dAb62e284Fe19B885B095d29fB7F",
                 to=safe.address, amount=100_000_000_000_000_000_000_000)
-    
+
     pot_contract = w3.eth.contract(address=ETHAddr.MakerPot, abi=ABI_POT)
 
     # approve DAI
     approve_dai = maker.ApproveDAI(spender=proxy_address, amount=100_000_000_000_000_000_000_000)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=ABI_TOKEN)
     dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
@@ -345,34 +358,35 @@ def test_integration_maker_dsr_module_proxy(local_node, accounts):
     # join DAI
     join_dai = maker.ProxyActionJoinDrs(proxy=proxy_address, wad=100_000_000_000_000_000_000_000)
     roles.send([join_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     assert dai_balance == 0
     pie = pot_contract.functions.pie(proxy_address).call()
-    chi = pot_contract.functions.chi().call() / (10**27)
+    chi = pot_contract.functions.chi().call() / (10 ** 27)
     assert pie * chi == approx(100_000_000_000_000_000_000_000)
 
     # exit DAI
     exit_dai = maker.ProxyActionExitDsr(proxy=proxy_address, wad=50_000_000_000_000_000_000_000)
     roles.send([exit_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     assert dai_balance == approx(50_000_000_000_000_000_000_000)
     pie = pot_contract.functions.pie(proxy_address).call()
-    chi = pot_contract.functions.chi().call() / (10**27)
+    chi = pot_contract.functions.chi().call() / (10 ** 27)
     assert pie * chi == approx(50_000_000_000_000_000_000_000)
 
     # exitAll DAI
     exit_all_dai = maker.ProxyActionExitAllDsr(proxy=proxy_address)
     roles.send([exit_all_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     assert dai_balance == approx(100_000_000_000_000_000_000_000)
     pie = pot_contract.functions.pie(proxy_address).call()
     assert pie == 0
+
 
 def test_integration_maker_dsr_module_no_proxy(local_node, accounts):
     w3 = local_node
@@ -388,20 +402,22 @@ def test_integration_maker_dsr_module_no_proxy(local_node, accounts):
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000373238337bfe1146fb49989fc222523f83081ddbef693bed0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value": "0"},
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000373238337bfe1146fb49989fc222523f83081ddbeb0dff660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value": "0"}
     ]}"""
-    apply_presets(safe, roles_ctract, json_data=presets, replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
+    apply_presets(safe, roles_ctract, json_data=presets,
+                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
 
     # steal DAI
     steal_token(w3, token=ETHAddr.DAI, holder="0x60FaAe176336dAb62e284Fe19B885B095d29fB7F",
                 to=safe.address, amount=100_000_000_000_000_000_000_000)
-    
-    dsr_manager_contract = w3.eth.contract(address=ETHAddr.MakerDSRManager, abi=ABI_DSR_MANAGER)
+
+    dsr_manager_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].DsrManager.address,
+                                           abi=AddressesAndAbis[Chain.Ethereum].DsrManager.abi)
     pot_contract = w3.eth.contract(address=ETHAddr.MakerPot, abi=ABI_POT)
 
     # approve DAI
     approve_dai = maker.ApproveDAI(spender=ETHAddr.MakerDSRManager, amount=100_000_000_000_000_000_000_000)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=ABI_TOKEN)
     dai_allowance = dai_contract.functions.allowance(safe.address, ETHAddr.MakerDSRManager).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
@@ -409,30 +425,30 @@ def test_integration_maker_dsr_module_no_proxy(local_node, accounts):
     # join DAI
     join_dai = maker.JoinDsr(avatar=safe.address, wad=100_000_000_000_000_000_000_000)
     roles.send([join_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     assert dai_balance == 0
     pie = dsr_manager_contract.functions.pieOf(safe.address).call()
-    chi = pot_contract.functions.chi().call() / (10**27)
+    chi = pot_contract.functions.chi().call() / (10 ** 27)
     assert pie * chi == approx(100_000_000_000_000_000_000_000)
 
     # exit DAI
     exit_dai = maker.ExitDsr(avatar=safe.address, wad=50_000_000_000_000_000_000_000)
     roles.send([exit_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     assert dai_balance == approx(50_000_000_000_000_000_000_000)
     pie = dsr_manager_contract.functions.pieOf(safe.address).call()
-    chi = pot_contract.functions.chi().call() / (10**27)
+    chi = pot_contract.functions.chi().call() / (10 ** 27)
     assert pie * chi == approx(50_000_000_000_000_000_000_000)
 
     # exitAll DAI
     exit_all_dai = maker.ExitAllDsr(avatar=safe.address)
     roles.send([exit_all_dai], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+               roles_mod_address=roles_ctract.address,
+               web3=w3)
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     assert dai_balance == approx(100_000_000_000_000_000_000_000)
     pie = dsr_manager_contract.functions.pieOf(safe.address).call()
