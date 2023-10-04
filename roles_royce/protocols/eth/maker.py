@@ -153,6 +153,70 @@ class ProxyActionWipe(_ProxyAction):
     def __init__(self, proxy: Address, cdp_id: int, wad: int):
         super().__init__(proxy, AddressesAndAbis[Chain.Ethereum].ProxyActions.address, [AddressesAndAbis[Chain.Ethereum].CdpManager.address, AddressesAndAbis[Chain.Ethereum].DaiJoin.address, cdp_id, wad])
 
+class ProxyActionLockGemAndDraw(_ProxyAction):
+    """combines lockGem and draw"""
+    selector = "0xcbd4be3f" # lockGemAndDraw(address,address,address,address,uint256,uint256,uint256,bool)
+    action_abi = ["address", "address", "address", "address", "uint256", "uint256", "uint256", "bool"]
+
+    def __init__(self, proxy: Address, gem_join: Address, cdp_id: int, wad_c: int, wad_d:int, transfer_from: bool = True):
+        super().__init__(proxy, AddressesAndAbis[Chain.Ethereum].ProxyActions.address, [AddressesAndAbis[Chain.Ethereum].CdpManager.address, AddressesAndAbis[Chain.Ethereum].Jug.address, gem_join, AddressesAndAbis[Chain.Ethereum].DaiJoin.address, cdp_id, wad_c, wad_d, transfer_from])
+
+class ProxyActionLockETHAndDraw(_ProxyAction):
+    """combines lockETH and draw"""
+    selector = "0x1c02d846" # lockETHAndDraw(address,address,address,address,uint256,uint256)
+    action_abi = ["address", "address", "address", "address", "uint256", "uint256"]
+
+    def __init__(self, proxy: Address, eth_join: Address, cdp_id: int, wad_d:int, value: int):
+        super().__init__(proxy, AddressesAndAbis[Chain.Ethereum].ProxyActions.address, [AddressesAndAbis[Chain.Ethereum].CdpManager.address, AddressesAndAbis[Chain.Ethereum].Jug.address, eth_join, AddressesAndAbis[Chain.Ethereum].DaiJoin.address, cdp_id, wad_d], value=value)
+
+class ProxyActionOpenLockGemAndDraw(_ProxyAction):
+    """combines open, lockGem and draw"""
+    selector = "0xdb802a32" # openLockGemAndDraw(address,address,address,address,bytes32,uint256,uint256,bool)
+    action_abi = ["address", "address", "address", "address", "bytes32", "uint256", "uint256", "bool"]
+
+    def __init__(self, proxy: Address, gem_join: Address, ilk: str, wad_c: int, wad_d:int, transfer_from: bool = True):
+        super().__init__(proxy, AddressesAndAbis[Chain.Ethereum].ProxyActions.address, [AddressesAndAbis[Chain.Ethereum].CdpManager.address, AddressesAndAbis[Chain.Ethereum].Jug.address, gem_join, AddressesAndAbis[Chain.Ethereum].DaiJoin.address, ilk, wad_c, wad_d, transfer_from])
+
+class ProxyActionOpenLockETHAndDraw(_ProxyAction):
+    """combines open, lockETH and draw"""
+    selector = "0xe685cc04" # openLockETHAndDraw(address,address,address,address,bytes32,uint256)
+    action_abi = ["address", "address", "address", "address", "bytes32", "uint256"]
+
+    def __init__(self, proxy: Address, eth_join: Address, ilk: str, wad_d: int, value:int):
+        super().__init__(proxy, AddressesAndAbis[Chain.Ethereum].ProxyActions.address, [AddressesAndAbis[Chain.Ethereum].CdpManager.address, AddressesAndAbis[Chain.Ethereum].Jug.address, eth_join, AddressesAndAbis[Chain.Ethereum].DaiJoin.address, ilk, wad_d], value=value)
+
+class ProxyActionWipeAndFreeGem(_ProxyAction):
+    """combines wipe and freeGem"""
+    selector = "0xcbd4be3f" # wipeAndFreeGem(address,address,address,uint256,uint256,uint256)
+    action_abi = ["address", "address", "address", "uint256", "uint256", "uint256"]
+
+    def __init__(self, proxy: Address, gem_join: Address, cdp_id: int, wad_c: int, wad_d:int):
+        super().__init__(proxy, AddressesAndAbis[Chain.Ethereum].ProxyActions.address, [AddressesAndAbis[Chain.Ethereum].CdpManager.address, gem_join, AddressesAndAbis[Chain.Ethereum].DaiJoin.address, cdp_id, wad_c, wad_d])
+
+class ProxyActionWipeAndFreeETH(_ProxyAction):
+    """combines wipe and freeETH"""
+    selector = "0xbe5e6c03" # wipeAndFreeETH(address,address,address,uint256,uint256,uint256)
+    action_abi = ["address", "address", "address", "uint256", "uint256", "uint256"]
+
+    def __init__(self, proxy: Address, eth_join: Address, cdp_id: int, wad_c: int, wad_d:int):
+        super().__init__(proxy, AddressesAndAbis[Chain.Ethereum].ProxyActions.address, [AddressesAndAbis[Chain.Ethereum].CdpManager.address, eth_join, AddressesAndAbis[Chain.Ethereum].DaiJoin.address, cdp_id, wad_c, wad_d])
+
+class ProxyActionWipeAllAndFreeGem(_ProxyAction):
+    """combines wipeAll and freeGem"""
+    selector = "0xbcd6deec" # wipeAllAndFreeGem(address,address,address,uint256,uint256)
+    action_abi = ["address", "address", "address", "uint256", "uint256"]
+
+    def __init__(self, proxy: Address, gem_join: Address, cdp_id: int, wad_c: int):
+        super().__init__(proxy, AddressesAndAbis[Chain.Ethereum].ProxyActions.address, [AddressesAndAbis[Chain.Ethereum].CdpManager.address, gem_join, AddressesAndAbis[Chain.Ethereum].DaiJoin.address, cdp_id, wad_c])
+
+class ProxyActionWipeAllAndFreeETH(_ProxyAction):
+    """combines wipeAll and freeETH"""
+    selector = "0x6d68b70b" # wipeAllAndFreeETH(address,address,address,uint256,uint256)
+    action_abi = ["address", "address", "address", "uint256", "uint256"]
+
+    def __init__(self, proxy: Address, eth_join: Address, cdp_id: int, wad_c: int):
+        super().__init__(proxy, AddressesAndAbis[Chain.Ethereum].ProxyActions.address, [AddressesAndAbis[Chain.Ethereum].CdpManager.address, eth_join, AddressesAndAbis[Chain.Ethereum].DaiJoin.address, cdp_id, wad_c])
+
 #-----------------------------------------------------#
 """CDP Module - CDPManager (no Proxy)"""
 #-----------------------------------------------------#
@@ -269,7 +333,7 @@ class ProxyActionJoinDrs(_ProxyAction):
     selector = "0x9f6c3dbd" # join(address,address,uint256)
     action_abi = ["address", "address", "uint256"]
 
-    def __init__(self, proxy: Address, wad: str):
+    def __init__(self, proxy: Address, wad: int):
         super().__init__(proxy, AddressesAndAbis[Chain.Ethereum].ProxyActionsDsr.address, [AddressesAndAbis[Chain.Ethereum].DaiJoin.address, AddressesAndAbis[Chain.Ethereum].Pot.address, wad])
 
 class ProxyActionExitDsr(_ProxyAction):
@@ -278,7 +342,7 @@ class ProxyActionExitDsr(_ProxyAction):
     selector = "0x71006c09" # exit(address,address,uint256)
     action_abi = ["address", "address", "uint256"]
 
-    def __init__(self, proxy: Address, wad: str):
+    def __init__(self, proxy: Address, wad: int):
         super().__init__(proxy, AddressesAndAbis[Chain.Ethereum].ProxyActionsDsr.address, [AddressesAndAbis[Chain.Ethereum].DaiJoin.address, AddressesAndAbis[Chain.Ethereum].Pot.address, wad])
 
 class ProxyActionExitAllDsr(_ProxyAction):
