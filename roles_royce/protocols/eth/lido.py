@@ -39,7 +39,8 @@ class Wrap(ContractMethod):
     def __init__(self, amount: int):
         """Sender deposits stETH and receives wstETH.
 
-        :param amount: amount of wstETH user receives after wrap.
+        Args:
+            amount: amount of wstETH user receives after wrap.
         """
         super().__init__()
         self.args.amount = amount
@@ -60,7 +61,8 @@ class Unwrap(ContractMethod):
 class RequestWithdrawalsStETH(ContractMethod):
     """Sender requests a claim on his ETH from stETH.
 
-    Locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue"""
+    Locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue
+    """
     name = "requestWithdrawals"
     in_signature = [("amounts", "uint256[]"), ("owner", "address")]
     fixed_arguments = {"owner": AvatarAddress}
@@ -77,7 +79,8 @@ class RequestWithdrawalsWithPermitStETH(ContractMethod):
     """Sender requests a claim on his ETH from wstETH.
 
     When the unstETH has no allowance over the owner's stETH locks your stETH in the queue.
-    In exchange, you receive an NFT that represents your position in the queue"""
+    In exchange, you receive an NFT that represents your position in the queue
+    """
     name = "requestWithdrawalsWithPermit"
     in_signature = [
         ("amounts", "uint256[]"),
@@ -100,14 +103,16 @@ class RequestWithdrawalsWithPermitStETH(ContractMethod):
 class RequestWithdrawalsWstETH(RequestWithdrawalsStETH):
     """Transfers the wstETH to the unstETH to be burned in exchange for stETH
 
-    Then it locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue"""
+    Then it locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue
+    """
     name = "requestWithdrawalsWstETH"
 
 
 class RequestWithdrawalsWithPermitWstETH(RequestWithdrawalsWithPermitStETH):
     """when the unstETH has no allowance over the owner's wstETH transfers the wstETH to the unstETH to be burned in exchange for stETH.
 
-    Then it locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue"""
+    Then it locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue
+    """
     name = "requestWithdrawalsWithPermitWstETH"
 
 

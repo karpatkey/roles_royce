@@ -81,9 +81,9 @@ class SingleAssetExit(Exit):
     def __init__(self, pool_id: str, avatar: Address, assets: list[Address], min_amounts_out: list[int],
                  bpt_amount_in: int, exit_token_index: int):
         """
-
-        :param bpt_amount_in: the amount of BPT to be burned
-        :param exit_token_index: the index of the token to removed from the pool
+        Args:
+            bpt_amount_in: the amount of BPT to be burned
+            exit_token_index: the index of the token to removed from the pool
         """
         super().__init__(pool_id, avatar, assets, min_amounts_out, user_data=[self.exit_kind, bpt_amount_in, exit_token_index])
 
@@ -99,7 +99,8 @@ class ProportionalExit(Exit):
 
     def __init__(self, pool_id: str, avatar: Address, assets: list[Address], min_amounts_out: list[int], bpt_amount_in: int):
         """
-        :param bpt_amount_in: the amount of BPT to burn in exchange for withdrawn tokens
+        Args:
+            bpt_amount_in: the amount of BPT to burn in exchange for withdrawn tokens
         """
         super().__init__(pool_id, avatar, assets, min_amounts_out, user_data=[self.exit_kind, bpt_amount_in])
 
@@ -115,9 +116,9 @@ class CustomExit(Exit):
     def __init__(self, pool_id: str, avatar: Address, assets: list[Address],
                  amounts_out: list[int], max_bpt_amount_in: int):
         """
-
-        :param amounts_out: are the amounts of each token to be withdrawn from the pool
-        :param max_bpt_amount_in: is the minimum acceptable BPT to burn in return for withdrawn tokens
+        Args:
+            amounts_out: are the amounts of each token to be withdrawn from the pool
+            max_bpt_amount_in: is the minimum acceptable BPT to burn in return for withdrawn tokens
         """
         super().__init__(pool_id, avatar, assets, amounts_out, user_data=[self.exit_kind, amounts_out, max_bpt_amount_in])
 
@@ -192,9 +193,9 @@ class SingleAssetJoin(Join):
     def __init__(self, pool_id: str, avatar: Address, assets: list[Address], max_amounts_in: list[int],
                  bpt_amount_out: int, join_token_index: int):
         """
-
-        :param bpt_amount_out: the amount of BPT to be minted
-        :param join_token_index: the index of the token to enter the pool
+        Args:
+            bpt_amount_out: the amount of BPT to be minted
+            join_token_index: the index of the token to enter the pool
         """
         super().__init__(pool_id, avatar, assets, max_amounts_in, user_data=[self.join_kind, bpt_amount_out, join_token_index])
 
@@ -210,7 +211,8 @@ class ProportionalJoin(Join):
 
     def __init__(self, pool_id: str, avatar: Address, assets: list[Address], max_amounts_in: list[int], bpt_amount_out: int):
         """
-        :param bpt_amount_out: the amount of BPT to mint in exchange for deposited tokens
+        Args:
+            bpt_amount_out: the amount of BPT to mint in exchange for deposited tokens
         """
         super().__init__(pool_id, avatar, assets, max_amounts_in, user_data=[self.join_kind, bpt_amount_out])
 
@@ -226,9 +228,9 @@ class ExactTokensJoin(Join):
     def __init__(self, pool_id: str, avatar: Address, assets: list[Address],
                  amounts_in: list[int], min_bpt_out: int):
         """
-
-        :param amounts_in: are the amounts of each token to be deposited into the pool
-        :param min_bpt_out: is the minimum acceptable BPT to mint in return for deposited tokens
+        Args:
+            amounts_in: are the amounts of each token to be deposited into the pool
+            min_bpt_out: is the minimum acceptable BPT to mint in return for deposited tokens
         """
         super().__init__(pool_id, avatar, assets, amounts_in, user_data=[self.join_kind, amounts_in, min_bpt_out])
 

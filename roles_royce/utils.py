@@ -90,33 +90,36 @@ def tenderly_simulate(account_id: str,
                       block_header: dict | None = None,
                       state_objects: dict | None = None
                       ) -> dict:
-    """
-    Simulate a transaction using the Tenderly Simulation API.
+    """Simulate a transaction using the Tenderly Simulation API.
 
     Check the docs at https://docs.tenderly.co/simulations-and-forks/reference/tenderly-simulation-api
 
-    :param account_id: Something like  2ae12345-d123-9876-abcd-123456123456. Get it using tenderly-cli whoami.
-    :param project: project slug. It is the name that is in the url of the dashboard.
-    :param api_token: the API token. Something like abIcb3qwhdPSPasd-asdfgA-foobarbaz.
-    :param block_number: Number of the block to be used for the simulation.
-    :param from_addr: Address initiating the transaction.
-    :param to_addr: The recipient address of the transaction.
-    :param calldata: Encoded contract method call data.
-    :param gas_price: Price of the gas in Wei.
-    :param gas: Amount of gas provided for the simulation.
-    :param network_id: ID of the network on which the simulation is being run. Eg: "1"
-    :param value: Amount of Ether (in Wei) sent along with the transaction.
-    :param transaction_index: Index of the transaction within the block.
-    :param sim_type: One of 'quick', 'abi' or 'full'.
-    :param save: Flag indicating whether to save the simulation in dashboard UI.
-    :param save_if_fails: Flag indicating whether to save failed simulation in dashboard UI.
-    :param access_list: List of addresses with their storage keys to grant access for this transaction.
-           Eg: [{"address": "0x3f41a1cfd3c8b8d9c162de0f42307a0095a6e5df", "storage_keys": [] }]
-    :param block_header: Details of the block header based on the provided block number.
-           Eg: { "number": "0x110ace7", "hash": "0x0000000000000000000000000000000000000000000000000000000000000000", // ... }
-    :param state_objects: Overrides for specific state objects.
+    Args:
+        account_id: Something like  2ae12345-d123-9876-abcd-123456123456. Get it using tenderly-cli
+            whoami.
+        project: project slug. It is the name that is in the url of the dashboard.
+        api_token: the API token. Something like abIcb3qwhdPSPasd-asdfgA-foobarbaz.
+        block_number: Number of the block to be used for the simulation.
+        from_addr: Address initiating the transaction.
+        to_addr: The recipient address of the transaction.
+        calldata: Encoded contract method call data.
+        gas_price: Price of the gas in Wei.
+        gas: Amount of gas provided for the simulation.
+        network_id: ID of the network on which the simulation is being run. Eg: "1"
+        value: Amount of Ether (in Wei) sent along with the transaction.
+        transaction_index: Index of the transaction within the block.
+        sim_type: One of 'quick', 'abi' or 'full'.
+        save: Flag indicating whether to save the simulation in dashboard UI.
+        save_if_fails: Flag indicating whether to save failed simulation in dashboard UI.
+        access_list: List of addresses with their storage keys to grant access for this transaction.
+            Eg: [{"address": "0x3f41a1cfd3c8b8d9c162de0f42307a0095a6e5df", "storage_keys": [] }]
+        block_header: Details of the block header based on the provided block number. Eg: {
+            "number": "0x110ace7", "hash":
+            "0x0000000000000000000000000000000000000000000000000000000000000000", // ... }
+        state_objects: Overrides for specific state objects.
 
-    :return: Simulation data as returned by Tenderly
+    Returns:
+        Simulation data as returned by Tenderly
     """
     url = TENDERLY_API_URL + f"account/{account_id}/project/{project}/simulate"
     headers = {"X-Access-Key": api_token}
@@ -150,18 +153,22 @@ def tenderly_simulate(account_id: str,
 
 def simulate_tx(tx: dict, block: int, account_id: str, project: str, api_token: str, sim_type: str = 'full',
                 share: bool = False, **kwargs) -> dict:
-    """
-    Helper function to simulate an already built transaction
+    """Helper function to simulate an already built transaction
 
-    :param tx: Transaction built with roles.build() or any tx data as expected by web3
-    :param account_id: Something like  2ae12345-d123-9876-abcd-123456123456. Get it using tenderly-cli whoami.
-    :param project: project slug. It is the name that is in the url of the dashboard.
-    :param api_token: the API token. Something like abIcb3qwhdPSPasd-asdfgA-foobarbaz.
-    :param block: Number of the block to be used for the simulation.
-    :param sim_type: One of 'quick', 'abi' or 'full'.
-    :param kwargs: Other parameters to pass to tenderly_simulate.
-    :param share: If true the simulation will be public and a link will be retrieved in result['share_url']
-    :return: Return the simulation data.
+    Args:
+        tx: Transaction built with roles.build() or any tx data as expected by web3
+        account_id: Something like  2ae12345-d123-9876-abcd-123456123456. Get it using tenderly-cli
+            whoami.
+        project: project slug. It is the name that is in the url of the dashboard.
+        api_token: the API token. Something like abIcb3qwhdPSPasd-asdfgA-foobarbaz.
+        block: Number of the block to be used for the simulation.
+        sim_type: One of 'quick', 'abi' or 'full'.
+        **kwargs: Other parameters to pass to tenderly_simulate.
+        share: If true the simulation will be public and a link will be retrieved in
+            result['share_url']
+
+    Returns:
+        Return the simulation data.
     """
     sim_data = tenderly_simulate(account_id=account_id, project=project, api_token=api_token,
                                  from_addr=tx['from'],
@@ -186,14 +193,14 @@ def tenderly_share_simulation(account_id: str,
                               api_token: str,
                               simulation_id: str,
                               share=True):
-    """
-    Publicly share a simulatation.
+    """Publicly share a simulatation.
 
-    :param account_id: Something like  2ae12345-d123-9876-abcd-123456123456. Get it using tenderly-cli whoami.
-    :param project: project slug. It is the name that is in the url of the dashboard.
-    :param api_token: the API token. Something like abIcb3qwhdPSPasd-asdfgA-foobarbaz.
-    :param simulation_id: Get it from the simulated data 'id' field.
-    :param share: Use False to unshare a shared simulation.
+    Args:
+        account_id: Something like  2ae12345-d123-9876-abcd-123456123456. Get it using tenderly-cli whoami.
+        project: project slug. It is the name that is in the url of the dashboard.
+        api_token: the API token. Something like abIcb3qwhdPSPasd-asdfgA-foobarbaz.
+        simulation_id: Get it from the simulated data 'id' field.
+        share: Use False to unshare a shared simulation.
     """
     url = TENDERLY_API_URL + f"account/{account_id}/project/{project}/simulations/{simulation_id}/"
     url += "share" if share else "unshare"

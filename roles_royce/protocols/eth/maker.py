@@ -55,7 +55,8 @@ class Build(ContractMethod):
 class ProxyExecute(ContractMethod):
     """The DSProxy makes calls using the metafunction
     execute(address,bytes) which inside executes a delegatecall
-    to the target address with the encoded function call (data)"""
+    to the target address with the encoded function call (data)
+    """
     name = "execute"
     in_signature = [("target", "address"), ("data", "bytes")]
 
@@ -85,7 +86,8 @@ class _ProxyActionCDP(_ProxyAction):
 
 class ProxyActionOpen(_ProxyActionCDP):
     """creates an UrnHandler (cdp) for the address usr (for a specific ilk)
-    and allows the user to manage it via the internal registry of the manager"""
+    and allows the user to manage it via the internal registry of the manager
+    """
     short_signature = "open(address,bytes32,address)"
 
     def __init__(self, proxy: Address, ilk: str):
@@ -95,7 +97,8 @@ class ProxyActionOpen(_ProxyActionCDP):
 class ProxyActionLockGem(_ProxyActionCDP):
     """deposits wad amount of collateral in GemJoin adapter and executes frob
     to cdp increasing the locked value. Gets funds from msg.sender
-    if transferFrom == true"""
+    if transferFrom == true
+    """
     short_signature = "lockGem(address,address,uint256,uint256,bool)"
 
     def __init__(self, proxy: Address, gem_join: Address, cdp_id: int, wad: int, transfer_from: bool = True):
@@ -104,7 +107,8 @@ class ProxyActionLockGem(_ProxyActionCDP):
 
 class ProxyActionLockETH(_ProxyActionCDP):
     """deposits msg.value amount of ETH in EthJoin adapter and executes frob
-    to cdp increasing the locked value"""
+    to cdp increasing the locked value
+    """
     short_signature = "lockETH(address,address,uint256)"
 
     def __init__(self, proxy: Address, eth_join: Address, cdp_id: int, value: int):
@@ -113,7 +117,8 @@ class ProxyActionLockETH(_ProxyActionCDP):
 
 class ProxyActionFreeGem(_ProxyActionCDP):
     """executes frob to cdp decreasing locked collateral and withdraws wad
-    amount of collateral from GemJoin adapter"""
+    amount of collateral from GemJoin adapter
+    """
     short_signature = "freeGem(address,address,uint256,uint256)"
 
     def __init__(self, proxy: Address, gem_join: Address, cdp_id: int, wad: int):
@@ -122,7 +127,8 @@ class ProxyActionFreeGem(_ProxyActionCDP):
 
 class ProxyActionFreeETH(_ProxyActionCDP):
     """executes frob to cdp decreasing locked collateral and withdraws wad
-    amount of ETH from EthJoin adapte"""
+    amount of ETH from EthJoin adapte
+    """
     short_signature = "freeETH(address,address,uint256,uint256)"
 
     def __init__(self, proxy: Address, eth_join: Address, cdp_id: int, wad: int):
@@ -131,7 +137,8 @@ class ProxyActionFreeETH(_ProxyActionCDP):
 
 class ProxyActionDraw(_ProxyActionCDP):
     """updates collateral fee rate, executes frob to cdp increasing debt
-    and exits wad amount of DAI token (minting it) from DaiJoin adapter"""
+    and exits wad amount of DAI token (minting it) from DaiJoin adapter
+    """
     short_signature = "draw(address,address,address,uint256,uint256)"
 
     def __init__(self, proxy: Address, cdp_id: int, wad: int):
@@ -140,7 +147,8 @@ class ProxyActionDraw(_ProxyActionCDP):
 
 class ProxyActionWipe(_ProxyActionCDP):
     """joins wad amount of DAI token to DaiJoin adapter (burning it) and
-    executes frob to cdp for decreasing debt"""
+    executes frob to cdp for decreasing debt
+    """
     short_signature = "wipe(address,address,uint256,uint256)"
 
     def __init__(self, proxy: Address, cdp_id: int, wad: int):
@@ -248,7 +256,8 @@ class Frob(ContractMethod):
     """increments/decrements the ink amount of collateral
     locked and increments/decrements the art amount of debt
     in the cdp depositing the generated DAI or collateral freed
-    in the cdp address"""
+    in the cdp address
+    """
     name = "frob"
     in_signature = [("cdp", "uint256"), ("dink", "int256"), ("dart", "int256")]
     target_address = MakerAddr.CdpManager.address
@@ -268,7 +277,8 @@ class Drip(ContractMethod):
     by ilk based on the time elapsed since the last update and the current
     instantaneous rate (base + duty); calls Vat.fold to update the collateral's
     rate, total tracked debt, and Vow surplus; updates ilks[ilk].rho to be
-    equal to the current timestamp"""
+    equal to the current timestamp
+    """
     name = "drip"
     in_signature = [("ilk", "bytes32")]
     target_address = MakerAddr.Jug.address
@@ -283,7 +293,8 @@ class Move(ContractMethod):
     However, you still won't see the balance on your wallet. In order to
     see the balance, you'll need to approve the DaiJoin adapter in Vat from
     the system with the Vat.hope() function. After, you call the DaiJoin.exit()
-    to finally move the DAI to your wallet"""
+    to finally move the DAI to your wallet
+    """
     name = "move"
     in_signature = [("cdp", "uint256"), ("dst", "address"), ("rad", "uint256")]
     target_address = MakerAddr.CdpManager.address
@@ -297,7 +308,8 @@ class Move(ContractMethod):
 
 class Hope(ContractMethod):
     """enable wish for a pair of addresses, where wish checks whether an address
-    is allowed to modify another address's Gem or DAI balance"""
+    is allowed to modify another address's Gem or DAI balance
+    """
     name = "hope"
     in_signature = [("usr", "address")]
     target_address = MakerAddr.Vat.address
@@ -341,7 +353,8 @@ class _ProxyActionDSR(_ProxyAction):
 
 class ProxyActionJoinDsr(_ProxyActionDSR):
     """joins wad amount of DAI token to DaiJoin adapter (burning it)
-    and moves the balance to Pot for DSR"""
+    and moves the balance to Pot for DSR
+    """
     short_signature = "join(address,address,uint256)"
 
     def __init__(self, proxy: Address, wad: int):
@@ -350,7 +363,8 @@ class ProxyActionJoinDsr(_ProxyActionDSR):
 
 class ProxyActionExitDsr(_ProxyActionDSR):
     """retrieves wad amount of DAI from Pot and exits DAI token from
-    DaiJoin adapter (minting it)"""
+    DaiJoin adapter (minting it)
+    """
     short_signature = "exit(address,address,uint256)"
 
     def __init__(self, proxy: Address, wad: int):
@@ -370,7 +384,8 @@ class ProxyActionExitAllDsr(_ProxyActionDSR):
 
 class JoinDsr(ContractMethod):
     """joins wad amount of DAI token to DaiJoin adapter (burning it)
-    and moves the balance to Pot for DSR"""
+    and moves the balance to Pot for DSR
+    """
     name = "join"
     in_signature = [("dst", "address"), ("wad", "uint256")]
     target_address = MakerAddr.DsrManager.address
@@ -383,7 +398,8 @@ class JoinDsr(ContractMethod):
 
 class ExitDsr(ContractMethod):
     """retrieves wad amount of DAI from Pot and exits DAI token from
-    DaiJoin adapter (minting it)"""
+    DaiJoin adapter (minting it)
+    """
     name = "exit"
     in_signature = [("dst", "address"), ("wad", "uint256")]
     target_address = MakerAddr.DsrManager.address

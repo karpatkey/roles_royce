@@ -18,6 +18,7 @@ author = 'Karpatkey'
 sys.path.append(os.path.abspath("./_ext"))
 
 extensions = [
+    "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
     "autodoc_method",
     "sphinx_autodoc_typehints",
