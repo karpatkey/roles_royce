@@ -36,8 +36,9 @@ class CtokenBaseMethod(ContractMethod):
 
     def __init__(self, ctoken: Ctoken, amount: int):
         """
-        :param ctoken: a Ctoken instance.
-        :param amount: the amount.
+        Args:
+            ctoken: a Ctoken instance.
+            amount: the amount.
         """
         super().__init__()
         self.token = ctoken
@@ -77,10 +78,7 @@ class RedeemUnderlying(CtokenBaseMethod):
 
 
 class EnterMarkets(ContractMethod):
-    """
-
-    Set asset as collateral
-    """
+    """Set asset as collateral"""
     name = "enterMarkets"
     in_signature = [("ctokens", "address[]")]
     target_address = ETHAddr.COMPOUND_V2_Comptroller
@@ -91,10 +89,7 @@ class EnterMarkets(ContractMethod):
 
 
 class ExitMarket(ContractMethod):
-    """
-
-    Unset asset as collateral
-    """
+    """Unset asset as collateral"""
     name = "exitMarkets"
     in_signature = [("ctoken", "address")]
     target_address = ETHAddr.COMPOUND_V2_Comptroller
@@ -105,26 +100,17 @@ class ExitMarket(ContractMethod):
 
 
 class Borrow(CtokenBaseMethod):
-    """
-
-    Borrow underlying asset amount.
-    """
+    """Borrow underlying asset amount."""
     name = "borrow"
 
 
 class Repay(CtokenBaseMethod):
-    """
-
-    Repay underlying asset amount.
-    """
+    """Repay underlying asset amount."""
     name = "repayBorrow"
 
 
 class RepayETH(ContractMethod):
-    """
-
-    Repay ETH amount
-    """
+    """Repay ETH amount"""
     name = "repayBehalf"
     in_signature = [("borrower", "address")]
     target_address = ETHAddr.COMPOUND_V2_Maximillion
@@ -135,10 +121,7 @@ class RepayETH(ContractMethod):
 
 
 class ClaimCOMP(ContractMethod):
-    """
-
-    Claim COMP rewards.
-    """
+    """Claim COMP rewards."""
     name = "claimComp"
     in_signature = [("holder", "address"), ("ctokens", "address[]")]
     target_address = ETHAddr.COMPOUND_V2_Comptroller

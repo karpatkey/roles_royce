@@ -6,9 +6,7 @@ from roles_royce.roles_modifier import Operation
 
 
 class Transactable(Protocol):
-    """
-    Base interface for operations that can be sent to the blockchain.
-    """
+    """Base interface for operations that can be sent to the blockchain."""
 
     #: the operation type
     operation: Operation

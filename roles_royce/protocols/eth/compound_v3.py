@@ -72,7 +72,8 @@ class Withdraw(ContractMethod):
 
     If the withdrawn asset is the underlying token of the Comet then you burn the amount of
     Comet token for the same amount of underlying token.  Otherwise, the withdrawn amount
-    of asset is removed from the Comet as collateral"""
+    of asset is removed from the Comet as collateral
+    """
     name = "withdraw"
     in_signature = [("asset", "address"), ("amount", "uint256")]
 

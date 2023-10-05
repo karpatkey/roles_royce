@@ -41,8 +41,9 @@ class ContractMethod:
 
     def __init__(self, value: int = 0, avatar: None | str = None):
         """
-        :param value: The value of the tx, eg: amount of Wei in mainnet, xDai Weis in GC.
-        :param avatar: Avatar address, usually a Safe address.
+        Args:
+            value: The value of the tx, eg: amount of Wei in mainnet, xDai Weis in GC.
+            avatar: Avatar address, usually a Safe address.
         """
         self.value = value  # Eg: amount of ETH in mainnet, xDai in GC
         self.avatar = avatar
@@ -126,7 +127,8 @@ class ContractMethod:
 class BaseApprove(ContractMethod):
     """Inherit from this class to define an approval that the token is fixed.
 
-    Specify the token using the token class attribute"""
+    Specify the token using the token class attribute
+    """
     name = "approve"
     in_signature = [("spender", "address"), ("amount", "uint256")]
     token = None

@@ -11,8 +11,7 @@ class MakerUtils:
 
     @staticmethod
     def get_chi(w3: Web3, block: int | str = 'latest') -> int:
-        """
-        Get the chi value from Maker's Pot contract.
+        """Get the chi value from Maker's Pot contract.
 
         Args:
             w3 (Web3): Web3 instance.
