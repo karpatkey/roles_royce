@@ -1,5 +1,5 @@
 from roles_royce.protocols.eth import maker
-from .utils import (local_node, accounts, get_balance, steal_token, create_simple_safe)
+from .utils import (local_node, accounts, get_balance, steal_token, create_simple_safe, top_up_address)
 from .roles import setup_common_roles, deploy_roles, apply_presets
 from roles_royce import roles
 from roles_royce.constants import ETHAddr
@@ -157,6 +157,7 @@ def test_exit_all_drs():
     method = maker.ExitAllDsr(avatar=AVATAR_TEST)
     assert method.data == '0xeb0dff66000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d'
 
+
 #-----------------------------------------------------#
 """Integration Tests"""
 #-----------------------------------------------------#
@@ -263,6 +264,114 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
                web3=w3)
     locked_gem = vat_contract.functions.urns(ilk, urn_handler).call()[0]
     assert locked_gem == 0
+
+
+def test_integration_maker_cdp_module_proxy_bulk(local_node, accounts):
+    w3 = local_node
+    safe = create_simple_safe(w3=w3, owner=accounts[0])
+    roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
+    setup_common_roles(safe, roles_ctract)
+
+    # Build proxy
+    build_receipt = safe.send([maker.Build()]).receipt
+    for log in build_receipt["logs"]:
+        if log["topics"][0].hex() == "0x259b30ca39885c6d801a0b5dbc988640f3c25e2f37531fe138c5c5af8955d41b":  # Created
+            proxy_address = w3.to_checksum_address('0x' + log["data"].hex()[26:66])
+            break
+
+    eth_join_contract = w3.eth.contract(address=JOIN_ETH_A, abi=AddressesAndAbis[Chain.Ethereum].GemJoin.abi)
+    ilk = eth_join_contract.functions.ilk().call()
+
+    presets = """{"version": "1.0","chainId": "1","meta":{ "description": "","txBuilderVersion": "1.8.0"},"createdAt": 1695904723785,"transactions": [
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x5e82669500000000000000000000000000000000000000000000000000000000000000010000000000000000000000006b175474e89094c44da98b954eedeac495271d0f","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c00000000000000000000000000000000000000000000000000000000000000010000000000000000000000006b175474e89094c44da98b954eedeac495271d0f095ea7b30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2095ea7b30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a","value": "0"},
+    {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a1cff79cd0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c0000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000082ecd135dce65fbc6dbdd0e4237e0af93ffd5038","value": "0"}
+    ]}"""
+    apply_presets(safe, roles_ctract, json_data=presets,
+                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:]),
+                            ("d758500ddec05172aaa035911387c8e0e789cf6a", proxy_address[2:])])
+
+    # Top up safe with ETH
+    top_up_address(w3, address=safe.address, amount=1000)
+    eth_balance = w3.eth.get_balance(safe.address)
+    assert eth_balance == approx(1100_000_000_000_000_000_000)
+
+    # open cdp, lockETH and draw DAI
+    wad_c = 500_000_000_000_000_000_000
+    wad_d = 50_000_000_000_000_000_000_000
+    open_lock_eth_and_draw = maker.ProxyActionOpenLockETHAndDraw(proxy=proxy_address, ilk=ilk, eth_join=JOIN_ETH_A, wad_d=wad_d, value=wad_c)
+    tx_receipt = roles.send([open_lock_eth_and_draw], role=1, private_key=accounts[1].key,
+                            roles_mod_address=roles_ctract.address,
+                            web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == wad_d
+    cdp_id = None
+    for log in tx_receipt["logs"]:
+        if log["topics"][0].hex() == "0xd6be0bc178658a382ff4f91c8c68b542aa6b71685b8fe427966b87745c3ea7a2": # NewCdp
+            cdp_id = int(log["topics"][3].hex(), 16)
+            break
+    assert cdp_id
+
+    # lockETH and draw DAI
+    lock_eth_and_draw = maker.ProxyActionLockETHAndDraw(proxy=proxy_address, eth_join=JOIN_ETH_A, cdp_id=cdp_id, wad_d=wad_d, value=wad_c)
+    roles.send([lock_eth_and_draw], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == 2 * wad_d
+    eth_balance = w3.eth.get_balance(safe.address)
+    assert eth_balance == approx(100_000_000_000_000_000_000)
+
+    # Wipe DAI and free ETH
+    approve_dai = maker.ApproveDAI(spender=proxy_address, amount=wad_d)
+    roles.send([approve_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=AddressesAndAbis[Chain.Ethereum].ERC20.abi)
+    dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
+    assert dai_allowance == wad_d
+    wipe_and_free_eth = maker.ProxyActionWipeAndFreeETH(proxy=proxy_address, eth_join=JOIN_ETH_A, cdp_id=cdp_id, wad_c=wad_c, wad_d=wad_d)
+    roles.send([wipe_and_free_eth], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == wad_d
+    eth_balance = w3.eth.get_balance(safe.address)
+    assert eth_balance == approx(600_000_000_000_000_000_000)
+    
+    # Wipe All DAI and free ETH
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    # Logic to get the amount of DAI to wipe
+    RAY = 10 ** 27
+    cdp_manager_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].CdpManager.address, abi=AddressesAndAbis[Chain.Ethereum].CdpManager.abi)
+    urn_handler = cdp_manager_contract.functions.urns(cdp_id).call()
+    vat_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].Vat.address, abi=AddressesAndAbis[Chain.Ethereum].Vat.abi)
+    rate = vat_contract.functions.ilks(ilk).call()[1]
+    art = vat_contract.functions.urns(ilk, urn_handler).call()[1]
+    urn_dai = vat_contract.functions.dai(urn_handler).call()
+    rad = int((Decimal(art) * Decimal(rate)) - Decimal(urn_dai))
+    dai_to_wipe = int(Decimal(rad) / Decimal(RAY))
+    if (dai_to_wipe * RAY) < rad:
+        dai_to_wipe += 1
+    # Steal amount of DAI to wipe all
+    steal_token(w3, token=ETHAddr.DAI, holder="0x60FaAe176336dAb62e284Fe19B885B095d29fB7F", to=safe.address, amount=dai_to_wipe-dai_balance)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == dai_to_wipe
+    approve_dai = maker.ApproveDAI(spender=proxy_address, amount=dai_to_wipe)
+    roles.send([approve_dai], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    wipe_all_and_free_eth = maker.ProxyActionWipeAllAndFreeETH(proxy=proxy_address, eth_join=JOIN_ETH_A, cdp_id=cdp_id, wad_c=wad_c)
+    roles.send([wipe_all_and_free_eth], role=1, private_key=accounts[1].key,
+                roles_mod_address=roles_ctract.address,
+                web3=w3)
+    dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
+    assert dai_balance == 0
+    eth_balance = w3.eth.get_balance(safe.address)
+    assert eth_balance == approx(1100_000_000_000_000_000_000)
 
 
 def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
