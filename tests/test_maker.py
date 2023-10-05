@@ -294,8 +294,9 @@ def test_integration_maker_cdp_module_proxy_bulk(local_node, accounts):
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:]),
                             ("d758500ddec05172aaa035911387c8e0e789cf6a", proxy_address[2:])])
 
-    # Top up safe with ETH
-    top_up_address(w3, address=safe.address, amount=1000)
+    # Tops up the safe with 1000 ETH and adds the difference between the initial 100 ETH and the current balance
+    eth_balance = w3.eth.get_balance(safe.address)
+    top_up_address(w3, address=safe.address, amount=1000+(100-(eth_balance/10**18))) 
     eth_balance = w3.eth.get_balance(safe.address)
     assert eth_balance == approx(1100_000_000_000_000_000_000)
 
