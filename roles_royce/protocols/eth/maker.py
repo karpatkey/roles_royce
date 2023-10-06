@@ -1,5 +1,4 @@
-from enum import StrEnum
-from roles_royce.constants import ETHAddr
+from roles_royce.constants import ETHAddr, StrEnum
 from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress
 from roles_royce.utils import to_data_input
 
