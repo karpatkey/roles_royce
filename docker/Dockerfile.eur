@@ -24,6 +24,6 @@ COPY ../tests ./tests
 
 ENV PYTHONPATH=.
 
-RUN pip3 install -r roles_royce/applications/EURE_rebalancing_bot/requirements.txt
+RUN pip3 install -r roles_royce/applications/EURe_rebalancing_bot/requirements.txt
 
-CMD ["python3", "-u", "/app/roles_royce/applications/EURE_rebalancing_bot/EURe_bot.py"]
+CMD ["python3", "-u", "/app/roles_royce/applications/EURe_rebalancing_bot/EURe_bot.py"]
