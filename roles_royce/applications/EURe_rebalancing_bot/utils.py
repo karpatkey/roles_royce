@@ -6,7 +6,7 @@ from roles_royce.toolshed.alerting.alerting import Messenger, LoggingLevel
 from roles_royce.constants import Chain
 import logging
 from roles_royce.protocols.base import ContractMethod, InvalidArgument, AvatarAddress, Address
-from roles_royce.applications.EURE_rebalancing_bot.addresses_and_abis import AddressesAndAbis
+from roles_royce.applications.EURe_rebalancing_bot.addresses_and_abis import AddressesAndAbis
 from decimal import Decimal
 import threading
 import requests
