@@ -99,7 +99,7 @@ class SwapsData:
         return self.EURe_to_WXDAI / (self.EUR_price * self.amount_EURe) - 1
 
     def get_WXDAI_to_EURe_drift(self) -> float:
-        return self.EURe_to_WXDAI / (self.amount_WXDAI / self.EUR_price) - 1
+        return self.WXDAI_to_EURe / (self.amount_WXDAI / self.EUR_price) - 1
 
 
 class SwapsDataManager:
