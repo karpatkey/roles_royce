@@ -221,23 +221,28 @@ while True:
         if not test_mode:
             w3 = Web3(Web3.HTTPProvider(ENV.RPC_ENDPOINT))
             if not w3.is_connected():
-                if ENV.FALLBACK_RPC_ENDPOINT != '':
-                    messenger.log_and_alert(LoggingLevel.Warning, title='Warning',
-                                            message=f'  RPC endpoint {ENV.RPC_ENDPOINT} is not working.')
-                    w3 = Web3(Web3.HTTPProvider(ENV.FALLBACK_RPC_ENDPOINT))
-                    if not w3.is_connected():
+                time.sleep(5)
+                if not w3.is_connected():
+                    if ENV.FALLBACK_RPC_ENDPOINT != '':
+                        messenger.log_and_alert(LoggingLevel.Warning, title='Warning',
+                                                message=f'  RPC endpoint {ENV.RPC_ENDPOINT} is not working.')
+                        w3 = Web3(Web3.HTTPProvider(ENV.FALLBACK_RPC_ENDPOINT))
+                        if not w3.is_connected():
+                            time.sleep(5)
+                            if not w3.is_connected():
+                                messenger.log_and_alert(LoggingLevel.Error, title='Error',
+                                                        message=f'  RPC endpoint {ENV.RPC_ENDPOINT} and fallback RPC endpoint {ENV.FALLBACK_RPC_ENDPOINT} are both not working.')
+                                rpc_endpoint_failure_counter += 1
+                                continue
+                    else:
                         messenger.log_and_alert(LoggingLevel.Error, title='Error',
-                                                message=f'  RPC endpoint {ENV.RPC_ENDPOINT} and fallback RPC endpoint {ENV.FALLBACK_RPC_ENDPOINT} are both not working.')
+                                                message=f'  RPC endpoint {ENV.RPC_ENDPOINT} is not working.')
                         rpc_endpoint_failure_counter += 1
                         continue
-                else:
-                    messenger.log_and_alert(LoggingLevel.Error, title='Error',
-                                            message=f'  RPC endpoint {ENV.RPC_ENDPOINT} is not working.')
-                    rpc_endpoint_failure_counter += 1
-                    continue
 
             if rpc_endpoint_failure_counter == 5:  # TODO: this can be added as an environment variable
-                messenger.log_and_alert(LoggingLevel.Error, title='Too many RPC endpoint failures, exiting...', message='')
+                messenger.log_and_alert(LoggingLevel.Error, title='Too many RPC endpoint failures, exiting...',
+                                        message='')
                 time.sleep(5)  # Cooldown time for the messenger system to send messages in queue
                 sys.exit(1)
 
