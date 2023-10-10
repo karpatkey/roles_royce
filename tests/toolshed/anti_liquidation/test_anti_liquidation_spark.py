@@ -1,8 +1,8 @@
 from pytest import approx
 from roles_royce.protocols.eth import spark
 from roles_royce.constants import ETHAddr
-from tests.utils import local_node, accounts, get_balance, get_allowance, steal_token, create_simple_safe, \
-    local_node_set_block, top_up_address, fork_unlock_account, web3_eth
+from tests.utils import local_node_eth, accounts, get_balance, get_allowance, steal_token, create_simple_safe, \
+    top_up_address, web3_eth
 from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager, CDPData
 from roles_royce import roles
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
@@ -99,8 +99,8 @@ def test_spark_cdp_manager_get_delta(web3_eth):
     assert amount_to_repay == 509677655395144366484434
 
 
-def test_integration_spark_cdp(local_node, accounts):
-    w3 = local_node
+def test_integration_spark_cdp(local_node_eth, accounts):
+    w3 = local_node_eth.w3
 
     safe = create_simple_safe(w3, accounts[0])
 
@@ -155,10 +155,10 @@ def test_integration_spark_cdp(local_node, accounts):
     assert amount_to_repay == 0
 
 
-def test_integration_spark_cdp_roles_1(local_node):
-    w3 = local_node
+def test_integration_spark_cdp_roles_1(local_node_eth):
+    w3 = local_node_eth.w3
     block = 17837956
-    local_node_set_block(w3, block)
+    local_node_eth.set_block(block)
 
     avatar_safe_address = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
     roles_mod_address = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
@@ -193,7 +193,7 @@ def test_integration_spark_cdp_roles_1(local_node):
                                     web3=w3)
     assert status_simulation
 
-    fork_unlock_account(w3, bot_address)
+    local_node_eth.unlock_account(bot_address)
 
     redeem_sDAI_tx = roles.build([redeem_sDAI], role=role, account=bot_address, roles_mod_address=roles_mod_address,
                                  web3=w3)
@@ -213,10 +213,10 @@ def test_integration_spark_cdp_roles_1(local_node):
     assert cdp.health_factor == approx(Decimal('3'))
 
 
-def test_integration_spark_cdp_roles_2(local_node, accounts):
-    w3 = local_node
+def test_integration_spark_cdp_roles_2(local_node_eth, accounts):
+    w3 = local_node_eth.w3
     block = 17837956
-    local_node_set_block(w3, block)
+    local_node_eth.set_block(block)
 
     avatar_safe_address = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
     roles_mod_address = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
@@ -231,7 +231,8 @@ def test_integration_spark_cdp_roles_2(local_node, accounts):
         "data": calldata_to_assign_role,
         "value": "0"
     }
-    fork_unlock_account(w3, avatar_safe_address)
+
+    local_node_eth.unlock_account(avatar_safe_address)
     tx_hash = w3.eth.send_transaction(tx_to_assign_role)
     w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)
     bot_address = accounts[0].address
@@ -287,10 +288,10 @@ def test_integration_spark_cdp_roles_2(local_node, accounts):
     assert cdp.health_factor == approx(Decimal('3'))
 
 
-def test_integration_spark_cdp_roles_3(local_node, accounts):
-    w3 = local_node
+def test_integration_spark_cdp_roles_3(local_node_eth, accounts):
+    w3 = local_node_eth.w3
     block = 17837956
-    local_node_set_block(w3, block)
+    local_node_eth.set_block(block)
 
     avatar_safe_address = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
     roles_mod_address = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
@@ -306,7 +307,7 @@ def test_integration_spark_cdp_roles_3(local_node, accounts):
         "data": calldata_to_assign_role,
         "value": "0"
     }
-    fork_unlock_account(w3, avatar_safe_address)
+    local_node_eth.unlock_account(avatar_safe_address)
     tx_hash = w3.eth.send_transaction(tx_to_assign_role)
     w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)
     private_key = accounts[0].key.hex()
