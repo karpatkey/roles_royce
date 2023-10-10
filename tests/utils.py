@@ -19,16 +19,21 @@ from roles_royce.evm_utils import erc20_abi
 from roles_royce.constants import ETHAddr
 from .safe import SimpleSafe
 
-REMOTE_NODE_URL = codecs.decode(
+REMOTE_ETH_NODE_URL = codecs.decode(
     b'x\x9c\xcb())(\xb6\xd2\xd7O-\xc9\xd0\xcdM\xcc\xcc\xcbK-\xd1K\xd7K\xccI\xceH\xcd\xad\xd4K\xce\xcf\xd5/3\xd2\x0f'
     b'u)74-6NNu\xb3\xcc\x0f\nH\n\xcb\xccq4\xd4u\xcd3(53+\xf32\n(\x06\x00Q\x92\x17X',
     "zlib").decode()
+REMOTE_GC_NODE_URL = "https://rpc.ankr.com/gnosis"
 
-ETH_FORK_NODE_URL = os.environ.get("RR_ETH_FORK_URL", REMOTE_NODE_URL)
-LOCAL_NODE_PORT = 8546
-LOCAL_NODE_DEFAULT_BLOCK = 17565000
+ETH_FORK_NODE_URL = os.environ.get("RR_ETH_FORK_URL", REMOTE_ETH_NODE_URL)
+GC_FORK_NODE_URL = os.environ.get("RR_ETH_FORK_URL", REMOTE_GC_NODE_URL)
+ETH_LOCAL_NODE_PORT = 8546
+GC_LOCAL_NODE_PORT = 8547
+ETH_LOCAL_NODE_DEFAULT_BLOCK = 17565000
+GC_LOCAL_NODE_DEFAULT_BLOCK = 17565000
 RUN_LOCAL_NODE = os.environ.get("RR_RUN_LOCAL_NODE", False)
-ETH_LOCAL_NODE_URL = f"http://127.0.0.1:{LOCAL_NODE_PORT}"
+ETH_LOCAL_NODE_URL = f"http://127.0.0.1:{ETH_LOCAL_NODE_PORT}"
+GC_LOCAL_NODE_URL = f"http://127.0.0.1:{GC_LOCAL_NODE_PORT}"
 DIR_OF_THIS_FILE = os.path.dirname(os.path.abspath(__file__))
 
 logger = logging.getLogger(__name__)
@@ -62,7 +67,7 @@ def web3_gnosis() -> Web3:
 
 @pytest.fixture(scope="module")
 def web3_eth() -> Web3:
-    return Web3(HTTPProvider(REMOTE_NODE_URL))
+    return Web3(HTTPProvider(REMOTE_ETH_NODE_URL))
 
 
 def wait_for_port(port, host='localhost', timeout=5.0):
@@ -133,40 +138,57 @@ def run_hardhat():
     hardhat_log = open(log_filename, "w")
     npx = shutil.which("npx")
     node = SimpleDaemonRunner(
-        cmd=f"{npx} hardhat node --show-stack-traces --fork '{ETH_FORK_NODE_URL}' --fork-block-number {LOCAL_NODE_DEFAULT_BLOCK} --port {LOCAL_NODE_PORT}",
+        cmd=f"{npx} hardhat node --show-stack-traces --fork '{ETH_FORK_NODE_URL}' --fork-block-number {ETH_LOCAL_NODE_DEFAULT_BLOCK} --port {ETH_LOCAL_NODE_PORT}",
         popen_kwargs={'stdout': hardhat_log, 'stderr': hardhat_log}
     )
     node.start()
     return node
 
 
-def run_anvil():
+def run_anvil(url, block, port):
     """Run anvil node in the background"""
-    log_filename = "/tmp/rr_fork_node_log.txt"
+    log_filename = f"/tmp/rr_fork_node_{port}_log.txt"
     logger.info(f"Writing Anvil log to {log_filename}")
     log = open(log_filename, "w")
     node = SimpleDaemonRunner(
-        cmd=f"anvil --accounts 15 -f '{ETH_FORK_NODE_URL}' --fork-block-number {LOCAL_NODE_DEFAULT_BLOCK} --port {LOCAL_NODE_PORT}",
+        cmd=f"anvil --accounts 15 -f '{url}' --fork-block-number {block} --port {port}",
         popen_kwargs={'stdout': log, 'stderr': log}
     )
+
     node.start()
     return node
 
 
-@pytest.fixture(scope='session')
-def local_node(request):
-    """Run a local node for testing"""
+class LocalNode:
+    def __init__(self, remote_url: str, port: int, default_block: int):
+        self.remote_url = remote_url
+        self.port = port
+        self.url = f"http://127.0.0.1:{port}"
+        self.default_block = default_block
+        self.w3 = Web3(HTTPProvider(self.url))
+
+    def reset_state(self):
+        fork_reset_state(self.w3, self.remote_url, self.default_block)
+
+    def unlock_account(self, address: str):
+        fork_unlock_account(self.w3, address)
+
+    def set_block(self, block):
+        """Set the local node to a specific block"""
+        fork_reset_state(self.w3, url=self.remote_url, block=block)
+
+
+def _local_node(request, node: LocalNode):
+    """Run a local node_daemon for testing"""
     if RUN_LOCAL_NODE:
-        node = run_anvil()
+        node_daemon = run_anvil(node.remote_url, node.default_block, node.port)
 
         def stop():
-            node.stop()
+            node_daemon.stop()
 
         request.addfinalizer(stop)
 
-    wait_for_port(LOCAL_NODE_PORT, timeout=20)
-
-    w3 = Web3(HTTPProvider(f"http://localhost:{LOCAL_NODE_PORT}"))
+    wait_for_port(node.port, timeout=20)
 
     class LatencyMeasurerMiddleware:
         def __init__(self, make_request, w3):
@@ -180,22 +202,36 @@ def local_node(request):
             logger.debug("Web3 time spent in %s: %f seconds", method, time.monotonic() - start_time)
             return response
 
-    w3.middleware_onion.add(LatencyMeasurerMiddleware, "call_counter")
+    node.w3.middleware_onion.add(LatencyMeasurerMiddleware, "call_counter")
+    node.reset_state()
+    assert node.w3.eth.block_number == node.default_block
+    return node
 
-    fork_reset_state(w3, url=ETH_FORK_NODE_URL, block=LOCAL_NODE_DEFAULT_BLOCK)
-    assert w3.eth.block_number == LOCAL_NODE_DEFAULT_BLOCK
-    return w3
+
+@pytest.fixture(scope='session')
+def local_node_eth(request) -> LocalNode:
+    node = LocalNode(ETH_FORK_NODE_URL, ETH_LOCAL_NODE_PORT, ETH_LOCAL_NODE_DEFAULT_BLOCK)
+    _local_node(request, node)
+    return node
+
+
+@pytest.fixture(scope='session')
+def local_node_gc(request) -> LocalNode:
+    node = LocalNode(GC_FORK_NODE_URL, GC_LOCAL_NODE_PORT, GC_LOCAL_NODE_DEFAULT_BLOCK)
+    _local_node(request, node)
+    return node
 
 
 @pytest.fixture(autouse=True)
-def local_node_reset(local_node):
+def local_node_eth_reset(local_node_eth):
     """Reset the local node state after each test"""
-    fork_reset_state(local_node, url=ETH_FORK_NODE_URL, block=LOCAL_NODE_DEFAULT_BLOCK)
+    local_node_eth.reset_state()
 
 
-def local_node_set_block(w3, block):
-    """Set the local node to a specific block"""
-    fork_reset_state(w3, url=ETH_FORK_NODE_URL, block=block)
+@pytest.fixture(autouse=True)
+def local_node_gc_reset(local_node_gc):
+    """Reset the local node state after each test"""
+    local_node_gc.reset_state()
 
 
 @pytest.fixture(scope='session')

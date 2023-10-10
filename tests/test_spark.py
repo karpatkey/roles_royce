@@ -1,12 +1,12 @@
 from roles_royce.protocols.eth import spark
 from roles_royce.constants import ETHAddr, Chain
-from .utils import local_node, accounts, get_balance, steal_token, create_simple_safe
+from .utils import local_node_eth, accounts, get_balance, steal_token, create_simple_safe
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
 from decimal import Decimal
 
 
-def test_integration(local_node, accounts):
-    w3 = local_node
+def test_integration(local_node_eth, accounts):
+    w3 = local_node_eth.w3
     safe = create_simple_safe(w3, accounts[0])
 
     ADDRESS_WITH_LOTS_OF_GNO = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
