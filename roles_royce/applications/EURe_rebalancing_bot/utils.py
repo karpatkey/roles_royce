@@ -11,7 +11,7 @@ from decimal import Decimal
 import threading
 import requests
 import json
-import schedule
+#import schedule
 import time
 from web3.types import TxReceipt
 from roles_royce import roles
@@ -194,16 +194,16 @@ def log_initial_data(env: ENV, messenger: Messenger):
     messenger.log_and_alert(LoggingLevel.Info, title, message)
 
 
-class SchedulerThread(threading.Thread):
-    def __init__(self):
-        super().__init__()
-        self.daemon = True
-        self.running = True
+#class SchedulerThread(threading.Thread):
+#    def __init__(self):
+#        super().__init__()
+#        self.daemon = True
+#        self.running = True
 
-    def run(self):
-        while self.running:
-            schedule.run_pending()
-            time.sleep(1)
+#    def run(self):
+#        while self.running:
+#            schedule.run_pending()
+#            time.sleep(1)
 
-    def stop(self):
-        self.running = False
+#    def stop(self):
+#        self.running = False
