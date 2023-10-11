@@ -1,2 +1,3 @@
+prometheus_client
 web3
 python-decouple
