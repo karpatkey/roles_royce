@@ -1,5 +1,5 @@
 from roles_royce.protocols.eth import maker
-from .utils import (local_node, accounts, get_balance, steal_token, create_simple_safe, top_up_address)
+from .utils import (local_node_eth, accounts, get_balance, steal_token, create_simple_safe, top_up_address)
 from .roles import setup_common_roles, deploy_roles, apply_presets
 from roles_royce import roles
 from roles_royce.constants import ETHAddr
@@ -161,8 +161,8 @@ def test_exit_all_drs():
 #-----------------------------------------------------#
 """Integration Tests"""
 #-----------------------------------------------------#
-def test_integration_maker_cdp_module_proxy(local_node, accounts):
-    w3 = local_node
+def test_integration_maker_cdp_module_proxy(local_node_eth, accounts):
+    w3 = local_node_eth.w3
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -266,8 +266,8 @@ def test_integration_maker_cdp_module_proxy(local_node, accounts):
     assert locked_gem == 0
 
 
-def test_integration_maker_cdp_module_proxy_bulk(local_node, accounts):
-    w3 = local_node
+def test_integration_maker_cdp_module_proxy_bulk(local_node_eth, accounts):
+    w3 = local_node_eth.w3
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -375,8 +375,8 @@ def test_integration_maker_cdp_module_proxy_bulk(local_node, accounts):
     assert eth_balance == approx(1100_000_000_000_000_000_000)
 
 
-def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
-    w3 = local_node
+def test_integration_maker_cdp_module_no_proxy(local_node_eth, accounts):
+    w3 = local_node_eth.w3
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -568,8 +568,8 @@ def test_integration_maker_cdp_module_no_proxy(local_node, accounts):
     assert gem_balance == wad_gem
 
 
-def test_integration_maker_dsr_module_proxy(local_node, accounts):
-    w3 = local_node
+def test_integration_maker_dsr_module_proxy(local_node_eth, accounts):
+    w3 = local_node_eth.w3
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -639,8 +639,8 @@ def test_integration_maker_dsr_module_proxy(local_node, accounts):
     assert pie == 0
 
 
-def test_integration_maker_dsr_module_no_proxy(local_node, accounts):
-    w3 = local_node
+def test_integration_maker_dsr_module_no_proxy(local_node_eth, accounts):
+    w3 = local_node_eth.w3
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)

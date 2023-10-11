@@ -6,17 +6,16 @@ from eth_account import Account
 
 from roles_royce.protocols.eth import balancer, aura
 from roles_royce import roles, Chain
-from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi, erc20_abi
+from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi
 from roles_royce.utils import MULTISENDS
 from roles_royce.constants import ETHAddr
 from roles_royce.generic_method import TxData
-from .utils import (local_node, local_node_reset, accounts, ETH_LOCAL_NODE_URL, fork_unlock_account, create_simple_safe,
-                    get_balance, steal_token, SimpleSafe)
+from .utils import (local_node_eth, local_node_eth_reset, accounts, ETH_LOCAL_NODE_URL, create_simple_safe, get_balance, steal_token, SimpleSafe)
 from .roles import setup_common_roles, deploy_roles, apply_presets
 
 
-def test_safe_and_roles(local_node):
-    w3 = local_node
+def test_safe_and_roles(local_node_eth):
+    w3 = local_node_eth.w3
     ethereum_client = EthereumClient(ETH_LOCAL_NODE_URL)
 
     # test accounts are generated using the Mnemonic: "test test test test test test test test test test test junk"
@@ -58,7 +57,7 @@ def test_safe_and_roles(local_node):
     dai_decimals = dai_ctract.functions.decimals().call()
     dai_amount = 5 * (10 ** dai_decimals)
 
-    fork_unlock_account(w3, ADDRESS_WITH_LOTS_OF_TOKENS)
+    local_node_eth.unlock_account(ADDRESS_WITH_LOTS_OF_TOKENS)
     dai_ctract.functions.transfer(safe.address, dai_amount).transact({"from": ADDRESS_WITH_LOTS_OF_TOKENS})
     assert dai_ctract.functions.balanceOf(safe.address).call() == 5 * (10 ** dai_decimals)
 
@@ -137,8 +136,8 @@ def test_safe_and_roles(local_node):
                    TxData(contract_address=roles_ctract_address, data=assign_role_5)])
 
 
-def test_balancer_aura_withdraw(local_node, accounts):
-    w3 = local_node
+def test_balancer_aura_withdraw(local_node_eth, accounts):
+    w3 = local_node_eth.w3
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -231,14 +230,13 @@ def test_balancer_aura_withdraw(local_node, accounts):
     assert bpt_balance == aura_balance == 0
 
 
-def test_simple_account_balance(local_node, accounts):
-    w3 = local_node
-
+def test_simple_account_balance(local_node_eth, accounts):
+    w3 = local_node_eth.w3
     assert w3.eth.get_balance(accounts[0].address) == 10000000000000000000000
 
 
-def test_build_operation(local_node, accounts):
-    w3 = local_node
+def test_build_operation(local_node_eth, accounts):
+    w3 = local_node_eth.w3
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
