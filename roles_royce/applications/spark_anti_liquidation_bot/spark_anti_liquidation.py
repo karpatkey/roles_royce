@@ -226,16 +226,16 @@ while True:
     try:
         if not test_mode:
             w3 = Web3(Web3.HTTPProvider(ENV.RPC_ENDPOINT))
-            if not w3.is_connected():
+            if not w3.is_connected(show_traceback=True):
                 time.sleep(5)
-                if not w3.is_connected():
+                if not w3.is_connected(show_traceback=True):
                     if ENV.FALLBACK_RPC_ENDPOINT != '':
                         messenger.log_and_alert(LoggingLevel.Warning, title='Warning',
                                                 message=f'  RPC endpoint {ENV.RPC_ENDPOINT} is not working.')
                         w3 = Web3(Web3.HTTPProvider(ENV.FALLBACK_RPC_ENDPOINT))
-                        if not w3.is_connected():
+                        if not w3.is_connected(show_traceback=True):
                             time.sleep(5)
-                            if not w3.is_connected():
+                            if not w3.is_connected(show_traceback=True):
                                 messenger.log_and_alert(LoggingLevel.Error, title='Error',
                                                         message=f'  RPC endpoint {ENV.RPC_ENDPOINT} and fallback RPC endpoint {ENV.FALLBACK_RPC_ENDPOINT} are both not working.')
                                 rpc_endpoint_failure_counter += 1
@@ -251,7 +251,7 @@ while True:
                 time.sleep(5) # Cooldown time for the messenger system to send messages in queue
                 sys.exit(1)
 
-        bot_do()
+        #bot_do()
 
     except Exception as e:
         messenger.log_and_alert(LoggingLevel.Error, title='Exception', message= '  ' + str(e.args[0]))

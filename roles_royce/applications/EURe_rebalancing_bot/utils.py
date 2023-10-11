@@ -127,12 +127,13 @@ class SwapsDataManager:
         return float(Decimal(rate) / Decimal(10 ** decimalsWXDAI))
 
     def get_EUR_oracle_price(self):
-        data_from_api = requests.get(
-            'https://data.fixer.io/api/latest?access_key=%s&base=EUR&symbols=USD' % ENV.FIXER_API_ACCESS_KEY)
-        if data_from_api.status_code == 200:
-            response = json.loads(data_from_api.content.decode('utf-8'))
-            if response['success']:
-                return response['rates']['USD']
+        if ENV.FIXER_API_ACCESS_KEY != '':
+            data_from_api = requests.get(
+                'https://data.fixer.io/api/latest?access_key=%s&base=EUR&symbols=USD' % ENV.FIXER_API_ACCESS_KEY)
+            if data_from_api.status_code == 200:
+                response = json.loads(data_from_api.content.decode('utf-8'))
+                if response['success']:
+                    return response['rates']['USD']
         contract = self.w3.eth.contract(address=AddressesAndAbis[Chain.GnosisChain].ChainlinkFeed.address,
                                         abi=AddressesAndAbis[Chain.GnosisChain].ChainlinkFeed.abi)
         chainlink_price = float(Decimal(contract.functions.latestAnswer().call()) / Decimal((10 ** 8)))

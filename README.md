@@ -41,9 +41,11 @@ status = roles.send([claim],
 * Install rolls_royce in editable mode: `pip install -e .`
 * Install anvil by downloading it from https://github.com/foundry-rs/foundry.
 
-To run the tests start anvil in a terminal in fork mode on port 8546 with:
+To run the tests start anvil in a terminal in fork mode on ports 8546 and 8547 with:
 
-`anvil --accounts 15 -f 'URL' --port 8546`
+`anvil --accounts 15 -f 'mainnet_RPC_endpoint_URL' --port 8546`
+
+`anvil --accounts 15 -f 'gnosis_RPC_endpoint_URL' --port 8547`
 
 and then run the tests with `pytest -vs`.
 
