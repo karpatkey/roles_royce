@@ -1,19 +1,13 @@
-from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager, CDPData
 from web3 import Web3
-from roles_royce.protocols.eth import spark
-from roles_royce.constants import ETHAddr, Chain
-from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
+from roles_royce.constants import Chain
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
-from decimal import Decimal
-from roles_royce import roles
-from roles_royce.evm_utils import erc20_abi
 from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
 from prometheus_client import start_http_server as prometheus_start_http_server, Gauge, Enum, Info
 import logging
-from utils import ENV, log_initial_data, SchedulerThread, SwapEUReForWXDAI, SwapWXDAIforEURe, SwapsDataManager, Swapper, \
+from env_utils import ENV
+from utils import log_initial_data, SwapsDataManager, Swapper, \
     AddressesAndAbis, decimalsWXDAI, decimalsEURe
 import time
-from threading import Event
 import sys
 
 # Importing the environment variables from the .env file
