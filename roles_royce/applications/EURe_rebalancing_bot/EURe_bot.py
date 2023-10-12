@@ -4,8 +4,8 @@ from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_tran
 from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
 from prometheus_client import start_http_server as prometheus_start_http_server, Gauge, Enum, Info
 import logging
-from utils import ENV, log_initial_data, SwapsDataManager, Swapper, \
-    AddressesAndAbis, decimalsWXDAI, decimalsEURe
+from utils import ENV, log_initial_data
+from swaps import SwapsDataManager, Swapper, AddressesAndAbis, decimalsWXDAI, decimalsEURe
 import time
 import sys
 

@@ -1,4 +1,4 @@
-from roles_royce.applications.EURe_rebalancing_bot.utils import SwapsData, Swapper, SwapsDataManager
+from roles_royce.applications.EURe_rebalancing_bot.swaps import SwapsData, Swapper, SwapsDataManager
 from tests.utils import local_node_gc
 
 
