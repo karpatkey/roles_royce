@@ -11,7 +11,7 @@ from decimal import Decimal
 import threading
 import requests
 import json
-#import schedule
+import schedule
 import time
 from web3.types import TxReceipt
 from roles_royce import roles
@@ -31,7 +31,7 @@ class ENV:
     ROLES_MOD_ADDRESS: Address | ChecksumAddress | str = config('ROLES_MOD_ADDRESS')
     ROLE: int = config('ROLE', cast=int)
     PRIVATE_KEY: str = config('PRIVATE_KEY')
-    FIXER_API_ACCESS_KEY: float = config('FIXER_API_ACCESS_KEY', cast=str)
+    FIXER_API_ACCESS_KEY: str = config('FIXER_API_ACCESS_KEY', cast=str)
     MAX_SLIPPAGE: float = custom_config('MAX_SLIPPAGE', default=0.01, cast=float)
     DRIFT_THRESHOLD: float = config('DRIFT_THRESHOLD', cast=float)
     AMOUNT: float = config('AMOUNT', cast=float)
@@ -42,7 +42,6 @@ class ENV:
     PROMETHEUS_PORT: int = custom_config('PROMETHEUS_PORT', default=8000, cast=int)
     TEST_MODE: bool = config('TEST_MODE', default=False, cast=bool)
     LOCAL_FORK_PORT: int = custom_config('LOCAL_FORK_PORT', default=8545, cast=int)
-    STATUS_NOTIFICATION_HOUR: int = custom_config('STATUS_NOTIFICATION_HOUR', default=12, cast=int)
 
     BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
 
@@ -104,11 +103,22 @@ class SwapsData:
 
 class SwapsDataManager:
     w3: Web3
+    fixer_api_key: str = ''
 
-    def __init__(self, w3: Web3):
+    def __init__(self, w3: Web3, fixer_api_key: str = ''):
         self.w3 = w3
+        self.fixer_api_key = fixer_api_key
 
     def get_EURe_to_WXDAI_curve(self, amount: float) -> float:
+        """
+        Returns the amount of WXDAI that would be received in a swap for the given amount of EURe.
+
+        Args:
+            amount: Amount of EURe to swap.
+
+        Returns:
+            Amount of WXDAI that would be received in a swap for the given amount of EURe.
+        """
         contract = self.w3.eth.contract(address=AddressesAndAbis[Chain.GnosisChain].DepositZap.address,
                                         abi=AddressesAndAbis[Chain.GnosisChain].DepositZap.abi)
         amount_int = int(amount * (10 ** decimalsEURe))
@@ -118,6 +128,15 @@ class SwapsDataManager:
         return float(Decimal(rate) / Decimal(10 ** decimalsEURe))
 
     def get_WXDAI_to_EURe_curve(self, amount: float) -> float:
+        """
+        Returns the amount of EURe that would be received in a swap for the given amount of WXDAI.
+
+        Args:
+            amount: Amount of WXDAI to swap.
+
+        Returns:
+            Amount of EURe that would be received in a swap for the given amount of WXDAI.
+        """
         contract = self.w3.eth.contract(address=AddressesAndAbis[Chain.GnosisChain].DepositZap.address,
                                         abi=AddressesAndAbis[Chain.GnosisChain].DepositZap.abi)
         amount_int = int(Decimal(amount) * Decimal(10 ** decimalsWXDAI))
@@ -127,9 +146,18 @@ class SwapsDataManager:
         return float(Decimal(rate) / Decimal(10 ** decimalsWXDAI))
 
     def get_EUR_oracle_price(self):
-        if ENV.FIXER_API_ACCESS_KEY != '':
+        """
+        Returns the EUR price in USD. If a Fixer api key is set, it will get the price from the Fixer API. Otherwise,
+        it will get the price from the Chainlink price feed.
+
+        Args:
+
+        Returns:
+            EUR price in USD.
+        """
+        if self.fixer_api_key != '':
             data_from_api = requests.get(
-                'https://data.fixer.io/api/latest?access_key=%s&base=EUR&symbols=USD' % ENV.FIXER_API_ACCESS_KEY)
+                'https://data.fixer.io/api/latest?access_key=%s&base=EUR&symbols=USD' % self.fixer_api_key)
             if data_from_api.status_code == 200:
                 response = json.loads(data_from_api.content.decode('utf-8'))
                 if response['success']:
@@ -194,16 +222,16 @@ def log_initial_data(env: ENV, messenger: Messenger):
     messenger.log_and_alert(LoggingLevel.Info, title, message)
 
 
-#class SchedulerThread(threading.Thread):
-#    def __init__(self):
-#        super().__init__()
-#        self.daemon = True
-#        self.running = True
+class SchedulerThread(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.daemon = True
+        self.running = True
 
-#    def run(self):
-#        while self.running:
-#            schedule.run_pending()
-#            time.sleep(1)
+    def run(self):
+        while self.running:
+            schedule.run_pending()
+            time.sleep(1)
 
-#    def stop(self):
-#        self.running = False
+    def stop(self):
+        self.running = False

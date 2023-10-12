@@ -4,8 +4,7 @@ from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_tran
 from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
 from prometheus_client import start_http_server as prometheus_start_http_server, Gauge, Enum, Info
 import logging
-from env_utils import ENV
-from utils import log_initial_data, SwapsDataManager, Swapper, \
+from utils import ENV, log_initial_data, SwapsDataManager, Swapper, \
     AddressesAndAbis, decimalsWXDAI, decimalsEURe
 import time
 import sys
@@ -79,49 +78,49 @@ def bot_do():
 
     WXDAI_contract = w3.eth.contract(address=AddressesAndAbis[Chain.GnosisChain].WXDAI.address,
                                      abi=AddressesAndAbis[Chain.GnosisChain].ERC20.abi)
-    balance = WXDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
-    if 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance and amount_WXDAI < ENV.AMOUNT:
-        while 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance and 10 * amount_WXDAI <= ENV.AMOUNT:
+    balance_WXDAI = WXDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
+    if 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance_WXDAI and amount_WXDAI < ENV.AMOUNT:
+        while 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance_WXDAI and 10 * amount_WXDAI <= ENV.AMOUNT:
             amount_WXDAI = amount_WXDAI * 10
-    elif amount_WXDAI * (10 ** decimalsWXDAI) < balance < 10 * amount_WXDAI * (10 ** decimalsWXDAI):
+    elif amount_WXDAI * (10 ** decimalsWXDAI) < balance_WXDAI < 10 * amount_WXDAI * (10 ** decimalsWXDAI):
         pass
-    elif balance < amount_WXDAI * (10 ** decimalsWXDAI):
+    elif balance_WXDAI < amount_WXDAI * (10 ** decimalsWXDAI):
         if lack_of_WXDAI_flag is False:
             title = "Lack of WXDAI in the avatar safe"
-            message = f"  Im running outta WXDAI! Only {balance / (10 ** decimalsWXDAI):.5f} left."
+            message = f"  Im running outta WXDAI! Only {balance_WXDAI / (10 ** decimalsWXDAI):.5f} left."
             messenger.log_and_alert(LoggingLevel.Warning, title, message,
                                     alert_flag=lack_of_WXDAI_flag)
 
-        while balance < amount_WXDAI * (10 ** decimalsWXDAI) and amount_WXDAI > 1:
+        while balance_WXDAI < amount_WXDAI * (10 ** decimalsWXDAI) and amount_WXDAI > 1:
             amount_WXDAI = amount_WXDAI / 10
         if amount_WXDAI <= 1:
             lack_of_WXDAI_flag = True
 
-    safe_WXDAI_balance_gauge.set(balance)
+    safe_WXDAI_balance_gauge.set(balance_WXDAI)
     amount_WXDAI_gauge.set(amount_WXDAI)
 
     # -----------------------------------------------------------------------------------------------------------------------
 
     EURe_contract = w3.eth.contract(address=AddressesAndAbis[Chain.GnosisChain].EURe.address,
                                     abi=AddressesAndAbis[Chain.GnosisChain].ERC20.abi)
-    balance = EURe_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
-    if 10 * amount_EURe * (10 ** decimalsEURe) < balance and amount_EURe < ENV.AMOUNT:
-        while 10 * amount_EURe * (10 ** decimalsEURe) < balance and 10 * amount_EURe <= ENV.AMOUNT:
+    balance_EURe = EURe_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
+    if 10 * amount_EURe * (10 ** decimalsEURe) < balance_EURe and amount_EURe < ENV.AMOUNT:
+        while 10 * amount_EURe * (10 ** decimalsEURe) < balance_EURe and 10 * amount_EURe <= ENV.AMOUNT:
             amount_EURe = amount_EURe * 10
-    elif amount_EURe * (10 ** decimalsEURe) < balance < 10 * amount_EURe * (10 ** decimalsEURe):
+    elif amount_EURe * (10 ** decimalsEURe) < balance_EURe < 10 * amount_EURe * (10 ** decimalsEURe):
         pass
-    elif balance < amount_EURe * (10 ** decimalsEURe):
+    elif balance_EURe < amount_EURe * (10 ** decimalsEURe):
         if lack_of_EURe_flag is False:
             title = "Lack of EURe in the avatar safe"
-            message = f"  Im running outta EURe! Only {balance / (10 ** decimalsEURe):.5f} left."
+            message = f"  Im running outta EURe! Only {balance_EURe / (10 ** decimalsEURe):.5f} left."
             messenger.log_and_alert(LoggingLevel.Warning, title, message,
                                     alert_flag=lack_of_EURe_flag)
-        while balance < amount_EURe * (10 ** decimalsEURe) and amount_EURe > 1:
+        while balance_EURe < amount_EURe * (10 ** decimalsEURe) and amount_EURe > 1:
             amount_EURe = amount_EURe / 10
         if amount_EURe <= 1:
             lack_of_EURe_flag = True
 
-    safe_EURe_balance_gauge.set(balance)
+    safe_EURe_balance_gauge.set(balance_EURe)
     amount_EURe_gauge.set(amount_EURe)
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -146,7 +145,7 @@ def bot_do():
     swapper = Swapper(w3=w3, private_keys=ENV.PRIVATE_KEY, role=ENV.ROLE, roles_mod_address=ENV.ROLES_MOD_ADDRESS,
                       avatar_safe_address=ENV.AVATAR_SAFE_ADDRESS, max_slippage=ENV.MAX_SLIPPAGE)
 
-    swaps_data_manager = SwapsDataManager(w3)
+    swaps_data_manager = SwapsDataManager(w3, ENV.FIXER_API_ACCESS_KEY)
     data = swaps_data_manager.get_data(amount_WXDAI, amount_EURe)
 
     EURe_price_curve_gauge.set(data.EURe_to_WXDAI/data.amount_EURe)
@@ -156,19 +155,23 @@ def bot_do():
     drift_WXDAI_to_EURe = data.get_WXDAI_to_EURe_drift()
 
     logger.info(
-        f'  Prices update:\n'
+        f'Status update:\n'
         f'  EUR to USD oracle: {data.amount_EURe:.3f} EURe ---> {data.amount_EURe * data.EUR_price:.3f} USD.\n'
         f'  EURe to WXDAI Curve: {data.amount_EURe:.3f} EURe ---> {data.EURe_to_WXDAI:.3f} WXDAI.\n'
         f'  EURe to WXDAI drift: {drift_EURe_to_WXDAI:.5f}.\n'
         f'\n'
-        f'  USD to EUR oracle: {data.amount_WXDAI:.3f} EURe ---> {data.amount_WXDAI / data.EUR_price:.3f} USD.\n'
+        f'  USD to EUR oracle: {data.amount_WXDAI:.3f} USD ---> {data.amount_WXDAI / data.EUR_price:.3f} EURe.\n'
         f'  WXDAI to EURe Curve: {data.amount_WXDAI:.3f} WXDAI ---> {data.WXDAI_to_EURe:.3f} EURe.\n'
         f'  WXDAI to EURe drift: {drift_WXDAI_to_EURe:.5f}.\n'
         f'\n'
         f'  Drift threshold: {ENV.DRIFT_THRESHOLD:.5f}.\n'
+        f'\n'
+        f'  Avatar safe"s WXDAI balance: {balance_WXDAI/ (10 ** decimalsWXDAI):.5f}.\n'
+        f'  Avatar safe"s EURe balance: {balance_EURe/ (10 ** decimalsEURe):.5f}.\n'
+        f'  Bot"s xDAI balance: {bot_xDAI_balance/ (10 ** 18):.5f}.\n'
     )
 
-    if drift_EURe_to_WXDAI > ENV.DRIFT_THRESHOLD:
+    if drift_EURe_to_WXDAI > ENV.DRIFT_THRESHOLD and balance_EURe >= amount_EURe * (10 ** decimalsEURe):
         logger.info(f'Swapping {amount_EURe:.3f} EURe for WDAI...')
         tx_receipt_EURe_to_WXDAI = swapper.swap_EURe_for_WXDAI(data)
 
@@ -179,7 +182,7 @@ def bot_do():
 
         tx_executed_flag = True
 
-    elif drift_WXDAI_to_EURe > ENV.DRIFT_THRESHOLD:
+    elif drift_WXDAI_to_EURe > ENV.DRIFT_THRESHOLD and balance_WXDAI >= amount_WXDAI * (10 ** decimalsWXDAI):
         logger.info(f'Swapping {amount_WXDAI:.3f} WXDAI for EURe...')
         tx_receipt_WXDAI_to_EURe = swapper.swap_WXDAI_for_EURe(data)
 
@@ -193,17 +196,24 @@ def bot_do():
     if tx_executed_flag:
         data = swaps_data_manager.get_data(amount_WXDAI, amount_EURe)
 
+        balance_EURe = EURe_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
+        balance_WXDAI = WXDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
+
         logger.info(
-            f'  Prices update:\n'
+            f'Status update:\n'
             f'  New EUR to USD oracle: {data.amount_EURe:.3f} EURe ---> {data.amount_EURe * data.EUR_price:.3f} USD.\n'
             f'  New EURe to WXDAI Curve: {data.amount_EURe:.3f} EURe ---> {data.EURe_to_WXDAI:.3f} WXDAI.\n'
             f'  New EURe to WXDAI drift: {drift_EURe_to_WXDAI:.5f}.\n'
             f'\n'
-            f'  New USD to EURe oracle: {data.amount_WXDAI:.3f} EURe ---> {data.amount_WXDAI / data.EUR_price:.3f} USD.\n'
+            f'  New USD to EURe oracle: {data.amount_WXDAI:.3f} USD ---> {data.amount_WXDAI / data.EUR_price:.3f} EURe.\n'
             f'  New WXDAI to EURe Curve: {data.amount_WXDAI:.3f} WXDAI ---> {data.WXDAI_to_EURe:.3f} EURe.\n'
             f'  New WXDAI to EURe drift: {drift_WXDAI_to_EURe:.5f}.\n'
             f'\n'
             f'  Drift threshold: {ENV.DRIFT_THRESHOLD:.5f}.\n'
+            f'\n'
+            f'  Avatar safe"s WXDAI balance: {balance_WXDAI / (10 ** decimalsWXDAI):.5f}.\n'
+            f'  Avatar safe"s EURe balance: {balance_EURe / (10 ** decimalsEURe):.5f}.\n'
+            f'  Bot"s xDAI balance: {bot_xDAI_balance / (10 ** 18):.5f}.\n'
         )
 
 
@@ -243,7 +253,7 @@ while True:
         bot_do()
 
     except Exception as e:
-        messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e.args[0]))
+        messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e))
         exception_counter += 1
         if exception_counter == 5:  # TODO: this can be added as an environment variable
             messenger.log_and_alert(LoggingLevel.Error, title='Too many exceptions, exiting...', message='')
