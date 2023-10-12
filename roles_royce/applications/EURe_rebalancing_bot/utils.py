@@ -8,6 +8,7 @@ from roles_royce.protocols.base import ContractMethod, InvalidArgument, AvatarAd
 import threading
 import schedule
 import time
+from prometheus_client import start_http_server as prometheus_start_http_server, Gauge
 
 
 # The next helper function allows to leave variables unfilled in the .env file
@@ -77,3 +78,15 @@ class SchedulerThread(threading.Thread):
 
     def stop(self):
         self.running = False
+@dataclass
+class Gauges:
+    EUR_price_feed = Gauge('EUR_price_feed', 'EUR price from feed')
+    EURe_price_curve = Gauge('EURe_price_curve', 'EURe price from Curve')
+    bot_ETH_balance = Gauge('bot_ETH_balance', 'ETH balance of the bot')
+    safe_WXDAI_balance = Gauge('safe_WXDAI_balance', 'WXDAI balance of the avatar safe')
+    safe_EURe_balance = Gauge('safe_EURe_balance', 'EURe balance of the avatar safe')
+    amount_WXDAI = Gauge('amount_WXDAI', 'Amount of WXDAI to swap')
+    amount_EURe= Gauge('amount_EURe', 'Amount of EURe to swap')
+    drift_threshold = Gauge('drift_threshold', 'Drift threshold')
+    drift_EURe_to_WXDAI = Gauge('EURe_to_WXDAI_drift', 'EURe to WXDAI drift')
+    drift_WXDAI_to_EURe = Gauge('WXDAI_to_EURe_drift', 'WXDAI to EURe drift')

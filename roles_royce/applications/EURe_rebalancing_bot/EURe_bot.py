@@ -4,7 +4,7 @@ from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_tran
 from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
 from prometheus_client import start_http_server as prometheus_start_http_server, Gauge, Enum, Info
 import logging
-from utils import ENV, log_initial_data
+from utils import ENV, log_initial_data, Gauges
 from swaps import SwapsDataManager, Swapper, AddressesAndAbis, decimalsWXDAI, decimalsEURe
 import time
 import sys
@@ -37,13 +37,8 @@ messenger = Messenger(slack_messenger, telegram_messenger)
 
 # Prometheus metrics from prometheus_client import Info
 prometheus_start_http_server(ENV.PROMETHEUS_PORT)
-EUR_price_feed_gauge = Gauge('EUR_price_feed', 'EUR price from feed')
-EURe_price_curve_gauge = Gauge('EURe_price_curve', 'EURe price from Curve')
-bot_ETH_balance_gauge = Gauge('bot_ETH_balance', 'ETH balance of the bot')
-safe_WXDAI_balance_gauge = Gauge('safe_WXDAI_balance', 'WXDAI balance of the avatar safe')
-safe_EURe_balance_gauge = Gauge('safe_EURe_balance', 'EURe balance of the avatar safe')
-amount_WXDAI_gauge = Gauge('amount_WXDAI', 'Amount of WXDAI to swap')
-amount_EURe_gauge = Gauge('amount_EURe', 'Amount of EURe to swap')
+gauges = Gauges()
+
 
 # Exception and RPC endpoint failure counters
 exception_counter = 0
@@ -65,11 +60,7 @@ def bot_do():
     global w3
     global amount_WXDAI
     global amount_EURe
-    global EURe_price_curve_gauge
-    global amount_EURe_gauge
-    global bot_ETH_balance_gauge
-    global safe_WXDAI_balance_gauge
-    global safe_EURe_balance_gauge
+    global gauges
     global lack_of_gas_warning_flag
     global lack_of_WXDAI_flag
     global lack_of_EURe_flag
@@ -96,8 +87,8 @@ def bot_do():
         if amount_WXDAI <= 1:
             lack_of_WXDAI_flag = True
 
-    safe_WXDAI_balance_gauge.set(balance_WXDAI)
-    amount_WXDAI_gauge.set(amount_WXDAI)
+    gauges.safe_WXDAI_balance.set(balance_WXDAI)
+    gauges.amount_WXDAI.set(amount_WXDAI)
 
     # -----------------------------------------------------------------------------------------------------------------------
 
@@ -120,8 +111,8 @@ def bot_do():
         if amount_EURe <= 1:
             lack_of_EURe_flag = True
 
-    safe_EURe_balance_gauge.set(balance_EURe)
-    amount_EURe_gauge.set(amount_EURe)
+    gauges.safe_EURe_balance.set(balance_EURe)
+    gauges.amount_EURe.set(amount_EURe)
 
     # -----------------------------------------------------------------------------------------------------------------------
 
@@ -136,7 +127,7 @@ def bot_do():
     if bot_xDAI_balance >= 0.1 and lack_of_gas_warning_flag:
         lack_of_gas_warning_flag = False
 
-    bot_ETH_balance_gauge.set(bot_xDAI_balance)
+    gauges.bot_ETH_balance.set(bot_xDAI_balance)
 
     # -----------------------------------------------------------------------------------------------------------------------
 
@@ -148,11 +139,14 @@ def bot_do():
     swaps_data_manager = SwapsDataManager(w3, ENV.FIXER_API_ACCESS_KEY)
     data = swaps_data_manager.get_data(amount_WXDAI, amount_EURe)
 
-    EURe_price_curve_gauge.set(data.EURe_to_WXDAI/data.amount_EURe)
-    EUR_price_feed_gauge.set(data.EUR_price)
+    gauges.EURe_price_curve.set(data.EURe_to_WXDAI/data.amount_EURe)
+    gauges.EUR_price_feed.set(data.EUR_price)
 
     drift_EURe_to_WXDAI = data.get_EURe_to_WXDAI_drift()
     drift_WXDAI_to_EURe = data.get_WXDAI_to_EURe_drift()
+
+    gauges.drift_EURe_to_WXDAI.set(drift_EURe_to_WXDAI)
+    gauges.drift_WXDAI_to_EURe.set(drift_WXDAI_to_EURe)
 
     logger.info(
         f'Status update:\n'
@@ -198,9 +192,25 @@ def bot_do():
 
         balance_EURe = EURe_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
         balance_WXDAI = WXDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
+        bot_xDAI_balance = w3.eth.get_balance(ENV.BOT_ADDRESS)
+
+        gauges.safe_WXDAI_balance.set(balance_WXDAI)
+        gauges.amount_WXDAI.set(amount_WXDAI)
+        gauges.safe_EURe_balance.set(balance_EURe)
+        gauges.amount_EURe.set(amount_EURe)
+        gauges.bot_ETH_balance.set(bot_xDAI_balance)
+
+        gauges.EURe_price_curve.set(data.EURe_to_WXDAI / data.amount_EURe)
+        gauges.EUR_price_feed.set(data.EUR_price)
+
+        drift_EURe_to_WXDAI = data.get_EURe_to_WXDAI_drift()
+        drift_WXDAI_to_EURe = data.get_WXDAI_to_EURe_drift()
+
+        gauges.drift_EURe_to_WXDAI.set(drift_EURe_to_WXDAI)
+        gauges.drift_WXDAI_to_EURe.set(drift_WXDAI_to_EURe)
 
         logger.info(
-            f'Status update:\n'
+            f'Status update after swap:\n'
             f'  New EUR to USD oracle: {data.amount_EURe:.3f} EURe ---> {data.amount_EURe * data.EUR_price:.3f} USD.\n'
             f'  New EURe to WXDAI Curve: {data.amount_EURe:.3f} EURe ---> {data.EURe_to_WXDAI:.3f} WXDAI.\n'
             f'  New EURe to WXDAI drift: {drift_EURe_to_WXDAI:.5f}.\n'
