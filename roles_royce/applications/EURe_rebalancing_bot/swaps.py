@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from web3 import Web3
 from roles_royce.constants import Chain
 from roles_royce.protocols.base import ContractMethod, Address
@@ -44,12 +44,12 @@ class SwapsData:
     EURe_to_WXDAI: float
     WXDAI_to_EURe: float
     EUR_price: float
+    drift_EURe_to_WXDAI: float = field(init=False)
+    drift_WXDAI_to_EURe: float = field(init=False)
 
-    def get_EURe_to_WXDAI_drift(self) -> float:
-        return self.EURe_to_WXDAI / (self.EUR_price * self.amount_EURe) - 1
-
-    def get_WXDAI_to_EURe_drift(self) -> float:
-        return self.WXDAI_to_EURe / (self.amount_WXDAI / self.EUR_price) - 1
+    def __post_init__(self):
+        self.drift_EURe_to_WXDAI = self.EURe_to_WXDAI / (self.EUR_price * self.amount_EURe) - 1
+        self.drift_WXDAI_to_EURe = self.WXDAI_to_EURe / (self.amount_WXDAI / self.EUR_price) - 1
 
 
 class SwapsDataManager:
