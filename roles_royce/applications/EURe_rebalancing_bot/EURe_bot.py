@@ -51,6 +51,8 @@ log_initial_data(ENV, messenger)
 amount_WXDAI = ENV.AMOUNT
 amount_EURe = ENV.AMOUNT
 
+gauges.drift_threshold.set(ENV.DRIFT_THRESHOLD)
+
 lack_of_gas_warning_flag = False  # flag to stop alerting when the bot's xDAI balance is below 0.1
 lack_of_WXDAI_flag = False  # flag to stop alerting when the WXDAI balance is below 1
 lack_of_EURe_flag = False  # flag to stop alerting when the EURe balance is below 1
@@ -194,11 +196,11 @@ def bot_do():
         balance_WXDAI = WXDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
         bot_xDAI_balance = w3.eth.get_balance(ENV.BOT_ADDRESS)
 
-        gauges.safe_WXDAI_balance.set(balance_WXDAI)
+        gauges.safe_WXDAI_balance.set(balance_WXDAI/(10**decimalsWXDAI))
         gauges.amount_WXDAI.set(amount_WXDAI)
-        gauges.safe_EURe_balance.set(balance_EURe)
+        gauges.safe_EURe_balance.set(balance_EURe/(10**decimalsEURe))
         gauges.amount_EURe.set(amount_EURe)
-        gauges.bot_ETH_balance.set(bot_xDAI_balance)
+        gauges.bot_ETH_balance.set(bot_xDAI_balance/(10**18))
 
         gauges.EURe_price_curve.set(data.EURe_to_WXDAI / data.amount_EURe)
         gauges.EUR_price_feed.set(data.EUR_price)
