@@ -80,9 +80,9 @@ def get_token_amounts_from_transfer_events(tx_receipt: object, target_address: s
             transfers.append(transfer)
 
             if transfer['from'] == target_address:
-                message = message + f"  Address {target_address} transferred {transfer['amount']:.3f} {token_symbol} to address {transfer['to']}."
+                message = message + f"  {target_address}  ----- {transfer['amount']:.3f} {token_symbol} ---->  {transfer['to']}."
             else:
-                message = message + f"  Address {target_address} received {transfer['amount']:.3f} {token_symbol} from address {transfer['from']}."
+                message = message + f"  {target_address}  <---- {transfer['amount']:.3f} {token_symbol} -----  {transfer['from']}."
             if element != transfers[-1]:
                 message = message + '\n\n'
 
