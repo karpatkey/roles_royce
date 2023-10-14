@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import threading
-
+from prometheus_client import Gauge
 import schedule
 import time
 from decouple import config
@@ -94,3 +94,15 @@ class SchedulerThread(threading.Thread):
 
     def stop(self):
         self.running = False
+
+@dataclass
+class Gauges:
+    health_factor = Gauge('health_factor', 'Spark CDP health factor')
+    # TODO: This should be generalized for any Spark CDP with any tokens
+    GNO_deposited = Gauge('GNO_balance', 'GNO deposited balance of the Spark CDP')
+    DAI_borrowed = Gauge('DAI_borrowed', 'DAI borrowed balance of the Spark CDP')
+    GNO_price = Gauge('GNO_price', 'GNO price')
+    DAI_price = Gauge('DAI_price', 'DAI price')
+    bot_ETH_balance = Gauge('bot_ETH_balance', 'ETH balance of the bot')
+    alerting_health_factor = Gauge('alerting_health_factor', 'Alerting health factor')
+    health_factor_threshold = Gauge('health_factor_threshold', 'Health factor threshold')
