@@ -1,13 +1,13 @@
 from roles_royce.toolshed.alerting.utils import get_token_amounts_from_transfer_events, get_tx_executed_msg, \
     get_tx_receipt_message_with_transfers
-from tests.utils import local_node_gc, local_node_eth
+from tests.utils import local_node_gc, local_node_eth, web3_gnosis
 from roles_royce.utils import Chain
 
-
-def test_get_token_transfers(local_node_eth, local_node_gc):
+# FIXME: the following should use local_node_gc instead of web3_gnosis, but for some reason it's not working
+def test_get_token_transfers(local_node_eth, web3_gnosis):
     local_node_eth.set_block(17877040)
     w3_eth = local_node_eth.w3
-    w3_gc = local_node_gc.w3
+    w3_gc = web3_gnosis
 
     tx_receipt = w3_eth.eth.get_transaction_receipt(
         '0xfe5e7f623deceea833e7300f1a9b637afcb253cebca0d3968e9190faf1c2cbc4')

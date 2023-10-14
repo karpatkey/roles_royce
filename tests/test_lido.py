@@ -10,10 +10,11 @@ MANAGER = "0x216071B1B5681D67A75f7eEAF92CEC8262bE29f7"
 ROLE = 1
 
 
-def test_methods(web3_eth):
+def test_methods(local_node_eth):
+    w3 = local_node_eth.w3
     approve = lido.ApproveWithdrawalStETHwithWstETH(amount=100)
     status = roles.check([approve], role=ROLE, account=MANAGER, roles_mod_address=ROLES_MOD_ADDRESS,
-                   web3=web3_eth, block=17067157)
+                         web3=w3, block=17067157)
     assert status
 
 
@@ -24,27 +25,30 @@ def test_withdrawal_approvals():
     assert approve_wsteth.data == "0x095ea7b3000000000000000000000000889edc2edab5f40e902b864ad4d7ade8e412f9b10000000000000000000000000000000000000000000000000000000000000064"
 
 
-def test_deposit(web3_eth):
+def test_deposit(local_node_eth):
+    w3 = local_node_eth.w3
     deposit = lido.Deposit(eth_amount=10)
     assert deposit.value == 10
     assert deposit.target_address == ETHAddr.stETH
     status = roles.check([deposit], role=ROLE, account=MANAGER, roles_mod_address=ROLES_MOD_ADDRESS,
-                   web3=web3_eth, block=17067157)
+                         web3=w3, block=17067157)
     assert status
 
 
-def test_wrap(web3_eth):
+def test_wrap(local_node_eth):
+    w3 = local_node_eth.w3
     approve = lido.ApproveWithdrawalStETHwithWstETH(amount=100)
     wrap = lido.Wrap(amount=10)
     status = roles.check([approve, wrap], role=ROLE, account=MANAGER, roles_mod_address=ROLES_MOD_ADDRESS,
-                   web3=web3_eth, block=17067157)
+                         web3=w3, block=17067157)
     assert status
 
 
-def test_unwrap(web3_eth):
+def test_unwrap(local_node_eth):
+    w3 = local_node_eth.w3
     unwrap = lido.Unwrap(amount=1_000_000_000_000)
     status = roles.check([unwrap], role=ROLE, account=MANAGER, roles_mod_address=ROLES_MOD_ADDRESS,
-                   web3=web3_eth, block=17067157)
+                         web3=w3, block=17067157)
     assert status
 
 
