@@ -1,15 +1,18 @@
 from roles_royce.toolshed.alerting.utils import get_token_amounts_from_transfer_events, get_tx_executed_msg, \
     get_tx_receipt_message_with_transfers
-from roles_royce.constants import ETHAddr
-from tests.utils import web3_eth, web3_gnosis
+from tests.utils import local_node_gc, local_node_eth
 from roles_royce.utils import Chain
 
 
-def test_get_token_transfers(web3_eth, web3_gnosis):
-    tx_receipt = web3_eth.eth.get_transaction_receipt(
+def test_get_token_transfers(local_node_eth, local_node_gc):
+    local_node_eth.set_block(17877040)
+    w3_eth = local_node_eth.w3
+    w3_gc = local_node_gc.w3
+
+    tx_receipt = w3_eth.eth.get_transaction_receipt(
         '0xfe5e7f623deceea833e7300f1a9b637afcb253cebca0d3968e9190faf1c2cbc4')
     transfers, message = get_token_amounts_from_transfer_events(tx_receipt,
-                                                                '0x65389F6FFe361C0C27Ea5D9691616a2060f8a167', web3_eth)
+                                                                '0x65389F6FFe361C0C27Ea5D9691616a2060f8a167', w3_eth)
     assert transfers == [{'amount': 0.055,
                           'from': '0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD',
                           'to': '0x65389F6FFe361C0C27Ea5D9691616a2060f8a167'},
@@ -37,7 +40,7 @@ def test_get_token_transfers(web3_eth, web3_gnosis):
 
     message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt,
                                                                    '0x65389F6FFe361C0C27Ea5D9691616a2060f8a167',
-                                                                   web3_eth)
+                                                                   w3_eth)
     assert message == ('  Txn hash (Success): '
                        'https://etherscan.io/tx/0xfe5e7f623deceea833e7300f1a9b637afcb253cebca0d3968e9190faf1c2cbc4.\n'
                        '\n'
@@ -64,11 +67,11 @@ def test_get_token_transfers(web3_eth, web3_gnosis):
                              '0xff30a1cF914a4a4e3B5514cD167bD2E69607e173.\n')
 
     # THis has to be fixed, we're getting the logs RPC endpoint error...
-    tx_receipt = web3_gnosis.eth.get_transaction_receipt(
+    tx_receipt = w3_gc.eth.get_transaction_receipt(
         '0x48ac45965d26ef89bf22f0a7b5f7d66f64e6cefaab8e6b3ccf2eeaf3dce49f25')
     transfers, message = get_token_amounts_from_transfer_events(tx_receipt,
                                                                 '0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f',
-                                                                web3_gnosis)
+                                                                w3_gc)
     assert transfers == [{'amount': 28623.229796554493,
                           'from': '0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f',
                           'to': '0xD7b118271B1B7d26C9e044Fc927CA31DccB22a5a'},

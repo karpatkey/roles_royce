@@ -71,8 +71,9 @@ def get_token_amounts_from_transfer_events(tx_receipt: object, target_address: s
             token_address = Web3.to_checksum_address(address)
             target_address = Web3.to_checksum_address(target_address)
             token_contract = w3.eth.contract(address=token_address, abi=erc20_abi)
-            token_decimals = token_contract.functions.decimals().call(block_identifier=tx_receipt.blockNumber)
-            token_symbol = token_contract.functions.symbol().call(block_identifier=tx_receipt.blockNumber)
+            a = w3.eth.block_number
+            token_decimals = token_contract.functions.decimals().call()
+            token_symbol = token_contract.functions.symbol().call()
 
             transfer = event.values.copy()
             amount = transfer.pop("value") / (10 ** token_decimals)
