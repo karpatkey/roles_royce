@@ -8,6 +8,7 @@ from utils import ENV, log_initial_data, Gauges
 from swaps import SwapsDataManager, Swapper, AddressesAndAbis, decimalsWXDAI, decimalsEURe
 import time
 import sys
+from decimal import Decimal
 
 # Importing the environment variables from the .env file
 ENV = ENV()
@@ -153,13 +154,13 @@ def bot_do():
 
     # -----------------------------------------------------------------------------------------------------------------------
 
-    gauges.safe_WXDAI_balance.set(balance_WXDAI)
+    gauges.safe_WXDAI_balance.set(float(Decimal(balance_WXDAI)/Decimal(10**decimalsWXDAI)))
     gauges.amount_WXDAI.set(amount_WXDAI)
 
-    gauges.safe_EURe_balance.set(balance_EURe)
+    gauges.safe_EURe_balance.set(float(Decimal(balance_EURe)/Decimal(10**decimalsEURe)))
     gauges.amount_EURe.set(amount_EURe)
 
-    gauges.bot_ETH_balance.set(bot_xDAI_balance / 1e18)
+    gauges.bot_ETH_balance.set(float(Decimal(bot_xDAI_balance) / Decimal(1e18)))
 
     gauges.last_updated.set_to_current_time()
 
@@ -199,11 +200,11 @@ def bot_do():
         balance_WXDAI = WXDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
         bot_xDAI_balance = w3.eth.get_balance(ENV.BOT_ADDRESS)
 
-        gauges.safe_WXDAI_balance.set(balance_WXDAI / (10 ** decimalsWXDAI))
+        gauges.safe_WXDAI_balance.set(float(Decimal(balance_WXDAI) / Decimal(10 ** decimalsWXDAI)))
         gauges.amount_WXDAI.set(amount_WXDAI)
-        gauges.safe_EURe_balance.set(balance_EURe / (10 ** decimalsEURe))
+        gauges.safe_EURe_balance.set(float(Decimal(balance_EURe) / Decimal((10 ** decimalsEURe))))
         gauges.amount_EURe.set(amount_EURe)
-        gauges.bot_ETH_balance.set(bot_xDAI_balance / (10 ** 18))
+        gauges.bot_ETH_balance.set(float(Decimal(bot_xDAI_balance) / Decimal(10 ** 18)))
 
         gauges.EURe_price_curve.set(data.EURe_to_WXDAI / data.amount_EURe)
         gauges.EUR_price_feed.set(data.EUR_price)
