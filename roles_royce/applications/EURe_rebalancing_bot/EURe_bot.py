@@ -2,7 +2,7 @@ from web3 import Web3
 from roles_royce.constants import Chain
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
 from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
-from prometheus_client import start_http_server as prometheus_start_http_server, Gauge, Enum, Info
+from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
 from utils import ENV, log_initial_data, Gauges
 from swaps import SwapsDataManager, Swapper, AddressesAndAbis, decimalsWXDAI, decimalsEURe
@@ -144,8 +144,8 @@ def bot_do():
     gauges.EURe_price_curve.set(data.EURe_to_WXDAI/data.amount_EURe)
     gauges.EUR_price_feed.set(data.EUR_price)
 
-    drift_EURe_to_WXDAI = data.get_EURe_to_WXDAI_drift()
-    drift_WXDAI_to_EURe = data.get_WXDAI_to_EURe_drift()
+    drift_EURe_to_WXDAI = data.drift_EURe_to_WXDAI
+    drift_WXDAI_to_EURe = data.drift_WXDAI_to_EURe
 
     gauges.drift_EURe_to_WXDAI.set(drift_EURe_to_WXDAI)
     gauges.drift_WXDAI_to_EURe.set(drift_WXDAI_to_EURe)
@@ -205,8 +205,8 @@ def bot_do():
         gauges.EURe_price_curve.set(data.EURe_to_WXDAI / data.amount_EURe)
         gauges.EUR_price_feed.set(data.EUR_price)
 
-        drift_EURe_to_WXDAI = data.get_EURe_to_WXDAI_drift()
-        drift_WXDAI_to_EURe = data.get_WXDAI_to_EURe_drift()
+        drift_EURe_to_WXDAI = data.drift_EURe_to_WXDAI
+        drift_WXDAI_to_EURe = data.drift_WXDAI_to_EURe
 
         gauges.drift_EURe_to_WXDAI.set(drift_EURe_to_WXDAI)
         gauges.drift_WXDAI_to_EURe.set(drift_WXDAI_to_EURe)
