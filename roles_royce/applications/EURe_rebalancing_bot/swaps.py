@@ -53,9 +53,6 @@ class SwapsData:
 
 
 class SwapsDataManager:
-    w3: Web3
-    fixer_api_key: str = ''
-
     def __init__(self, w3: Web3, fixer_api_key: str = ''):
         self.w3 = w3
         self.fixer_api_key = fixer_api_key
@@ -126,13 +123,6 @@ class SwapsDataManager:
 
 
 class Swapper:
-    w3: Web3
-    avatar_safe_address: str
-    roles_mod_address: str
-    role: int
-    private_keys: str
-    max_slippage: float
-
     def __init__(self, w3: Web3, avatar_safe_address: str, roles_mod_address: str, role: int, private_keys: str,
                  max_slippage: float):
         self.w3 = w3
