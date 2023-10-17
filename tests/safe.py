@@ -33,8 +33,8 @@ class SimpleSafe(Safe):
         tx = multi_or_one(txs, Chain.Ethereum)
         safe_tx = self.build_multisig_tx(to=tx.contract_address, value=tx.value,
                                          data=tx.data, operation=tx.operation,
-                                         safe_tx_gas=10_000_000,
-                                         base_gas=10_000_000, gas_price=1, gas_token=ETHAddr.ZERO, refund_receiver=ETHAddr.ZERO)
+                                         safe_tx_gas=14_000_000,
+                                         base_gas=14_000_000, gas_price=1, gas_token=ETHAddr.ZERO, refund_receiver=ETHAddr.ZERO)
         safe_tx.sign(self.signer_key)
         tx_hash, _ = safe_tx.execute(self.signer_key)
         receipt = self.ethereum_client.get_transaction_receipt(tx_hash, timeout=60)

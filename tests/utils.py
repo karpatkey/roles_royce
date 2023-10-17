@@ -15,6 +15,7 @@ from eth_account import Account
 from eth_account.signers.local import LocalAccount
 
 from web3 import Web3, HTTPProvider
+from web3.types import TxReceipt
 from roles_royce.evm_utils import erc20_abi
 from roles_royce.constants import ETHAddr
 from .safe import SimpleSafe
@@ -30,7 +31,7 @@ GC_FORK_NODE_URL = os.environ.get("RR_ETH_FORK_URL", REMOTE_GC_NODE_URL)
 ETH_LOCAL_NODE_PORT = 8546
 GC_LOCAL_NODE_PORT = 8547
 ETH_LOCAL_NODE_DEFAULT_BLOCK = 17565000
-GC_LOCAL_NODE_DEFAULT_BLOCK = 17565000
+GC_LOCAL_NODE_DEFAULT_BLOCK = 30397769
 RUN_LOCAL_NODE = os.environ.get("RR_RUN_LOCAL_NODE", False)
 ETH_LOCAL_NODE_URL = f"http://127.0.0.1:{ETH_LOCAL_NODE_PORT}"
 GC_LOCAL_NODE_URL = f"http://127.0.0.1:{GC_LOCAL_NODE_PORT}"
@@ -274,3 +275,44 @@ def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
 def top_up_address(w3: Web3, address: str, amount: int) -> None:
     """Top up an address with ETH"""
     w3.eth.send_transaction({"to": address, "value": Web3.to_wei(amount, "ether"), "from": SCRAPE_ACCOUNT.address})
+
+
+def to_hex_32_bytes(value: str | int) -> str:
+    """Convert a value to a 32 bytes hex string"""
+    if isinstance(value, str):
+        if value.startswith('0x') and len(value) <= 66:
+            return '0x' + value[2:].rjust(64, '0')
+        else:
+            raise ValueError('Invalid value. Value must be a hex string with or without 0x prefix and length <= 66')
+    elif isinstance(value, int):
+        return Web3.to_hex(Web3.to_bytes(value).rjust(32, b'\0'))
+    else:
+        raise ValueError('Invalid value. Value must be an int or a hex string with 0x prefix and length <= 66')
+
+
+def assign_role(local_node, avatar_safe_address: str, roles_mod_address: str, role: int, asignee: str) -> TxReceipt:
+    asignee_32_bytes = to_hex_32_bytes(asignee)
+    role_32_byes = to_hex_32_bytes(role)
+    a = asignee_32_bytes[2:]
+    calldata_to_assign_role = f'0xa6edf38f' \
+                              f'{asignee_32_bytes[2:]}' \
+                              f'0000000000000000000000000000000000000000000000000000000000000060' \
+                              f'00000000000000000000000000000000000000000000000000000000000000a0' \
+                              f'0000000000000000000000000000000000000000000000000000000000000001' \
+                              f'{role_32_byes[2:]}' \
+                              f'0000000000000000000000000000000000000000000000000000000000000001' \
+                              f'0000000000000000000000000000000000000000000000000000000000000001'
+
+    tx_to_assign_role = {
+        "from": avatar_safe_address,
+        "to": roles_mod_address,
+        "data": calldata_to_assign_role,
+        "value": "0"
+    }
+
+    local_node.unlock_account(avatar_safe_address)
+    # The amount of ETH of the Avatar address is increased
+    top_up_address(local_node.w3, address=avatar_safe_address, amount=1)
+    tx_hash = local_node.w3.eth.send_transaction(tx_to_assign_role)
+    tx_receipt = local_node.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)
+    return tx_receipt

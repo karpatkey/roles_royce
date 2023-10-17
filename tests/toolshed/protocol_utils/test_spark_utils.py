@@ -1,15 +1,21 @@
 import pytest
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 
-from tests.utils import web3_gnosis, web3_eth
+from tests.utils import web3_gnosis, web3_eth, local_node_eth
 
-def test_chi(web3_eth):
-    block = 17837956
-    assert SparkUtils.get_chi(w3=web3_eth, block=block) == 1027669481839376650556452943
 
-def test_spark_token_addresses(web3_eth):
+def test_chi(local_node_eth):
+    w3 = local_node_eth.w3
     block = 17837956
-    assert SparkUtils.get_spark_token_addresses(w3=web3_eth, block=block) == [
+    local_node_eth.set_block(block+123)
+    assert SparkUtils.get_chi(w3=w3, block=block) == 1027669481839376650556452943
+
+
+def test_spark_token_addresses(local_node_eth):
+    w3 = local_node_eth.w3
+    block = 17837956
+    local_node_eth.set_block(block + 123)
+    assert SparkUtils.get_spark_token_addresses(w3=w3, block=block) == [
         {
             SparkToken.UNDERLYING: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
             SparkToken.INTEREST_BEARING: '0x4DEDf26112B3Ec8eC46e7E31EA5e123490B05B8B',

@@ -2,7 +2,7 @@ from roles_royce.roles_modifier import RolesMod
 from roles_royce.constants import ETHAddr, GCAddr
 
 from roles_royce.protocols.eth import aave_v2 as aave
-from .utils import web3_eth
+from .utils import web3_eth, local_node_eth
 
 AVATAR = "0x0EFcCBb9E2C09Ea29551879bd9Da32362b32fc89"
 ROLES_MOD_ADDRESS = "0xd8dd9164E765bEF903E429c9462E51F0Ea8514F9"
@@ -21,12 +21,14 @@ def test_approve_method():
     assert method.data == '0x095ea7b30000000000000000000000004da27a545c0c5b758a6ba100e3a049001de870f50000000000000000000000000000000000000000000000000000000000002710'
 
 
-def test_approve_method_with_roles(web3_eth):
+def test_approve_method_with_roles(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(17683159)
     method = aave.ApproveForStkAAVE(amount=1000)
     ROLE = 1
     ROLES_MOD_ADDRESS = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
     REVOKER_ADDRESS = "0xf099e0f6604BDE0AA860B39F7da75770B34aC804"
-    roles_mod = RolesMod(role=ROLE, contract_address=ROLES_MOD_ADDRESS, account=REVOKER_ADDRESS, web3=web3_eth)
+    roles_mod = RolesMod(role=ROLE, contract_address=ROLES_MOD_ADDRESS, account=REVOKER_ADDRESS, web3=w3)
     check_transaction = roles_mod.check(method.target_address, method.data, block=17603159)
     assert check_transaction
 
@@ -49,7 +51,7 @@ def test_deposit_method():
     assert method.target_address == ETHAddr.AAVE_V2_LendingPool
 
 
-def test_deposit_eth(web3_eth):
+def test_deposit_eth():
     method = aave.DepositETH(eth_amount=123, avatar=AVATAR)
     referral_code = 0
     assert method.args_list == [ETHAddr.AAVE_V2_LendingPool, AVATAR, referral_code]
@@ -91,17 +93,21 @@ def test_repay_eth():
     assert method.value == 10
 
 
-def test_cooldown(web3_eth):
+def test_cooldown(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(17683159)
     method = aave.CooldownStkAAVE()
-    roles_mod = RolesMod(role=1, contract_address=ROLES_MOD_ADDRESS, account=MANAGER_SAFE_ADDRESS, web3=web3_eth)
+    roles_mod = RolesMod(role=1, contract_address=ROLES_MOD_ADDRESS, account=MANAGER_SAFE_ADDRESS, web3=w3)
     check_transaction = roles_mod.check(method.target_address, method.data, block=17603159)
     assert check_transaction
 
 
-def test_claim(web3_eth):
+def test_claim(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(17683159)
     method = aave.ClaimAAVERewards(avatar=AVATAR, amount=10)
 
-    roles_mod = RolesMod(role=1, contract_address=ROLES_MOD_ADDRESS, account=MANAGER_SAFE_ADDRESS, web3=web3_eth)
+    roles_mod = RolesMod(role=1, contract_address=ROLES_MOD_ADDRESS, account=MANAGER_SAFE_ADDRESS, web3=w3)
     check_transaction = roles_mod.check(method.target_address, method.data, block=17603159)
     assert check_transaction
 

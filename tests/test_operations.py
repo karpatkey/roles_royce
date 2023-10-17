@@ -1,7 +1,7 @@
 from roles_royce import roles, GenericMethodTransaction, Operation, Chain
 from roles_royce.constants import GCAddr
 from roles_royce.utils import multi_or_one, MULTISENDS
-from .utils import web3_gnosis, web3_eth
+from .utils import web3_gnosis
 
 CURVE_USDC_USDT_REWARD_GAUGE = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
 
