@@ -132,6 +132,9 @@ def bot_do():
     gauges.bot_ETH_balance.set(bot_xDAI_balance)
 
     # -----------------------------------------------------------------------------------------------------------------------
+    gauges.last_updated.set_to_current_time()
+    # -----------------------------------------------------------------------------------------------------------------------
+
 
     tx_executed_flag = False
 
@@ -210,6 +213,8 @@ def bot_do():
 
         gauges.drift_EURe_to_WXDAI.set(drift_EURe_to_WXDAI)
         gauges.drift_WXDAI_to_EURe.set(drift_WXDAI_to_EURe)
+
+        gauges.last_updated.set_to_current_time()
 
         logger.info(
             f'Status update after swap:\n'
