@@ -90,3 +90,4 @@ class Gauges:
     drift_threshold = Gauge('drift_threshold', 'Drift threshold')
     drift_EURe_to_WXDAI = Gauge('EURe_to_WXDAI_drift', 'EURe to WXDAI drift')
     drift_WXDAI_to_EURe = Gauge('WXDAI_to_EURe_drift', 'WXDAI to EURe drift')
+    last_updated = Gauge('last_updated', 'Last updated time and date')

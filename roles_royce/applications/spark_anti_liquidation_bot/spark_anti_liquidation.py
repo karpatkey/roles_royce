@@ -63,6 +63,7 @@ log_initial_data(ENV, messenger)
 gauges.alerting_health_factor.set(ENV.ALERTING_HEALTH_FACTOR)
 gauges.health_factor_threshold.set(ENV.THRESHOLD_HEALTH_FACTOR)
 
+
 # -----------------------------------------------------------------------------------------------------------------------
 
 def bot_do():
@@ -70,7 +71,21 @@ def bot_do():
     global lack_of_gas_warning
     global gauges
 
+    # -----------------------------------------------------------------------------------------------------------------------
+
     bot_ETH_balance = w3.eth.get_balance(ENV.BOT_ADDRESS)
+
+    if bot_ETH_balance < 0.1:
+        title = 'Lack of ETH for gas'
+        message = 'Im running outta ETH for gas! Only %.5f ETH left.' % (bot_ETH_balance / (10 ** 18))
+        messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=lack_of_gas_warning)
+        lack_of_gas_warning = True
+
+    if bot_ETH_balance >= 0.1 and lack_of_gas_warning_flag:
+        lack_of_gas_warning = False
+
+    # -----------------------------------------------------------------------------------------------------------------------
+
     cdp_manager = SparkCDPManager(w3, ENV.AVATAR_SAFE_ADDRESS)
     cdp = cdp_manager.get_cdp_data()
 
@@ -78,25 +93,41 @@ def bot_do():
         send_status_flag.clear()
         send_status(messenger, cdp, bot_ETH_balance / 1e18)
 
-    gauges.bot_ETH_balance.set(bot_ETH_balance / 1e18)
-    gauges.health_factor.set(float(cdp.health_factor))
     for element in cdp.balances_data:
         if element[CDPData.UnderlyingAddress] == ETHAddr.GNO:
-            gauges.GNO_deposited.set(element[CDPData.InterestBearingBalance])
-            gauges.GNO_price.set(element[CDPData.UnderlyingPriceUSD])
+            GNO_deposited = element[CDPData.InterestBearingBalance]
+            GNO_spark_price = element[CDPData.UnderlyingPriceUSD]
         if element[CDPData.UnderlyingAddress] == ETHAddr.DAI:
-            gauges.DAI_borrowed.set(element[CDPData.VariableDebtBalance])
-            gauges.DAI_price.set(element[CDPData.UnderlyingPriceUSD])
+            DAI_borrowed = element[CDPData.VariableDebtBalance]
+            DAI_spark_price = element[CDPData.UnderlyingPriceUSD]
 
-    # DAI_balances_data.info(cdp.balances_data[0])
-    # GNO_balances_data.info(cdp.balances_data[1])
+    sDAI_contract = w3.eth.contract(address=ETHAddr.sDAI, abi=erc20_abi)
+    sDAI_balance = sDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
+    chi = SparkUtils.get_chi(w3)
+    DAI_contract = w3.eth.contract(address=ETHAddr.DAI, abi=erc20_abi)
+    DAI_balance = DAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
 
-    logger.info(
-        f"Target health factor: {ENV.TARGET_HEALTH_FACTOR}, Alerting health factor: {ENV.ALERTING_HEALTH_FACTOR}, "
-        f"Health factor threshold: {ENV.THRESHOLD_HEALTH_FACTOR}, Bot ETH balance: {bot_ETH_balance / 1e18}")
+    gauges.bot_ETH_balance.set(bot_ETH_balance / 1e18)
+    gauges.health_factor.set(float(cdp.health_factor))
+    gauges.sDAI_balance.set(float(Decimal(sDAI_balance) / Decimal(1e18)))
+    gauges.DAI_equivalent.set(float(Decimal(sDAI_balance) * (Decimal(chi) / Decimal(1e27))))
+    gauges.DAI_balance.set(float(Decimal(DAI_balance) / Decimal(1e18)))
+    gauges.GNO_deposited.set(GNO_deposited)
+    gauges.GNO_price.set(GNO_spark_price)
+    gauges.DAI_borrowed.set(DAI_borrowed)
+    gauges.DAI_price.set(DAI_spark_price)
+    gauges.last_updated.set_to_current_time()
+
+
 
     logger.info("SparK CDP data retrieved:\n"
-                f"{cdp}")
+                f"{cdp}\n"
+                f"  DAI balance: {DAI_balance / 1e18:.3f}, sDAI balance: {sDAI_balance / 1E18:.3f}; Equivalent DAI: {float(Decimal(sDAI_balance) * (Decimal(chi) / Decimal(1e27)) / Decimal(1e18)):.3f}\n"
+                f"  Bot's ETH balance: {bot_ETH_balance / 1e18:.5f}\n"
+                f"  Target health factor: {ENV.TARGET_HEALTH_FACTOR}, Alerting health factor: {ENV.ALERTING_HEALTH_FACTOR}, Health factor threshold: {ENV.THRESHOLD_HEALTH_FACTOR}")
+
+    # -----------------------------------------------------------------------------------------------------------------------
+
     if ENV.THRESHOLD_HEALTH_FACTOR < cdp.health_factor <= ENV.ALERTING_HEALTH_FACTOR:
         title = "Health factor dropped below the alerting threshold"
         message = (f"  Current health factor: ({cdp.health_factor}).\n"
@@ -104,6 +135,8 @@ def bot_do():
                    f"{cdp}")
         messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=alerting_health_factor_flag.is_set())
         alerting_health_factor_flag.set()
+
+    # -----------------------------------------------------------------------------------------------------------------------
 
     elif cdp.health_factor <= ENV.THRESHOLD_HEALTH_FACTOR:
         title = "Health factor dropped below the critical threshold"
@@ -118,11 +151,7 @@ def bot_do():
                                                                          token_in_address=ETHAddr.DAI,
                                                                          rate_model=spark.RateModel.VARIABLE,
                                                                          tolerance=ENV.TOLERANCE)
-        chi = SparkUtils.get_chi(w3)
         amount_of_sDAI_to_redeem = int(Decimal(amount_of_DAI_to_repay) / (Decimal(chi) / Decimal(1e27)))
-
-        sDAI_contract = w3.eth.contract(address=ETHAddr.sDAI, abi=erc20_abi)
-        sDAI_balance = sDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
 
         if sDAI_balance == 0:
             title = 'No sDAI to redeem'
@@ -153,8 +182,6 @@ def bot_do():
                                                                        ENV.AVATAR_SAFE_ADDRESS, w3)
         messenger.log_and_alert(LoggingLevel.Info, 'sDAI redeemed for DAI', message, slack_msg=message_slack)
 
-        DAI_contract = w3.eth.contract(address=ETHAddr.DAI, abi=erc20_abi)
-        DAI_balance = DAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
         if DAI_balance < amount_of_DAI_to_repay:
             title = 'Not enough DAI to repay'
             message = (f'  Current health factor: {cdp.health_factor}.\n'
@@ -180,17 +207,28 @@ def bot_do():
         messenger.log_and_alert(LoggingLevel.Info, 'DAI debt repayed', message + '\n' + extra_message,
                                 slack_msg=message_slack + '\n' + extra_message)
 
+        bot_ETH_balance = w3.eth.get_balance(ENV.BOT_ADDRESS)
+        for element in cdp.balances_data:
+            if element[CDPData.UnderlyingAddress] == ETHAddr.GNO:
+                GNO_deposited = element[CDPData.InterestBearingBalance]
+                GNO_spark_price = element[CDPData.UnderlyingPriceUSD]
+            if element[CDPData.UnderlyingAddress] == ETHAddr.DAI:
+                DAI_borrowed = element[CDPData.VariableDebtBalance]
+                DAI_spark_price = element[CDPData.UnderlyingPriceUSD]
+
+        sDAI_balance = sDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
+        DAI_balance = DAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
+
         gauges.bot_ETH_balance.set(bot_ETH_balance / 1e18)
         gauges.health_factor.set(float(cdp.health_factor))
-
-        if bot_ETH_balance < 0.1:
-            title = 'Lack of ETH for gas'
-            message = 'Im running outta ETH for gas! Only %.5f ETH left.' % (bot_ETH_balance / (10 ** 18))
-            messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=lack_of_gas_warning)
-            lack_of_gas_warning = True
-
-        if bot_ETH_balance >= 0.1 and lack_of_gas_warning_flag:
-            lack_of_gas_warning = False
+        gauges.sDAI_balance.set(float(Decimal(sDAI_balance) / Decimal(1e18)))
+        gauges.DAI_equivalent.set(float(Decimal(sDAI_balance) * (Decimal(chi) / Decimal(1e27))))
+        gauges.DAI_balance.set(float(Decimal(DAI_balance) / Decimal(1e18)))
+        gauges.GNO_deposited.set(GNO_deposited)
+        gauges.GNO_price.set(GNO_spark_price)
+        gauges.DAI_borrowed.set(DAI_borrowed)
+        gauges.DAI_price.set(DAI_spark_price)
+        gauges.last_updated.set_to_current_time()
 
 
 # -----------------------------MAIN LOOP-----------------------------------------

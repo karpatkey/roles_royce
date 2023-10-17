@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import threading
-from prometheus_client import Gauge
+from prometheus_client import Gauge, Info
 import schedule
 import time
 from decouple import config
@@ -106,3 +106,7 @@ class Gauges:
     bot_ETH_balance = Gauge('bot_ETH_balance', 'ETH balance of the bot')
     alerting_health_factor = Gauge('alerting_health_factor', 'Alerting health factor')
     health_factor_threshold = Gauge('health_factor_threshold', 'Health factor threshold')
+    sDAI_balance = Gauge('sDAI_balance', 'sDAI balance of the avatar safe')
+    last_updated = Gauge('last_updated', 'Last updated time and date')
+    DAI_equivalent = Gauge('DAI_equivalent', 'DAI that would be obtained by redeeming the total of the sDAI')
+    DAI_balance = Gauge('DAI_balance', 'DAI balance of the avatar safe')
