@@ -177,7 +177,7 @@ def bot_do():
 
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt_EURe_to_WXDAI,
                                                                        ENV.AVATAR_SAFE_ADDRESS, w3)
-        messenger.log_and_alert(LoggingLevel.Info, f'{amount_EURe:.3f} EURe swapped for WDAI', message,
+        messenger.log_and_alert(LoggingLevel.Info, f'{amount_EURe:.3f} EURe swapped for WXDAI', message,
                                 slack_msg=message_slack)
 
         tx_executed_flag = True
