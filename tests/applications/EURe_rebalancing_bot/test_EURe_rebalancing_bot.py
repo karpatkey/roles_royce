@@ -47,7 +47,6 @@ def test_get_data(local_node_gc):
                                    WXDAI_to_EURe=94.4092662187878,
                                    EUR_price=1.0617255)
 
-@pytest.mark.skip("FIXME: It passes locally but failes in the CI... ")
 def test_integration_swaps(local_node_gc, accounts):
     w3 = local_node_gc.w3
 

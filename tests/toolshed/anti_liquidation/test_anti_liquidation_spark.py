@@ -103,7 +103,6 @@ def test_spark_cdp_manager_get_delta(local_node_eth):
                                                               rate_model=spark.RateModel.VARIABLE)
     assert amount_to_repay == 509677655395144366484434
 
-@pytest.mark.skip("FIXME: this test passes locally while it fails in the CI testing: https://github.com/karpatkey/roles_royce/actions/runs/6518794140/job/17704596371")
 def test_integration_spark_cdp(local_node_eth, accounts):
     w3 = local_node_eth.w3
 
