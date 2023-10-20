@@ -47,6 +47,7 @@ def test_get_data(local_node_gc):
                                    WXDAI_to_EURe=94.4092662187878,
                                    EUR_price=1.0617255)
 
+
 def test_integration_swaps(local_node_gc, accounts):
     w3 = local_node_gc.w3
 
@@ -86,7 +87,7 @@ def test_integration_swaps(local_node_gc, accounts):
     assert data.drift_EURe_to_WXDAI == -0.0033362264860316015
     assert data.drift_WXDAI_to_EURe == -0.0005208130376402886
     assert balance_WXDAI_2 == 22698145428369714746848
-    assert balance_WXDAI_2 == balance_WXDAI_1 - int(Decimal(amount_WXDAI) * Decimal(10**18))
+    assert balance_WXDAI_2 == balance_WXDAI_1 - int(Decimal(amount_WXDAI) * Decimal(10 ** 18))
     assert balance_EURe_2 == 183430354569876169864074
 
     tx_receipt_EURe_to_WXDAI = swapper.swap_EURe_for_WXDAI(data)
@@ -99,4 +100,4 @@ def test_integration_swaps(local_node_gc, accounts):
     assert data.drift_WXDAI_to_EURe == 0.0027580600458207982
     assert balance_WXDAI_3 == 76559677600609370000862
     assert balance_EURe_3 == 132530354569876169864074
-    assert balance_EURe_3 == balance_EURe_2 - int(Decimal(amount_EURe) * Decimal(10**18))
+    assert balance_EURe_3 == balance_EURe_2 - int(Decimal(amount_EURe) * Decimal(10 ** 18))

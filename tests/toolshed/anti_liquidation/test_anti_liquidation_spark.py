@@ -103,7 +103,9 @@ def test_spark_cdp_manager_get_delta(local_node_eth):
                                                               rate_model=spark.RateModel.VARIABLE)
     assert amount_to_repay == 509677655395144366484434
 
+
 def test_integration_spark_cdp(local_node_eth, accounts):
+    local_node_eth.reset_state()# Back to block ETH_LOCAL_NODE_DEFAULT_BLOCK = 17565000
     w3 = local_node_eth.w3
 
     safe = create_simple_safe(w3, accounts[0])
