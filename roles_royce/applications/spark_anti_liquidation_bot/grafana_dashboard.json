@@ -1335,7 +1335,7 @@
       "type": "stat"
     }
   ],
-  "refresh": "5m",
+  "refresh": "1m",
   "schemaVersion": 38,
   "style": "dark",
   "tags": [],
@@ -1343,13 +1343,13 @@
     "list": []
   },
   "time": {
-    "from": "now-12h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "spark-anti-liquidation-bot",
   "uid": "a5e1f888-f9d7-4b1c-93b2-584977251de1",
-  "version": 4,
+  "version": 5,
   "weekStart": ""
 }

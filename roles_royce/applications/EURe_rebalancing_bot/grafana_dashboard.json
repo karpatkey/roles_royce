@@ -594,7 +594,7 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "dark-red",
+                  "fixedColor": "red",
                   "mode": "fixed"
                 }
               }
@@ -1451,7 +1451,7 @@
       "type": "stat"
     }
   ],
-  "refresh": "5m",
+  "refresh": "1m",
   "schemaVersion": 38,
   "style": "dark",
   "tags": [],
@@ -1459,13 +1459,13 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "EURe-rebalancing-bot",
   "uid": "f9d3a688-a245-4bb5-a2ba-ce72759df878",
-  "version": 9,
+  "version": 11,
   "weekStart": ""
 }
