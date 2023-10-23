@@ -1,13 +1,9 @@
-from roles_royce.protocols.eth import balancer
-from roles_royce.evm_utils import erc20_abi
-from .utils import local_node, local_node_set_block, top_up_address, fork_unlock_account
-from roles_royce.toolshed.protocol_utils.balancer import get_assets_from_pid, get_bpt_balance_from_pid
-from roles_royce import roles
-from roles_royce.constants import MAX_UINT256
-import pytest
+from roles_royce.protocols import balancer
+from ...utils import local_node_eth
+from roles_royce.protocols.balancer.utils import Pool
 
 stable_pool_pid = "0x3dd0843a028c86e0b760b1a76929d1c5ef93a2dd000200000000000000000249"
-meta_stable_pool_pid = "0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112"
+metastable_pool_pid = "0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112"
 composable_stable_pool_pid = "0x42ed016f826165c2e5976fe5bc3df540c5ad0af700000000000000000000058b"
 weighted_pool_pid = "0x5c6ee304399dbdb9c8ef030ab642b10820db8f56000200000000000000000014"
 
@@ -23,33 +19,20 @@ block = 17658530
 block_composable = 18238491
 
 # --------------------------------------------------------------------------------------------------------------------
-# Staking and Unstaking in gauge
-# --------------------------------------------------------------------------------------------------------------------
-
-def test_stake_in_gauge():
-    m = balancer.Stake(gauge_address="0xb812249d60b80c7cbc9398e382ed6dfdf82e23d2", amount=100508265407679418)
-    assert m.data == "0xb6b55f25000000000000000000000000000000000000000000000000016513bc209d8bba"
-
-def test_unstake_in_gauge():
-    m = balancer.Unstake(gauge_address="0xb812249d60b80c7cbc9398e382ed6dfdf82e23d2", amount=35072783119882834679)
-    assert m.data == "0x2e1a7d4d000000000000000000000000000000000000000000000001e6bb8e6c88eed2f7"
-
-# --------------------------------------------------------------------------------------------------------------------
 # Exit - Exact BPT Single Token
 # --------------------------------------------------------------------------------------------------------------------
 
-def test_exit_pool_exact_bpt_single_stable(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_bpt_single_stable(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
-    assets = get_assets_from_pid(w3, stable_pool_pid)
+    assets = Pool(w3, stable_pool_pid).assets()
     bpt_amount_in = 16991614618808728544
     exit_token_index = 1
     token_out_address = assets[exit_token_index]
 
     m = balancer.ExactBptSingleTokenQueryExit(w3=w3,
                                               pool_id=stable_pool_pid,
-                                              avatar=avatar_address,
                                               bpt_amount_in=bpt_amount_in,
                                               token_out_address=token_out_address)
 
@@ -70,18 +53,17 @@ def test_exit_pool_exact_bpt_single_stable(local_node):
     assert m.data == "0x8bdb39133dd0843a028c86e0b760b1a76929d1c5ef93a2dd0002000000000000000002490000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000005c6ee304399dbdb9c8ef030ab642b10820db8f56000000000000000000000000616e8bfa43f920657b3497dbf40d6b1a02d4608d00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f18bdd7c27c1f00000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ebce57786a6dbbe00000000000000000000000000000000000000000000000000000000000000001"
 
 
-def test_exit_pool_exact_bpt_single_metastable(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_bpt_single_metastable(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
-    assets = get_assets_from_pid(w3, meta_stable_pool_pid)
+    assets = Pool(w3, metastable_pool_pid).assets()
     exit_token_index = 1
     token_out_address = assets[exit_token_index]
     bpt_amount_in = 16991614618808728544
 
     m = balancer.ExactBptSingleTokenQueryExit(w3=w3,
-                                              pool_id=meta_stable_pool_pid,
-                                              avatar=avatar_address,
+                                              pool_id=metastable_pool_pid,
                                               bpt_amount_in=bpt_amount_in,
                                               token_out_address=token_out_address)
 
@@ -93,7 +75,7 @@ def test_exit_pool_exact_bpt_single_metastable(local_node):
     min_amount_out = [int(amount * 0.99) for amount in amounts_out][exit_token_index]
 
     m = balancer.ExactBptSingleTokenExit(w3=w3,
-                                         pool_id=meta_stable_pool_pid,
+                                         pool_id=metastable_pool_pid,
                                          avatar=avatar_address,
                                          bpt_amount_in=bpt_in,
                                          token_out_address=token_out_address,
@@ -102,17 +84,16 @@ def test_exit_pool_exact_bpt_single_metastable(local_node):
     assert m.data == "0x8bdb39131e19cf2d73a72ef1332c882f20534b6519be02760002000000000000000001120000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000ae78736cd615f374d3085123a210448e74fc6393000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000eef90c7361bbf80000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ebce57786a6dbbe00000000000000000000000000000000000000000000000000000000000000001"
 
 
-def test_exit_pool_exact_bpt_single_composable_stable(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block_composable)
+def test_exit_pool_exact_bpt_single_composable_stable(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block_composable)
 
-    assets = get_assets_from_pid(w3, composable_stable_pool_pid)
+    assets = Pool(w3, composable_stable_pool_pid).assets()
     bpt_amount_in = 1699161461880870000
     exit_token_index = 1  # 0 is the BPT token itself
     token_out_address = assets[exit_token_index]
     m = balancer.ExactBptSingleTokenQueryExit(w3=w3,
                                               pool_id=composable_stable_pool_pid,
-                                              avatar=avatar_address,
                                               bpt_amount_in=bpt_amount_in,
                                               token_out_address=token_out_address)
 
@@ -133,18 +114,17 @@ def test_exit_pool_exact_bpt_single_composable_stable(local_node):
     assert m.data == "0x8bdb391342ed016f826165c2e5976fe5bc3df540c5ad0af700000000000000000000058b0000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd4500000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000042ed016f826165c2e5976fe5bc3df540c5ad0af70000000000000000000000007f39c581f595b53c5cb19bd0b3f8da6c935e2ca0000000000000000000000000ac3e018457b222d93114458476f3e3416abbe38f000000000000000000000000ae78736cd615f374d3085123a210448e74fc639300000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001794a258d77154700000000000000000000000000000000000000000000000000000000000000001"
 
 
-def test_exit_pool_exact_bpt_single_weighted(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_bpt_single_weighted(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
-    assets = get_assets_from_pid(w3, weighted_pool_pid)
+    assets = Pool(w3, weighted_pool_pid).assets()
     bpt_amount_in = 16991614618808728544
     exit_token_index = 1
     token_out_address = assets[exit_token_index]
 
     m = balancer.ExactBptSingleTokenQueryExit(w3=w3,
                                               pool_id=weighted_pool_pid,
-                                              avatar=avatar_address,
                                               bpt_amount_in=bpt_amount_in,
                                               token_out_address=token_out_address)
 
@@ -169,14 +149,13 @@ def test_exit_pool_exact_bpt_single_weighted(local_node):
 # Exit - Exact BPT proportional
 # --------------------------------------------------------------------------------------------------------------------
 
-def test_exit_pool_exact_bpt_proportional_stable(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_bpt_proportional_stable(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     bpt_amount_in = 169916146188087
     m = balancer.ExactBptProportionalQueryExit(w3=w3,
                                                pool_id=stable_pool_pid,
-                                               avatar=avatar_address,
                                                bpt_amount_in=bpt_amount_in)
 
     bpt_in, amounts_out = m.call(web3=w3, block_identifier=block)
@@ -195,14 +174,13 @@ def test_exit_pool_exact_bpt_proportional_stable(local_node):
     assert m.data == "0x8bdb39133dd0843a028c86e0b760b1a76929d1c5ef93a2dd0002000000000000000002490000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000005c6ee304399dbdb9c8ef030ab642b10820db8f56000000000000000000000000616e8bfa43f920657b3497dbf40d6b1a02d4608d0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000045c6ee796cba0000000000000000000000000000000000000000000000000000586698281ed00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000009a89af88ff37"
 
 
-def test_exit_pool_exact_bpt_proportional_metastable(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_bpt_proportional_metastable(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     bpt_amount_in = 169916146188087
     m = balancer.ExactBptProportionalQueryExit(w3=w3,
-                                               pool_id=meta_stable_pool_pid,
-                                               avatar=avatar_address,
+                                               pool_id=metastable_pool_pid,
                                                bpt_amount_in=bpt_amount_in)
 
     bpt_in, amounts_out = m.call(web3=w3, block_identifier=block)
@@ -213,7 +191,7 @@ def test_exit_pool_exact_bpt_proportional_metastable(local_node):
     amounts_out = [int(amount * 0.99) for amount in amounts_out]
 
     m = balancer.ExactBptProportionalExit(w3=w3,
-                                          pool_id=meta_stable_pool_pid,
+                                          pool_id=metastable_pool_pid,
                                           avatar=avatar_address,
                                           min_amounts_out=amounts_out,
                                           bpt_amount_in=bpt_in)
@@ -221,14 +199,13 @@ def test_exit_pool_exact_bpt_proportional_metastable(local_node):
     assert m.data == "0x8bdb39131e19cf2d73a72ef1332c882f20534b6519be02760002000000000000000001120000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000ae78736cd615f374d3085123a210448e74fc6393000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000004878c1aa110400000000000000000000000000000000000000000000000000004ea312ca011d0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000009a89af88ff37"
 
 
-def test_exit_pool_exact_bpt_proportional_composable_stable(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block_composable)
+def test_exit_pool_exact_bpt_proportional_composable_stable(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block_composable)
 
     bpt_amount_in = 27506842240670593572
     m = balancer.ExactBptProportionalQueryExit(w3=w3,
                                                pool_id=composable_stable_pool_pid,
-                                               avatar=avatar_address,
                                                bpt_amount_in=bpt_amount_in)
 
     bpt_in, amounts_out = m.call(web3=w3)
@@ -247,14 +224,13 @@ def test_exit_pool_exact_bpt_proportional_composable_stable(local_node):
     assert m.data == "0x8bdb391342ed016f826165c2e5976fe5bc3df540c5ad0af700000000000000000000058b0000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd4500000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000042ed016f826165c2e5976fe5bc3df540c5ad0af70000000000000000000000007f39c581f595b53c5cb19bd0b3f8da6c935e2ca0000000000000000000000000ac3e018457b222d93114458476f3e3416abbe38f000000000000000000000000ae78736cd615f374d3085123a210448e74fc6393000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003a16b7752d825400000000000000000000000000000000000000000000000000fcc61dd2952318000000000000000000000000000000000000000000000000002a619f5501275000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000017dbbef47c7e17224"
 
 
-def test_exit_pool_exact_bpt_proportional_weighted(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_bpt_proportional_weighted(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     bpt_amount_in = 169916146188087
     m = balancer.ExactBptProportionalQueryExit(w3=w3,
                                                pool_id=weighted_pool_pid,
-                                               avatar=avatar_address,
                                                bpt_amount_in=bpt_amount_in)
 
     bpt_in, amounts_out = m.call(web3=w3)
@@ -277,15 +253,14 @@ def test_exit_pool_exact_bpt_proportional_weighted(local_node):
 # Exit - Exact Tokens
 # --------------------------------------------------------------------------------------------------------------------
 
-def test_exit_pool_exact_stable(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_stable(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     amounts_out = [381328743127738, 2362871487560]
 
     m = balancer.ExactTokensQueryExit(w3=w3,
                                       pool_id=stable_pool_pid,
-                                      avatar=avatar_address,
                                       amounts_out=amounts_out)
 
     bpt_in, amounts_out = m.call(web3=w3)
@@ -303,15 +278,14 @@ def test_exit_pool_exact_stable(local_node):
     assert m.data == "0x8bdb39133dd0843a028c86e0b760b1a76929d1c5ef93a2dd0002000000000000000002490000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000005c6ee304399dbdb9c8ef030ab642b10820db8f56000000000000000000000000616e8bfa43f920657b3497dbf40d6b1a02d4608d000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000015ad10446daba00000000000000000000000000000000000000000000000000000226261d9c4800000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000001565d0a1262a5000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000015ad10446daba00000000000000000000000000000000000000000000000000000226261d9c48"
 
 
-def test_exit_pool_exact_metastable(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_metastable(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     amounts_out = [381328743127738, 2362871487560]
 
     m = balancer.ExactTokensQueryExit(w3=w3,
-                                      pool_id=meta_stable_pool_pid,
-                                      avatar=avatar_address,
+                                      pool_id=metastable_pool_pid,
                                       amounts_out=amounts_out)
 
     bpt_in, amounts_out = m.call(web3=w3)
@@ -321,7 +295,7 @@ def test_exit_pool_exact_metastable(local_node):
     # allow 1% slippage
     max_bpt_amount_in = int(bpt_in * (1 + 0.01))
     m = balancer.ExactTokensExit(w3=w3,
-                                 pool_id=meta_stable_pool_pid,
+                                 pool_id=metastable_pool_pid,
                                  avatar=avatar_address,
                                  amounts_out=amounts_out,
                                  max_bpt_amount_in=max_bpt_amount_in)
@@ -329,16 +303,15 @@ def test_exit_pool_exact_metastable(local_node):
     assert m.data == "0x8bdb39131e19cf2d73a72ef1332c882f20534b6519be02760002000000000000000001120000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000ae78736cd615f374d3085123a210448e74fc6393000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000015ad10446dab900000000000000000000000000000000000000000000000000000226261d9c4800000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000001727211f11e02000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000015ad10446dab900000000000000000000000000000000000000000000000000000226261d9c48"
 
 
-def test_exit_pool_exact_composable(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block_composable)
+def test_exit_pool_exact_composable(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block_composable)
 
     # The amount of BPT should not be included in the amounts_out
     amounts_out = [2228014765242451885, 1144675749406, 3784744656337673758]
 
     m = balancer.ExactTokensQueryExit(w3=w3,
                                       pool_id=composable_stable_pool_pid,
-                                      avatar=avatar_address,
                                       amounts_out=amounts_out)
 
     bpt_in, amounts_out_sim = m.call(web3=w3)
@@ -358,15 +331,14 @@ def test_exit_pool_exact_composable(local_node):
     assert m.data == "0x8bdb391342ed016f826165c2e5976fe5bc3df540c5ad0af700000000000000000000058b0000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd4500000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000042ed016f826165c2e5976fe5bc3df540c5ad0af70000000000000000000000007f39c581f595b53c5cb19bd0b3f8da6c935e2ca0000000000000000000000000ac3e018457b222d93114458476f3e3416abbe38f000000000000000000000000ae78736cd615f374d3085123a210448e74fc639300000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000001eeb7f9fdc9a07ad0000000000000000000000000000000000000000000000000000010a83fdce1e00000000000000000000000000000000000000000000000034861d3666909e1e00000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000005cdd553612562c0000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000001eeb7f9fdc9a07ad0000000000000000000000000000000000000000000000000000010a83fdce1e00000000000000000000000000000000000000000000000034861d3666909e1e"
 
 
-def test_exit_pool_exact_weighted(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_weighted(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     amounts_out = [381328743127738, 2362871487560]
 
     m = balancer.ExactTokensQueryExit(w3=w3,
                                       pool_id=weighted_pool_pid,
-                                      avatar=avatar_address,
                                       amounts_out=amounts_out)
 
     bpt_in, amounts_out = m.call(web3=w3)
@@ -388,15 +360,15 @@ def test_exit_pool_exact_weighted(local_node):
 # Exit - Exact Single Token Proportional Tx
 # --------------------------------------------------------------------------------------------------------------------
 
-def test_exit_pool_exact_single_proportional_stable_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_single_proportional_stable_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
-    assets = get_assets_from_pid(w3, stable_pool_pid)
+    assets = Pool(w3, stable_pool_pid).assets()
     token_out_address = assets[0]
     amount_out = 16991614618808700
 
-    m = balancer.ExactSingleTokenProportionalExitTx(w3=w3,
+    m = balancer.ExactSingleTokenProportionalExitSlippage(w3=w3,
                                                     pool_id=stable_pool_pid,
                                                     avatar=avatar_address,
                                                     token_out_address=token_out_address,
@@ -407,17 +379,17 @@ def test_exit_pool_exact_single_proportional_stable_tx(local_node):
     assert m.args.min_amounts_out == [16991614618808700, 21526842172308723]
 
 
-def test_exit_pool_exact_single_proportional_metastable_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_single_proportional_metastable_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
-    assets = get_assets_from_pid(w3, meta_stable_pool_pid)
+    assets = Pool(w3, metastable_pool_pid).assets()
     token_out_address = assets[0]
 
     amount_out = 16991614618808700
 
-    m = balancer.ExactSingleTokenProportionalExitTx(w3=w3,
-                                                    pool_id=meta_stable_pool_pid,
+    m = balancer.ExactSingleTokenProportionalExitSlippage(w3=w3,
+                                                    pool_id=metastable_pool_pid,
                                                     avatar=avatar_address,
                                                     token_out_address=token_out_address,
                                                     amount_out=amount_out,
@@ -427,15 +399,15 @@ def test_exit_pool_exact_single_proportional_metastable_tx(local_node):
     assert m.args.min_amounts_out == [16991614618808700, 18437122352050807]
 
 
-def test_exit_pool_exact_single_proportional_composable_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block_composable)
+def test_exit_pool_exact_single_proportional_composable_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block_composable)
 
-    assets = get_assets_from_pid(w3, composable_stable_pool_pid)
+    assets = Pool(w3, composable_stable_pool_pid).assets()
     token_out_address = assets[1]  # [0] is the BPT itself
     amount_out = 16991614618808700
 
-    m = balancer.ExactSingleTokenProportionalExitTx(w3=w3,
+    m = balancer.ExactSingleTokenProportionalExitSlippage(w3=w3,
                                                     pool_id=composable_stable_pool_pid,
                                                     avatar=avatar_address,
                                                     token_out_address=token_out_address,
@@ -446,15 +418,15 @@ def test_exit_pool_exact_single_proportional_composable_tx(local_node):
     assert m.args.min_amounts_out == [16991614618808700, 73939231621535229, 12397022079678937]
 
 
-def test_exit_pool_exact_single_proportional_weighted_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_single_proportional_weighted_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
-    assets = get_assets_from_pid(w3, weighted_pool_pid)
+    assets = Pool(w3, weighted_pool_pid).assets()
     token_out_address = assets[1]
     amount_out = 169916146188087
 
-    m = balancer.ExactSingleTokenProportionalExitTx(w3=w3,
+    m = balancer.ExactSingleTokenProportionalExitSlippage(w3=w3,
                                                     pool_id=weighted_pool_pid,
                                                     avatar=avatar_address,
                                                     token_out_address=token_out_address,
@@ -466,17 +438,17 @@ def test_exit_pool_exact_single_proportional_weighted_tx(local_node):
 
 
 # --------------------------------------------------------------------------------------------------------------------
-# Exit - Exact BPT Proportional Tx
+# Exit - Exact BPT Proportional Slippage
 # --------------------------------------------------------------------------------------------------------------------
 
 
-def test_exit_pool_exact_bpt_proportional_stable_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_bpt_proportional_stable_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     bpt_amount_in = 169916146188087
 
-    m = balancer.ExactBptProportionalExitTx(w3=w3,
+    m = balancer.ExactBptProportionalExitSlippage(w3=w3,
                                             pool_id=stable_pool_pid,
                                             avatar=avatar_address,
                                             bpt_amount_in=bpt_amount_in,
@@ -486,14 +458,14 @@ def test_exit_pool_exact_bpt_proportional_stable_tx(local_node):
     assert m.args.min_amounts_out == [76720706776250, 97197662674640]
 
 
-def test_exit_pool_exact_bpt_proportional_metastable_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_bpt_proportional_metastable_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     bpt_amount_in = 169916146188087
 
-    m = balancer.ExactBptProportionalExitTx(w3=w3,
-                                            pool_id=meta_stable_pool_pid,
+    m = balancer.ExactBptProportionalExitSlippage(w3=w3,
+                                            pool_id=metastable_pool_pid,
                                             avatar=avatar_address,
                                             bpt_amount_in=bpt_amount_in,
                                             max_slippage=0.01)
@@ -502,13 +474,13 @@ def test_exit_pool_exact_bpt_proportional_metastable_tx(local_node):
     assert m.args.min_amounts_out == [79683482423555, 86462301864221]
 
 
-def test_exit_pool_exact_bpt_proportional_composable_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block_composable)
+def test_exit_pool_exact_bpt_proportional_composable_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block_composable)
 
     bpt_amount_in = 169916146188087
 
-    m = balancer.ExactBptProportionalExitTx(w3=w3,
+    m = balancer.ExactBptProportionalExitSlippage(w3=w3,
                                             pool_id=composable_stable_pool_pid,
                                             avatar=avatar_address,
                                             bpt_amount_in=bpt_amount_in,
@@ -518,13 +490,13 @@ def test_exit_pool_exact_bpt_proportional_composable_tx(local_node):
     assert m.args.min_amounts_out == [0, 25856253834310, 112513824260354, 18864631576972]
 
 
-def test_exit_pool_exact_bpt_proportional_weighted_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_bpt_proportional_weighted_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     bpt_amount_in = 169916146188087
 
-    m = balancer.ExactBptProportionalExitTx(w3=w3,
+    m = balancer.ExactBptProportionalExitSlippage(w3=w3,
                                             pool_id=weighted_pool_pid,
                                             avatar=avatar_address,
                                             bpt_amount_in=bpt_amount_in,
@@ -538,13 +510,13 @@ def test_exit_pool_exact_bpt_proportional_weighted_tx(local_node):
 # Exit - Exact tokens Tx
 # --------------------------------------------------------------------------------------------------------------------
 
-def test_exit_pool_exact_tokens_stable_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_tokens_stable_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     amounts_out = [169916146188087, 698453980146188087]
 
-    m = balancer.ExactTokensExitTx(w3=w3,
+    m = balancer.ExactTokensExitSlippage(w3=w3,
                                    pool_id=stable_pool_pid,
                                    avatar=avatar_address,
                                    amounts_out=amounts_out,
@@ -554,14 +526,14 @@ def test_exit_pool_exact_tokens_stable_tx(local_node):
     assert m.args.min_amounts_out == [169916146188087, 698453980146188087]
 
 
-def test_exit_pool_exact_tokens_metastable_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_tokens_metastable_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     amounts_out = [169916146188087, 698453980146188087]
 
-    m = balancer.ExactTokensExitTx(w3=w3,
-                                   pool_id=meta_stable_pool_pid,
+    m = balancer.ExactTokensExitSlippage(w3=w3,
+                                   pool_id=metastable_pool_pid,
                                    avatar=avatar_address,
                                    amounts_out=amounts_out,
                                    max_slippage=0.01)
@@ -570,13 +542,13 @@ def test_exit_pool_exact_tokens_metastable_tx(local_node):
     assert m.args.min_amounts_out == [169916146188087, 698453980146188087]
 
 
-def test_exit_pool_exact_tokens_composable_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block_composable)
+def test_exit_pool_exact_tokens_composable_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block_composable)
 
     amounts_out = [10000000000, 0, 698453980146188087000]
 
-    m = balancer.ExactTokensExitTx(w3=w3,
+    m = balancer.ExactTokensExitSlippage(w3=w3,
                                    pool_id=composable_stable_pool_pid,
                                    avatar=avatar_address,
                                    amounts_out=amounts_out,
@@ -586,13 +558,13 @@ def test_exit_pool_exact_tokens_composable_tx(local_node):
     assert m.args.min_amounts_out == [10000000000, 0, 698453980146188087000]
 
 
-def test_exit_pool_exact_tokens_weighted_tx(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+def test_exit_pool_exact_tokens_weighted_tx(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(block)
 
     amounts_out = [81212098322152, 698453980146188087]
 
-    m = balancer.ExactTokensExitTx(w3=w3,
+    m = balancer.ExactTokensExitSlippage(w3=w3,
                                    pool_id=weighted_pool_pid,
                                    avatar=avatar_address,
                                    amounts_out=amounts_out,
@@ -601,33 +573,18 @@ def test_exit_pool_exact_tokens_weighted_tx(local_node):
     assert m.data == "0x8bdb39135c6ee304399dbdb9c8ef030ab642b10820db8f560002000000000000000000140000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000beceb88bf999727f52f0f8efed66d92c089bd450000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000ba100000625a3754423978a60c9317c58a424e3d000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000049dcaa459ee800000000000000000000000000000000000000000000000009b16831c2923f3700000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000058b670eb1cd88b5c20000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000049dcaa459ee800000000000000000000000000000000000000000000000009b16831c2923f37"
     assert m.args.min_amounts_out == [81212098322152, 698453980146188087]
 
+def test_exit_exact_bpt_recovery_mode(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(18408808)
+    recovery_mode_pid = "0x00c2a4be503869fa751c2dbcb7156cc970b5a8da000000000000000000000477"
 
-pool_id = "0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080"
-join_assets = ["0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"]
-join_avatar_address = "0xB7eECEc62C5F7931C76b834B3126D70F0a7C28EE"
+    bpt_amount_in = 50_000_000_000_000_000
 
+    m = balancer.ExactBptRecoveryModeExit(w3=w3,
+                                         pool_id=recovery_mode_pid,
+                                         avatar='0xBA12222222228d8Ba445958a75a0704d566BF2C8',
+                                         bpt_amount_in=bpt_amount_in)
 
-def test_join_pool_exact_tokens(local_node):
-    w3 = local_node
-    local_node_set_block(local_node, block)
+    assert m.data == "0x8bdb391300c2a4be503869fa751c2dbcb7156cc970b5a8da000000000000000000000477000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c8000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c800000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000c2a4be503869fa751c2dbcb7156cc970b5a8da000000000000000000000000d4e7c1f3da1144c9e2cfd1b015eda7652b4a4399000000000000000000000000f71d0774b214c4cf51e33eb3d30ef98132e4dbaa000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000b1a2bc2ec4ff3f00000000000000000000000000000000000000000000000000000000000000860000000000000000000000000000000000000000000000000000000000000039000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000ff00000000000000000000000000000000000000000000000000b1a2bc2ec50000"
+    assert m.args.min_amounts_out == [49999999999999807, 134, 57]
 
-    amounts_in = [166666789, 17604819345413045908]
-    m = balancer.ExactTokensQueryJoin(w3=w3,
-                                      pool_id=bb_a_USD_pid,
-                                      avatar=avatar_address,
-                                      amounts_in=amounts_in)
-
-    bpt_out, amounts_in = m.call(web3=w3, block_identifier=17658530)
-    assert bpt_out == 16984717609279605576
-    assert amounts_in == amounts_in
-
-    # allow 1% slipage
-    min_bpt_amount_out = int(bpt_out * 0.99)
-
-    m = balancer.ExactTokensJoin(w3=w3,
-                                 pool_id=pool_id,
-                                 avatar=join_avatar_address,
-                                 amounts_in=[4557078529222453624530, 4758711463074243205157],
-                                 min_bpt_amount_out=min_bpt_amount_out)
-
-    assert m.data == "0xb95cac2832296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080000000000000000000000000b7eecec62c5f7931c76b834b3126d70f0a7c28ee000000000000000000000000b7eecec62c5f7931c76b834b3126d70f0a7c28ee0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000007f39c581f595b53c5cb19bd0b3f8da6c935e2ca0000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000f70a2b39e417e9fed2000000000000000000000000000000000000000000000101f8634eee9faad82500000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000e95a6b91ea51800000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000f70a2b39e417e9fed2000000000000000000000000000000000000000000000101f8634eee9faad825"

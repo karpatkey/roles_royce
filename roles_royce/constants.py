@@ -17,6 +17,8 @@ class StrEnum(str, Enum):
 class CrossChainAddr(StrEnum):
     BalancerVault = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
 
+MAX_UINT256 = 115792089237316195423570985008687907853269984665640564039457584007913129639935
+ZERO = "0x0000000000000000000000000000000000000000"
 
 class ETHAddr(StrEnum):
     ZERO = "0x0000000000000000000000000000000000000000"
@@ -71,6 +73,8 @@ class Blockchain:
 
     def __hash__(self):
         return self.chain_id
+
+
 
 
 class Chain:
