@@ -4,7 +4,8 @@ from gnosis.safe import addresses, Safe, SafeOperation
 from gnosis.eth import EthereumNetwork, EthereumClient
 from eth_account import Account
 
-from roles_royce.protocols.eth import balancer, aura
+from roles_royce.protocols.eth import aura
+from roles_royce.protocols import balancer
 from roles_royce import roles, Chain
 from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi
 from roles_royce.utils import MULTISENDS
@@ -171,15 +172,18 @@ def test_balancer_aura_withdraw(local_node_eth, accounts):
                 to=safe.address, amount=1_000_000_000)
 
     # deposit tokens in balancer and stake in aura
-    deposit_balancer = balancer.ExactAssetQueryJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
-                                                    avatar=safe.address, assets=[ETHAddr.wstETH, ETHAddr.WETH],
-                                                    amounts_in=[0, 1_000_000_000], min_bpt_out=0)
+    deposit_balancer = balancer.ExactSingleTokenQueryJoin(w3=w3,
+                                                          pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
+                                                          token_in_address=ETHAddr.WETH,
+                                                    amount_in=1_000_000_000)
 
     bpt_out, amounts_in = deposit_balancer.call(web3=w3)
 
-    deposit_balancer = balancer.ExactTokensJoin(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
-                                                avatar=safe.address, assets=[ETHAddr.wstETH, ETHAddr.WETH],
-                                                amounts_in=[0, 1_000_000_000], min_bpt_out=int(bpt_out * 0.99))
+    deposit_balancer = balancer.ExactTokensJoin(w3=w3,
+                                                pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
+                                                avatar=safe.address,
+                                                amounts_in=[0, 1_000_000_000],
+                                                min_bpt_amount_out=int(bpt_out * 0.99))
 
     send_bpt_deposits = roles.send([deposit_balancer], role=1, private_key=accounts[1].key, roles_mod_address=roles_ctract.address,
                                    web3=w3)
@@ -204,19 +208,19 @@ def test_balancer_aura_withdraw(local_node_eth, accounts):
     # withdraw tokens from aura and balancer
     withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_contract_address, amount=int(aura_rewards_amount * 1))
 
-    withdraw_balancer = balancer.SingleAssetQueryExit(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
-                                                      avatar=safe.address,
-                                                      assets=[ETHAddr.wstETH, ETHAddr.WETH],
-                                                      min_amounts_out=[0, 0],  # Not used
+    withdraw_balancer = balancer.ExactBptSingleTokenQueryExit(w3=w3,
+                                                              pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
                                                       bpt_amount_in=bpt_amount,
-                                                      exit_token_index=1)
+                                                      token_out_address=ETHAddr.WETH)
 
     bpt_in, amounts_out = withdraw_balancer.call(web3=w3)
     amounts_out = [int(amount * 0.99) for amount in amounts_out]
-    withdraw_balancer = balancer.SingleAssetExit(pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
-                                                 avatar=safe.address,
-                                                 assets=[ETHAddr.wstETH, ETHAddr.WETH],
-                                                 min_amounts_out=amounts_out, bpt_amount_in=bpt_amount, exit_token_index=1)
+    withdraw_balancer = balancer.ExactBptSingleTokenExit(w3=w3,
+                                                         pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
+                                                         avatar=safe.address,
+                                                         bpt_amount_in=bpt_amount,
+                                                         token_out_address=ETHAddr.WETH,
+                                                         min_amount_out=amounts_out[1])
     send_withdraw = roles.send([withdraw_aura, withdraw_balancer], role=4, private_key=accounts[4].key,
                                roles_mod_address=roles_ctract.address,
                                web3=w3)
