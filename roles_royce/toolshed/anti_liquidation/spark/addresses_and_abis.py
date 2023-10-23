@@ -14,6 +14,19 @@ class EthereumAddressesAndAbis:
     LendingPool = AddressOrAbi(abi=load_abi('lending_pool.json'), name='lending_pool')
 
 
+class GnosisChainAddressesAndAbis:
+    ProtocolDataProvider = AddressOrAbi(address='0x2a002054A06546bB5a264D57A81347e23Af91D18',
+                                        abi=load_abi('protocol_data_provider.json'),
+                                        name='protocol_data_provider')
+    PoolAddressesProvider = AddressOrAbi(address='0xA98DaCB3fC964A6A0d2ce3B77294241585EAbA6d',
+                                         abi=load_abi('pool_addresses_provider.json'),
+                                         name='pool_addresses_provider')
+    PriceOracle = AddressOrAbi(abi=load_abi('price_oracle.json'), name='price_oracle')
+    ERC20 = AddressOrAbi(abi=load_abi('erc20.json'), name='erc20')
+    LendingPool = AddressOrAbi(abi=load_abi('lending_pool.json'), name='lending_pool')
+
+
 AddressesAndAbis = {
-    Chain.Ethereum: EthereumAddressesAndAbis
+    Chain.Ethereum: EthereumAddressesAndAbis,
+    Chain.GnosisChain: GnosisChainAddressesAndAbis
 }
