@@ -20,6 +20,7 @@ class StakeInGauge(ContractMethod):
         self.target_address = gauge_address
         self.args.value = amount
 
+
 class UnstakeFromGauge(ContractMethod):
     """Unstake BPT from gauge"""
     name = "withdraw"
@@ -33,7 +34,6 @@ class UnstakeFromGauge(ContractMethod):
         super().__init__()
         self.target_address = gauge_address
         self.args.value = amount
-
 
 
 # When providing your assets, you must ensure that the tokens are sorted numerically by token address.
@@ -68,7 +68,7 @@ class Exit(ContractMethod):
                  assets: list[Address],
                  min_amounts_out: list[int],
                  user_data: list):
-        if self.name == 'queryExit': # Target address might be specified beforehand by Mixins
+        if self.name == 'queryExit':  # Target address might be specified beforehand by Mixins
             self.target_address = AddressesAndAbis[blockchain].Queries.address
         else:
             self.target_address = AddressesAndAbis[blockchain].Vault.address
@@ -84,15 +84,6 @@ class Exit(ContractMethod):
         return eth_abi.encode(self.user_data_abi, user_data)
 
 
-
-# -----------------------------------------------------------------------------------------------------------------------
-
-
-
-# When providing your assets, you must ensure that the tokens are sorted numerically by token address.
-# It's also important to note that the values in maxAmountsIn correspond to the same index value in assets,
-# so these arrays must be made in parallel after sorting.
-
 class Join(ContractMethod):
     target_address = None
     name = "joinPool"
@@ -100,16 +91,18 @@ class Join(ContractMethod):
         ("pool_id", "bytes32"),
         ("sender", "address"),
         ("recipient", "address"),
-        ("request", ((
-                         ("assets", "address[]"),  # list of tokens, ordered numerically
-                         ("max_amounts_in", "uint256[]"),  # the higher limits for the tokens to deposit
-                         ("user_data", "bytes"),
-                         # userData encodes a ExitKind to tell the pool what style of join you're performing
-                         ("from_internal_balance", "bool")
-                     ), "tuple")
+        ("request", (
+            (
+                ("assets", "address[]"),  # list of tokens, ordered numerically
+                ("max_amounts_in", "uint256[]"),  # the lower limits for the tokens to receive
+                ("user_data", "bytes"),
+                # userData encodes a ExitKind to tell the pool what style of exit you're performing
+                ("to_internal_balance", "bool")
+            ),
+            "tuple"),
          )
     )
-    fixed_arguments = {"sender": AvatarAddress, "recipient": AvatarAddress, "from_internal_balance": False}
+    fixed_arguments = {"sender": AvatarAddress, "recipient": AvatarAddress, "to_internal_balance": False}
     user_data_abi = None
 
     def __init__(self,
@@ -120,6 +113,7 @@ class Join(ContractMethod):
                  max_amounts_in: list[int],
                  user_data: list):
         if self.name == 'queryJoin':  # Target address might be specified beforehand by Mixins
+            a = AddressesAndAbis[blockchain].Queries.address
             self.target_address = AddressesAndAbis[blockchain].Queries.address
         else:
             self.target_address = AddressesAndAbis[blockchain].Vault.address
@@ -129,7 +123,7 @@ class Join(ContractMethod):
         self.args.max_amounts_in = max_amounts_in
         self.args.user_data = self.encode_user_data(user_data)
         self.args.request = [self.args.assets, self.args.max_amounts_in, self.args.user_data,
-                             self.fixed_arguments['from_internal_balance']]
+                             self.fixed_arguments['to_internal_balance']]
 
     def encode_user_data(self, user_data):
         return eth_abi.encode(self.user_data_abi, user_data)
@@ -186,7 +180,3 @@ class SingleSwap(ContractMethod):
                            self.fixed_arguments["recipient"], self.fixed_arguments["to_internal_balance"]]
         self.args.deadline = self.fixed_arguments["deadline"]
         self.args.limit = limit
-
-
-
-

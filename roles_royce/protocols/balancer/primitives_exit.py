@@ -27,11 +27,7 @@ class _ExactBptSingleTokenExit(Exit):
                  bpt_amount_in: int,
                  exit_token_index: int,
                  min_amounts_out: list[int]):
-        """
 
-        :param bpt_amount_in: the amount of BPT to be burned
-        :param exit_token_index: the index of the token to removed from the pool
-        """
         if pool_kind == PoolKind.ComposableStablePool:
             self.exit_kind = ComposableStablePoolExitKind.EXACT_BPT_IN_FOR_ONE_TOKEN_OUT
         else:

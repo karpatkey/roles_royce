@@ -22,7 +22,7 @@ pool_id = "0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080"
 join_assets = ["0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"]
 join_avatar_address = "0xB7eECEc62C5F7931C76b834B3126D70F0a7C28EE"
 
-@pytest.mark.skip("WIP")
+#@pytest.mark.skip("WIP")
 def test_join_pool_exact_tokens(local_node_eth):
     w3 = local_node_eth.w3
     local_node_eth.set_block(block)

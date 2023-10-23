@@ -10,11 +10,6 @@ from .contract_methods import Join
 from .types_and_enums import PoolKind
 from .addresses_and_abis import AddressesAndAbis
 
-# When providing your assets, you must ensure that the tokens are sorted numerically by token address.
-# It's also important to note that the values in maxAmountsIn correspond to the same index value in assets,
-# so these arrays must be made in parallel after sorting.
-
-
 
 class _ExactBptSingleTokenJoin(Join):
     """Single Asset Join
@@ -60,7 +55,7 @@ class ExactBptSingleTokenJoin(_ExactBptSingleTokenJoin):
         join_token_index = assets.index(token_in_address)
         max_amounts_in = [0] * join_token_index + [max_amount_in] + [0] * (len(assets) - join_token_index - 1)
 
-        super().__init__(blockchain=Chain.get_blockchain_by_chain_id(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,
@@ -109,7 +104,7 @@ class ProportionalJoin(_ProportionalJoin):
         if assets is None:
             assets = Pool(w3, pool_id).assets()
 
-        super().__init__(blockchain=Chain.get_blockchain_by_chain_id(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,
@@ -132,12 +127,6 @@ class _ExactTokensJoin(Join):
                  assets: list[Address],
                  amounts_in: list[int],
                  min_bpt_amount_out: int):
-        """
-        :param amounts_in: the amounts of each token to be deposited into the pool
-        :param min_bpt_amount_out: the minimum acceptable BPT to be minted in return for deposited tokens
-
-        """
-
         super().__init__(blockchain=blockchain,
                          pool_id=pool_id,
                          avatar=avatar,
@@ -157,7 +146,7 @@ class ExactTokensJoin(_ExactTokensJoin):
         if assets is None:
             assets = Pool(w3, pool_id).assets()
 
-        super().__init__(blockchain=Chain.get_blockchain_by_chain_id(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,
@@ -183,7 +172,7 @@ class ExactSingleTokenJoin(_ExactTokensJoin):
         join_token_index = assets.index(token_in_address)
         amounts_in = [0] * join_token_index + [amount_in] + [0] * (len(assets) - join_token_index - 1)
 
-        super().__init__(blockchain=Chain.get_blockchain_by_chain_id(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,
@@ -252,6 +241,7 @@ class ExactSingleTokenQueryJoin(QueryJoinMixin, ExactSingleTokenJoin):
                          token_in_address=token_in_address,
                          amount_in=amount_in,
                          min_bpt_amount_out=0)
+
 
 class ExactBptSingleTokenJoinSlippage(ExactBptSingleTokenJoin):
     def __init__(self,
