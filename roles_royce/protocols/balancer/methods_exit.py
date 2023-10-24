@@ -229,19 +229,8 @@ class ExactBptRecoveryModeExit(_ExactBptRecoveryModeExit):
                  assets: list[Address] = None):
         if assets is None:
             assets = Pool(w3, pool_id).assets()
-        blockchain = Chain.get_blockchain_from_web3(w3)
-        bpt_contract = w3.eth.contract(address=Web3.to_checksum_address(pool_id[:42]),
-                                       abi=AddressesAndAbis[blockchain].UniversalBPT.abi)
 
-        bpt_total_supply = bpt_contract.functions.totalSupply().call()
-
-        pool_balances = Pool(w3, pool_id).pool_balances()
-
-        min_amounts_out = [
-            int((Decimal(balance) * Decimal(bpt_amount_in) / Decimal(bpt_total_supply)).quantize(Decimal('0'),
-                                                                                                 rounding=ROUND_DOWN))
-            for balance in
-            pool_balances]
+        min_amounts_out = [0] * len(assets)
 
         super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
@@ -325,7 +314,6 @@ class ExactSingleTokenQueryExit(QueryExitMixin, ExactSingleTokenExit):
 # -----------------------------------------------------------------------------------------------------------------------
 # The next are the classes ready to be used inputting max slippage
 
-# Exit
 class ExactBptSingleTokenExitSlippage(ExactBptSingleTokenExit):
     def __init__(self,
                  w3: Web3,

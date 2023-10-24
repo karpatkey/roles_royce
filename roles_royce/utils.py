@@ -7,6 +7,7 @@ from gnosis.safe.multi_send import MultiSend, MultiSendOperation, MultiSendTx
 from .roles_modifier import Operation
 from .constants import Blockchain, Chain
 from .generic_method import Transactable, TxData
+from dataclasses import dataclass
 
 TENDERLY_API_URL = "https://api.tenderly.co/api/v1/"
 TENDERLY_DASHBOARD_URL = "https://dashboard.tenderly.co/"
@@ -211,3 +212,10 @@ def tenderly_share_simulation(account_id: str,
     response.raise_for_status()
 
     return f"{TENDERLY_DASHBOARD_URL}shared/simulation/{simulation_id}"
+
+
+@dataclass
+class TenderlyCredentials:
+    account_id: str
+    project: str
+    api_token: str
