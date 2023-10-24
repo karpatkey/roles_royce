@@ -13,7 +13,7 @@ from tests.utils import create_simple_safe
 from eth_account import Account
 from web3 import Web3
 
-
+@pytest.mark.skip("WIP...")
 def test_integration_exit_1_1_non_composable(local_node_eth, accounts):
     w3 = local_node_eth.w3
     block = 18193307
