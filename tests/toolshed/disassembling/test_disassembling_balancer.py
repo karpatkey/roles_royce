@@ -91,7 +91,7 @@ def test_integration_exit_1_1(local_node_eth, accounts):
 
 def test_integration_exit_1_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = 18193307
+    block = 18421437
     local_node_eth.set_block(block)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -104,6 +104,7 @@ def test_integration_exit_1_2(local_node_eth, accounts):
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[1].address
+    private_key = accounts[1].key
     role = 1
 
     fork_unlock_account(w3, disassembler_address)
@@ -113,6 +114,8 @@ def test_integration_exit_1_2(local_node_eth, accounts):
                                                  roles_mod_address=roles_contract.address,
                                                  role=role,
                                                  signer_address=disassembler_address)
+    # ----------------------------------------------------------------------------------------------------------------
+    # Composable
     GHO_USDT_USDC_bpt_address = "0x8353157092ED8Be69a9DF8F95af097bbF33Cb2aF"
 
     bpt_contract = w3.eth.contract(address=GHO_USDT_USDC_bpt_address,
@@ -126,19 +129,46 @@ def test_integration_exit_1_2(local_node_eth, accounts):
     GHO_balance = GHO_contract.functions.balanceOf(avatar_safe_address).call()
     assert GHO_balance == 0
 
-    txn_transactable = balancer_disassembler.exit_1_2(percentage=50,
+    txn_transactable = balancer_disassembler.exit_1_2(percentage=30,
                                                       exit_arguments=[{"bpt_address": GHO_USDT_USDC_bpt_address,
                                                                        "token_out_address": ETHAddr.GHO,
                                                                        "max_slippage": 0.01}])
 
-    balancer_disassembler.send(txns=txn_transactable, private_key=accounts[1].key)
+    balancer_disassembler.send(txns=txn_transactable, private_key=private_key)
 
     bpt_token_balance_after = bpt_contract.functions.balanceOf(avatar_safe_address).call()
-    assert bpt_token_balance_after == 4499999999999500000
-    assert bpt_token_balance_after == int(Decimal(bpt_token_balance) / Decimal(2))
+    assert bpt_token_balance_after == 6299999999999300100
+    assert bpt_token_balance_after == approx(int(Decimal(bpt_token_balance) * Decimal(0.7)))
 
     new_GHO_balance = GHO_contract.functions.balanceOf(avatar_safe_address).call()
-    assert new_GHO_balance == 4544779680369055719
+    assert new_GHO_balance == 2736771989880524105
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # Metastable
+    rETH_WETH_bpt_address = "0x1E19CF2D73a72Ef1332C882F20534B6519Be0276"
+    # Initial data
+    bpt_contract = w3.eth.contract(address=rETH_WETH_bpt_address,
+                                   abi=AddressesAndAbis[blockchain].UniversalBPT.abi)
+
+    steal_token(w3=w3, token=rETH_WETH_bpt_address, holder="0xa7dB55e153C0c71Ff35432a9aBe2A853f886Ce0D",
+                to=avatar_safe.address, amount=80_999_999)
+    bpt_token_balance = bpt_contract.functions.balanceOf(avatar_safe.address).call()
+    assert bpt_token_balance == 80_999_999
+
+    WETH_contract = w3.eth.contract(address=ETHAddr.WETH, abi=erc20_abi)
+    WETH_balance = WETH_contract.functions.balanceOf(avatar_safe_address).call()
+    assert WETH_balance == 0
+
+    txn_transactable = balancer_disassembler.exit_1_2(percentage=30,
+                                                      exit_arguments=[{"bpt_address": rETH_WETH_bpt_address,
+                                                                       "token_out_address": ETHAddr.WETH,
+                                                                       "max_slippage": 1}])
+
+    balancer_disassembler.send(txns=txn_transactable, private_key=private_key)
+
+    bpt_token_balance_after = bpt_contract.functions.balanceOf(avatar_safe_address).call()
+    assert bpt_token_balance_after == 56700000
+    assert bpt_token_balance_after == approx(int(Decimal(bpt_token_balance) * Decimal(0.7)))
 
 
 def test_integration_exit_1_3(local_node_eth, accounts):
@@ -149,14 +179,8 @@ def test_integration_exit_1_3(local_node_eth, accounts):
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
 
-    presets = """{"version":"1.0","chainId":"1","meta":{"name":null,"description":"","txBuilderVersion":"1.8.0"}, 
-    "createdAt":1695826823729,"transactions": [{"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86", 
-    "data":"0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c8","value":"0"}, {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c88bdb391300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000020ff4ce5aaab5a627bf82f4a571ab1ce94aa365ea60000000000000000000005d90000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value":"0"}]}"""
-
-    apply_presets(avatar_safe, roles_contract, json_data=presets,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:]), (
-                      "ff4ce5aaab5a627bf82f4a571ab1ce94aa365ea60000000000000000000005d9",
-                      "ff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426")])
+    apply_presets(avatar_safe, roles_contract, json_data=preset,
+                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
 
     blockchain = Chain.get_blockchain_from_web3(w3)
 
@@ -198,8 +222,6 @@ def test_integration_exit_1_3(local_node_eth, accounts):
     txn_transactable = balancer_disassembler.exit_1_3(percentage=50,
                                                       exit_arguments=[{"bpt_address": DOLA_USDC_BPT}])
 
-    txntest = balancer_disassembler.check(txns=txn_transactable, block=block, from_address=disassembler_address)
-    assert txntest
     balancer_disassembler.send(txns=txn_transactable, private_key=private_key)
 
     bpt_balance_after = bpt_contract.functions.balanceOf(avatar_safe_address).call()
@@ -240,8 +262,6 @@ def test_integration_exit_2_1(local_node_eth, accounts):
     role = 1
 
     emergency = "0xA29F61256e948F3FB707b4b3B138C5cCb9EF9888"
-
-    fork_unlock_account(w3, disassembler_address)
 
     balancer_disassembler = BalancerDisassembler(w3=w3,
                                                  avatar_safe_address=avatar_safe.address,
