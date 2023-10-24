@@ -4,7 +4,8 @@ from ..tokens import Abis as TokenAbis
 
 
 class Abis(TokenAbis): # The inheritance with TokenAbis adds the ERC20 abi
-    pass
+    BaseRewardPool = AddressOrAbi(abi=load_abi('base_reward_pool.json'),
+                                  name='base_reward_pool')
 
 
 class EthereumAddresses:
