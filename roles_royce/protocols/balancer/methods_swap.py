@@ -1,8 +1,8 @@
-from roles_royce.constants import ETHAddr, CrossChainAddr, MAX_UINT256, Chain
+from roles_royce.constants import MAX_UINT256, Chains, Blockchain
 from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
 from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from web3 import Web3
-from roles_royce.addresses_and_abis.balancer import AddressesAndAbis
+from roles_royce.addresses_and_abis.balancer import ContractSpecs
 
 
 class SingleSwap(ContractMethod):
@@ -36,7 +36,7 @@ class SingleSwap(ContractMethod):
                        "to_internal_balance": False, "user_data": "0x", "deadline": MAX_UINT256}
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  pool_id: str,
                  avatar: Address,
                  swap_kind: SwapKind,
@@ -44,7 +44,7 @@ class SingleSwap(ContractMethod):
                  token_out_address: Address,
                  amount: int,
                  limit: int):
-        self.target_address = AddressesAndAbis[blockchain].Vault.address
+        self.target_address = ContractSpecs[blockchain].Vault.address
         super().__init__(avatar=avatar)
         self.args.single_swap["pool_id"] = pool_id
         self.args.single_swap["kind"] = swap_kind
@@ -68,7 +68,7 @@ class ExactTokenInSingleSwap(SingleSwap):
                  amount_in: int,
                  min_amount_out: int):
         swap_kind = SwapKind.OutGivenExactIn
-        super().__init__(blockchain=Chain.get_blockchain_by_chain_id(w3),
+        super().__init__(blockchain=Chains.get_blockchain_by_chain_id(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          swap_kind=swap_kind,
@@ -88,7 +88,7 @@ class ExactTokenOutSingleSwap(SingleSwap):
                  amount_out: int,
                  max_amount_in: int):
         swap_kind = SwapKind.InGivenExactOut
-        super().__init__(blockchain=Chain.get_blockchain_by_chain_id(w3),
+        super().__init__(blockchain=Chains.get_blockchain_by_chain_id(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          swap_kind=swap_kind,

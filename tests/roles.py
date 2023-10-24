@@ -2,7 +2,7 @@ import json
 from roles_royce.utils import MULTISENDS
 from roles_royce.evm_utils import roles_abi, roles_bytecode
 from roles_royce.generic_method import TxData
-from roles_royce import Chain
+from roles_royce import Chains
 
 from web3 import Web3
 from .utils import TEST_ACCOUNTS, SimpleSafe
@@ -20,7 +20,7 @@ def deploy_roles(w3: Web3, avatar):
     roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5).contractAddress
 
     ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
-    ctract.functions.setMultisend(MULTISENDS[Chain.Ethereum]).transact({"from": avatar})
+    ctract.functions.setMultisend(MULTISENDS[Chains.Ethereum]).transact({"from": avatar})
     return ctract
 
 

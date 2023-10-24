@@ -1,13 +1,12 @@
-from roles_royce.constants import ZERO, MAX_UINT256, Chain
+from roles_royce.constants import ZERO, MAX_UINT256, Chains, Blockchain
 from roles_royce.protocols.base import Address
 from web3 import Web3
-from decimal import Decimal, ROUND_DOWN
+from decimal import Decimal
 from roles_royce.protocols.balancer.types_and_enums import ComposableStablePoolExitKind, StablePoolExitKind, \
     StablePoolv2ExitKind
 from .utils import Pool
 from .contract_methods import Exit
 from .types_and_enums import PoolKind
-from roles_royce.addresses_and_abis.balancer import AddressesAndAbis
 
 
 class _ExactBptSingleTokenExit(Exit):
@@ -19,7 +18,7 @@ class _ExactBptSingleTokenExit(Exit):
     user_data_abi = ['uint256', 'uint256', 'uint256']
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  pool_kind: PoolKind,
                  pool_id: str,
                  avatar: Address,
@@ -57,7 +56,7 @@ class ExactBptSingleTokenExit(_ExactBptSingleTokenExit):
         min_amounts_out = [0] * exit_token_index + [min_amount_out] + [0] * (
                 len(assets) - exit_token_index - 1)
 
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                          pool_kind=pool_kind,
                          pool_id=pool_id,
                          avatar=avatar,
@@ -76,7 +75,7 @@ class _ExactBptProportionalExit(Exit):
     user_data_abi = ['uint256', 'uint256']
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  pool_kind: PoolKind,
                  pool_id: str,
                  avatar: Address,
@@ -110,7 +109,7 @@ class ExactBptProportionalExit(_ExactBptProportionalExit):
             assets = Pool(w3, pool_id).assets()
         pool_kind = Pool(w3, pool_id).pool_kind()
 
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                          pool_kind=pool_kind,
                          pool_id=pool_id,
                          avatar=avatar,
@@ -127,7 +126,7 @@ class _ExactTokensExit(Exit):
     user_data_abi = ['uint256', 'uint256[]', 'uint256']
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  pool_kind: PoolKind,
                  pool_id: str,
                  avatar: Address,
@@ -165,7 +164,7 @@ class ExactTokensExit(_ExactTokensExit):
             assets = Pool(w3, pool_id).assets()
         pool_kind = Pool(w3, pool_id).pool_kind()
 
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                          pool_kind=pool_kind,
                          pool_id=pool_id,
                          avatar=avatar,
@@ -201,7 +200,7 @@ class _ExactBptRecoveryModeExit(Exit):
     user_data_abi = ['uint256', 'uint256']
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  pool_id: str,
                  avatar: Address,
                  assets: list[Address],
@@ -232,7 +231,7 @@ class ExactBptRecoveryModeExit(_ExactBptRecoveryModeExit):
 
         min_amounts_out = [0] * len(assets)
 
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,

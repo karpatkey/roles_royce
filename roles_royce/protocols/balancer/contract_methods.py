@@ -1,8 +1,8 @@
 import eth_abi
 from roles_royce.constants import MAX_UINT256
 from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
-from roles_royce.addresses_and_abis.balancer import AddressesAndAbis
-from roles_royce.constants import Chain
+from roles_royce.addresses_and_abis.balancer import ContractSpecs
+from roles_royce.constants import Blockchain
 from .types_and_enums import SwapKind
 
 
@@ -12,7 +12,7 @@ class StakeInGauge(ContractMethod):
     in_signature = [("value", "uint256")]
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  gauge_address: Address,
                  amount: int):
         # The blockchain is not needed, but it is included for consistency
@@ -27,7 +27,7 @@ class UnstakeFromGauge(ContractMethod):
     in_signature = [("value", "uint256")]
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  gauge_address: Address,
                  amount: int):
         # The blockchain is not needed, but it is included for consistency
@@ -61,16 +61,16 @@ class Exit(ContractMethod):
     user_data_abi = None
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  pool_id: str,
                  avatar: Address,
                  assets: list[Address],
                  min_amounts_out: list[int],
                  user_data: list):
         if self.name == 'queryExit':  # Target address might be specified beforehand by Mixins
-            self.target_address = AddressesAndAbis[blockchain].Queries.address
+            self.target_address = ContractSpecs[blockchain].Queries.address
         else:
-            self.target_address = AddressesAndAbis[blockchain].Vault.address
+            self.target_address = ContractSpecs[blockchain].Vault.address
         super().__init__(avatar=avatar)
         self.args.pool_id = pool_id
         self.args.assets = assets
@@ -104,16 +104,16 @@ class Join(ContractMethod):
     user_data_abi = None
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  pool_id: str,
                  avatar: Address,
                  assets: list[Address],
                  max_amounts_in: list[int],
                  user_data: list):
         if self.name == 'queryJoin':  # Target address might be specified beforehand by Mixins
-            self.target_address = AddressesAndAbis[blockchain].Queries.address
+            self.target_address = ContractSpecs[blockchain].Queries.address
         else:
-            self.target_address = AddressesAndAbis[blockchain].Vault.address
+            self.target_address = ContractSpecs[blockchain].Vault.address
         super().__init__(avatar=avatar)
         self.args.pool_id = pool_id
         self.args.assets = assets
@@ -157,7 +157,7 @@ class SingleSwap(ContractMethod):
                        "to_internal_balance": False, "user_data": "0x", "deadline": MAX_UINT256}
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  pool_id: str,
                  avatar: Address,
                  swap_kind: SwapKind,
@@ -165,7 +165,7 @@ class SingleSwap(ContractMethod):
                  token_out_address: Address,
                  amount: int,
                  limit: int):
-        self.target_address = AddressesAndAbis[blockchain].Vault.address
+        self.target_address = ContractSpecs[blockchain].Vault.address
         super().__init__(avatar=avatar)
         self.args.single_swap["pool_id"] = pool_id
         self.args.single_swap["kind"] = swap_kind

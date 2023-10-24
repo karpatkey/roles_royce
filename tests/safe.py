@@ -7,7 +7,7 @@ from eth_account.signers.local import LocalAccount
 from hexbytes import HexBytes
 
 from roles_royce.generic_method import Transactable
-from roles_royce.constants import ETHAddr, Chain
+from roles_royce.constants import ETHAddr, Chains
 from roles_royce.utils import multi_or_one
 
 
@@ -30,7 +30,7 @@ class SimpleSafe(Safe):
         super().__init__(address, ethereum_client)
 
     def send(self, txs: list[Transactable]) -> TxResult:
-        tx = multi_or_one(txs, Chain.Ethereum)
+        tx = multi_or_one(txs, Chains.Ethereum)
         safe_tx = self.build_multisig_tx(to=tx.contract_address, value=tx.value,
                                          data=tx.data, operation=tx.operation,
                                          safe_tx_gas=14_000_000,

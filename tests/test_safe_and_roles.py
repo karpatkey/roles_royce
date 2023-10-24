@@ -4,7 +4,7 @@ from gnosis.eth import EthereumNetwork, EthereumClient
 from eth_account import Account
 from roles_royce.protocols.eth import aura
 from roles_royce.protocols import balancer
-from roles_royce import roles, Chain
+from roles_royce import roles, Chains
 from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi
 from roles_royce.utils import MULTISENDS
 from roles_royce.constants import ETHAddr
@@ -89,7 +89,7 @@ def test_safe_and_roles(local_node_eth):
     # give the roles_mod to the safe
     role_ctract.functions.setTarget(safe.address).transact({"from": test_account0_addr})
     role_ctract.functions.setAvatar(safe.address).transact({"from": test_account0_addr})
-    role_ctract.functions.setMultisend(MULTISENDS[Chain.Ethereum]).transact({"from": test_account0_addr})
+    role_ctract.functions.setMultisend(MULTISENDS[Chains.Ethereum]).transact({"from": test_account0_addr})
     role_ctract.functions.transferOwnership(safe.address).transact({"from": test_account0_addr})
 
     assert role_ctract.functions.owner().call() == safe.address

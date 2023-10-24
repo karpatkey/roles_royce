@@ -5,7 +5,7 @@ from web3 import Web3
 import requests
 from gnosis.safe.multi_send import MultiSend, MultiSendOperation, MultiSendTx
 from .roles_modifier import Operation
-from .constants import Blockchain, Chain
+from .constants import Blockchain, Chains
 from .generic_method import Transactable, TxData
 from dataclasses import dataclass
 
@@ -26,8 +26,8 @@ def to_data_input(name, signature, args):
 
 
 MULTISENDS = {
-    Chain.Ethereum: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
-    Chain.Gnosis: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
+    Chains.Ethereum: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
+    Chains.Gnosis: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
 }
 
 

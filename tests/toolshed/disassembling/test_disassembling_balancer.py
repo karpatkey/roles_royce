@@ -3,8 +3,8 @@ from tests.utils import (local_node_eth, accounts, ETH_LOCAL_NODE_URL, fork_unlo
                          create_simple_safe,
                          get_balance, steal_token, SimpleSafe, top_up_address, SCRAPE_ACCOUNT)
 from roles_royce.toolshed.disassembling import BalancerDisassembler
-from roles_royce.addresses_and_abis.balancer import AddressesAndAbis
-from roles_royce.constants import Chain
+from roles_royce.addresses_and_abis.balancer import Abis
+from roles_royce.constants import Chains
 from decimal import Decimal
 import pytest
 from roles_royce.evm_utils import erc20_abi
@@ -28,7 +28,7 @@ def test_integration_exit_1_1_non_composable(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=presets,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
 
-    blockchain = Chain.get_blockchain_from_web3(w3)
+    blockchain = Chains.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[1].address
@@ -43,7 +43,7 @@ def test_integration_exit_1_1_non_composable(local_node_eth, accounts):
     BAL_WETH_bpt_address = "0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56"
     # Initial data
     bpt_contract = w3.eth.contract(address=BAL_WETH_bpt_address,
-                                   abi=AddressesAndAbis[blockchain].UniversalBPT.abi)
+                                   abi=Abis[blockchain].UniversalBPT.abi)
     steal_token(w3=w3, token=BAL_WETH_bpt_address, holder="0x24FAf482304Ed21F82c86ED5fEb0EA313231a808",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     bpt_token_balance = bpt_contract.functions.balanceOf(avatar_safe.address).call()
@@ -74,7 +74,7 @@ def test_integration_exit_1_1_composable(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=presets,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
 
-    blockchain = Chain.get_blockchain_from_web3(w3)
+    blockchain = Chains.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[1].address
@@ -90,7 +90,7 @@ def test_integration_exit_1_1_composable(local_node_eth, accounts):
     GHO_USDT_USDC_bpt_address = "0x8353157092ED8Be69a9DF8F95af097bbF33Cb2aF"
     # Initial data
     bpt_contract = w3.eth.contract(address=GHO_USDT_USDC_bpt_address,
-                                   abi=AddressesAndAbis[blockchain].UniversalBPT.abi)
+                                   abi=Abis[blockchain].UniversalBPT.abi)
     steal_token(w3=w3, token=GHO_USDT_USDC_bpt_address, holder="0x854B004700885A61107B458f11eCC169A019b764",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     bpt_token_balance = bpt_contract.functions.balanceOf(avatar_safe.address).call()
@@ -121,7 +121,7 @@ def test_integration_exit_1_2_composable(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=presets,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
 
-    blockchain = Chain.get_blockchain_from_web3(w3)
+    blockchain = Chains.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[1].address
@@ -138,7 +138,7 @@ def test_integration_exit_1_2_composable(local_node_eth, accounts):
     GHO_USDT_USDC_bpt_address = "0x8353157092ED8Be69a9DF8F95af097bbF33Cb2aF"
 
     bpt_contract = w3.eth.contract(address=GHO_USDT_USDC_bpt_address,
-                                   abi=AddressesAndAbis[blockchain].UniversalBPT.abi)
+                                   abi=Abis[blockchain].UniversalBPT.abi)
     steal_token(w3=w3, token=GHO_USDT_USDC_bpt_address, holder="0x854B004700885A61107B458f11eCC169A019b764",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     bpt_token_balance = bpt_contract.functions.balanceOf(avatar_safe.address).call()
@@ -180,7 +180,7 @@ def test_integration_exit_1_3(local_node_eth, accounts):
                       "ff4ce5aaab5a627bf82f4a571ab1ce94aa365ea60000000000000000000005d9",
                       "ff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426")])
 
-    blockchain = Chain.get_blockchain_from_web3(w3)
+    blockchain = Chains.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[1].address
@@ -200,7 +200,7 @@ def test_integration_exit_1_3(local_node_eth, accounts):
     DOLA_USDC_BPT = "0xFf4ce5AAAb5a627bf82f4A571AB1cE94Aa365eA6"
 
     bpt_contract = w3.eth.contract(address=DOLA_USDC_BPT,
-                                   abi=AddressesAndAbis[blockchain].UniversalBPT.abi)
+                                   abi=Abis[blockchain].UniversalBPT.abi)
     steal_token(w3=w3, token=DOLA_USDC_BPT, holder="0xF59b324Cb65258DC52B5DB8ac4f991286603B7e1",
                 to=avatar_safe.address, amount=4_000_000_000)
     bpt_balance = bpt_contract.functions.balanceOf(avatar_safe.address).call()
@@ -254,7 +254,7 @@ def test_integration_exit_2_1(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=presets,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
 
-    blockchain = Chain.get_blockchain_from_web3(w3)
+    blockchain = Chains.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[1].address
@@ -275,7 +275,7 @@ def test_integration_exit_2_1(local_node_eth, accounts):
     OHM = "0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D5"
 
     bpt_gauge_contract = w3.eth.contract(address=OHM_DAI_BPT_gauge,
-                                         abi=AddressesAndAbis[blockchain].Gauge.abi)
+                                         abi=Abis[blockchain].Gauge.abi)
     steal_token(w3=w3, token=OHM_DAI_BPT_gauge, holder="0x03D27ae932AEA212f453E105D09A12fEEab3Bd49",
                 to=avatar_safe.address, amount=4_000_000_000)
     bpt_gauge_balance = bpt_gauge_contract.functions.balanceOf(avatar_safe.address).call()

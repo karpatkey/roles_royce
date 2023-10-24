@@ -1,59 +1,48 @@
 from web3 import Web3
-from enum import IntEnum
-from roles_royce.constants import Chain
-from roles_royce.addresses_and_abis.balancer import AddressesAndAbis
+from roles_royce.constants import Chains
+from roles_royce.addresses_and_abis.balancer import ContractSpecs, Abis
 from web3.exceptions import ContractLogicError
 from .types_and_enums import PoolKind
-from dataclasses import dataclass
 
-@dataclass
+
 class Pool:
-    w3: Web3
-    pool_id: str
+    def __init__(self, w3: Web3, pool_id: str):
+        self.w3 = w3
+        self.pool_id = pool_id
+        blockchain = Chains.get_blockchain_from_web3(self.w3)
+        self.vault_contract = ContractSpecs[blockchain].Vault.contract(self.w3)
+        bpt_address = self.vault_contract.functions.getPool(self.pool_id).call()[0]
+        self.bpt_contract = self.w3.eth.contract(address=bpt_address, abi=Abis[blockchain].UniversalBPT.abi)
 
     def pool_kind(self) -> PoolKind:
         """
         Returns the kind of pool
         """
-        blockchain = Chain.get_blockchain_from_web3(self.w3)
-        vault_contract = self.w3.eth.contract(address=AddressesAndAbis[blockchain].Vault.address,
-                                         abi=AddressesAndAbis[blockchain].Vault.abi)
-        bpt_address = vault_contract.functions.getPool(self.pool_id).call()[0]
-        bpt_contract = self.w3.eth.contract(address=bpt_address, abi=AddressesAndAbis[blockchain].UniversalBPT.abi)
         try:
-            bpt_contract.functions.getNormalizedWeights().call()
+            self.bpt_contract.functions.getNormalizedWeights().call()
             return PoolKind.WeightedPool
         except ContractLogicError:
             try:
-                bpt_contract.functions.getBptIndex().call()
+                self.bpt_contract.functions.getBptIndex().call()
                 return PoolKind.ComposableStablePool
             except ContractLogicError:
                 try:
-                    bpt_contract.functions.inRecoveryMode().call()
+                    self.bpt_contract.functions.inRecoveryMode().call()
                     return PoolKind.StablePool
                 except ContractLogicError:
                     return PoolKind.MetaStablePool
-
 
     def assets(self) -> list[str]:
         """
         Returns the assets of a pool given a pool id
         """
-        blockchain = Chain.get_blockchain_from_web3(self.w3)
-        vault_contract = self.w3.eth.contract(address=AddressesAndAbis[blockchain].Vault.address,
-                                         abi=AddressesAndAbis[blockchain].Vault.abi)
-        return vault_contract.functions.getPoolTokens(self.pool_id).call()[0]
-
+        return self.vault_contract.functions.getPoolTokens(self.pool_id).call()[0]
 
     def pool_balances(self) -> list[int]:
         """
         Returns the token balances of a pool given a pool id
         """
-        blockchain = Chain.get_blockchain_from_web3(self.w3)
-        vault_contract = self.w3.eth.contract(address=AddressesAndAbis[blockchain].Vault.address,
-                                         abi=AddressesAndAbis[blockchain].Vault.abi)
-        return vault_contract.functions.getPoolTokens(self.pool_id).call()[1]
-
+        return self.vault_contract.functions.getPoolTokens(self.pool_id).call()[1]
 
     def bpt_index_from_composable(self) -> int:
         """
@@ -63,17 +52,8 @@ class Pool:
         if pool_kind != PoolKind.ComposableStablePool:
             raise ValueError("Pool is not a composable stable pool")
         else:
-            blockchain = Chain.get_blockchain_from_web3(self.w3)
-            vault_contract = self.w3.eth.contract(address=AddressesAndAbis[blockchain].Vault.address,
-                                             abi=AddressesAndAbis[blockchain].Vault.abi)
-            bpt_address = vault_contract.functions.getPool(self.pool_id).call()[0]
-            bpt_contract = self.w3.eth.contract(address=bpt_address, abi=AddressesAndAbis[blockchain].UniversalBPT.abi)
-            return bpt_contract.functions.getBptIndex().call()
+
+            return self.bpt_contract.functions.getBptIndex().call()
 
     def bpt_balance(self, address: str) -> int:
-        blockchain = Chain.get_blockchain_from_web3(self.w3)
-        vault_contract = self.w3.eth.contract(address=AddressesAndAbis[blockchain].Vault.address,
-                                         abi=AddressesAndAbis[blockchain].Vault.abi)
-        bpt_address = vault_contract.functions.getPool(self.pool_id).call()[0]
-        bpt_contract = self.w3.eth.contract(address=bpt_address, abi=AddressesAndAbis[blockchain].UniversalBPT.abi)
-        return bpt_contract.functions.balanceOf(address).call()
+        return self.bpt_contract.functions.balanceOf(address).call()

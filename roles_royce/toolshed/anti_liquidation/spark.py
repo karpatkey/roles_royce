@@ -1,6 +1,6 @@
 from decimal import Decimal
-from roles_royce.addresses_and_abis.spark import AddressesAndAbis
-from roles_royce.constants import Chain
+from roles_royce.addresses_and_abis.spark import ContractSpecs, Abis
+from roles_royce.constants import Blockchain, Chains
 from roles_royce.protocols.eth.spark import RateModel
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 from roles_royce.protocols.eth import spark
@@ -27,7 +27,7 @@ class CDPData(Enum):
 @dataclass
 class SparkCDP:
     owner_address: Address | ChecksumAddress | str
-    blockchain: Chain
+    blockchain: Blockchain
     block: int
     balances_data: list[dict]
     health_factor: Decimal
@@ -62,7 +62,7 @@ class SparkCDPManager:
     """A class to handle a CDP in Spark protocol."""
     w3: Web3
     owner_address: Address | ChecksumAddress | str
-    blockchain: Chain = field(init=False)
+    blockchain: Blockchain = field(init=False)
     token_addresses: list[dict] = field(init=False)
     token_addresses_block: int | str = 'latest'
 
@@ -72,7 +72,7 @@ class SparkCDPManager:
         if not self.owner_address:
             raise ValueError("'owner_address' must be filled.")
         self.owner_address = Web3.to_checksum_address(self.owner_address)
-        self.blockchain = Chain.get_blockchain_from_web3(self.w3)
+        self.blockchain = Chains.get_blockchain_from_web3(self.w3)
         if self.token_addresses_block == 'latest':
             self.token_addresses_block = self.w3.eth.block_number
         self.token_addresses = SparkUtils.get_spark_token_addresses(self.w3, block=self.token_addresses_block)
@@ -92,22 +92,17 @@ class SparkCDPManager:
         if block == 'latest':
             block = self.w3.eth.block_number
 
-        pool_addresses_provider_contract = self.w3.eth.contract(
-            address=AddressesAndAbis[self.blockchain].PoolAddressesProvider.address,
-            abi=AddressesAndAbis[self.blockchain].PoolAddressesProvider.abi)
+        pool_addresses_provider_contract = ContractSpecs[self.blockchain].PoolAddressesProvider.contract(self.w3)
         price_oracle_address = pool_addresses_provider_contract.functions.getPriceOracle().call(block_identifier=block)
-        price_oracle_contract = self.w3.eth.contract(price_oracle_address,
-                                                     abi=AddressesAndAbis[self.blockchain].PriceOracle.abi)
-        protocol_data_provider_contract = self.w3.eth.contract(
-            address=AddressesAndAbis[self.blockchain].ProtocolDataProvider.address,
-            abi=AddressesAndAbis[self.blockchain].ProtocolDataProvider.abi)
+        price_oracle_contract = self.w3.eth.contract(price_oracle_address, abi=Abis[self.blockchain].PriceOracle.abi)
+        protocol_data_provider_contract = ContractSpecs[self.blockchain].ProtocolDataProvider.contract(self.w3)
 
         result = []
 
         for element in spark_tokens:
             # Decimals
             token_contract = self.w3.eth.contract(address=element[SparkToken.UNDERLYING],
-                                                  abi=AddressesAndAbis[self.blockchain].ERC20.abi)
+                                                  abi=Abis[self.blockchain].ERC20.abi)
             decimals = token_contract.functions.decimals().call(block_identifier=block)
 
             # Wallet balances
@@ -155,12 +150,10 @@ class SparkCDPManager:
         """"""
         if block == 'latest':
             block = self.w3.eth.block_number
-        pool_addresses_provider_contract = self.w3.eth.contract(
-            address=AddressesAndAbis[self.blockchain].PoolAddressesProvider.address,
-            abi=AddressesAndAbis[self.blockchain].PoolAddressesProvider.abi)
+        pool_addresses_provider_contract = ContractSpecs[self.blockchain].PoolAddressesProvider.contract(self.w3)
         lending_pool_address = pool_addresses_provider_contract.functions.getPool().call(block_identifier=block)
         lending_pool_contract = self.w3.eth.contract(address=lending_pool_address,
-                                                     abi=AddressesAndAbis[self.blockchain].LendingPool.abi)
+                                                     abi=Abis[self.blockchain].LendingPool.abi)
         health_factor = \
             lending_pool_contract.functions.getUserAccountData(self.owner_address).call(block_identifier=block)[
                 5] / Decimal(
@@ -208,7 +201,7 @@ class SparkCDPManager:
 
         if block == 'latest':
             block = self.w3.eth.block_number
-        token_in_decimals = self.w3.eth.contract(address=token_in_address, abi=AddressesAndAbis[
+        token_in_decimals = self.w3.eth.contract(address=token_in_address, abi=Abis[
             self.blockchain].ERC20.abi).functions.decimals().call(block_identifier=block)
 
         health_factor = spark_cdp.health_factor
@@ -279,10 +272,8 @@ class SparkCDPManager:
             raise ValueError('There is no variable borrowed amount of token %s.' % token_in_address)
 
         token_in_contract = self.w3.eth.contract(address=token_in_address,
-                                                 abi=AddressesAndAbis[self.blockchain].ERC20.abi)
-        pool_addresses_provider_contract = self.w3.eth.contract(
-            address=AddressesAndAbis[self.blockchain].PoolAddressesProvider.address,
-            abi=AddressesAndAbis[self.blockchain].PoolAddressesProvider.abi)
+                                                 abi=Abis[self.blockchain].ERC20.abi)
+        pool_addresses_provider_contract = ContractSpecs[self.blockchain].PoolAddressesProvider.contract(self.w3)
         lending_pool_address = pool_addresses_provider_contract.functions.getPool().call()
         allowance = token_in_contract.functions.allowance(self.owner_address, lending_pool_address).call()
 

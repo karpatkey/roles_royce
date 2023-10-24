@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from decimal import Decimal, ROUND_DOWN
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols import balancer
-from roles_royce.addresses_and_abis.balancer import AddressesAndAbis
+from roles_royce.addresses_and_abis.balancer import Abis
 from roles_royce.toolshed.disassembling.disassembler import Disassembler, validate_percentage
 from web3 import Web3
 from web3.exceptions import ContractLogicError
@@ -13,13 +13,13 @@ from roles_royce.protocols.base import Address
 class BalancerDisassembler(Disassembler):
     def get_bpt_amount_to_redeem_from_gauge(self, gauge_address: Address, fraction: float | Decimal) -> int:
         gauge_contract = self.w3.eth.contract(address=gauge_address,
-                                              abi=AddressesAndAbis[self.blockchain].Gauge.abi)
+                                              abi=Abis[self.blockchain].Gauge.abi)
 
         return int(Decimal(gauge_contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
 
     def get_bpt_amount_to_redeem(self, bpt_address: Address, fraction: float | Decimal) -> int:
         bpt_contract = self.w3.eth.contract(address=bpt_address,
-                                            abi=AddressesAndAbis[self.blockchain].UniversalBPT.abi)
+                                            abi=Abis[self.blockchain].UniversalBPT.abi)
 
         return int(Decimal(bpt_contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
 
@@ -52,7 +52,7 @@ class BalancerDisassembler(Disassembler):
             max_slippage = element["max_slippage"]
 
             bpt_contract = self.w3.eth.contract(address=bpt_address,
-                                                abi=AddressesAndAbis[self.blockchain].UniversalBPT.abi)
+                                                abi=Abis[self.blockchain].UniversalBPT.abi)
 
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem(bpt_address, fraction)
@@ -109,7 +109,7 @@ class BalancerDisassembler(Disassembler):
             token_out_address = Web3.to_checksum_address(element["token_out_address"])
 
             bpt_contract = self.w3.eth.contract(address=bpt_address,
-                                                abi=AddressesAndAbis[self.blockchain].UniversalBPT.abi)
+                                                abi=Abis[self.blockchain].UniversalBPT.abi)
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem(bpt_address, fraction)
 
@@ -158,7 +158,7 @@ class BalancerDisassembler(Disassembler):
             bpt_address = Web3.to_checksum_address(element["bpt_address"])
 
             bpt_contract = self.w3.eth.contract(address=bpt_address,
-                                                abi=AddressesAndAbis[self.blockchain].UniversalBPT.abi)
+                                                abi=Abis[self.blockchain].UniversalBPT.abi)
 
             try:
                 bpt_pool_recovery_mode = bpt_contract.functions.inRecoveryMode().call()
@@ -215,7 +215,7 @@ class BalancerDisassembler(Disassembler):
             txns.append(unstake_gauge)
 
             gauge_contract = self.w3.eth.contract(address=gauge_contract,
-                                                  abi=AddressesAndAbis[self.blockchain].Gauge.abi)
+                                                  abi=Abis[self.blockchain].Gauge.abi)
             bpt_address = gauge_contract.functions.lp_token().call()
 
             withdraw_balancer = self.exit_1_1(percentage=fraction, exit_arguments=[
@@ -261,7 +261,7 @@ class BalancerDisassembler(Disassembler):
             txns.append(unstake_gauge)
 
             gauge_contract = self.w3.eth.contract(address=gauge_contract,
-                                                  abi=AddressesAndAbis[self.blockchain].Gauge.abi)
+                                                  abi=Abis[self.blockchain].Gauge.abi)
             bpt_address = gauge_contract.functions.lp_token().call()
 
             withdraw_balancer = self.exit_1_2(percentage=fraction, exit_arguments=[
@@ -305,7 +305,7 @@ class BalancerDisassembler(Disassembler):
             txns.append(unstake_gauge)
 
             gauge_contract = self.w3.eth.contract(address=gauge_contract,
-                                                  abi=AddressesAndAbis[self.blockchain].Gauge.abi)
+                                                  abi=Abis[self.blockchain].Gauge.abi)
             bpt_address = gauge_contract.functions.lp_token().call()
 
             withdraw_balancer = self.exit_1_3(percentage=fraction, exit_arguments=[

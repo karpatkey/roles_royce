@@ -1,6 +1,5 @@
-import eth_abi
-from roles_royce.constants import ZERO, CrossChainAddr, MAX_UINT256, Chain
-from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
+from roles_royce.constants import ZERO, MAX_UINT256, Blockchain, Chains
+from roles_royce.protocols.base import Address
 from web3 import Web3
 from decimal import Decimal
 from roles_royce.protocols.balancer.types_and_enums import StablePoolJoinKind
@@ -18,7 +17,7 @@ class _ExactBptSingleTokenJoin(Join):
     join_kind = StablePoolJoinKind.TOKEN_IN_FOR_EXACT_BPT_OUT
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  pool_id: str,
                  avatar: Address,
                  assets: list[Address],
@@ -52,7 +51,7 @@ class ExactBptSingleTokenJoin(_ExactBptSingleTokenJoin):
         join_token_index = assets.index(token_in_address)
         max_amounts_in = [0] * join_token_index + [max_amount_in] + [0] * (len(assets) - join_token_index - 1)
 
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,
@@ -72,7 +71,7 @@ class _ProportionalJoin(Join):
     join_kind = StablePoolJoinKind.ALL_TOKENS_IN_FOR_EXACT_BPT_OUT
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  pool_id: str,
                  avatar: Address,
                  assets: list[Address],
@@ -101,7 +100,7 @@ class ProportionalJoin(_ProportionalJoin):
         if assets is None:
             assets = Pool(w3, pool_id).assets()
 
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,
@@ -118,7 +117,7 @@ class _ExactTokensJoin(Join):
     join_kind = StablePoolJoinKind.EXACT_TOKENS_IN_FOR_BPT_OUT
 
     def __init__(self,
-                 blockchain: Chain,
+                 blockchain: Blockchain,
                  pool_id: str,
                  avatar: Address,
                  assets: list[Address],
@@ -143,7 +142,7 @@ class ExactTokensJoin(_ExactTokensJoin):
         if assets is None:
             assets = Pool(w3, pool_id).assets()
 
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,
@@ -169,7 +168,7 @@ class ExactSingleTokenJoin(_ExactTokensJoin):
         join_token_index = assets.index(token_in_address)
         amounts_in = [0] * join_token_index + [amount_in] + [0] * (len(assets) - join_token_index - 1)
 
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,

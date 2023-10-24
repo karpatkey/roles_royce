@@ -1,7 +1,7 @@
 import logging
 from .generic_method import GenericMethodTransaction, Transactable
 from .roles_modifier import Operation
-from .constants import Chain
+from .constants import Chains
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 

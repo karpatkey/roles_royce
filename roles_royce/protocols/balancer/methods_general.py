@@ -1,4 +1,4 @@
-from roles_royce.constants import CrossChainAddr, Chain
+from roles_royce.constants import CrossChainAddr, Chains
 from roles_royce.protocols.base import BaseApproveForToken
 from web3 import Web3
 from roles_royce.protocols.base import Address
@@ -15,7 +15,7 @@ class Stake(StakeInGauge):
                  w3: Web3,
                  gauge_address: Address,
                  amount: int):
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                          gauge_address=gauge_address,
                          amount=amount)
 
@@ -25,6 +25,6 @@ class Unstake(UnstakeFromGauge):
                  w3: Web3,
                  gauge_address: Address,
                  amount: int):
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                          gauge_address=gauge_address,
                          amount=amount)

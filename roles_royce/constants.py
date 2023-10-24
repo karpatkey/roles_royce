@@ -79,9 +79,7 @@ class Blockchain:
         return self.chain_id
 
 
-
-
-class Chain:
+class Chains:
     Ethereum = Blockchain("ethereum", 0x1)
     Polygon = Blockchain("polygon", 0x89)
     Avalanche = Blockchain("avalanche", 0xA86A)
@@ -97,12 +95,12 @@ class Chain:
             _by_id[attr_value.chain_id] = attr_value
 
     @classmethod
-    def get_blockchain_by_chain_id(cls, chain_id):
+    def get_blockchain_by_chain_id(cls, chain_id) -> Blockchain:
         try:
             return cls._by_id.get(chain_id, None)
         except KeyError:
             raise ValueError(f"No Blockchain with chain_id {chain_id} found in Chain.")
 
     @classmethod
-    def get_blockchain_from_web3(cls, w3: Web3):
+    def get_blockchain_from_web3(cls, w3: Web3) -> Blockchain:
         return cls.get_blockchain_by_chain_id(w3.eth.chain_id)

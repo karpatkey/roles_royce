@@ -1,5 +1,5 @@
 from roles_royce.protocols.eth import spark
-from roles_royce.constants import ETHAddr, Chain
+from roles_royce.constants import ETHAddr, Chains
 from .utils import local_node_eth, accounts, get_balance, steal_token, create_simple_safe
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
 from decimal import Decimal

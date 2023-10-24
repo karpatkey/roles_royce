@@ -26,16 +26,35 @@ def load_local_abi(abi_filename):
 
 
 @dataclass
-class AddressOrAbi:
-    address: str = None
-    name: str = None
-    abi: str = None
+class ContractSpec:
+    address: str
+    name: str
+    abi: str
 
     def __post_init__(self):
-        if not self.address and not self.abi:
-            raise ValueError("Either 'address' or 'abi' must be filled.")
         if self.address is not None:
             self.address = Web3.to_checksum_address(self.address)
+
+    def __str__(self):
+        return self.name
+
+    def contract(self, w3: Web3):
+        return w3.eth.contract(address=self.address, abi=self.abi)
+
+
+@dataclass
+class ContractAbi:
+    name: str
+    abi: str
+
+    def __str__(self):
+        return self.name
+
+
+@dataclass
+class ContractAddress:
+    name: str
+    address: str
 
     def __str__(self):
         return self.name
