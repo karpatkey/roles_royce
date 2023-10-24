@@ -68,8 +68,8 @@ def bot_do():
 
     # -----------------------------------------------------------------------------------------------------------------------
 
-    WXDAI_contract = w3.eth.contract(address=AddressesAndAbis[Chain.GnosisChain].WXDAI.address,
-                                     abi=AddressesAndAbis[Chain.GnosisChain].ERC20.abi)
+    WXDAI_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Gnosis].WXDAI.address,
+                                     abi=AddressesAndAbis[Chain.Gnosis].ERC20.abi)
     balance_WXDAI = WXDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
     if 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance_WXDAI and amount_WXDAI < ENV.AMOUNT:
         while 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance_WXDAI and 10 * amount_WXDAI <= ENV.AMOUNT:
@@ -90,8 +90,8 @@ def bot_do():
 
     # -----------------------------------------------------------------------------------------------------------------------
 
-    EURe_contract = w3.eth.contract(address=AddressesAndAbis[Chain.GnosisChain].EURe.address,
-                                    abi=AddressesAndAbis[Chain.GnosisChain].ERC20.abi)
+    EURe_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Gnosis].EURe.address,
+                                    abi=AddressesAndAbis[Chain.Gnosis].ERC20.abi)
     balance_EURe = EURe_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
     if 10 * amount_EURe * (10 ** decimalsEURe) < balance_EURe and amount_EURe < ENV.AMOUNT:
         while 10 * amount_EURe * (10 ** decimalsEURe) < balance_EURe and 10 * amount_EURe <= ENV.AMOUNT:

@@ -1,5 +1,5 @@
 from decimal import Decimal
-from .addresses_and_abis import AddressesAndAbis
+from roles_royce.addresses_and_abis.spark import AddressesAndAbis
 from roles_royce.constants import Chain
 from roles_royce.protocols.eth.spark import RateModel
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken

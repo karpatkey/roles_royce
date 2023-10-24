@@ -3,12 +3,9 @@ from roles_royce.constants import ZERO, CrossChainAddr, MAX_UINT256, Chain
 from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
 from web3 import Web3
 from decimal import Decimal
-from roles_royce.protocols.balancer.types_and_enums import ComposableStablePoolExitKind, StablePoolExitKind, \
-    StablePoolv2ExitKind, SwapKind, StablePoolJoinKind
+from roles_royce.protocols.balancer.types_and_enums import StablePoolJoinKind
 from .utils import Pool
 from .contract_methods import Join
-from .types_and_enums import PoolKind
-from .addresses_and_abis import AddressesAndAbis
 
 
 class _ExactBptSingleTokenJoin(Join):

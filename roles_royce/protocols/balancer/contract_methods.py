@@ -1,7 +1,7 @@
 import eth_abi
 from roles_royce.constants import MAX_UINT256
 from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
-from .addresses_and_abis import AddressesAndAbis
+from roles_royce.addresses_and_abis.balancer import AddressesAndAbis
 from roles_royce.constants import Chain
 from .types_and_enums import SwapKind
 
@@ -41,7 +41,6 @@ class UnstakeFromGauge(ContractMethod):
 # so these arrays must be made in parallel after sorting.
 
 class Exit(ContractMethod):
-    target_address = None
     name = "exitPool"
     in_signature = (
         ("pool_id", "bytes32"),
@@ -85,7 +84,6 @@ class Exit(ContractMethod):
 
 
 class Join(ContractMethod):
-    target_address = None
     name = "joinPool"
     in_signature = (
         ("pool_id", "bytes32"),
@@ -113,7 +111,6 @@ class Join(ContractMethod):
                  max_amounts_in: list[int],
                  user_data: list):
         if self.name == 'queryJoin':  # Target address might be specified beforehand by Mixins
-            a = AddressesAndAbis[blockchain].Queries.address
             self.target_address = AddressesAndAbis[blockchain].Queries.address
         else:
             self.target_address = AddressesAndAbis[blockchain].Vault.address

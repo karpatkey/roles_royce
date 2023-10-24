@@ -1,9 +1,8 @@
 from roles_royce.constants import ETHAddr, CrossChainAddr, MAX_UINT256, Chain
 from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
-from roles_royce.protocols.balancer.types_and_enums import ComposableStablePoolExitKind, StablePoolExitKind, \
-    StablePoolv2ExitKind, SwapKind, StablePoolJoinKind
-from .addresses_and_abis import AddressesAndAbis
+from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from web3 import Web3
+from roles_royce.addresses_and_abis.balancer import AddressesAndAbis
 
 
 class SingleSwap(ContractMethod):

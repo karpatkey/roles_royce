@@ -3,11 +3,10 @@ from roles_royce.protocols.eth import spark
 from roles_royce.constants import ETHAddr
 from tests.utils import local_node_eth, accounts, get_balance, get_allowance, steal_token, create_simple_safe, \
     top_up_address, assign_role
-from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager, CDPData
+from roles_royce.toolshed.anti_liquidation.spark import SparkCDPManager, CDPData
 from roles_royce import roles
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 from decimal import Decimal
-import pytest
 
 
 def test_spark_cdp_manager_token_addresses(local_node_eth):
@@ -105,7 +104,7 @@ def test_spark_cdp_manager_get_delta(local_node_eth):
 
 
 def test_integration_spark_cdp(local_node_eth, accounts):
-    local_node_eth.reset_state()# Back to block ETH_LOCAL_NODE_DEFAULT_BLOCK = 17565000
+    local_node_eth.reset_state()  # Back to block ETH_LOCAL_NODE_DEFAULT_BLOCK = 17565000
     w3 = local_node_eth.w3
 
     safe = create_simple_safe(w3, accounts[0])
@@ -150,6 +149,7 @@ def test_integration_spark_cdp(local_node_eth, accounts):
                            avatar=safe.address)])
 
     cdp = cdp_manager.get_cdp_data()
+
     assert cdp.health_factor == approx(Decimal('4.999999969705976845'))
 
     # Testing the 1% tolerance

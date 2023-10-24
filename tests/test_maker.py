@@ -5,7 +5,7 @@ from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from decimal import Decimal
 from pytest import approx
-from roles_royce.toolshed.protocol_utils.maker.addresses_and_abis import AddressesAndAbis
+from roles_royce.addresses_and_abis.maker import AddressesAndAbis
 from roles_royce.constants import Chain
 
 JOIN_WSTETH_A = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH-A

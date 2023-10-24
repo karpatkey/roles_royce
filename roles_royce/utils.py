@@ -13,18 +13,20 @@ TENDERLY_DASHBOARD_URL = "https://dashboard.tenderly.co/"
 
 logger = logging.getLogger(__name__)
 
+
 def to_selector(short_signature):
     return Web3.keccak(text=short_signature).hex()[:10]
 
+
 def to_data_input(name, signature, args):
-    encoded_signature = to_selector(name+signature)
+    encoded_signature = to_selector(name + signature)
     encoded_args = abi.encode([signature], [args]).hex()
     return f"{encoded_signature}{encoded_args}"
 
 
 MULTISENDS = {
     Chain.Ethereum: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
-    Chain.GnosisChain: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
+    Chain.Gnosis: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
 }
 
 

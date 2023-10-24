@@ -80,7 +80,12 @@ class Blockchain:
 class Chain:
     Ethereum = Blockchain("ethereum", 0x1)
     Polygon = Blockchain("polygon", 0x89)
-    GnosisChain = Blockchain("gnosisChain", 0x64)
+    Avalanche = Blockchain("avalanche", 0xA86A)
+    Binance = Blockchain("binance", 0x38)
+    Fantom = Blockchain("fantom", 0xFA)
+    Gnosis = Blockchain("gnosisChain", 0x64)
+    Arbitrum = Blockchain("arbitrum", 0xA4B1)
+    Optimism = Blockchain("optimism", 0xA)
 
     _by_id = {}
     for attr_name, attr_value in locals().copy().items():

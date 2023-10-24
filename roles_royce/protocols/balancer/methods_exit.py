@@ -7,7 +7,7 @@ from roles_royce.protocols.balancer.types_and_enums import ComposableStablePoolE
 from .utils import Pool
 from .contract_methods import Exit
 from .types_and_enums import PoolKind
-from .addresses_and_abis import AddressesAndAbis
+from roles_royce.addresses_and_abis.balancer import AddressesAndAbis
 
 
 class _ExactBptSingleTokenExit(Exit):
@@ -230,15 +230,18 @@ class ExactBptRecoveryModeExit(_ExactBptRecoveryModeExit):
         if assets is None:
             assets = Pool(w3, pool_id).assets()
         blockchain = Chain.get_blockchain_from_web3(w3)
-        bpt_contract = w3.eth.contract(address=Web3.to_checksum_address(pool_id[:42]), abi=AddressesAndAbis[blockchain].UniversalBPT.abi)
+        bpt_contract = w3.eth.contract(address=Web3.to_checksum_address(pool_id[:42]),
+                                       abi=AddressesAndAbis[blockchain].UniversalBPT.abi)
 
         bpt_total_supply = bpt_contract.functions.totalSupply().call()
 
         pool_balances = Pool(w3, pool_id).pool_balances()
 
-        min_amounts_out = [int((Decimal(balance)*Decimal(bpt_amount_in)/Decimal(bpt_total_supply)).quantize(Decimal('0'), rounding=ROUND_DOWN)) for balance in
-                         pool_balances]
-
+        min_amounts_out = [
+            int((Decimal(balance) * Decimal(bpt_amount_in) / Decimal(bpt_total_supply)).quantize(Decimal('0'),
+                                                                                                 rounding=ROUND_DOWN))
+            for balance in
+            pool_balances]
 
         super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
@@ -255,7 +258,6 @@ class ExactBptRecoveryModeExit(_ExactBptRecoveryModeExit):
 class QueryExitMixin:
     name = "queryExit"
     out_signature = [("bpt_in", "uint256"), ("amounts_out", "uint256[]")]
-
 
 
 class ExactBptSingleTokenQueryExit(QueryExitMixin, ExactBptSingleTokenExit):
@@ -318,16 +320,6 @@ class ExactSingleTokenQueryExit(QueryExitMixin, ExactSingleTokenExit):
                          token_out_address=token_out_address,
                          amount_out=amount_out,
                          max_bpt_amount_in=MAX_UINT256)
-
-
-
-
-
-
-
-
-
-
 
 
 # -----------------------------------------------------------------------------------------------------------------------

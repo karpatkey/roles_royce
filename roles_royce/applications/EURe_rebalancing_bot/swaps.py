@@ -16,7 +16,7 @@ decimalsWXDAI = 18
 class SwapWXDAIforEURe(ContractMethod):
     name = "exchange_underlying"
     in_signature = [("i", "uint256"), ("j", "uint256"), ("_dx", "uint256"), ("_min_dy", "uint256")]
-    target_address = AddressesAndAbis[Chain.GnosisChain].DepositZap.address
+    target_address = AddressesAndAbis[Chain.Gnosis].DepositZap.address
     fixed_arguments = {"i": 1, "j": 0}
 
     def __init__(self, avatar: Address, amount: int, min_amount_out: int):
@@ -28,7 +28,7 @@ class SwapWXDAIforEURe(ContractMethod):
 class SwapEUReForWXDAI(ContractMethod):
     name = "exchange_underlying"
     in_signature = [("i", "uint256"), ("j", "uint256"), ("_dx", "uint256"), ("_min_dy", "uint256")]
-    target_address = AddressesAndAbis[Chain.GnosisChain].DepositZap.address
+    target_address = AddressesAndAbis[Chain.Gnosis].DepositZap.address
     fixed_arguments = {"i": 0, "j": 1}
 
     def __init__(self, avatar: Address, amount: int, min_amount_out):
@@ -67,8 +67,8 @@ class SwapsDataManager:
         Returns:
             Amount of WXDAI that would be received in a swap for the given amount of EURe.
         """
-        contract = self.w3.eth.contract(address=AddressesAndAbis[Chain.GnosisChain].DepositZap.address,
-                                        abi=AddressesAndAbis[Chain.GnosisChain].DepositZap.abi)
+        contract = self.w3.eth.contract(address=AddressesAndAbis[Chain.Gnosis].DepositZap.address,
+                                        abi=AddressesAndAbis[Chain.Gnosis].DepositZap.abi)
         amount_int = int(amount * (10 ** decimalsEURe))
         if amount_int == 0:
             raise ValueError('Amount of EURe too small. Amount of EURe: %f.' % (amount * (10 ** decimalsEURe)))
@@ -85,8 +85,8 @@ class SwapsDataManager:
         Returns:
             Amount of EURe that would be received in a swap for the given amount of WXDAI.
         """
-        contract = self.w3.eth.contract(address=AddressesAndAbis[Chain.GnosisChain].DepositZap.address,
-                                        abi=AddressesAndAbis[Chain.GnosisChain].DepositZap.abi)
+        contract = self.w3.eth.contract(address=AddressesAndAbis[Chain.Gnosis].DepositZap.address,
+                                        abi=AddressesAndAbis[Chain.Gnosis].DepositZap.abi)
         amount_int = int(Decimal(amount) * Decimal(10 ** decimalsWXDAI))
         if amount_int == 0:
             raise ValueError('Amount of WXDAI too small. Amount of WXDAI: %f.' % (amount * (10 ** decimalsWXDAI)))
@@ -110,8 +110,8 @@ class SwapsDataManager:
                 response = json.loads(data_from_api.content.decode('utf-8'))
                 if response['success']:
                     return response['rates']['USD']
-        contract = self.w3.eth.contract(address=AddressesAndAbis[Chain.GnosisChain].ChainlinkFeed.address,
-                                        abi=AddressesAndAbis[Chain.GnosisChain].ChainlinkFeed.abi)
+        contract = self.w3.eth.contract(address=AddressesAndAbis[Chain.Gnosis].ChainlinkFeed.address,
+                                        abi=AddressesAndAbis[Chain.Gnosis].ChainlinkFeed.abi)
         chainlink_price = float(Decimal(contract.functions.latestAnswer().call()) / Decimal((10 ** 8)))
         return chainlink_price
 

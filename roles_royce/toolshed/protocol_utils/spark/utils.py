@@ -1,5 +1,5 @@
 from web3 import Web3
-from .addresses_and_abis import AddressesAndAbis
+from roles_royce.addresses_and_abis import AddressesAndAbis
 from dataclasses import dataclass
 from enum import Enum
 from roles_royce.constants import Chain
@@ -12,6 +12,7 @@ class SparkToken(Enum):
     STABLE_DEBT = "stable_debt"
     VARIABLE_DEBT = "variable_debt"
 
+
 @dataclass
 class SparkUtils:
     """A class to handle miscellaneous tools for Spark protocol."""
@@ -20,7 +21,8 @@ class SparkUtils:
     @staticmethod
     def get_chi(w3: Web3, block: int | str = 'latest') -> int:
         blockchain = Chain.get_blockchain_from_web3(w3)
-        maker_pot_contract = w3.eth.contract(address=AddressesAndAbis[blockchain].MakerPot.address, abi=AddressesAndAbis[blockchain].MakerPot.abi)
+        maker_pot_contract = w3.eth.contract(address=AddressesAndAbis.Maker[blockchain].Pot.address,
+                                             abi=AddressesAndAbis.Maker[blockchain].Pot.abi)
         ts = w3.eth.get_block(block)['timestamp']
         rho = maker_pot_contract.functions.rho().call(block_identifier=block)
         if ts > rho:
@@ -32,8 +34,9 @@ class SparkUtils:
     @staticmethod
     def get_spark_token_addresses(w3: Web3, block: int | str = 'latest') -> list[dict]:
         blockchain = Chain.get_blockchain_from_web3(w3)
-        protocol_data_provider_contract = w3.eth.contract(address=AddressesAndAbis[blockchain].ProtocolDataProvider.address,
-                                                          abi=AddressesAndAbis[blockchain].ProtocolDataProvider.abi)
+        protocol_data_provider_contract = w3.eth.contract(
+            address=AddressesAndAbis.Spark[blockchain].ProtocolDataProvider.address,
+            abi=AddressesAndAbis.Spark[blockchain].ProtocolDataProvider.abi)
         reserve_tokens = protocol_data_provider_contract.functions.getAllReservesTokens().call(block_identifier=block)
         spark_tokens = []
         for token in reserve_tokens:

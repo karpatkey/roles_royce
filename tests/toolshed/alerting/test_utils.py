@@ -84,7 +84,7 @@ def test_get_token_transfers(local_node_eth, web3_gnosis):
                        '  0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f  <---- 2839.940 GNO -----  '
                        '0xE43e60736b1cb4a75ad25240E2f9a62Bff65c0C0.\n')
 
-    message, message_slack = get_tx_executed_msg(tx_receipt, Chain.GnosisChain)
+    message, message_slack = get_tx_executed_msg(tx_receipt, Chain.Gnosis)
     assert message == ('  Txn hash (Success): '
                        'https://gnosisscan.io/tx/0x48ac45965d26ef89bf22f0a7b5f7d66f64e6cefaab8e6b3ccf2eeaf3dce49f25.')
     assert message_slack == ('  *Txn hash (Success):* '
