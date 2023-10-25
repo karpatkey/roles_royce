@@ -50,7 +50,6 @@ class WithdrawAndUnwrap(ContractMethod):
     fixed_arguments = {"claim": True}
 
     def __init__(self,
-                 blockchain: Chain,
                  reward_address: Address,
                  amount: int):
         super().__init__()
