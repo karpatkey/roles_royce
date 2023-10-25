@@ -1,11 +1,10 @@
 from roles_royce.constants import Chains
-from roles_royce.abi_utils import load_abi, ContractSpec
+from roles_royce.abi_utils import load_abi, ContractSpec, ContractAbi
 from ..tokens import Abis as TokenAbis
 
 
 class Abis(TokenAbis):
-    pass
-
+    BaseRewardPool = ContractAbi(abi=load_abi('base_reward_pool.json'), name='base_reward_pool')
 
 class EthereumContractSpecs:
     Booster = ContractSpec(address='0xA57b8d98dAE62B26Ec3bcC4a365338157060B234',

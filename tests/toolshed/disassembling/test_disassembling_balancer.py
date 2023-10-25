@@ -1,7 +1,5 @@
 from roles_royce.constants import ETHAddr
-from tests.utils import (local_node_eth, accounts, ETH_LOCAL_NODE_URL, fork_unlock_account,
-                         create_simple_safe,
-                         get_balance, steal_token, SimpleSafe, top_up_address, SCRAPE_ACCOUNT)
+from tests.utils import (local_node_eth, accounts, fork_unlock_account, create_simple_safe, steal_token, top_up_address)
 from roles_royce.toolshed.disassembling import BalancerDisassembler
 from roles_royce.addresses_and_abis.balancer import Abis
 from roles_royce.constants import Chains
@@ -9,69 +7,25 @@ from decimal import Decimal
 import pytest
 from roles_royce.evm_utils import erc20_abi
 from tests.roles import setup_common_roles, deploy_roles, apply_presets
-from tests.utils import create_simple_safe
-from eth_account import Account
-from web3 import Web3
+from pytest import approx
 
-@pytest.mark.skip("WIP...")
-def test_integration_exit_1_1_non_composable(local_node_eth, accounts):
+# Preset with the permission to call the exit() function in the Balancer vault (the avatar address is
+# 0xc01318bab7ee1f5ba734172bf7718b5dc6ec90e1)
+preset = '{"version":"1.0","chainId":"1","meta":{"name":null,"description":"","txBuilderVersion":"1.8.0"},' \
+         '"createdAt":1695826823729,"transactions":[{"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",' \
+         '"data":"0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c8","value":"0"},{"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c88bdb3913000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000280000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value":"0"}]}'
+
+
+def test_integration_exit_1_1(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = 18193307
+    block = 18421437
     local_node_eth.set_block(block)
+
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
 
-    presets = '{"version":"1.0","chainId":"1","meta":{"name":null,"description":"","txBuilderVersion":"1.8.0"},' \
-              '"createdAt":1695826823729,"transactions":[{"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",' \
-              '"data":"0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c8","value":"0"},{"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c88bdb391300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000000208353157092ed8be69a9df8f95af097bbf33cb2af0000000000000000000005d90000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value":"0"}]}'
-    apply_presets(avatar_safe, roles_contract, json_data=presets,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
-
-    blockchain = Chains.get_blockchain_from_web3(w3)
-
-    avatar_safe_address = avatar_safe.address
-    disassembler_address = accounts[1].address
-    # Role 4 already has the correct preset applied
-    role = 1
-
-    balancer_disassembler = BalancerDisassembler(w3=w3,
-                                                 avatar_safe_address=avatar_safe.address,
-                                                 roles_mod_address=roles_contract.address,
-                                                 role=role,
-                                                 signer_address=disassembler_address)
-    BAL_WETH_bpt_address = "0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56"
-    # Initial data
-    bpt_contract = w3.eth.contract(address=BAL_WETH_bpt_address,
-                                   abi=Abis[blockchain].UniversalBPT.abi)
-    steal_token(w3=w3, token=BAL_WETH_bpt_address, holder="0x24FAf482304Ed21F82c86ED5fEb0EA313231a808",
-                to=avatar_safe.address, amount=8_999_999_999_999_000_000)
-    bpt_token_balance = bpt_contract.functions.balanceOf(avatar_safe.address).call()
-    assert bpt_token_balance == 8999999999999000000
-
-    txn_transactable = balancer_disassembler.exit_1_1(percentage=50,
-                                                      exit_arguments=[{"bpt_address": BAL_WETH_bpt_address,
-                                                                       "max_slippage": 0.01}])
-
-    balancer_disassembler.send(txns=txn_transactable, private_key=accounts[1].key)
-
-    bpt_token_balance_after = bpt_contract.functions.balanceOf(avatar_safe_address).call()
-    assert bpt_token_balance_after == 4499999999999500000
-    assert bpt_token_balance_after == int(Decimal(bpt_token_balance) / Decimal(2))
-
-
-def test_integration_exit_1_1_composable(local_node_eth, accounts):
-    w3 = local_node_eth.w3
-    block = 18193307
-    local_node_eth.set_block(block)
-    avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
-    roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
-    setup_common_roles(avatar_safe, roles_contract)
-
-    presets = '{"version":"1.0","chainId":"1","meta":{"name":null,"description":"","txBuilderVersion":"1.8.0"},' \
-              '"createdAt":1695826823729,"transactions":[{"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",' \
-              '"data":"0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c8","value":"0"},{"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c88bdb391300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000000208353157092ed8be69a9df8f95af097bbf33cb2af0000000000000000000005d90000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value":"0"}]}'
-    apply_presets(avatar_safe, roles_contract, json_data=presets,
+    apply_presets(avatar_safe, roles_contract, json_data=preset,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
 
     blockchain = Chains.get_blockchain_from_web3(w3)
@@ -79,7 +33,6 @@ def test_integration_exit_1_1_composable(local_node_eth, accounts):
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[1].address
     private_key = accounts[1].key
-    # Role 4 already has the correct preset applied
     role = 1
 
     balancer_disassembler = BalancerDisassembler(w3=w3,
@@ -87,6 +40,8 @@ def test_integration_exit_1_1_composable(local_node_eth, accounts):
                                                  roles_mod_address=roles_contract.address,
                                                  role=role,
                                                  signer_address=disassembler_address)
+    # ----------------------------------------------------------------------------------------------------------------
+    # Composable
     GHO_USDT_USDC_bpt_address = "0x8353157092ED8Be69a9DF8F95af097bbF33Cb2aF"
     # Initial data
     bpt_contract = w3.eth.contract(address=GHO_USDT_USDC_bpt_address,
@@ -94,7 +49,7 @@ def test_integration_exit_1_1_composable(local_node_eth, accounts):
     steal_token(w3=w3, token=GHO_USDT_USDC_bpt_address, holder="0x854B004700885A61107B458f11eCC169A019b764",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     bpt_token_balance = bpt_contract.functions.balanceOf(avatar_safe.address).call()
-    assert bpt_token_balance == 8999999999999000000
+    assert bpt_token_balance == 8_999_999_999_999_000_000
 
     txn_transactable = balancer_disassembler.exit_1_1(percentage=50,
                                                       exit_arguments=[{"bpt_address": GHO_USDT_USDC_bpt_address,
@@ -106,26 +61,45 @@ def test_integration_exit_1_1_composable(local_node_eth, accounts):
     assert bpt_token_balance_after == 4499999999999500000
     assert bpt_token_balance_after == int(Decimal(bpt_token_balance) / Decimal(2))
 
+    # ----------------------------------------------------------------------------------------------------------------
+    # Metastable
+    rETH_WETH_bpt_address = "0x1E19CF2D73a72Ef1332C882F20534B6519Be0276"
+    # Initial data
+    bpt_contract = w3.eth.contract(address=rETH_WETH_bpt_address,
+                                   abi=Abis[blockchain].UniversalBPT.abi)
 
-def test_integration_exit_1_2_composable(local_node_eth, accounts):
+    steal_token(w3=w3, token=rETH_WETH_bpt_address, holder="0xa7dB55e153C0c71Ff35432a9aBe2A853f886Ce0D",
+                to=avatar_safe.address, amount=80_999_999)
+    bpt_token_balance = bpt_contract.functions.balanceOf(avatar_safe.address).call()
+    assert bpt_token_balance == 80_999_999
+
+    txn_transactable = balancer_disassembler.exit_1_1(percentage=50,
+                                                      exit_arguments=[{"bpt_address": rETH_WETH_bpt_address,
+                                                                       "max_slippage": 1}])
+
+    balancer_disassembler.send(txns=txn_transactable, private_key=private_key)
+
+    bpt_token_balance_after = bpt_contract.functions.balanceOf(avatar_safe_address).call()
+    assert bpt_token_balance_after == 40500000 or bpt_token_balance_after == 40499999
+    assert bpt_token_balance_after == approx(int(Decimal(bpt_token_balance) / Decimal(2)))
+
+
+def test_integration_exit_1_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = 18193307
+    block = 18421437
     local_node_eth.set_block(block)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
 
-    presets = """{"version":"1.0","chainId":"1","meta":{"name":null,"description":"","txBuilderVersion":"1.8.0"},"createdAt":1695826823729,"transactions":
-                [{"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c8","value":"0"},
-                {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c88bdb391300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000000208353157092ed8be69a9df8f95af097bbf33cb2af0000000000000000000005d90000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value":"0"}]}"""
-    apply_presets(avatar_safe, roles_contract, json_data=presets,
+    apply_presets(avatar_safe, roles_contract, json_data=preset,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
 
     blockchain = Chains.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[1].address
-    # Role 4 already has the correct preset applied
+    private_key = accounts[1].key
     role = 1
 
     fork_unlock_account(w3, disassembler_address)
@@ -135,6 +109,8 @@ def test_integration_exit_1_2_composable(local_node_eth, accounts):
                                                  roles_mod_address=roles_contract.address,
                                                  role=role,
                                                  signer_address=disassembler_address)
+    # ----------------------------------------------------------------------------------------------------------------
+    # Composable
     GHO_USDT_USDC_bpt_address = "0x8353157092ED8Be69a9DF8F95af097bbF33Cb2aF"
 
     bpt_contract = w3.eth.contract(address=GHO_USDT_USDC_bpt_address,
@@ -148,19 +124,46 @@ def test_integration_exit_1_2_composable(local_node_eth, accounts):
     GHO_balance = GHO_contract.functions.balanceOf(avatar_safe_address).call()
     assert GHO_balance == 0
 
-    txn_transactable = balancer_disassembler.exit_1_2(percentage=50,
+    txn_transactable = balancer_disassembler.exit_1_2(percentage=30,
                                                       exit_arguments=[{"bpt_address": GHO_USDT_USDC_bpt_address,
                                                                        "token_out_address": ETHAddr.GHO,
                                                                        "max_slippage": 0.01}])
 
-    balancer_disassembler.send(txns=txn_transactable, private_key=accounts[1].key)
+    balancer_disassembler.send(txns=txn_transactable, private_key=private_key)
 
     bpt_token_balance_after = bpt_contract.functions.balanceOf(avatar_safe_address).call()
-    assert bpt_token_balance_after == 4499999999999500000
-    assert bpt_token_balance_after == int(Decimal(bpt_token_balance) / Decimal(2))
+    assert bpt_token_balance_after == 6299999999999300100
+    assert bpt_token_balance_after == approx(int(Decimal(bpt_token_balance) * Decimal(0.7)))
 
     new_GHO_balance = GHO_contract.functions.balanceOf(avatar_safe_address).call()
-    assert new_GHO_balance == 4544779680369055719
+    assert new_GHO_balance == 2736771989880524105
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # Metastable
+    rETH_WETH_bpt_address = "0x1E19CF2D73a72Ef1332C882F20534B6519Be0276"
+    # Initial data
+    bpt_contract = w3.eth.contract(address=rETH_WETH_bpt_address,
+                                   abi=Abis[blockchain].UniversalBPT.abi)
+
+    steal_token(w3=w3, token=rETH_WETH_bpt_address, holder="0xa7dB55e153C0c71Ff35432a9aBe2A853f886Ce0D",
+                to=avatar_safe.address, amount=80_999_999)
+    bpt_token_balance = bpt_contract.functions.balanceOf(avatar_safe.address).call()
+    assert bpt_token_balance == 80_999_999
+
+    WETH_contract = w3.eth.contract(address=ETHAddr.WETH, abi=erc20_abi)
+    WETH_balance = WETH_contract.functions.balanceOf(avatar_safe_address).call()
+    assert WETH_balance == 0
+
+    txn_transactable = balancer_disassembler.exit_1_2(percentage=30,
+                                                      exit_arguments=[{"bpt_address": rETH_WETH_bpt_address,
+                                                                       "token_out_address": ETHAddr.WETH,
+                                                                       "max_slippage": 1}])
+
+    balancer_disassembler.send(txns=txn_transactable, private_key=private_key)
+
+    bpt_token_balance_after = bpt_contract.functions.balanceOf(avatar_safe_address).call()
+    assert bpt_token_balance_after == 56700000
+    assert bpt_token_balance_after == approx(int(Decimal(bpt_token_balance) * Decimal(0.7)))
 
 
 def test_integration_exit_1_3(local_node_eth, accounts):
@@ -171,14 +174,8 @@ def test_integration_exit_1_3(local_node_eth, accounts):
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
 
-    presets = """{"version":"1.0","chainId":"1","meta":{"name":null,"description":"","txBuilderVersion":"1.8.0"}, 
-    "createdAt":1695826823729,"transactions": [{"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86", 
-    "data":"0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c8","value":"0"}, {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c88bdb391300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000020ff4ce5aaab5a627bf82f4a571ab1ce94aa365ea60000000000000000000005d90000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value":"0"}]}"""
-
-    apply_presets(avatar_safe, roles_contract, json_data=presets,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:]), (
-                      "ff4ce5aaab5a627bf82f4a571ab1ce94aa365ea60000000000000000000005d9",
-                      "ff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6000200000000000000000426")])
+    apply_presets(avatar_safe, roles_contract, json_data=preset,
+                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
 
     blockchain = Chains.get_blockchain_from_web3(w3)
 
@@ -220,8 +217,6 @@ def test_integration_exit_1_3(local_node_eth, accounts):
     txn_transactable = balancer_disassembler.exit_1_3(percentage=50,
                                                       exit_arguments=[{"bpt_address": DOLA_USDC_BPT}])
 
-    txntest = balancer_disassembler.check(txns=txn_transactable, block=block, from_address=disassembler_address)
-    assert txntest
     balancer_disassembler.send(txns=txn_transactable, private_key=private_key)
 
     bpt_balance_after = bpt_contract.functions.balanceOf(avatar_safe_address).call()
@@ -262,8 +257,6 @@ def test_integration_exit_2_1(local_node_eth, accounts):
     role = 1
 
     emergency = "0xA29F61256e948F3FB707b4b3B138C5cCb9EF9888"
-
-    fork_unlock_account(w3, disassembler_address)
 
     balancer_disassembler = BalancerDisassembler(w3=w3,
                                                  avatar_safe_address=avatar_safe.address,

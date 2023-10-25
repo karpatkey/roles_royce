@@ -1,5 +1,6 @@
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import ContractMethod, BaseApproveForToken, BaseApprove, Address
+from roles_royce.constants import Blockchain
 
 
 class ApproveForBooster(BaseApproveForToken):
@@ -42,14 +43,16 @@ class ApproveAURA(BaseApprove):
     token = ETHAddr.AURA
 
 
-class WithdrawAndUndwrapStakedBPT(ContractMethod):
-    """withdraw and unwrap AURAVaultToken"""
-    target_address = None
+class WithdrawAndUnwrap(ContractMethod):
+    """WIthdraws staked BPT and claims any corresponding unclaimed rewards."""
     name = "withdrawAndUnwrap"
     in_signature = [("amount", "uint256"), ("claim", "bool")]
     fixed_arguments = {"claim": True}
 
-    def __init__(self, reward_address: Address, amount: int):
+    def __init__(self,
+                 blockchain: Blockchain,
+                 reward_address: Address,
+                 amount: int):
         super().__init__()
         self.target_address = reward_address
         self.args.amount = amount
