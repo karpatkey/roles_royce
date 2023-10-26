@@ -17,7 +17,8 @@ class ENV:
     FALLBACK_RPC_ENDPOINT: str = config('FALLBACK_RPC_ENDPOINT', default='')
 
     THRESHOLD_HEALTH_FACTOR: float = config('THRESHOLD_HEALTH_FACTOR', cast=float)
-
+    ALERTING_HEALTH_FACTOR: float = config('ALERTING_HEALTH_FACTOR', cast=float)
+    
     BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
 
     # Path to bigquery credentials file (json) to get the list of addresses to monitor
@@ -26,7 +27,7 @@ class ENV:
     # I left all of these down below in case you need them for the actual bot. 
     AVATAR_SAFE_ADDRESS: Address | ChecksumAddress | str = config('AVATAR_SAFE_ADDRESS')
     ROLES_MOD_ADDRESS: Address | ChecksumAddress | str = config('ROLES_MOD_ADDRESS')
-    ROLE: int = config('ROLE', cast=int)
+    # ROLE: int = config('ROLE', cast=int)
     PRIVATE_KEY: str = config('PRIVATE_KEY')
     
     TOLERANCE: float = custom_config('TOLERANCE', default=0.01, cast=float)
@@ -46,7 +47,7 @@ class ENV:
         if self.FALLBACK_RPC_ENDPOINT != '':
             if not Web3(Web3.HTTPProvider(self.FALLBACK_RPC_ENDPOINT)).is_connected():
                 raise ValueError(f"FALLBACK_RPC_ENDPOINT is not valid or not active: {self.FALLBACK_RPC_ENDPOINT}.")
-        self.BOT_ADDRESS = Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).eth.account.from_key(self.PRIVATE_KEY).address
+        # self.BOT_ADDRESS = Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).eth.account.from_key(self.PRIVATE_KEY).address
 
     def __repr__(self):
         return 'Environment variables'

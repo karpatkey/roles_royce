@@ -15,18 +15,18 @@ ENV = ENV()
 # Alert flag
 threshold_health_factor_flag = Event()
 
-# Messenger system
-slack_messenger = SlackMessenger(webhook=ENV.SLACK_WEBHOOK_URL)
-slack_messenger.start()
-telegram_messenger = TelegramMessenger(bot_token=ENV.TELEGRAM_BOT_TOKEN, chat_id=ENV.TELEGRAM_CHAT_ID)
-telegram_messenger.start()
+# # Messenger system
+# slack_messenger = SlackMessenger(webhook=ENV.SLACK_WEBHOOK_URL)
+# slack_messenger.start()
+# telegram_messenger = TelegramMessenger(bot_token=ENV.TELEGRAM_BOT_TOKEN, chat_id=ENV.TELEGRAM_CHAT_ID)
+# telegram_messenger.start()
 
 # Configure logging settings
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Create a logger instance
 logger = logging.getLogger(__name__)
-messenger = Messenger(slack_messenger, telegram_messenger)
+# messenger = Messenger(slack_messenger, telegram_messenger)
 
 # Addresses to monitor
 current_addresses = []
@@ -88,8 +88,8 @@ def check_health_for_address(address):
         message = (f"  Current health factor: ({health_factor}).\n"
                 f"  Health factor threshold: ({ENV.ALERTING_HEALTH_FACTOR}).\n"
                 f"  Address: ({address}).")
-        messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=threshold_health_factor_flag.is_set())
-
+        # messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=threshold_health_factor_flag.is_set())
+        logger.info([title, message])
 
 # --------------- This is the main function that runs the bot
 
@@ -111,5 +111,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
-    pass
+    main()
+    
