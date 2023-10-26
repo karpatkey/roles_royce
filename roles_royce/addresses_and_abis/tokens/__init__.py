@@ -1,4 +1,4 @@
-from roles_royce.constants import Chains
+from roles_royce.constants import Chains, StrEnum
 from roles_royce.abi_utils import load_abi, ContractAbi
 
 
@@ -6,7 +6,7 @@ class Abis:
     ERC20 = ContractAbi(abi=load_abi('erc20.json'), name='erc20')
 
 
-class EthereumAddresses:
+class EthereumAddresses(StrEnum):
     ZERO = "0x0000000000000000000000000000000000000000"
     AAVE = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9"
     ABPT = "0x41A08648C3766F9F9d85598fF102a08f4ef84F84"
