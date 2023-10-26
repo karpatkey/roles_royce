@@ -7,6 +7,7 @@ from roles_royce.protocols.balancer.types_and_enums import ComposableStablePoolE
 from .utils import Pool
 from .contract_methods import Exit
 from .types_and_enums import PoolKind
+from roles_royce.addresses_and_abis.balancer import ContractSpecs
 
 
 class _ExactBptSingleTokenExit(Exit):
@@ -260,6 +261,7 @@ class ExactBptSingleTokenQueryExit(QueryExitMixin, ExactBptSingleTokenExit):
                          bpt_amount_in=bpt_amount_in,
                          token_out_address=token_out_address,
                          min_amount_out=0)
+        self.target_address = ContractSpecs[Chains.get_blockchain_from_web3(w3)].Queries.address
 
 
 class ExactBptProportionalQueryExit(QueryExitMixin, ExactBptProportionalExit):
@@ -396,6 +398,11 @@ class ExactTokensExitSlippage(ExactTokensExit):
                  avatar: Address,
                  amounts_out: list[int],
                  max_slippage: float):
+        max_bpt_amount_in = self.get_max_bpt_amount_in(pool_id, amounts_out, w3, max_slippage)
+        super().__init__(w3, pool_id, avatar, amounts_out, max_bpt_amount_in)
+
+    @staticmethod
+    def get_max_bpt_amount_in(pool_id, amounts_out, w3, max_slippage):
         m = ExactTokensQueryExit(w3=w3,
                                  pool_id=pool_id,
                                  amounts_out=amounts_out)
@@ -407,14 +414,15 @@ class ExactTokensExitSlippage(ExactTokensExit):
             bpt_index = Pool(w3, pool_id).bpt_index_from_composable()
             del amounts_out_sim[bpt_index]
 
-        for index in range(len(amounts_out)):
-            if not amounts_out[index] - 1 <= amounts_out_sim[index] <= amounts_out[index] + 1:
-                raise ValueError(
-                    f"The amounts_out = {amounts_out} specified are not the same as the amounts_out = {amounts_out_sim} calculated by the query contract.")
+        check_amounts_out_in_range(amounts_out, amounts_out_sim)
 
-        max_bpt_amount_in = int(Decimal(bpt_in) * Decimal(1 + max_slippage))
+        return int(Decimal(bpt_in) * Decimal(1 + max_slippage))
 
-        super().__init__(w3, pool_id, avatar, amounts_out, max_bpt_amount_in)
+def check_amounts_out_in_range(amounts_out, amounts_out_sim):
+    for amount_out, amount_out_sim in zip(amounts_out, amounts_out_sim):
+        if not amount_out - 1 <= amount_out_sim <= amount_out + 1:
+            raise ValueError(
+                f"The amounts_out = {amounts_out} specified are not the same as the amounts_out = {amounts_out_sim} calculated by the query contract.")
 
 
 class ExactSingleTokenProportionalExitSlippage(ExactTokensExit):

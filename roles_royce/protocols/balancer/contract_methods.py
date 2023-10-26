@@ -67,11 +67,8 @@ class Exit(ContractMethod):
                  assets: list[Address],
                  min_amounts_out: list[int],
                  user_data: list):
-        if self.name == 'queryExit':  # Target address might be specified beforehand by Mixins
-            self.target_address = ContractSpecs[blockchain].Queries.address
-        else:
-            self.target_address = ContractSpecs[blockchain].Vault.address
         super().__init__(avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].Vault.address
         self.args.pool_id = pool_id
         self.args.assets = assets
         self.args.min_amounts_out = min_amounts_out
@@ -104,16 +101,11 @@ class Join(ContractMethod):
     user_data_abi = None
 
     def __init__(self,
-                 blockchain: Blockchain,
                  pool_id: str,
                  avatar: Address,
                  assets: list[Address],
                  max_amounts_in: list[int],
                  user_data: list):
-        if self.name == 'queryJoin':  # Target address might be specified beforehand by Mixins
-            self.target_address = ContractSpecs[blockchain].Queries.address
-        else:
-            self.target_address = ContractSpecs[blockchain].Vault.address
         super().__init__(avatar=avatar)
         self.args.pool_id = pool_id
         self.args.assets = assets
