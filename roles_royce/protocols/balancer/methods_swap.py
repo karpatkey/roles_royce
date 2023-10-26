@@ -1,8 +1,9 @@
-from roles_royce.constants import MAX_UINT256, Chains, Blockchain
+from roles_royce.constants import MAX_UINT256
+from defabipedia.types import Blockchain, Chains
 from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
 from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from web3 import Web3
-from roles_royce.addresses_and_abis.balancer import ContractSpecs
+from defabipedia.balancer import ContractSpecs
 
 
 class SingleSwap(ContractMethod):

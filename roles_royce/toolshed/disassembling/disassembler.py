@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from web3.types import Address, ChecksumAddress, TxReceipt, TxParams
 from web3 import Web3
-from roles_royce.constants import Chains, Blockchain
+from defabipedia.types import Blockchain, Chains
 from roles_royce.utils import TenderlyCredentials, tenderly_share_simulation, simulate_tx
 from roles_royce import roles
 from roles_royce.generic_method import Transactable

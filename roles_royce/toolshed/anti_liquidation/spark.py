@@ -1,6 +1,6 @@
 from decimal import Decimal
-from roles_royce.addresses_and_abis.spark import ContractSpecs, Abis
-from roles_royce.constants import Blockchain, Chains
+from defabipedia.spark import ContractSpecs, Abis
+from defabipedia.types import Blockchain, Chains
 from roles_royce.protocols.eth.spark import RateModel
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 from roles_royce.protocols.eth import spark

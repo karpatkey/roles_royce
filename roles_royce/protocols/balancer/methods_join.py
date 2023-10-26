@@ -1,4 +1,5 @@
-from roles_royce.constants import ZERO, MAX_UINT256, Blockchain, Chains
+from roles_royce.constants import ZERO, MAX_UINT256
+from defabipedia.types import Blockchain, Chains
 from roles_royce.protocols.base import Address
 from web3 import Web3
 from decimal import Decimal

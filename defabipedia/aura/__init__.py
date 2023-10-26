@@ -1,5 +1,4 @@
-from roles_royce.constants import Chains
-from roles_royce.abi_utils import load_abi, ContractSpec, ContractAbi
+from ..types import Chains, load_abi, ContractSpec, ContractAbi
 from ..tokens import Abis as TokenAbis
 
 

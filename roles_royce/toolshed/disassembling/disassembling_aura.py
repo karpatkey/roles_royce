@@ -7,7 +7,7 @@ from roles_royce.generic_method import Transactable
 from roles_royce.protocols.eth import aura
 from roles_royce.toolshed.disassembling import BalancerDisassembler
 from roles_royce.toolshed.disassembling import Disassembler, validate_percentage
-from roles_royce.addresses_and_abis.aura import Abis
+from defabipedia.aura import Abis
 
 
 @dataclass

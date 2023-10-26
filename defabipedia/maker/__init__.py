@@ -1,6 +1,5 @@
-from roles_royce.constants import Chains
-from roles_royce.abi_utils import load_abi, ContractSpec, ContractAbi
-from roles_royce.addresses_and_abis.tokens import Abis as TokenAbis
+from defabipedia.types import Chains, load_abi, ContractSpec, ContractAbi
+from defabipedia.tokens import Abis as TokenAbis
 
 
 class EthereumContractSpecs:

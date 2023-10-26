@@ -1,7 +1,8 @@
 from roles_royce.toolshed.alerting.utils import get_token_amounts_from_transfer_events, get_tx_executed_msg, \
     get_tx_receipt_message_with_transfers
 from tests.utils import local_node_gc, local_node_eth, web3_gnosis
-from roles_royce.utils import Chains
+from defabipedia.types import Chains
+
 
 # FIXME: the following should use local_node_gc instead of web3_gnosis, but for some reason it's not working
 def test_get_token_transfers(local_node_eth, web3_gnosis):

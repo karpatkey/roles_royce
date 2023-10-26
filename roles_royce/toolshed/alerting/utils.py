@@ -1,7 +1,7 @@
 from roles_royce.evm_utils import erc20_abi
 from dataclasses import dataclass
 from typing import Any, Dict, cast, Union
-from roles_royce.utils import Chains, Blockchain
+from defabipedia.types import Blockchain, Chains
 from web3.types import Address, ChecksumAddress
 from web3._utils.abi import get_abi_input_names, get_abi_input_types, map_abi_data
 from web3._utils.normalizers import BASE_RETURN_NORMALIZERS

@@ -1,6 +1,6 @@
 from web3 import Web3
-from roles_royce.constants import Chains
-from roles_royce.addresses_and_abis.balancer import ContractSpecs, Abis
+from defabipedia.types import Chains
+from defabipedia.balancer import ContractSpecs, Abis
 from web3.exceptions import ContractLogicError
 from .types_and_enums import PoolKind
 

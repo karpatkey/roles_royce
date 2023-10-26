@@ -3,7 +3,7 @@ from decouple import config
 from web3.types import Address
 from web3 import Web3
 from roles_royce.protocols.base import Address
-from roles_royce.constants import Blockchain
+from defabipedia.types import Blockchain
 
 
 # The next helper function allows to leave variables unfilled in the .env file

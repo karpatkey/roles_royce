@@ -1,5 +1,5 @@
-from roles_royce.constants import Chains, StrEnum
-from roles_royce.abi_utils import load_abi, ContractAbi
+from roles_royce.constants import StrEnum
+from defabipedia.types import Chains, load_abi, ContractAbi
 
 
 class Abis:

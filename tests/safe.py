@@ -7,7 +7,8 @@ from eth_account.signers.local import LocalAccount
 from hexbytes import HexBytes
 
 from roles_royce.generic_method import Transactable
-from roles_royce.constants import ETHAddr, Chains
+from roles_royce.constants import ETHAddr
+from defabipedia.types import Chains
 from roles_royce.utils import multi_or_one
 
 

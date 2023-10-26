@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from web3 import Web3
-from roles_royce.constants import Chains
+from defabipedia.types import Chains
 from roles_royce.protocols.base import ContractMethod, Address
 from roles_royce.applications.EURe_rebalancing_bot.addresses_and_abis import AddressesAndAbis
 from decimal import Decimal

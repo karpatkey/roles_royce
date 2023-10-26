@@ -1,8 +1,8 @@
 from roles_royce.constants import ETHAddr
 from tests.utils import local_node_eth, get_balance, top_up_address, fork_unlock_account
 from roles_royce.toolshed.disassembling import AuraDisassembler
-from roles_royce.addresses_and_abis.aura import Abis
-from roles_royce.constants import Chains
+from defabipedia.aura import Abis
+from defabipedia.types import Chains
 from decimal import Decimal
 
 

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from decimal import Decimal, ROUND_DOWN
+from decimal import Decimal
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols import balancer
-from roles_royce.addresses_and_abis.balancer import Abis
+from defabipedia.balancer import Abis
 from roles_royce.toolshed.disassembling.disassembler import Disassembler, validate_percentage
 from web3 import Web3
 from web3.exceptions import ContractLogicError

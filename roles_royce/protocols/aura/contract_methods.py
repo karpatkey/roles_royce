@@ -1,6 +1,6 @@
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import ContractMethod, BaseApproveForToken, BaseApprove, Address
-from roles_royce.constants import Blockchain
+from defabipedia.types import Blockchain
 
 
 class ApproveForBooster(BaseApproveForToken):

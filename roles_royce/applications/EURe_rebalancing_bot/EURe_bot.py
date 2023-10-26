@@ -1,5 +1,5 @@
 from web3 import Web3
-from roles_royce.constants import Chains
+from defabipedia.types import Chains
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
 from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
 from prometheus_client import start_http_server as prometheus_start_http_server

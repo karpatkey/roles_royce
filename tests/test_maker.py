@@ -5,8 +5,8 @@ from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from decimal import Decimal
 from pytest import approx
-from roles_royce.addresses_and_abis.maker import ContractSpecs, Abis
-from roles_royce.constants import Chains
+from defabipedia.maker import ContractSpecs, Abis
+from defabipedia.types import Chains
 
 JOIN_WSTETH_A = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH-A
 JOIN_ETH_A = "0x2F0b23f53734252Bda2277357e97e1517d6B042A"  # ETHJoin ETH-A

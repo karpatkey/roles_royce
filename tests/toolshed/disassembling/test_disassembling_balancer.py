@@ -1,8 +1,8 @@
 from roles_royce.constants import ETHAddr
 from tests.utils import (local_node_eth, accounts, fork_unlock_account, create_simple_safe, steal_token, top_up_address)
 from roles_royce.toolshed.disassembling import BalancerDisassembler
-from roles_royce.addresses_and_abis.balancer import Abis
-from roles_royce.constants import Chains
+from defabipedia.balancer import Abis
+from defabipedia.types import Chains
 from decimal import Decimal
 import pytest
 from roles_royce.evm_utils import erc20_abi

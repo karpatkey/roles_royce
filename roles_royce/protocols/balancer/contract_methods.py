@@ -1,8 +1,8 @@
 import eth_abi
 from roles_royce.constants import MAX_UINT256
 from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
-from roles_royce.addresses_and_abis.balancer import ContractSpecs
-from roles_royce.constants import Blockchain
+from defabipedia.balancer import ContractSpecs
+from defabipedia.types import Blockchain
 from .types_and_enums import SwapKind
 
 

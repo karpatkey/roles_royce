@@ -1,4 +1,5 @@
-from roles_royce import roles, GenericMethodTransaction, Operation, Chains
+from roles_royce import roles, GenericMethodTransaction, Operation
+from defabipedia.types import Chains
 from roles_royce.constants import GCAddr
 from roles_royce.utils import multi_or_one, MULTISENDS
 from .utils import web3_gnosis

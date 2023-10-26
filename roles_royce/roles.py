@@ -4,7 +4,7 @@ from typing import List
 from web3 import Web3
 from web3.types import TxReceipt
 from .roles_modifier import RolesMod
-from .constants import Chains
+from defabipedia.types import Chains
 from .generic_method import Transactable
 from .utils import multi_or_one
 

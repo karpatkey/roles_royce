@@ -1,4 +1,5 @@
-from roles_royce.constants import CrossChainAddr, Chains
+from roles_royce.constants import CrossChainAddr
+from defabipedia.types import Chains
 from roles_royce.protocols.base import BaseApproveForToken
 from web3 import Web3
 from roles_royce.protocols.base import Address

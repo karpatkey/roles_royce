@@ -5,7 +5,7 @@ from web3 import Web3
 import requests
 from gnosis.safe.multi_send import MultiSend, MultiSendOperation, MultiSendTx
 from .roles_modifier import Operation
-from .constants import Blockchain, Chains
+from defabipedia.types import Blockchain, Chains
 from .generic_method import Transactable, TxData
 from dataclasses import dataclass
 

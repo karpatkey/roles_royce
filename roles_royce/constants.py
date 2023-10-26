@@ -1,6 +1,4 @@
-from dataclasses import dataclass
 from enum import Enum
-from web3 import Web3
 
 
 class StrEnum(str, Enum):
@@ -69,40 +67,3 @@ class GCAddr(StrEnum):
     USDT = "0x4ECaBa5870353805a9F068101A40E0f32ed605C6"
 
 
-@dataclass
-class Blockchain:
-    name: str
-    chain_id: int
-
-    def __str__(self):
-        return self.name
-
-    def __hash__(self):
-        return self.chain_id
-
-
-class Chains:
-    Ethereum = Blockchain("ethereum", 0x1)
-    Polygon = Blockchain("polygon", 0x89)
-    Avalanche = Blockchain("avalanche", 0xA86A)
-    Binance = Blockchain("binance", 0x38)
-    Fantom = Blockchain("fantom", 0xFA)
-    Gnosis = Blockchain("gnosisChain", 0x64)
-    Arbitrum = Blockchain("arbitrum", 0xA4B1)
-    Optimism = Blockchain("optimism", 0xA)
-
-    _by_id = {}
-    for attr_name, attr_value in locals().copy().items():
-        if isinstance(attr_value, Blockchain):
-            _by_id[attr_value.chain_id] = attr_value
-
-    @classmethod
-    def get_blockchain_by_chain_id(cls, chain_id) -> Blockchain:
-        try:
-            return cls._by_id.get(chain_id, None)
-        except KeyError:
-            raise ValueError(f"No Blockchain with chain_id {chain_id} found in Chain.")
-
-    @classmethod
-    def get_blockchain_from_web3(cls, w3: Web3) -> Blockchain:
-        return cls.get_blockchain_by_chain_id(w3.eth.chain_id)

@@ -1,4 +1,4 @@
-from roles_royce.constants import Chains
+from defabipedia.types import Chains
 from roles_royce.protocols import balancer
 from ...utils import local_node_eth
 

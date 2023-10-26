@@ -1,5 +1,4 @@
-from roles_royce.constants import Chains
-from roles_royce.abi_utils import load_local_abi, ContractSpec, ContractAbi, ContractAddress
+from defabipedia.types import Chains, load_local_abi, ContractSpec, ContractAbi, ContractAddress
 
 
 class GnosisChainAddressesAndAbis:

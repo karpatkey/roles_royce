@@ -2,7 +2,7 @@ import json
 from roles_royce.utils import MULTISENDS
 from roles_royce.evm_utils import roles_abi, roles_bytecode
 from roles_royce.generic_method import TxData
-from roles_royce import Chains
+from defabipedia.types import Chains
 
 from web3 import Web3
 from .utils import TEST_ACCOUNTS, SimpleSafe
