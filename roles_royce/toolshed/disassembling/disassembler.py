@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from web3.types import Address, ChecksumAddress, TxReceipt, TxParams
 from web3 import Web3
-from roles_royce.constants import Chain
+from roles_royce.constants import Chain, Blockchain
 from roles_royce.utils import TenderlyCredentials, tenderly_share_simulation, simulate_tx
 from roles_royce import roles
 from roles_royce.generic_method import Transactable
@@ -13,7 +13,7 @@ class Disassembler:
     avatar_safe_address: Address | ChecksumAddress | str
     roles_mod_address: Address | ChecksumAddress | str
     role: int
-    blockchain: str = field(init=False)
+    blockchain: Blockchain = field(init=False)
     tenderly_credentials: TenderlyCredentials = None
     signer_address: Address | ChecksumAddress | str | None = None
 
