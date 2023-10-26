@@ -5,6 +5,7 @@ from roles_royce.addresses_and_abis.aura import Abis
 from roles_royce.constants import Chains
 from decimal import Decimal
 
+
 # TODO: build an adequate preset to execute the transactions with roles.send
 
 def test_integration_exit_1(local_node_eth):

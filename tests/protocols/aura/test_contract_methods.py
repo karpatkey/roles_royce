@@ -48,7 +48,7 @@ def test_approve_aura():
 
 
 def test_withdraw_and_unwrap():
-    method = aura.WithdrawAndUndwrapStakedBPT(reward_address=REWARDS, amount=123)
+    method = aura.WithdrawAndUnwrap(reward_address=REWARDS, amount=123)
     assert method.data == "0xc32e7202000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000001"
 
 

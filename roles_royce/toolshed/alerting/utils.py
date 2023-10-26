@@ -6,6 +6,7 @@ from web3.types import Address, ChecksumAddress
 from web3._utils.abi import get_abi_input_names, get_abi_input_types, map_abi_data
 from web3._utils.normalizers import BASE_RETURN_NORMALIZERS
 from web3.contract import Contract
+from web3.types import TxReceipt
 from web3 import Web3
 from eth_typing import HexStr
 from eth_utils import event_abi_to_log_topic
@@ -97,13 +98,18 @@ ExplorerTxUrls = {
 }
 
 
-def get_tx_executed_msg(tx_receipt: object, chain: Blockchain) -> (str, str):
+def get_tx_link(tx_receipt: TxReceipt, chain: Blockchain) -> str:
+    return f'{ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}'
+
+
+def get_tx_executed_msg(tx_receipt: TxReceipt, chain: Blockchain) -> (str, str):
+    tx_link = get_tx_link(tx_receipt, chain)
     if tx_receipt.status == 1:
-        message_slack = f'  *Txn hash (Success):* <{ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}|{tx_receipt.transactionHash.hex()}>.'
-        message = f'  Txn hash (Success): {ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}.'
+        message_slack = f'  *Txn hash (Success):* <{tx_link}|{tx_receipt.transactionHash.hex()}>.'
+        message = f'  Txn hash (Success): {tx_link}.'
     else:
-        message_slack = f'  *Txn hash (Failure):* <{ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}|{tx_receipt.transactionHash.hex()}>.'
-        message = f'  Txn hash (Failure): {ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}.'
+        message_slack = f'  *Txn hash (Failure):* <{tx_link}|{tx_receipt.transactionHash.hex()}>.'
+        message = f'  Txn hash (Failure): {tx_link}.'
 
     return message, message_slack
 
