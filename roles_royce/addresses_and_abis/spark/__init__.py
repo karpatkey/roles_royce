@@ -3,7 +3,7 @@ from roles_royce.abi_utils import load_abi, ContractSpec, ContractAbi
 from ..tokens import Abis as TokenAbis
 
 
-class EthereumAbis(TokenAbis):  # The inheritance with TokenAbis adds the ERC20 abi
+class AllAbis(TokenAbis):  # The inheritance with TokenAbis adds the ERC20 abi
     PriceOracle = ContractAbi(abi=load_abi('price_oracle.json'), name='price_oracle')
     LendingPool = ContractAbi(abi=load_abi('lending_pool.json'), name='lending_pool')
 
@@ -16,11 +16,21 @@ class EthereumContractSpecs:
                                          abi=load_abi('pool_addresses_provider.json'),
                                          name='pool_addresses_provider')
 
+class GnosisContractSpecs:
+    ProtocolDataProvider = ContractSpec(address='0x2a002054A06546bB5a264D57A81347e23Af91D18',
+                                        abi=load_abi('protocol_data_provider.json'),
+                                        name='protocol_data_provider')
+    PoolAddressesProvider = ContractSpec(address='0xA98DaCB3fC964A6A0d2ce3B77294241585EAbA6d',
+                                         abi=load_abi('pool_addresses_provider.json'),
+                                         name='pool_addresses_provider')
+
 
 ContractSpecs = {
-    Chains.Ethereum: EthereumContractSpecs
+    Chains.Ethereum: EthereumContractSpecs,
+    Chains.Gnosis: GnosisContractSpecs
 }
 
 Abis = {
-    Chains.Ethereum: EthereumAbis
+    Chains.Ethereum: AllAbis,
+    Chains.Gnosis: AllAbis
 }
