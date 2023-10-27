@@ -17,7 +17,7 @@ avatar_safe_address = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
 roles_mod_address = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
 role = 4
 
-with open ('/Users/richard/Documents/Code/Karpatkey/roles_royce/tests/applications/panic_button_app/strategiesGnosisDAOEthereum.json', 'r') as f:
+with open ('strategiesGnosisDAOEthereum.json', 'r') as f:
     strategies = json.load(f)
 list_of_positions = []
 for position in strategies['positions']:
