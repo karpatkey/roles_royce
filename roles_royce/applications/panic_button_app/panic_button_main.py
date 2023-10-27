@@ -57,11 +57,13 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
     return disassembler, txn_transactables
 
 
-def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable], private_key: str,simulate: bool) -> dict:
+def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable], private_key: str, simulate: bool) -> dict:
+
     try:
+        disassembler_address = disassembler.w3.eth.account.from_key(private_key).address
         if simulate:
             tx_data, sim_link = disassembler.simulate(txns=txn_transactables,
-                                                      from_address=disassembler.signer_address)
+                                                      from_address=disassembler_address)
             if tx_data['transaction']['status']:
                 response_message = {"status": 200, "link": sim_link,
                                     "message": "Transaction executed successfully in Tenderly"}
@@ -70,7 +72,7 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
                                     "message": "Transaction reverted in Tenderly simulation"}
         else:
             check_exit_tx = disassembler.check(txns=txn_transactables,
-                                               from_address=disassembler.signer_address)
+                                               from_address=disassembler_address)
 
             if check_exit_tx:
                 tx_receipt = disassembler.send(txns=txn_transactables, private_key=private_key)

@@ -40,7 +40,7 @@ class ENV:
         self.AVATAR_SAFE_ADDRESS: Address = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_AVATAR_SAFE_ADDRESS')
         self.ROLES_MOD_ADDRESS: Address = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_ROLES_MOD_ADDRESS')
         self.ROLE: int = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_ROLE', cast=int)
-        self.PRIVATE_KEY: str = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_PRIVATE_KEYS')
+        self.PRIVATE_KEY: str = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_PRIVATE_KEY')
         self.SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
         self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
         self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
@@ -51,7 +51,7 @@ class ENV:
 
 @dataclass
 class ExecConfig:
-    percentage: int
+    percentage: float
     simulate: bool
     dao: str
     blockchain: str

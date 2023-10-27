@@ -1,103 +1,106 @@
-from web3 import Web3
-
-from roles_royce.applications.panic_button_app.panic_button_main import start_the_engine, gear_up, drive_away, main
+from roles_royce.applications.panic_button_app.panic_button_main import start_the_engine, gear_up, drive_away
 from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
-from tests.roles import setup_common_roles, deploy_roles, apply_presets
-from tests.utils import create_simple_safe
+from tests.utils import assign_role, local_node_eth, accounts
 
-JSON_FORM = {"simulate": True,
-          "position_id": "Balancer_106",
-          "protocol": "Balancer",
-          "common_exec_config": [{"name":"percentage","value": 100}],
-          "position_exec_config": [
-            {
-              "function_name": "exit_1_1",
-               "parameters": [
-                {
-                "bpt_address": "0x8353157092ED8Be69a9DF8F95af097bbF33Cb2aF",#"0xF4C0DD9B82DA36C07605df83c8a416F11724d88b",
-                "max_slippage": 0.01}
-            ]
-            }
-            ]
-        }
+dao = 'GnosisDAO'
+blockchain = 'mainnet'
+avatar_safe_address = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
+roles_mod_address = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
+role = 4
+
+
+def set_env(monkeypatch, private_key: str) -> ENV:
+    monkeypatch.setenv('MAINNET_RPC_ENDPOINT', 'DummyString')
+    monkeypatch.setenv('MAINNET_FALLBACK_RPC_ENDPOINT', 'DummyString')
+    monkeypatch.setenv('GNOSISDAO_MAINNET_AVATAR_SAFE_ADDRESS', avatar_safe_address)
+    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLES_MOD_ADDRESS', roles_mod_address)
+    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLE', role)
+    monkeypatch.setenv('GNOSISDAO_MAINNET_PRIVATE_KEY', private_key)
+    return ENV(dao, blockchain)
+
+
+JSON_FORM = {
+    "simulate": False,
+    "protocol": "Aura",
+    "exit_strategy": "exit_2_1",
+    "percentage": 21,
+    "exit_arguments": {
+
+        "rewards_address": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
+        "max_slippage": 0.01
+    }
+}
+
+exec_config = ExecConfig(percentage=JSON_FORM["percentage"],
+                         simulate=JSON_FORM["simulate"],
+                         dao=dao,
+                         blockchain=blockchain,
+                         protocol=JSON_FORM["protocol"],
+                         exit_strategy=JSON_FORM["exit_strategy"],
+                         exit_arguments=[JSON_FORM["exit_arguments"]])
+
 
 def test_start_the_engine(monkeypatch):
-    # have an anvil instance running before testing
-    monkeypatch.setenv('MAINNET_RPC_ENDPOINT', 'https://eth.llamarpc.com')
-    monkeypatch.setenv('MAINNET_FALLBACK_RPC_ENDPOINT', 'https://eth.llamarpc.com')
-    monkeypatch.setenv('GNOSISDAO_MAINNET_AVATAR_SAFE_ADDRESS', "0x849D52316331967b6fF1198e5E32A0eB168D039d")
-    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLES_MOD_ADDRESS', "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc")
-    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLE', "4")
-    monkeypatch.setenv('GNOSISDAO_MAINNET_PRIVATE_KEYS', "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80")
-    env = ENV("GnosisDAO", "mainnet")
-    w3 = start_the_engine(env)
+    env = set_env(monkeypatch, "DummyString")
+    w3 = start_the_engine(env, local_fork_port=8546)
     assert w3.is_connected()
 
-def test_gear_up(monkeypatch):
-    monkeypatch.setenv('MAINNET_RPC_ENDPOINT', 'https://eth.llamarpc.com')
-    monkeypatch.setenv('MAINNET_FALLBACK_RPC_ENDPOINT', 'https://eth.llamarpc.com')
-    monkeypatch.setenv('GNOSISDAO_MAINNET_AVATAR_SAFE_ADDRESS', "0x849D52316331967b6fF1198e5E32A0eB168D039d")
-    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLES_MOD_ADDRESS', "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc")
-    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLE', "4")
-    monkeypatch.setenv('GNOSISDAO_MAINNET_PRIVATE_KEYS', "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80")
-    
-    DAO = 'GnosisDAO'
-    BLOCKCHAIN = 'mainnet'
-    ENVY = ENV(DAO, BLOCKCHAIN)
 
-    PROTOCOL = JSON_FORM["protocol"]
-    SIMULATE = False
-    W3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8546'))
-    PERCENTAGE = JSON_FORM["common_exec_config"][0]["value"]
-    EXIT_STRATEGY = JSON_FORM["position_exec_config"][0]["function_name"]
-    EXIT_ARGUMENTS = [JSON_FORM["position_exec_config"][0]["parameters"][0]]
-    EXEC_CONFIG = ExecConfig(PERCENTAGE, SIMULATE, DAO, BLOCKCHAIN, PROTOCOL, EXIT_STRATEGY, EXIT_ARGUMENTS)
+def test_gear_up(monkeypatch, local_node_eth):
+    private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    env = set_env(monkeypatch, private_key)
 
-    disassembler, txn_transactable = gear_up(W3, ENVY, EXEC_CONFIG)
-    assert disassembler.avatar_safe_address == '0x849D52316331967b6fF1198e5E32A0eB168D039d'    
-    assert txn_transactable[0].data == """0x8bdb3913f4c0dd9b82da36c07605df83c8a416f11724d88b000200000000000000000026000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000006810e776880c02933d47db1b9fc05908e5386b96000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"""   
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(18437790)
 
-#@pytest.mark.skip("transaction is now reverted, check why")
+    disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
+    assert disassembler.avatar_safe_address == '0x849D52316331967b6fF1198e5E32A0eB168D039d'
+    assert txn_transactables[
+               0].data == '0xc32e72020000000000000000000000000000000000000000000000111ed47dc81e6e5ad80000000000000000000000000000000000000000000000000000000000000001'
+    assert txn_transactables[
+               1].data == '0x8bdb39131e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d00000000000000000000000000000000000000000000000'
+
+
 def test_drive_away(local_node_eth, accounts, monkeypatch):
-    PRESET = '{"version":"1.0","chainId":"1","meta":{"name":null,"description":"","txBuilderVersion":"1.8.0"},' \
-         '"createdAt":1695826823729,"transactions":[{"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",' \
-         '"data":"0x5e8266950000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c8","value":"0"},{"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c88bdb3913000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000280000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value":"0"}]}'
-
     w3 = local_node_eth.w3
     block = 18421437
     local_node_eth.set_block(block)
 
-    avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
-    roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
-    setup_common_roles(avatar_safe, roles_contract)
+    disassembler_address = accounts[0].address
+    private_key = accounts[0].key.hex()
 
-    apply_presets(avatar_safe, roles_contract, json_data=PRESET,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
+    assign_role(local_node=local_node_eth,
+                avatar_safe_address=avatar_safe_address,
+                roles_mod_address=roles_mod_address,
+                role=role,
+                asignee=disassembler_address)
 
+    env = set_env(monkeypatch, private_key)
 
-    PRIVATE_KEY = accounts[1].key
-    monkeypatch.setenv('MAINNET_RPC_ENDPOINT', 'https://eth.llamarpc.com')
-    monkeypatch.setenv('MAINNET_FALLBACK_RPC_ENDPOINT', 'https://eth.llamarpc.com')
-    monkeypatch.setenv('GNOSISDAO_MAINNET_AVATAR_SAFE_ADDRESS', avatar_safe.address)
-    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLES_MOD_ADDRESS', roles_contract.address)
-    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLE', "1")
-    monkeypatch.setenv('GNOSISDAO_MAINNET_PRIVATE_KEYS', "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d")
+    disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
 
-    DAO = 'GnosisDAO'
-    BLOCKCHAIN = 'mainnet'
-    ENVY = ENV(DAO, BLOCKCHAIN)
-
-    PROTOCOL = JSON_FORM["protocol"]
-    SIMULATE = False
-    W3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8546'))
-    PERCENTAGE = JSON_FORM["common_exec_config"][0]["value"]
-    EXIT_STRATEGY = JSON_FORM["position_exec_config"][0]["function_name"]
-    EXIT_ARGUMENTS = [JSON_FORM["position_exec_config"][0]["parameters"][0]]
-    EXEC_CONFIG = ExecConfig(PERCENTAGE, SIMULATE, DAO, BLOCKCHAIN, PROTOCOL, EXIT_STRATEGY, EXIT_ARGUMENTS)
-
-    DISASSEMBLER, TXN_TRANSACTABLE = gear_up(W3, ENVY, EXEC_CONFIG)
-    response = drive_away(DISASSEMBLER, TXN_TRANSACTABLE, PRIVATE_KEY, SIMULATE)
+    response = drive_away(disassembler=disassembler,
+                          txn_transactables=txn_transactables,
+                          private_key=private_key,
+                          simulate=exec_config.simulate)
 
     assert response['status'] == 200
     assert response['message'] == "Transaction executed successfully"
 
+    disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
+    response_reverted = drive_away(disassembler=disassembler,
+                                   txn_transactables=txn_transactables,
+                                   private_key=accounts[1].key.hex(),
+                                   simulate=exec_config.simulate)
+
+    assert response_reverted['status'] == 422
+    assert response_reverted['message'] == "Transaction reverted when executed locally"
+
+    disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
+    response_exception = drive_away(disassembler=disassembler,
+                                    txn_transactables=txn_transactables,
+                                    private_key='0x',
+                                    simulate=exec_config.simulate)
+
+    assert response_exception['status'] == 500
+    assert response_exception['message'] == "Error: The private key must be exactly 32 bytes long, instead of 2 bytes."
