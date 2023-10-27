@@ -10,6 +10,10 @@ role = 4
 
 
 def set_env(monkeypatch, private_key: str) -> ENV:
+    monkeypatch.setenv('TENDERLY_ACCOUNT_ID', 'DummyString')
+    monkeypatch.setenv('TENDERLY_PROJECT', 'DummyString')
+    monkeypatch.setenv('TENDERLY_API_TOKEN', 'DummyString')
+    monkeypatch.setenv('MAINNET_FALLBACK_RPC_ENDPOINT', 'DummyString')
     monkeypatch.setenv('MAINNET_RPC_ENDPOINT', 'DummyString')
     monkeypatch.setenv('MAINNET_FALLBACK_RPC_ENDPOINT', 'DummyString')
     monkeypatch.setenv('GNOSISDAO_MAINNET_AVATAR_SAFE_ADDRESS', avatar_safe_address)
