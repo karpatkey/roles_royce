@@ -2,10 +2,11 @@ import argparse
 from web3 import Web3
 from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler
 from roles_royce.utils import TenderlyCredentials
-from .utils import ENV, ExecConfig
+from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
 import time
 from roles_royce.generic_method import Transactable
 from roles_royce.toolshed.alerting.utils import get_tx_link
+import json
 
 
 def start_the_engine(env: ENV, local_fork_port: int = None) -> Web3:
@@ -107,7 +108,7 @@ def main():
 
     parser.add_argument("-prot", "--protocol", type=str, help="Protocol where the funds are deposited.")
     parser.add_argument("-s", "--exitStrategy", type=str, help="Exit strategy to execute, e.g. exit_2_1, exit_3")
-    parser.add_argument("-a", "--exitArguments", type=list[dict],
+    parser.add_argument("-a", "--exitArguments", type=str,
                         help="List of dictionaries with the custom exit arguments for each position and exit strategy, " \
                              "e.g. [{ 'bpt_address': '0xsOmEAddResS', 'max_slippage': 0.01}]")
 
@@ -115,14 +116,14 @@ def main():
     args = parser.parse_args()
 
     simulate = args.simulate
-
+    
     exec_config = ExecConfig(percentage=args.percentage,
                              simulate=args.simulate,
                              dao=args.dao,
                              blockchain=args.blockchain,
                              protocol=args.protocol,
                              exit_strategy=args.exitStrategy,
-                             exit_arguments=args.exitArguments)
+                             exit_arguments=json.loads(args.exitArguments))
 
     env = ENV(DAO=exec_config.dao, BLOCKCHAIN=exec_config.blockchain)
 
