@@ -20,8 +20,8 @@ def start_the_engine(env: ENV, local_fork_port: int = None) -> Web3:
                 w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
                 if not w3.is_connected():
                     w3 = Web3(Web3.HTTPProvider(env.FALLBACK_RPC_ENDPOINT))
-            raise Exception("No connection to RPC endpoint")
-
+                    if not w3.is_connected():
+                        raise Exception("No connection to RPC endpoint")
     return w3
 
 

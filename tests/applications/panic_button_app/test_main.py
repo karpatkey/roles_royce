@@ -1,6 +1,7 @@
 from roles_royce.applications.panic_button_app.panic_button_main import start_the_engine, gear_up, drive_away
 from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
 from tests.utils import assign_role, local_node_eth, accounts
+import pytest
 
 dao = 'GnosisDAO'
 blockchain = 'mainnet'
@@ -10,6 +11,8 @@ role = 4
 
 
 def set_env(monkeypatch, private_key: str) -> ENV:
+    monkeypatch.setenv('MAINNET_RPC_ENDPOINT', 'DummyString')
+    monkeypatch.setenv('MAINNET_FALLBACK_RPC_ENDPOINT', 'DummyString')
     monkeypatch.setenv('GNOSISDAO_MAINNET_AVATAR_SAFE_ADDRESS', avatar_safe_address)
     monkeypatch.setenv('GNOSISDAO_MAINNET_ROLES_MOD_ADDRESS', roles_mod_address)
     monkeypatch.setenv('GNOSISDAO_MAINNET_ROLE', role)
@@ -42,6 +45,9 @@ def test_start_the_engine(monkeypatch):
     env = set_env(monkeypatch, "DummyString")
     w3 = start_the_engine(env, local_fork_port=8546)
     assert w3.is_connected()
+
+    with pytest.raises(Exception):
+        start_the_engine(env) # RPC endpoints are 'DummyString'
 
 
 def test_gear_up(monkeypatch, local_node_eth):
