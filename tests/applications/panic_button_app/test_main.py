@@ -98,7 +98,7 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
                                    simulate=exec_config.simulate)
 
     assert response_reverted['status'] == 422
-    assert response_reverted['message'] == "Transaction reverted when executed locally"
+    assert response_reverted['message'] == "Transaction reverted when simulated in local execution"
 
     disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
     response_exception = drive_away(disassembler=disassembler,
