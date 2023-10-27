@@ -17,9 +17,9 @@ class ENV:
     DAO: str
     BLOCKCHAIN: str
 
-    TENDERLY_ACCOUNT_ID: str = config('TENDERLY_ACCOUNT_ID')
-    TENDERLY_PROJECT: str = config('TENDERLY_PROJECT')
-    TENDERLY_API_TOKEN: str = config('TENDERLY_API_TOKEN')
+    TENDERLY_ACCOUNT_ID: str = config('TENDERLY_ACCOUNT_ID', default='')
+    TENDERLY_PROJECT: str = config('TENDERLY_PROJECT', default='')
+    TENDERLY_API_TOKEN: str = config('TENDERLY_API_TOKEN', default='')
 
     RPC_ENDPOINT: str = field(init=False)
     FALLBACK_RPC_ENDPOINT: str = field(init=False)
