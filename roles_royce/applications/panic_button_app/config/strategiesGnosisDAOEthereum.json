@@ -1,7 +1,7 @@
 {
   "dao": "GnosisDAO",
   "blockchain": "mainnet",
-  "common_exec_config": [
+  "general_parameters": [
     {
       "name": "percentage",
       "label": "Percentage",
