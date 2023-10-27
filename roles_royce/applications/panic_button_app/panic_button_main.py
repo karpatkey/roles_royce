@@ -85,7 +85,7 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
                                         "message": "Transaction executed successfully"}
             else:
                 response_message = {"status": 422, "link": "No link",
-                                    "message": "Transaction reverted when executed locally"}
+                                    "message": "Transaction reverted when simulated in local execution"}
         return response_message
     except Exception as e:
         response_message = {"status": 500, "message": f"Error: {e}"}
@@ -130,7 +130,7 @@ def main():
 
     disassembler, txn_transactables = gear_up(w3, env, exec_config)
 
-    tx_message = drive_away(disassembler, txn_transactables, env.PRIVATE_KEYS, simulate)
+    tx_message = drive_away(disassembler, txn_transactables, env.PRIVATE_KEY, simulate)
 
     return tx_message
 
