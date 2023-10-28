@@ -53,7 +53,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -140,7 +140,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -227,7 +227,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -317,7 +317,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -404,7 +404,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -491,7 +491,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -578,7 +578,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -665,7 +665,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -734,7 +734,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -865,7 +865,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -934,7 +934,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1003,7 +1003,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1072,7 +1072,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1141,7 +1141,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1210,7 +1210,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1279,7 +1279,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1348,7 +1348,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1417,7 +1417,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1486,7 +1486,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1555,7 +1555,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1624,7 +1624,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1693,7 +1693,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1762,7 +1762,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1831,7 +1831,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1900,7 +1900,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -1969,7 +1969,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2038,7 +2038,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2107,7 +2107,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2178,7 +2178,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2249,7 +2249,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2320,7 +2320,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2391,7 +2391,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2463,7 +2463,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2579,7 +2579,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2650,7 +2650,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2721,7 +2721,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2794,7 +2794,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -2885,7 +2885,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -2958,7 +2958,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -3031,7 +3031,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -3122,7 +3122,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -3195,7 +3195,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -3269,7 +3269,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -3361,7 +3361,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",
@@ -3435,7 +3435,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -3511,7 +3511,7 @@
         {
           "function_name": "exit_1_2",
           "label": "Exit_1_2",
-          "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "bpt_address",
@@ -3605,7 +3605,7 @@
         {
           "function_name": "exit_2_2",
           "label": "Exit 2 2",
-          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.",
+          "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
           "parameters": [
             {
               "name": "rewards_address",

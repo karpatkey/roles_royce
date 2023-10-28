@@ -98,8 +98,8 @@ def main():
                                      epilog='Build by karpatkey',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("-sim", "--simulate", action='store_true',
-                        default='False', help="If set simulates transaction in Tenderly")
+    parser.add_argument("-sim", "--simulate", default=False, action='store_true',
+                        help="If set simulates transaction in Tenderly")
     parser.add_argument("-p", "--percentage", type=int, default=100,
                         help="Percentage of liquidity to be removed, defaults to 100.")
 
@@ -109,8 +109,8 @@ def main():
     parser.add_argument("-prot", "--protocol", type=str, help="Protocol where the funds are deposited.")
     parser.add_argument("-s", "--exitStrategy", type=str, help="Exit strategy to execute, e.g. exit_2_1, exit_3")
     parser.add_argument("-a", "--exitArguments", type=str,
-                        help="List of dictionaries (cast as a string) with the custom exit arguments for each position and exit strategy, " \
-                             "e.g. [{ 'bpt_address': '0xsOmEAddResS', 'max_slippage': 0.01}]")
+                        help="List of dictionaries (cast as a string) with the custom exit arguments for each "
+                             "position and exit strategy, e.g. [{ 'bpt_address': '0xsOmEAddResS', 'max_slippage': 0.01}]")
 
     parser.add_argument("-t", "--test", type=int, help="Local fork port to test the script.")
     args = parser.parse_args()
@@ -133,7 +133,7 @@ def main():
 
     tx_message = drive_away(disassembler, txn_transactables, env.PRIVATE_KEY, simulate)
 
-    return tx_message
+    print(tx_message)
 
 
 if __name__ == "__main__":

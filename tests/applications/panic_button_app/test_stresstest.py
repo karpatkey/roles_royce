@@ -1,16 +1,13 @@
-from roles_royce.applications.panic_button_app.panic_button_main import start_the_engine, gear_up, drive_away
-from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
+from roles_royce.applications.panic_button_app.utils import ENV
 from tests.utils import assign_role, local_node_eth, accounts
-
+import os
 import json
-from unittest.mock import patch
 import pytest
-import argparse
 import subprocess
 from pathlib import Path
 
 PERCENTAGE = 80
-MAX_SLIPPAGE = 1
+MAX_SLIPPAGE = 0.05
 
 dao = 'GnosisDAO'
 blockchain = 'mainnet'
@@ -18,13 +15,16 @@ avatar_safe_address = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
 roles_mod_address = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
 role = 4
 
-path = Path(__file__).with_name('strategiesGnosisDAOEthereum.json')
-with path.open('r') as f:
+file_path_main = os.path.join(Path().resolve().parent.parent.parent, 'roles_royce', 'applications', 'panic_button_app',
+                              'panic_button_main.py')
+file_path_json = os.path.join(Path().resolve().parent.parent.parent, 'roles_royce', 'applications', 'panic_button_app',
+                              'config', 'strategiesGnosisDAOEthereum.json')
+with open(file_path_json, 'r') as f:
     strategies = json.load(f)
 list_of_positions = []
 for position in strategies['positions']:
-    for position_exec_config in position['position_exec_config']:
-        list_of_positions.append(position_exec_config)
+    for exec_config in position['exec_config']:
+        list_of_positions.append(exec_config)
 
 
 def set_up_roles(local_node_eth, accounts):
@@ -50,15 +50,14 @@ def set_env(monkeypatch, private_key: str) -> ENV:
     return ENV(dao, blockchain)
 
 
-@pytest.mark.skip("This test would take a huge time to run in the CI")
+@pytest.mark.skip("This test would take forever to run in the CI")
 @pytest.mark.parametrize("args", list_of_positions)
 def test_stresstest(local_node_eth, accounts, monkeypatch, args):
     private_key = set_up_roles(local_node_eth, accounts)
-
-    env = set_env(monkeypatch, private_key)
+    set_env(monkeypatch, private_key)
 
     arguments = [
-        'python', 'roles_royce/applications/panic_button_app/panic_button_main.py',
+        'python', file_path_main,
         '-p', str(PERCENTAGE),
         '-d', dao,
         '-b', blockchain,
@@ -74,7 +73,7 @@ def test_stresstest(local_node_eth, accounts, monkeypatch, args):
             exit_arguments_dict[item['name']] = MAX_SLIPPAGE
         elif item['name'] == 'token_out_address':
             exit_arguments_dict[item['name']] = item['options'][0]
-        exit_arguments = [exit_arguments_dict]
+    exit_arguments = [exit_arguments_dict]
     # Convert the parameters to a JSON string
     parameters_json = json.dumps(exit_arguments)
     arguments.extend(['-a', parameters_json])
@@ -82,5 +81,6 @@ def test_stresstest(local_node_eth, accounts, monkeypatch, args):
     main = subprocess.run(arguments, capture_output=True, text=True)
 
     assert main.returncode == 0
-
-    assert 'Expected output' in main.stdout
+    dict_message_stdout = json.loads(main.stdout[:-1].replace("\'", "\""))
+    assert dict_message_stdout['status'] == 200
+    assert dict_message_stdout['message'] == "Transaction executed successfully"
