@@ -7,6 +7,7 @@ from unittest.mock import patch
 import pytest
 import argparse
 import subprocess
+from pathlib import Path
 
 PERCENTAGE = 80
 MAX_SLIPPAGE = 1
@@ -17,7 +18,8 @@ avatar_safe_address = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
 roles_mod_address = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
 role = 4
 
-with open('strategiesGnosisDAOEthereum.json', 'r') as f:
+path = Path(__file__).with_name('strategiesGnosisDAOEthereum.json')
+with path.open('r') as f:
     strategies = json.load(f)
 list_of_positions = []
 for position in strategies['positions']:
