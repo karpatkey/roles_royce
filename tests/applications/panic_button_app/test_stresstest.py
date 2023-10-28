@@ -5,6 +5,7 @@ import json
 import pytest
 import subprocess
 from pathlib import Path
+import traceback
 
 PERCENTAGE = 80
 MAX_SLIPPAGE = 0.05
@@ -15,9 +16,9 @@ avatar_safe_address = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
 roles_mod_address = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
 role = 4
 
-file_path_main = os.path.join(Path.cwd().resolve().parent.parent.parent, 'roles_royce', 'applications', 'panic_button_app',
+file_path_main = os.path.join(Path(traceback.extract_stack()[-1].filename).resolve().parent.parent.parent, 'roles_royce', 'applications', 'panic_button_app',
                               'panic_button_main.py')
-file_path_json = os.path.join(Path.cwd().resolve().parent.parent.parent, 'roles_royce', 'applications', 'panic_button_app',
+file_path_json = os.path.join(Path(traceback.extract_stack()[-1].filename).resolve().parent.parent.parent, 'roles_royce', 'applications', 'panic_button_app',
                               'config', 'strategiesGnosisDAOEthereum.json')
 with open(file_path_json, 'r') as f:
     strategies = json.load(f)
