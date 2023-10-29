@@ -1,10 +1,10 @@
 {
   "position_id": "FllMeWithPositionId",
   "protocol": "Balancer",
-  "exec_config": [
+  "position_exec_config": [
     {
-      "function_name": "exit_1",
-      "label": "Exit_1",
+      "function_name": "exit_1_1",
+      "label": "Exit_1_1",
       "description": "Withdraw funds from the Balancer pool withdrawing all assets in proportional way (not used for pools in recovery mode!)",
       "parameters": [
         {
@@ -14,17 +14,16 @@
         },
         {
           "name": "max_slippage",
+          "label": "Max slippage",
           "type": "input",
-          "rules": {
-            "min": 0,
-            "max": 100
-          }
+          "rules": { "min": 0, "max": 100 }
         }
       ]
     },
     {
-      "function_name": "exit_2",
-      "description": "Withdraw funds from the Balancer pool withdrawing a single asset.",
+      "function_name": "exit_1_2",
+      "label": "Exit_1_2",
+      "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
       "parameters": [
         {
           "name": "bpt_address",
@@ -33,17 +32,14 @@
         },
         {
           "name": "max_slippage",
-          "type": "input",
           "label": "Max slippage",
-          "rules": {
-            "min": 0,
-            "max": 100
-          }
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
         },
         {
           "name": "token_out_address",
-          "type": "input",
           "label": "Token out",
+          "type": "input",
           "options": [
             {
               "value": "FillMewithTokenAddress",
@@ -54,8 +50,8 @@
       ]
     },
     {
-      "function_name": "exit_3",
-      "label": "Exit_3",
+      "function_name": "exit_1_3",
+      "label": "Exit_1_3",
       "description": "Withdraw funds from the Balancer pool withdrawing all assets in proportional way for pools in recovery mode.",
       "parameters": [
         {
@@ -65,12 +61,9 @@
         },
         {
           "name": "max_slippage",
-          "type": "input",
           "label": "Max slippage",
-          "rules": {
-            "min": 0,
-            "max": 100
-          }
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
         }
       ]
     }

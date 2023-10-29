@@ -1,7 +1,7 @@
 {
   "position_id": "FillMeWIthPositionId",
   "protocol": "Aura",
-  "exec_config": [
+  "position_exec_config": [
     {
       "function_name": "exit_1",
       "label": "Exit_1",
