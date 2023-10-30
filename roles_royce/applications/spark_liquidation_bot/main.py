@@ -1,3 +1,4 @@
+import concurrent
 import logging
 import time
 from threading import Event, Thread
@@ -41,56 +42,62 @@ def get_addresses_from_bigquery():
     query = """
     SELECT address FROM `karpatkey-data-warehouse.liquidation_bot_spark.dwh_gnosis_spark_user_address` 
     """
-    query_job = client.query(query)
-    
-    for row in query_job:
-        addresses.append(row.address)
+    for _ in range(3):
+        try:
+            query_job = client.query(query)
+            return [row.address for row in query_job]
+        except Exception as e:
+            logging.error(f"Error querying BigQuery: {e}. Retrying...")
+            time.sleep(20)
 
-    return addresses
+    logger.error("Failed to retrieve addresses from BigQuery after multiple retries.")
+    return []
 
 def update_address_list():
     global current_addresses
     new_addresses = get_addresses_from_bigquery()
 
     # Check if there's a difference between the new and current addresses
-    if new_addresses != current_addresses:
+    if new_addresses and new_addresses != current_addresses:
         current_addresses = new_addresses
 
+MAX_THREADS = 10
 def check_health_factor():
     """Check health factor for all addresses. Starts a thread for each address to check health factor. 
     threads are for parallel execution.
     """
-    # Create threads
-    threads = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+        # Use executor.submit to start tasks and collect the resulting Future objects
+        futures = [executor.submit(check_health_for_address, address) for address in current_addresses]
+        
+        # Collect and handle results/errors
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                future.result()
+            except Exception as e:
+                pass
 
-    # Start threads
-    for address in current_addresses:
-        thread = Thread(target=check_health_for_address, args=(address,))
-        thread.start()
-        threads.append(thread)
-
-    # Wait for all threads to complete 
-    for thread in threads:
-        thread.join()
     
-
 def check_health_for_address(address):
     """For a single address, check health factor and send alert if it is below the threshold.
 
     Args:
         address (str): address to check health factor for.
     """
-    spark_cdp_manager = SparkCDPManager(w3=Web3(Web3.HTTPProvider("https://gcarch.karpatkey.dev")), owner_address=address)
-    health_factor = spark_cdp_manager.get_health_factor()
+    try:
+        spark_cdp_manager = SparkCDPManager(w3=Web3(Web3.HTTPProvider("https://gcarch.karpatkey.dev")), owner_address=address)
+        health_factor = spark_cdp_manager.get_health_factor()
 
-    if health_factor <= ENV.THRESHOLD_HEALTH_FACTOR:
-        title = "Health factor dropped below the critical threshold"
-        message = (f"  Current health factor: ({health_factor}).\n"
-                f"  Health factor threshold: ({ENV.ALERTING_HEALTH_FACTOR}).\n"
-                f"  Address: ({address}).")
-        # messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=threshold_health_factor_flag.is_set())
-        logger.info([title, message])
-
+        if health_factor <= ENV.THRESHOLD_HEALTH_FACTOR:
+            title = "Health factor dropped below the critical threshold"
+            message = (f"  Current health factor: ({health_factor}).\n"
+                    f"  Health factor threshold: ({ENV.ALERTING_HEALTH_FACTOR}).\n"
+                    f"  Address: ({address}).")
+            # messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=threshold_health_factor_flag.is_set())
+            logger.info([title, message])
+    except Exception as e:
+        logger.error(f"Error while checking health factor for address {address}. Error: {e}")
+        
 # --------------- This is the main function that runs the bot
 
 def main():
