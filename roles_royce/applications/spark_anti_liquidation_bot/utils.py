@@ -1,16 +1,17 @@
 from dataclasses import dataclass, field
 import threading
-
+from prometheus_client import Gauge
 import schedule
 import time
 from decouple import config
 from web3.types import Address, ChecksumAddress
 from web3 import Web3
 from roles_royce.toolshed.alerting.alerting import Messenger, LoggingLevel
-from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDP
+from roles_royce.toolshed.anti_liquidation.spark import SparkCDP
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 # The next helper function allows to leave variables unfilled in the .env file
 def custom_config(variable, default, cast):
@@ -41,14 +42,7 @@ class ENV:
 
     BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
 
-    MANDATORY_ATTRIBUTES = ['RPC_ENDPOINT', 'AVATAR_SAFE_ADDRESS', 'ROLES_MOD_ADDRESS', 'ROLE', 'PRIVATE_KEY',
-                            'TARGET_HEALTH_FACTOR', 'THRESHOLD_HEALTH_FACTOR']
-
     def __post_init__(self):
-        for attr_name in self.MANDATORY_ATTRIBUTES:
-            attr_value = getattr(self, attr_name)
-            if not attr_value:
-                raise ValueError(f"{attr_name} cannot be empty in .env file.")
         self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
         self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
         if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).is_connected():
@@ -78,6 +72,7 @@ def log_initial_data(env: ENV, messenger: Messenger):
                          f"  Cooldown Minutes: {env.COOLDOWN_MINUTES}\n")
     messenger.log_and_alert(LoggingLevel.Info, title, message)
 
+
 def send_status(messenger: Messenger, cdp: SparkCDP, bot_ETH_balance: float):
     title = "Spark CDP status update"
     message = (f"  Current health factor: {cdp.health_factor}\n"
@@ -99,3 +94,19 @@ class SchedulerThread(threading.Thread):
 
     def stop(self):
         self.running = False
+
+@dataclass
+class Gauges:
+    health_factor = Gauge('health_factor', 'Spark CDP health factor')
+    # TODO: This should be generalized for any Spark CDP with any tokens
+    wstETH_deposited = Gauge('wstETH_balance', 'wstETH deposited balance of the Spark CDP')
+    DAI_borrowed = Gauge('DAI_borrowed', 'DAI borrowed balance of the Spark CDP')
+    wstETH_price = Gauge('wstETH_price', 'wstETH price')
+    DAI_price = Gauge('DAI_price', 'DAI price')
+    bot_ETH_balance = Gauge('bot_ETH_balance', 'ETH balance of the bot')
+    alerting_health_factor = Gauge('alerting_health_factor', 'Alerting health factor')
+    health_factor_threshold = Gauge('health_factor_threshold', 'Health factor threshold')
+    sDAI_balance = Gauge('sDAI_balance', 'sDAI balance of the avatar safe')
+    last_updated = Gauge('last_updated', 'Last updated time and date')
+    DAI_equivalent = Gauge('DAI_equivalent', 'DAI that would be obtained by redeeming the total of the sDAI')
+    DAI_balance = Gauge('DAI_balance', 'DAI balance of the avatar safe')

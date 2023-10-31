@@ -7,7 +7,8 @@ from eth_account.signers.local import LocalAccount
 from hexbytes import HexBytes
 
 from roles_royce.generic_method import Transactable
-from roles_royce.constants import ETHAddr, Chain
+from roles_royce.constants import ETHAddr
+from defabipedia.types import Chains
 from roles_royce.utils import multi_or_one
 
 
@@ -30,11 +31,11 @@ class SimpleSafe(Safe):
         super().__init__(address, ethereum_client)
 
     def send(self, txs: list[Transactable]) -> TxResult:
-        tx = multi_or_one(txs, Chain.Ethereum)
+        tx = multi_or_one(txs, Chains.Ethereum)
         safe_tx = self.build_multisig_tx(to=tx.contract_address, value=tx.value,
                                          data=tx.data, operation=tx.operation,
-                                         safe_tx_gas=10_000_000,
-                                         base_gas=10_000_000, gas_price=1, gas_token=ETHAddr.ZERO, refund_receiver=ETHAddr.ZERO)
+                                         safe_tx_gas=14_000_000,
+                                         base_gas=14_000_000, gas_price=1, gas_token=ETHAddr.ZERO, refund_receiver=ETHAddr.ZERO)
         safe_tx.sign(self.signer_key)
         tx_hash, _ = safe_tx.execute(self.signer_key)
         receipt = self.ethereum_client.get_transaction_receipt(tx_hash, timeout=60)

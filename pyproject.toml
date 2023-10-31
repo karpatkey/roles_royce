@@ -23,11 +23,12 @@ dependencies = [
     "safe-eth-py>=5.3.1",
     "web3>=6.6,<7.0",
     "requests>=2.31.0,<3.0",
+    "python-decouple>=3.8"
 ]
 
 [project.urls]
 Homepage = "https://github.com/KarpatkeyDAO/rolling-roles"
 
 [tool.setuptools.packages.find]
-include = ["roles_royce*"]
+include = ["roles_royce*", "defabipedia*"]
 namespaces = false
