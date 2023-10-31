@@ -1,11 +1,12 @@
 from roles_royce.evm_utils import erc20_abi
 from dataclasses import dataclass
 from typing import Any, Dict, cast, Union
-from roles_royce.utils import Chain, Blockchain
+from defabipedia.types import Blockchain, Chains
 from web3.types import Address, ChecksumAddress
 from web3._utils.abi import get_abi_input_names, get_abi_input_types, map_abi_data
 from web3._utils.normalizers import BASE_RETURN_NORMALIZERS
 from web3.contract import Contract
+from web3.types import TxReceipt
 from web3 import Web3
 from eth_typing import HexStr
 from eth_utils import event_abi_to_log_topic
@@ -92,25 +93,30 @@ def get_token_amounts_from_transfer_events(tx_receipt: object, target_address: s
 
 
 ExplorerTxUrls = {
-    Chain.Ethereum: 'https://etherscan.io/tx/',
-    Chain.GnosisChain: 'https://gnosisscan.io/tx/'
+    Chains.Ethereum: 'https://etherscan.io/tx/',
+    Chains.Gnosis: 'https://gnosisscan.io/tx/'
 }
 
 
-def get_tx_executed_msg(tx_receipt: object, chain: Blockchain) -> (str, str):
+def get_tx_link(tx_receipt: TxReceipt, chain: Blockchain) -> str:
+    return f'{ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}'
+
+
+def get_tx_executed_msg(tx_receipt: TxReceipt, chain: Blockchain) -> (str, str):
+    tx_link = get_tx_link(tx_receipt, chain)
     if tx_receipt.status == 1:
-        message_slack = f'  *Txn hash (Success):* <{ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}|{tx_receipt.transactionHash.hex()}>.'
-        message = f'  Txn hash (Success): {ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}.'
+        message_slack = f'  *Txn hash (Success):* <{tx_link}|{tx_receipt.transactionHash.hex()}>.'
+        message = f'  Txn hash (Success): {tx_link}.'
     else:
-        message_slack = f'  *Txn hash (Failure):* <{ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}|{tx_receipt.transactionHash.hex()}>.'
-        message = f'  Txn hash (Failure): {ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}.'
+        message_slack = f'  *Txn hash (Failure):* <{tx_link}|{tx_receipt.transactionHash.hex()}>.'
+        message = f'  Txn hash (Failure): {tx_link}.'
 
     return message, message_slack
 
 
 def get_tx_receipt_message_with_transfers(tx_receipt: object, target_address: str | ChecksumAddress | Address,
                                           w3: Web3) -> (str, str):
-    chain = Chain.get_blockchain_from_web3(w3)
+    chain = Chains.get_blockchain_from_web3(w3)
     tx_executed_message, tx_executed_message_slack = get_tx_executed_msg(tx_receipt, chain)
     transfers, transfers_message = get_token_amounts_from_transfer_events(tx_receipt, target_address, w3)
 
