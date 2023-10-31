@@ -266,7 +266,7 @@ def get_allowance(w3, token, owner_address, spender_address):
 
 
 def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
-    """Create a Safe with one owner and 100 ETH in balance"""
+    """Create a Safe with one owner and 1 ETH in balance"""
 
     safe = SimpleSafe.build(owner, ETH_LOCAL_NODE_URL)
     top_up_address(w3=w3, address=safe.address, amount=1)
