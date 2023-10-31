@@ -4,14 +4,14 @@ from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import ContractMethod, InvalidArgument, AvatarAddress, Address, BaseApprove, BaseApproveForToken
 
 
-class InterestRateModel(IntEnum):
+class InterestRateMode(IntEnum):
     STABLE = 1
     VARIABLE = 2
 
     @staticmethod
     def check(value):
-        if value not in InterestRateModel:
-            raise InvalidArgument(f"Invalid interestRateModel={value}")
+        if value not in InterestRateMode:
+            raise InvalidArgument(f"Invalid interestRateMode={value}")
 
 class DelegationType(IntEnum):
     VOTING = 0
@@ -109,44 +109,44 @@ class Collateralize(ContractMethod):
 class Borrow(ContractMethod):
     """Sender receives Token and receives debtToken (stable or variable debt) token."""
     name = "borrow"
-    in_signature = [("asset", "address"), ("amount", "uint256"), ("interest_rate_model", "uint256"),
+    in_signature = [("asset", "address"), ("amount", "uint256"), ("interest_rate_mode", "uint256"),
                     ("referral_code", "uint16"), ("on_behalf_of", "address")]
     fixed_arguments = {"referral_code": 0, "on_behalf_of": AvatarAddress}
     target_address = ETHAddr.AAVE_V2_LendingPool
 
-    def __init__(self, asset: Address, amount: int, interest_rate_model: InterestRateModel, avatar: Address):
+    def __init__(self, asset: Address, amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
         super().__init__(avatar=avatar)
         self.args.asset = asset
         self.args.amount = amount
-        InterestRateModel.check(interest_rate_model)
-        self.args.interest_rate_model = interest_rate_model
+        InterestRateMode.check(interest_rate_mode)
+        self.args.interest_rate_mode = interest_rate_mode
 
 
 class BorrowETH(ContractMethod):
     """Sender receives ETH and debtETH (stable or variable debt) token."""
     name = "borrowETH"
-    in_signature = [("address", "address"), ("amount", "uint256"), ("interest_rate_model", "uint256"), ("referral_code", "uint16")]
+    in_signature = [("address", "address"), ("amount", "uint256"), ("interest_rate_mode", "uint256"), ("referral_code", "uint16")]
     fixed_arguments = {"address": ETHAddr.AAVE_V2_LendingPool, "referral_code": 0}
     target_address: str = ETHAddr.AAVE_V2_WrappedTokenGateway
 
-    def __init__(self, amount: int, interest_rate_model: InterestRateModel):
+    def __init__(self, amount: int, interest_rate_mode: InterestRateMode):
         super().__init__()
         self.args.amount = amount
-        InterestRateModel.check(interest_rate_model)
-        self.args.interest_rate_model = interest_rate_model
+        InterestRateMode.check(interest_rate_mode)
+        self.args.interest_rate_mode = interest_rate_mode
 
 
 class SwapBorrowRateMode(ContractMethod):
     """Swaps the borrow rate mode."""
     name = "swapBorrowRateMode"
-    in_signature = [("asset", "address"), ("interest_rate_model", "uint256")]
+    in_signature = [("asset", "address"), ("interest_rate_mode", "uint256")]
     target_address = ETHAddr.AAVE_V2_LendingPool
 
-    def __init__(self, asset: Address, interest_rate_model: InterestRateModel):
+    def __init__(self, asset: Address, interest_rate_mode: InterestRateMode):
         super().__init__()
         self.args.asset = asset
-        InterestRateModel.check(interest_rate_model)
-        self.args.interest_rate_model = interest_rate_model
+        InterestRateMode.check(interest_rate_mode)
+        self.args.interest_rate_mode = interest_rate_mode
 
 
 class StakeAAVE(ContractMethod):
@@ -164,6 +164,18 @@ class StakeAAVE(ContractMethod):
 class StakeABPT(StakeAAVE):
     """Stake ABPT in Aave’s safety module."""
     target_address = ETHAddr.stkABPT
+
+
+class ClaimRewardsAndStake(ContractMethod):
+    """claim AAVE rewards accrued from staking AAVE and restake"""
+    name = 'claimRewardsAndStake'
+    in_signature = [("to", "address"), ("amount", "uint256")]
+    fixed_arguments = {"to": AvatarAddress}
+    target_address = ETHAddr.stkAAVE
+
+    def __init__(self, avatar: Address, amount: int):
+        super().__init__(avatar=avatar)
+        self.args.amount = amount
 
 
 class UnstakeAAVE(ContractMethod):
@@ -216,28 +228,28 @@ class ClaimABPTRewards(ClaimAAVERewards):
 class Repay(ContractMethod):
     """Repay borrowed Token."""
     name = 'repay'
-    in_signature = [('asset', 'address'), ('amount', 'uint256'), ('interest_rate_model', 'uint256'), ('on_behalf_of', 'address')]
+    in_signature = [('asset', 'address'), ('amount', 'uint256'), ('interest_rate_mode', 'uint256'), ('on_behalf_of', 'address')]
     fixed_arguments = {'on_behalf_of': AvatarAddress}
     target_address = ETHAddr.AAVE_V2_LendingPool
 
-    def __init__(self, asset: Address, amount: int, interest_rate_model: InterestRateModel):
+    def __init__(self, asset: Address, amount: int, interest_rate_mode: InterestRateMode):
         super().__init__()
         self.args.asset = asset
         self.args.amount = amount
-        self.args.interest_rate_model = interest_rate_model
+        self.args.interest_rate_mode = interest_rate_mode
 
 
 class RepayETH(ContractMethod):
     """Repay borrowed ETH."""
     name = 'repayETH'
-    in_signature = [('address', 'address'), ('amount', 'uint256'), ('interest_rate_model', 'uint256'), ('on_behalf_of', 'address')]
+    in_signature = [('address', 'address'), ('amount', 'uint256'), ('interest_rate_mode', 'uint256'), ('on_behalf_of', 'address')]
     fixed_arguments = {'address': ETHAddr.AAVE_V2_LendingPool, 'on_behalf_of': AvatarAddress}
     target_address = ETHAddr.AAVE_V2_WrappedTokenGateway
 
-    def __init__(self, eth_amount: int, interest_rate_model: InterestRateModel, avatar: Address):
+    def __init__(self, eth_amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
         super().__init__(value=eth_amount, avatar=avatar)
         self.args.amount = eth_amount
-        self.args.interest_rate_model = interest_rate_model
+        self.args.interest_rate_mode = interest_rate_mode
 
 
 class SwapAndRepay(ContractMethod):
