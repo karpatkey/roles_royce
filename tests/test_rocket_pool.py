@@ -4,44 +4,54 @@ from .utils import (local_node_eth, accounts, get_balance, create_simple_safe)
 from .roles import setup_common_roles, deploy_roles, apply_presets
 from pytest import approx
 from decimal import Decimal
-from roles_royce.toolshed.protocol_utils.rocket_pool.addresses_and_abis import AddressesAndAbis
-from roles_royce.constants import Chain
+from defabipedia.rocket_pool import Abis, ContractSpecs
+from defabipedia import Chains
 
+rETH = ContractSpecs[Chains.Ethereum].rETH.address
 
-#-----------------------------------------------------#
+# -----------------------------------------------------#
 """Unit Tests"""
-#-----------------------------------------------------#
+
+
+# -----------------------------------------------------#
 def test_approve_for_swap_router():
     method = rocket_pool.ApproveForSwapRouter(amount=123)
     assert method.data == '0x095ea7b300000000000000000000000016d5a408e807db8ef7c578279beeee6b228f1c1c000000000000000000000000000000000000000000000000000000000000007b'
 
+
 def test_deposit(local_node_eth):
     w3 = local_node_eth.w3
     local_node_eth.set_block(18443122)
-    storage_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].Storage.address, abi=AddressesAndAbis[Chain.Ethereum].Storage.abi)
-    deposit_pool_hash = w3.solidity_keccak(["string", "string"],["contract.address", "rocketDepositPool"]).hex()
-   
+
+    storage_contract = ContractSpecs[Chains.Ethereum].Storage.contract(w3)
+    deposit_pool_hash = w3.solidity_keccak(["string", "string"], ["contract.address", "rocketDepositPool"]).hex()
+
     deposit_pool_address = storage_contract.functions.getAddress(deposit_pool_hash).call()
     method = rocket_pool.Deposit(deposit_pool=deposit_pool_address, value=1000000000000000000)
     assert method.target_address == '0xDD3f50F8A6CafbE9b31a427582963f465E745AF8'
     assert method.data == '0xd0e30db0'
 
+
 def test_burn():
     method = rocket_pool.Burn(amount=123)
     assert method.data == '0x42966c68000000000000000000000000000000000000000000000000000000000000007b'
 
+
 def test_swap_to():
     method = rocket_pool.SwapTo(uniswap_portion=0, balancer_portion=10, min_tokens_out=99, ideal_tokens_out=100, value=100)
     assert method.data == '0x55362f4d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000630000000000000000000000000000000000000000000000000000000000000064'
+
 
 def test_swap_from():
     method = rocket_pool.SwapFrom(uniswap_portion=0, balancer_portion=10, min_tokens_out=99, ideal_tokens_out=100, tokens_in=100)
     assert method.data == '0xa824ae8b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000006300000000000000000000000000000000000000000000000000000000000000640000000000000000000000000000000000000000000000000000000000000064'
 
 
-#-----------------------------------------------------#
+# -----------------------------------------------------#
 """Integration Tests"""
-#-----------------------------------------------------#
+
+
+# -----------------------------------------------------#
 def test_integration_rocket_pool_deposit_pool(local_node_eth, accounts):
     w3 = local_node_eth.w3
     local_node_eth.set_block(18443122)
@@ -61,18 +71,20 @@ def test_integration_rocket_pool_deposit_pool(local_node_eth, accounts):
     ]}"""
     apply_presets(safe, roles_ctract, json_data=presets,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
-    
-    storage_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].Storage.address, abi=AddressesAndAbis[Chain.Ethereum].Storage.abi)
-    deposit_pool_hash = w3.solidity_keccak(["string", "string"],["contract.address", "rocketDepositPool"]).hex()
-    protocol_settings_deposit_hash = w3.solidity_keccak(["string", "string"],["contract.address", "rocketDAOProtocolSettingsDeposit"]).hex()
+
+    storage_contract = ContractSpecs[Chains.Ethereum].Storage.contract(w3)
+    deposit_pool_hash = w3.solidity_keccak(["string", "string"], ["contract.address", "rocketDepositPool"]).hex()
+    protocol_settings_deposit_hash = w3.solidity_keccak(["string", "string"],
+                                                        ["contract.address", "rocketDAOProtocolSettingsDeposit"]).hex()
 
     deposit_pool_address = storage_contract.functions.getAddress(deposit_pool_hash).call()
-    deposit_pool_contract = w3.eth.contract(address=deposit_pool_address, abi=AddressesAndAbis[Chain.Ethereum].DepositPool.abi)
+    deposit_pool_contract = w3.eth.contract(address=deposit_pool_address, abi=Abis[Chains.Ethereum].DepositPool.abi)
     protocol_settings_deposit_address = storage_contract.functions.getAddress(protocol_settings_deposit_hash).call()
-    protocol_settings_deposit_contract = w3.eth.contract(address=protocol_settings_deposit_address, abi=AddressesAndAbis[Chain.Ethereum].ProtocolSettingsDeposit.abi)
-    rETH_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].rETH.address, abi=AddressesAndAbis[Chain.Ethereum].rETH.abi)
+    protocol_settings_deposit_contract = w3.eth.contract(address=protocol_settings_deposit_address,
+                                                         abi=Abis[Chains.Ethereum].ProtocolSettingsDeposit.abi)
+    rETH_contract = ContractSpecs[Chains.Ethereum].rETH.contract(w3)
     exchange_rate = rETH_contract.functions.getExchangeRate().call()
-    swap_router_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].SwapRouter.address, abi=AddressesAndAbis[Chain.Ethereum].SwapRouter.abi)
+    swap_router_contract = ContractSpecs[Chains.Ethereum].SwapRouter.contract(w3)
 
     eth_amount = 1000000000000000000
 
@@ -90,35 +102,38 @@ def test_integration_rocket_pool_deposit_pool(local_node_eth, accounts):
         optimise_swap_to = swap_router_contract.functions.optimiseSwapTo(eth_amount, 10).call()
 
         # swapTo
-        swap_to = rocket_pool.SwapTo(uniswap_portion=optimise_swap_to[0][0], balancer_portion=optimise_swap_to[0][1], min_tokens_out=int(Decimal(optimise_swap_to[1] * 0.99)), ideal_tokens_out=optimise_swap_to[1], value=eth_amount)
+        swap_to = rocket_pool.SwapTo(uniswap_portion=optimise_swap_to[0][0], balancer_portion=optimise_swap_to[0][1],
+                                     min_tokens_out=int(Decimal(optimise_swap_to[1] * 0.99)), ideal_tokens_out=optimise_swap_to[1],
+                                     value=eth_amount)
         roles.send([swap_to], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
-        
-        rETH_balance = get_balance(w3, AddressesAndAbis[Chain.Ethereum].rETH.address, safe.address)
+                   roles_mod_address=roles_ctract.address,
+                   web3=w3)
+
+        rETH_balance = get_balance(w3, rETH, safe.address)
         assert rETH_balance == approx(optimise_swap_to[1])
-    
+
     else:
         deposit = rocket_pool.Deposit(deposit_pool=deposit_pool_address, value=eth_amount)
         roles.send([deposit], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
-        
-        rETH_balance = get_balance(w3, AddressesAndAbis[Chain.Ethereum].rETH.address, safe.address)
+                   roles_mod_address=roles_ctract.address,
+                   web3=w3)
+
+        rETH_balance = get_balance(w3, rETH, safe.address)
         # Staking Directly via Rocket Pool
         # The advantage is that you will always get exactly as much rETH as your ETH is worth 
         # (minus a 0.05% deposit fee), since Rocket Pool's contracts will directly mint the 
         # rETH that you receive.
-        assert rETH_balance == approx((eth_amount / (exchange_rate / 10**18)) * 0.9995)
+        assert rETH_balance == approx((eth_amount / (exchange_rate / 10 ** 18)) * 0.9995)
 
         # burn
         burn = rocket_pool.Burn(amount=rETH_balance)
         roles.send([burn], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
-        
-        rETH_balance = get_balance(w3, AddressesAndAbis[Chain.Ethereum].rETH.address, safe.address)
+                   roles_mod_address=roles_ctract.address,
+                   web3=w3)
+
+        rETH_balance = get_balance(w3, rETH, safe.address)
         assert rETH_balance == 0
+
 
 def test_integration_rocket_pool_secondary_markets(local_node_eth, accounts):
     w3 = local_node_eth.w3
@@ -139,18 +154,20 @@ def test_integration_rocket_pool_secondary_markets(local_node_eth, accounts):
     ]}"""
     apply_presets(safe, roles_ctract, json_data=presets,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
-    
-    storage_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].Storage.address, abi=AddressesAndAbis[Chain.Ethereum].Storage.abi)
-    deposit_pool_hash = w3.solidity_keccak(["string", "string"],["contract.address", "rocketDepositPool"]).hex()
-    protocol_settings_deposit_hash = w3.solidity_keccak(["string", "string"],["contract.address", "rocketDAOProtocolSettingsDeposit"]).hex()
+
+    storage_contract = ContractSpecs[Chains.Ethereum].Storage.contract(w3)
+    deposit_pool_hash = w3.solidity_keccak(["string", "string"], ["contract.address", "rocketDepositPool"]).hex()
+    protocol_settings_deposit_hash = w3.solidity_keccak(["string", "string"],
+                                                        ["contract.address", "rocketDAOProtocolSettingsDeposit"]).hex()
 
     deposit_pool_address = storage_contract.functions.getAddress(deposit_pool_hash).call()
-    deposit_pool_contract = w3.eth.contract(address=deposit_pool_address, abi=AddressesAndAbis[Chain.Ethereum].DepositPool.abi)
+    deposit_pool_contract = w3.eth.contract(address=deposit_pool_address, abi=Abis[Chains.Ethereum].DepositPool.abi)
     protocol_settings_deposit_address = storage_contract.functions.getAddress(protocol_settings_deposit_hash).call()
-    protocol_settings_deposit_contract = w3.eth.contract(address=protocol_settings_deposit_address, abi=AddressesAndAbis[Chain.Ethereum].ProtocolSettingsDeposit.abi)
-    rETH_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].rETH.address, abi=AddressesAndAbis[Chain.Ethereum].rETH.abi)
+    protocol_settings_deposit_contract = w3.eth.contract(address=protocol_settings_deposit_address,
+                                                         abi=Abis[Chains.Ethereum].ProtocolSettingsDeposit.abi)
+    rETH_contract = ContractSpecs[Chains.Ethereum].rETH.contract(w3)
     exchange_rate = rETH_contract.functions.getExchangeRate().call()
-    swap_router_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].SwapRouter.address, abi=AddressesAndAbis[Chain.Ethereum].SwapRouter.abi)
+    swap_router_contract = ContractSpecs[Chains.Ethereum].SwapRouter.contract(w3)
 
     eth_amount = 1000000000000000000
 
@@ -168,15 +185,16 @@ def test_integration_rocket_pool_secondary_markets(local_node_eth, accounts):
         optimise_swap_to = swap_router_contract.functions.optimiseSwapTo(eth_amount, 10).call()
 
         # swapTo
-        swap_to = rocket_pool.SwapTo(uniswap_portion=optimise_swap_to[0][0], balancer_portion=optimise_swap_to[0][1], min_tokens_out=int(Decimal(optimise_swap_to[1] * 0.99)), ideal_tokens_out=optimise_swap_to[1], value=eth_amount)
+        swap_to = rocket_pool.SwapTo(uniswap_portion=optimise_swap_to[0][0], balancer_portion=optimise_swap_to[0][1],
+                                     min_tokens_out=int(Decimal(optimise_swap_to[1] * 0.99)), ideal_tokens_out=optimise_swap_to[1],
+                                     value=eth_amount)
         roles.send([swap_to], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
-        
-        rETH_balance = get_balance(w3, AddressesAndAbis[Chain.Ethereum].rETH.address, safe.address)
+                   roles_mod_address=roles_ctract.address,
+                   web3=w3)
+
+        rETH_balance = get_balance(w3, rETH, safe.address)
         assert rETH_balance == approx(optimise_swap_to[1])
-        
-        
+
         # Swap the rETH for ETH in secondary markets
         # The rETH contracts does the following check to if there's sufficient  ETH balance for exchange:
         # See: function burn(uint256 _rethAmount) override external in rETH conctract
@@ -192,11 +210,11 @@ def test_integration_rocket_pool_secondary_markets(local_node_eth, accounts):
         # rETH_amount = rETH_contract.functions.getRethValue(eth_amount).call()
         # if total_collateral >= eth_amount -> Swaps rETH for ETH in the Deposit Pool else swaps rETH for ETH in secondary markets
         # In this case we will swap a small amount of rETH for ETH in secondary markets without doing the check
-        
+
         approve_rETH = rocket_pool.ApproveForSwapRouter(amount=rETH_balance)
         roles.send([approve_rETH], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
+                   roles_mod_address=roles_ctract.address,
+                   web3=w3)
 
         # optimiseSwapFrom
         # @param _amount The amount of rETH to swap
@@ -206,10 +224,12 @@ def test_integration_rocket_pool_secondary_markets(local_node_eth, accounts):
         eth_balance_before_swap = w3.eth.get_balance(safe.address)
 
         # swapFrom
-        swap_from = rocket_pool.SwapFrom(uniswap_portion=optimise_swap_from[0][0], balancer_portion=optimise_swap_from[0][1], min_tokens_out=int(Decimal(optimise_swap_from[1] * 0.99)), ideal_tokens_out=optimise_swap_from[1], tokens_in=rETH_balance)
+        swap_from = rocket_pool.SwapFrom(uniswap_portion=optimise_swap_from[0][0], balancer_portion=optimise_swap_from[0][1],
+                                         min_tokens_out=int(Decimal(optimise_swap_from[1] * 0.99)), ideal_tokens_out=optimise_swap_from[1],
+                                         tokens_in=rETH_balance)
         roles.send([swap_from], role=1, private_key=accounts[1].key,
-        roles_mod_address=roles_ctract.address,
-        web3=w3)
+                   roles_mod_address=roles_ctract.address,
+                   web3=w3)
 
         eth_balance_after_swap = w3.eth.get_balance(safe.address)
         assert eth_balance_after_swap == approx(eth_balance_before_swap + optimise_swap_from[1])
@@ -217,9 +237,9 @@ def test_integration_rocket_pool_secondary_markets(local_node_eth, accounts):
     else:
         deposit = rocket_pool.Deposit(deposit_pool=deposit_pool_address, value=eth_amount)
         roles.send([deposit], role=1, private_key=accounts[1].key,
-                roles_mod_address=roles_ctract.address,
-                web3=w3)
-        
-        rETH_balance = get_balance(w3, AddressesAndAbis[Chain.Ethereum].rETH.address, safe.address) / 10**18 
+                   roles_mod_address=roles_ctract.address,
+                   web3=w3)
+
+        rETH_balance = get_balance(w3, rETH, safe.address) / 10 ** 18
 
         assert rETH_balance == approx(eth_amount / exchange_rate * 0.9995)

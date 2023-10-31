@@ -1,12 +1,13 @@
 from roles_royce.protocols.base import ContractMethod, BaseApprove, Address
-from roles_royce.toolshed.protocol_utils.rocket_pool.addresses_and_abis import AddressesAndAbis
-from roles_royce.constants import Chain
+from defabipedia import Chains
+from defabipedia.rocket_pool import ContractSpecs
 
 
 class ApproveForSwapRouter(BaseApprove):
     """Approve rETH with Swap Router as spender"""
-    fixed_arguments = {"spender": AddressesAndAbis[Chain.Ethereum].SwapRouter.address}
-    token = AddressesAndAbis[Chain.Ethereum].rETH.address
+    fixed_arguments = {"spender": ContractSpecs[Chains.Ethereum].SwapRouter.address}
+    token = ContractSpecs[Chains.Ethereum].rETH.address
+
 
 class Deposit(ContractMethod):
     """sender deposits ETH and receives rETH"""
@@ -16,15 +17,17 @@ class Deposit(ContractMethod):
         super().__init__(value=value)
         self.target_address = deposit_pool
 
+
 class Burn(ContractMethod):
     """Burns rETH in exchange for ETH"""
     name = "burn"
-    target_address = AddressesAndAbis[Chain.Ethereum].rETH.address
+    target_address = ContractSpecs[Chains.Ethereum].rETH.address
     in_signature = [("_rethAmount", "uint256")]
 
     def __init__(self, amount: int):
         super().__init__()
         self.args._rethAmount = amount
+
 
 class SwapTo(ContractMethod):
     """Swap ETH for rETH through SWAP_ROUTER.
@@ -32,15 +35,17 @@ class SwapTo(ContractMethod):
     the ETH you are depositing, the SWAP_ROUTER swaps the ETH for rETH 
     in secondary markets (Balancer and Uniswap)"""
     name = "swapTo"
-    target_address = AddressesAndAbis[Chain.Ethereum].SwapRouter.address
-    in_signature = [("_uniswapPortion", "uint256"), ("_balancerPortion", "uint256"), ("_minTokensOut", "uint256"), ("_idealTokensOut", "uint256")]
+    target_address = ContractSpecs[Chains.Ethereum].SwapRouter.address
+    in_signature = [("_uniswapPortion", "uint256"), ("_balancerPortion", "uint256"), ("_minTokensOut", "uint256"),
+                    ("_idealTokensOut", "uint256")]
 
-    def __init__(self, uniswap_portion: int, balancer_portion: int, min_tokens_out:int, ideal_tokens_out:int, value: int):
+    def __init__(self, uniswap_portion: int, balancer_portion: int, min_tokens_out: int, ideal_tokens_out: int, value: int):
         super().__init__(value=value)
         self.args._uniswapPortion = uniswap_portion
         self.args._balancerPortion = balancer_portion
         self.args._minTokensOut = min_tokens_out
         self.args._idealTokensOut = ideal_tokens_out
+
 
 class SwapFrom(ContractMethod):
     """Swap rETH for ETH through SWAP_ROUTER.
@@ -48,10 +53,11 @@ class SwapFrom(ContractMethod):
     the rETH you are withdrawing, the SWAP_ROUTER swaps the rETH for 
     ETH in secondary markets (Balancer and Uniswap)"""
     name = "swapFrom"
-    target_address = AddressesAndAbis[Chain.Ethereum].SwapRouter.address
-    in_signature = [("_uniswapPortion", "uint256"), ("_balancerPortion", "uint256"), ("_minTokensOut", "uint256"), ("_idealTokensOut", "uint256"), ("_tokensIn", "uint256")]
+    target_address = ContractSpecs[Chains.Ethereum].SwapRouter.address
+    in_signature = [("_uniswapPortion", "uint256"), ("_balancerPortion", "uint256"), ("_minTokensOut", "uint256"),
+                    ("_idealTokensOut", "uint256"), ("_tokensIn", "uint256")]
 
-    def __init__(self, uniswap_portion: int, balancer_portion: int, min_tokens_out:int, ideal_tokens_out:int, tokens_in: int):
+    def __init__(self, uniswap_portion: int, balancer_portion: int, min_tokens_out: int, ideal_tokens_out: int, tokens_in: int):
         super().__init__()
         self.args._uniswapPortion = uniswap_portion
         self.args._balancerPortion = balancer_portion
