@@ -2,6 +2,13 @@ from roles_royce.constants import Chain
 from roles_royce.abi_utils import load_abi, AddressOrAbi
 
 class EthereumAddressesAndAbis:
+    ProtocolDataProvider = AddressOrAbi(address='0x7B4EB56E7CD4b454BA8ff71E4518426369a138a3',
+                                        abi=load_abi('protocol_data_provider.json'),
+                                        name='ProtocolDataProvider')
+    PoolAddressesProvider = AddressOrAbi(address='0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e',
+                                        abi=load_abi('protocol_address_provider.json'),
+                                        name='PoolAddressesProvider')
+    PriceOracle = AddressOrAbi(abi=load_abi('price_oracle.json'), name='PriceOracle')
     LendingPoolV3 = AddressOrAbi(address='0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
                                 abi=load_abi('lending_pool_v3.json'),
                                 name='LendingPoolV3')
@@ -39,7 +46,7 @@ class EthereumAddressesAndAbis:
                                 abi=load_abi('governance_v2.json'),
                                 name='GovernanceV2')
 
-    # ERC20 = AddressOrAbi(abi=load_abi('erc20.json'), name='erc20')
+    ERC20 = AddressOrAbi(abi=load_abi('erc20.json'), name='erc20')
 
 AddressesAndAbis = {
     Chain.Ethereum: EthereumAddressesAndAbis
