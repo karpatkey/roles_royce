@@ -259,8 +259,74 @@ class ClaimABPTRewards(ClaimAAVERewards):
     """Claim AAVE rewards accrued from staking ABPT"""
     target_address = AddressesAndAbis[Chain.Ethereum].stkABPT.address
 
+class SwapAndRepay(ContractMethod):
+    """Repay debt using collateral"""
+    name = 'swapAndRepay'
+    in_signature = [
+        ("collateral_asset", "address"),
+        ("debt_asset", "address"),
+        ("collateral_amount", "uint256"),
+        ("debt_repay_amount", "uint256"),
+        ("debt_rate_mode", "uint256"),
+        ("buy_all_balance_offset", "uint256"),
+        ("paraswap_data", "bytes"),
+        ("permit", (
+            ("amount", "uint256"),
+            ("deadline", "uint256"),
+            ("v", "uint8"),
+            ("r", "bytes32"),
+            ("s", "bytes32"))
+         )
+    ]
+    target_address = AddressesAndAbis[Chain.Ethereum].ParaSwapRepayAdapter.address
+    fixed_arguments = {}
+
+    def __init__(self, collateral_asset: Address, debt_asset: Address, collateral_amount: int,
+                 debt_repay_amount: int, debt_rate_mode: int, buy_all_balance_offset: int,
+                 calldata, permit_amount, permit_deadline, permit_v, permit_r, permit_s):
+        super().__init__()
+        self.args.collateral_asset, self.args.collateral_amount = collateral_asset, collateral_amount
+        self.args.debt_asset, self.args.debt_repay_amount = debt_asset, debt_repay_amount
+        self.args.debt_rate_mode = debt_rate_mode
+        self.args.buy_all_balance_offset = buy_all_balance_offset
+        self.args.paraswap_data = calldata
+        self.args.permit = [permit_amount, permit_deadline, permit_v, permit_r, permit_s]
+
+class SwapAndDeposit(ContractMethod):
+    """Swaps an existing amount of a given collateral asset for another one"""
+    name = "swapAndDeposit"
+    in_signature = [
+        ("from_asset", "address"),
+        ("to_asset", "address"),
+        ("amount", "uint256"),
+        ("min_amount_to_receive", "uint256"),
+        ("swap_all_balance_offset", "uint256"),
+        ("swap_calldata", "bytes"),
+        ("augustus", "address"),
+        ("permit", (
+            ("amount", "uint256"),
+            ("deadline", "uint256"),
+            ("v", "uint8"),
+            ("r", "bytes32"),
+            ("s", "bytes32"))
+         )
+    ]
+    target_address = AddressesAndAbis[Chain.Ethereum].ParaSwapLiquidityAdapter.address
+
+    def __init__(self, from_asset: Address, to_asset: Address, amount: int,
+                 min_amount_to_receive: int, swap_all_balance_offset: int, calldata,
+                 augustus, permit_amount, permit_deadline, permit_v, permit_r, permit_s):
+        super().__init__()
+        self.args.from_asset, self.args.to_asset = from_asset, to_asset
+        self.args.amount = amount
+        self.args.min_amount_to_receive = min_amount_to_receive
+        self.args.swap_all_balance_offset = swap_all_balance_offset
+        self.args.swap_calldata = calldata
+        self.args.augustus = augustus
+        self.args.permit = [permit_amount, permit_deadline, permit_v, permit_r, permit_s]
+
 class DelegateAAVE(ContractMethod):
-    """Delegate the AAVE voting power for all type of actions (Voting and Proposition)."""
+    """Delegate the AAVE voting power for all type of actions (Voting and Proposition)"""
     name = "delegate"
     in_signature = [("delegatee", "address")]
     target_address = AddressesAndAbis[Chain.Ethereum].AAVE.address
@@ -270,7 +336,7 @@ class DelegateAAVE(ContractMethod):
         self.args.delegatee = delegatee
 
 class DelegateAAVEByType(ContractMethod):
-    """Delegate the AAVE voting power by type of action."""
+    """Delegate the AAVE voting power by type of action"""
     name = "delegateByType"
     in_signature = [("delegatee", "address"), ("delegation_type", "uint8")]
     target_address = AddressesAndAbis[Chain.Ethereum].AAVE.address
@@ -281,7 +347,39 @@ class DelegateAAVEByType(ContractMethod):
         self.args.delegation_type = delegation_type
 
 class DelegatestkAAVE(DelegateAAVE):
+    """Delegate the stkAAVE voting power for all type of actions (Voting and Proposition)"""
     target_address = AddressesAndAbis[Chain.Ethereum].stkAAVE.address
 
 class DelegatestkAAVEByType(DelegateAAVEByType):
+    """Delegate the stkAAVE voting power by type of action"""
     target_address = AddressesAndAbis[Chain.Ethereum].stkAAVE.address
+
+class SubmitVote(ContractMethod):
+    """Submit vote for a specific snapshot"""
+    name = "submitVote"
+    in_signature = [("proposal_id", "uint256"), ("support", "bool")]
+    target_address = AddressesAndAbis[Chain.Ethereum].GovernanceV2.address
+
+    def __init__(self, proposal_id: int, support: bool):
+        super().__init__()
+        self.args.proposal_id = proposal_id
+        self.args.support = support
+
+class LiquidationCall(ContractMethod):
+    """Liquidate positions with a health factor below 1"""
+    name = "liquidationCall"
+    in_signature = [("collateral_asset", "address"),
+                    ("debt_asset", "address"),
+                    ("user", "address"),
+                    ("debt_to_cover", "uint256"),
+                    ("receive_a_token", "bool")]
+    target_address = AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address
+
+    def __init__(self, collateral_asset: Address, debt_asset: Address, user: Address,
+                 debt_to_cover: int, receive_a_token: bool):
+        super().__init__()
+        self.args.collateral_asset = collateral_asset
+        self.args.debt_asset = debt_asset
+        self.args.user = user
+        self.args.debt_to_cover = debt_to_cover
+        self.args.receive_a_token = receive_a_token
