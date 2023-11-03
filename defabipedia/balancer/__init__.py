@@ -37,4 +37,5 @@ ContractSpecs = {
 
 Abis = {
     Chains.Ethereum: Abis,
+    Chains.Gnosis: Abis
 }

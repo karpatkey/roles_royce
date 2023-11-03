@@ -81,7 +81,7 @@ def bot_do():
         messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=lack_of_gas_warning)
         lack_of_gas_warning = True
 
-    if bot_ETH_balance >= 0.1 and lack_of_gas_warning_flag:
+    if bot_ETH_balance >= 0.1 and lack_of_gas_warning:
         lack_of_gas_warning = False
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -94,9 +94,9 @@ def bot_do():
         send_status(messenger, cdp, bot_ETH_balance / 1e18)
 
     for element in cdp.balances_data:
-        if element[CDPData.UnderlyingAddress] == ETHAddr.GNO:
-            GNO_deposited = element[CDPData.InterestBearingBalance]
-            GNO_spark_price = element[CDPData.UnderlyingPriceUSD]
+        if element[CDPData.UnderlyingAddress] == ETHAddr.wstETH:
+            wstETH_deposited = element[CDPData.InterestBearingBalance]
+            wstETH_spark_price = element[CDPData.UnderlyingPriceUSD]
         if element[CDPData.UnderlyingAddress] == ETHAddr.DAI:
             DAI_borrowed = element[CDPData.VariableDebtBalance]
             DAI_spark_price = element[CDPData.UnderlyingPriceUSD]
@@ -112,13 +112,11 @@ def bot_do():
     gauges.sDAI_balance.set(float(Decimal(sDAI_balance) / Decimal(1e18)))
     gauges.DAI_equivalent.set(float(Decimal(sDAI_balance) * (Decimal(chi) / Decimal(1e27)) / Decimal(1e18)))
     gauges.DAI_balance.set(float(Decimal(DAI_balance) / Decimal(1e18)))
-    gauges.GNO_deposited.set(GNO_deposited)
-    gauges.GNO_price.set(GNO_spark_price)
+    gauges.wstETH_deposited.set(wstETH_deposited)
+    gauges.wstETH_price.set(wstETH_spark_price)
     gauges.DAI_borrowed.set(DAI_borrowed)
     gauges.DAI_price.set(DAI_spark_price)
     gauges.last_updated.set_to_current_time()
-
-
 
     logger.info("SparK CDP data retrieved:\n"
                 f"{cdp}\n"
@@ -141,7 +139,7 @@ def bot_do():
     elif cdp.health_factor <= ENV.THRESHOLD_HEALTH_FACTOR:
         title = "Health factor dropped below the critical threshold"
         message = (f"  Current health factor: ({cdp.health_factor}).\n"
-                   f"  Health factor threshold: ({ENV.ALERTING_HEALTH_FACTOR}).\n"
+                   f"  Health factor threshold: ({ENV.THRESHOLD_HEALTH_FACTOR}).\n"
                    f"{cdp}")
         messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=threshold_health_factor_flag.is_set())
 
@@ -173,7 +171,7 @@ def bot_do():
 
             amount_of_sDAI_to_redeem = sDAI_balance
 
-        logger.info(f'Redeeming {amount_of_sDAI_to_redeem} sDAI for DAI...')
+        logger.info(f'Redeeming {amount_of_sDAI_to_redeem / 1e18:.5f} sDAI for DAI...')
         tx_receipt_sDAI_redeemed = roles.send(
             [spark.RedeemSDAIforDAI(amount=amount_of_sDAI_to_redeem, avatar=ENV.AVATAR_SAFE_ADDRESS)],
             role=ENV.ROLE, private_key=ENV.PRIVATE_KEY, roles_mod_address=ENV.ROLES_MOD_ADDRESS, web3=w3)
@@ -209,9 +207,9 @@ def bot_do():
 
         bot_ETH_balance = w3.eth.get_balance(ENV.BOT_ADDRESS)
         for element in cdp.balances_data:
-            if element[CDPData.UnderlyingAddress] == ETHAddr.GNO:
-                GNO_deposited = element[CDPData.InterestBearingBalance]
-                GNO_spark_price = element[CDPData.UnderlyingPriceUSD]
+            if element[CDPData.UnderlyingAddress] == ETHAddr.wstETH:
+                wstETH_deposited = element[CDPData.InterestBearingBalance]
+                wstETH_spark_price = element[CDPData.UnderlyingPriceUSD]
             if element[CDPData.UnderlyingAddress] == ETHAddr.DAI:
                 DAI_borrowed = element[CDPData.VariableDebtBalance]
                 DAI_spark_price = element[CDPData.UnderlyingPriceUSD]
@@ -224,8 +222,8 @@ def bot_do():
         gauges.sDAI_balance.set(float(Decimal(sDAI_balance) / Decimal(1e18)))
         gauges.DAI_equivalent.set(float(Decimal(sDAI_balance) * (Decimal(chi) / Decimal(1e27)) / Decimal(1e18)))
         gauges.DAI_balance.set(float(Decimal(DAI_balance) / Decimal(1e18)))
-        gauges.GNO_deposited.set(GNO_deposited)
-        gauges.GNO_price.set(GNO_spark_price)
+        gauges.wstETH_deposited.set(wstETH_deposited)
+        gauges.wstETH_price.set(wstETH_spark_price)
         gauges.DAI_borrowed.set(DAI_borrowed)
         gauges.DAI_price.set(DAI_spark_price)
         gauges.last_updated.set_to_current_time()
