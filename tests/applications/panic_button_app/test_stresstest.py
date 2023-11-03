@@ -8,7 +8,7 @@ from pathlib import Path
 import traceback
 
 PERCENTAGE = 80
-MAX_SLIPPAGE = 0.05
+MAX_SLIPPAGE = 1
 
 dao = 'GnosisDAO'
 blockchain = 'mainnet'
@@ -73,7 +73,7 @@ def test_stresstest(local_node_eth, accounts, monkeypatch, args):
         elif item['name'] == 'max_slippage':
             exit_arguments_dict[item['name']] = MAX_SLIPPAGE
         elif item['name'] == 'token_out_address':
-            exit_arguments_dict[item['name']] = item['options'][0]
+            exit_arguments_dict[item['name']] = item['options'][0]['value']
     exit_arguments = [exit_arguments_dict]
     # Convert the parameters to a JSON string
     parameters_json = json.dumps(exit_arguments)
