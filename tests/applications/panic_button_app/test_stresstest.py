@@ -11,7 +11,7 @@ PERCENTAGE = 80
 MAX_SLIPPAGE = 1
 
 dao = 'GnosisDAO'
-blockchain = 'mainnet'
+blockchain = 'ETHEREUM'
 avatar_safe_address = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
 roles_mod_address = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
 role = 4
@@ -44,14 +44,14 @@ def set_up_roles(local_node_eth, accounts):
 
 
 def set_env(monkeypatch, private_key: str) -> ENV:
-    monkeypatch.setenv('GNOSISDAO_MAINNET_AVATAR_SAFE_ADDRESS', avatar_safe_address)
-    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLES_MOD_ADDRESS', roles_mod_address)
-    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLE', role)
-    monkeypatch.setenv('GNOSISDAO_MAINNET_PRIVATE_KEY', private_key)
+    monkeypatch.setenv('GNOSISDAO_ETHEREUM_AVATAR_SAFE_ADDRESS', avatar_safe_address)
+    monkeypatch.setenv('GNOSISDAO_ETHEREUM_ROLES_MOD_ADDRESS', roles_mod_address)
+    monkeypatch.setenv('GNOSISDAO_ETHEREUM_ROLE', role)
+    monkeypatch.setenv('GNOSISDAO_ETHEREUM_PRIVATE_KEY', private_key)
     return ENV(dao, blockchain)
 
 
-@pytest.mark.skip("This test would take forever to run in the CI")
+#@pytest.mark.skip("This test would take forever to run in the CI")
 @pytest.mark.parametrize("args", list_of_positions)
 def test_stresstest(local_node_eth, accounts, monkeypatch, args):
     private_key = set_up_roles(local_node_eth, accounts)

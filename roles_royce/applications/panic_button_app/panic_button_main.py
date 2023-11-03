@@ -129,7 +129,7 @@ def main():
     w3 = start_the_engine(env, local_fork_port=args.test)
     disassembler, txn_transactables = gear_up(w3, env, exec_config)
     tx_message = drive_away(disassembler, txn_transactables, env.PRIVATE_KEY, simulate)
-    return tx_message
+    print(tx_message)
 
 
 if __name__ == "__main__":
