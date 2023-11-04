@@ -57,6 +57,9 @@ class BalancerDisassembler(Disassembler):
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem(bpt_address, fraction)
 
+            if amount_to_redeem == 0:
+                return []
+
             bpt_pool_id = '0x' + bpt_contract.functions.getPoolId().call().hex()
             bpt_pool_paused_state = bpt_contract.functions.getPausedState().call()
             # TODO: Not all pools have recovery mode, the following has to be improved
@@ -112,6 +115,9 @@ class BalancerDisassembler(Disassembler):
                                                 abi=Abis[self.blockchain].UniversalBPT.abi)
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem(bpt_address, fraction)
+
+            if amount_to_redeem == 0:
+                return []
 
             bpt_pool_id = '0x' + bpt_contract.functions.getPoolId().call().hex()
             bpt_pool_paused_state = bpt_contract.functions.getPausedState().call()
@@ -172,6 +178,9 @@ class BalancerDisassembler(Disassembler):
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem(bpt_address, fraction)
 
+            if amount_to_redeem == 0:
+                return []
+
             withdraw_balancer = balancer.ExactBptRecoveryModeExit(w3=self.w3,
                                                                   pool_id=bpt_pool_id,
                                                                   avatar=self.avatar_safe_address,
@@ -210,6 +219,9 @@ class BalancerDisassembler(Disassembler):
 
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem_from_gauge(gauge_address, fraction)
+
+            if amount_to_redeem == 0:
+                return []
 
             unstake_gauge = balancer.Unstake(w3=self.w3, gauge_address=gauge_address, amount=amount_to_redeem)
             txns.append(unstake_gauge)
@@ -257,6 +269,9 @@ class BalancerDisassembler(Disassembler):
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem_from_gauge(gauge_address, fraction)
 
+            if amount_to_redeem == 0:
+                return []
+
             unstake_gauge = balancer.Unstake(w3=self.w3, gauge_address=gauge_address, amount=amount_to_redeem)
             txns.append(unstake_gauge)
 
@@ -300,6 +315,9 @@ class BalancerDisassembler(Disassembler):
 
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem_from_gauge(gauge_address, fraction)
+
+            if amount_to_redeem == 0:
+                return []
 
             unstake_gauge = balancer.Unstake(w3=self.w3, gauge_address=gauge_address, amount=amount_to_redeem)
             txns.append(unstake_gauge)

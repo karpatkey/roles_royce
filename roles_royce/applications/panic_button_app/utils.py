@@ -33,8 +33,10 @@ class ENV:
     def __post_init__(self):
         if self.DAO not in ['GnosisDAO', 'GnosisLTD']:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
-        if self.BLOCKCHAIN not in ['mainnet', 'gnosis']:
+        if self.BLOCKCHAIN.lower() not in ['mainnet', 'ethereum', 'gnosis']:
             raise ValueError(f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}.")
+        elif self.BLOCKCHAIN.lower() == 'mainnet':
+            self.BLOCKCHAIN = 'ethereum'
         self.RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT', default='')
         self.FALLBACK_RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_FALLBACK_RPC_ENDPOINT', default='')
         self.AVATAR_SAFE_ADDRESS: Address = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_AVATAR_SAFE_ADDRESS', default='')

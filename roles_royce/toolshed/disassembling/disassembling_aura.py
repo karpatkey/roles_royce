@@ -48,7 +48,8 @@ class AuraDisassembler(Disassembler):
 
             bpt_address, amount_to_redeem = self.aura_contracts_helper(aura_rewards_address=aura_rewards_address,
                                                                        fraction=fraction)
-
+            if amount_to_redeem == 0:
+                return []
             withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_address,
                                                              amount=amount_to_redeem)
             txns.append(withdraw_aura)
@@ -82,6 +83,9 @@ class AuraDisassembler(Disassembler):
 
             bpt_address, amount_to_redeem = self.aura_contracts_helper(aura_rewards_address=aura_rewards_address,
                                                                        fraction=fraction)
+
+            if amount_to_redeem == 0:
+                return []
 
             withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_address,
                                                              amount=amount_to_redeem)
@@ -134,6 +138,9 @@ class AuraDisassembler(Disassembler):
             bpt_address, amount_to_redeem = self.aura_contracts_helper(aura_rewards_address=aura_rewards_address,
                                                                        fraction=fraction)
 
+            if amount_to_redeem == 0:
+                return []
+
             withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_address,
                                                              amount=amount_to_redeem)
 
@@ -182,6 +189,9 @@ class AuraDisassembler(Disassembler):
 
             bpt_address, amount_to_redeem = self.aura_contracts_helper(aura_rewards_address=aura_rewards_address,
                                                                        fraction=fraction)
+
+            if amount_to_redeem == 0:
+                return []
 
             withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_address,
                                                              amount=amount_to_redeem)

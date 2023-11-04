@@ -1,23 +1,42 @@
 from roles_royce.applications.panic_button_app.panic_button_main import start_the_engine, gear_up, drive_away
 from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
 from tests.utils import assign_role, local_node_eth, accounts
+import os
+import json
 import pytest
+import subprocess
+from pathlib import Path
 
 dao = 'GnosisDAO'
-blockchain = 'mainnet'
+blockchain = 'ETHEREUM'
 avatar_safe_address = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
 roles_mod_address = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
 role = 4
 
 
 def set_env(monkeypatch, private_key: str) -> ENV:
-    monkeypatch.setenv('MAINNET_RPC_ENDPOINT', 'DummyString')
-    monkeypatch.setenv('MAINNET_FALLBACK_RPC_ENDPOINT', 'DummyString')
-    monkeypatch.setenv('GNOSISDAO_MAINNET_AVATAR_SAFE_ADDRESS', avatar_safe_address)
-    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLES_MOD_ADDRESS', roles_mod_address)
-    monkeypatch.setenv('GNOSISDAO_MAINNET_ROLE', role)
-    monkeypatch.setenv('GNOSISDAO_MAINNET_PRIVATE_KEY', private_key)
+    monkeypatch.setenv('ETHEREUM_RPC_ENDPOINT', 'DummyString')
+    monkeypatch.setenv('ETHEREUM_FALLBACK_RPC_ENDPOINT', 'DummyString')
+    monkeypatch.setenv('GNOSISDAO_ETHEREUM_AVATAR_SAFE_ADDRESS', avatar_safe_address)
+    monkeypatch.setenv('GNOSISDAO_ETHEREUM_ROLES_MOD_ADDRESS', roles_mod_address)
+    monkeypatch.setenv('GNOSISDAO_ETHEREUM_ROLE', role)
+    monkeypatch.setenv('GNOSISDAO_ETHEREUM_PRIVATE_KEY', private_key)
     return ENV(dao, blockchain)
+
+
+def set_up_roles(local_node_eth, accounts):
+    block = 18421437
+    local_node_eth.set_block(block)
+
+    disassembler_address = accounts[0].address
+    private_key = accounts[0].key.hex()
+
+    assign_role(local_node=local_node_eth,
+                avatar_safe_address=avatar_safe_address,
+                roles_mod_address=roles_mod_address,
+                role=role,
+                asignee=disassembler_address)
+    return private_key
 
 
 JSON_FORM = {
@@ -47,7 +66,7 @@ def test_start_the_engine(monkeypatch):
     assert w3.is_connected()
 
     with pytest.raises(Exception):
-        start_the_engine(env) # RPC endpoints are 'DummyString'
+        start_the_engine(env)  # RPC endpoints are 'DummyString'
 
 
 def test_gear_up(monkeypatch, local_node_eth):
@@ -70,14 +89,7 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
     block = 18421437
     local_node_eth.set_block(block)
 
-    disassembler_address = accounts[0].address
-    private_key = accounts[0].key.hex()
-
-    assign_role(local_node=local_node_eth,
-                avatar_safe_address=avatar_safe_address,
-                roles_mod_address=roles_mod_address,
-                role=role,
-                asignee=disassembler_address)
+    private_key = set_up_roles(local_node_eth, accounts)
 
     env = set_env(monkeypatch, private_key)
 
@@ -108,3 +120,115 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
 
     assert response_exception['status'] == 500
     assert response_exception['message'] == "Error: The private key must be exactly 32 bytes long, instead of 2 bytes."
+
+
+positions_mock = [
+    {
+        "position_id": "Aura_33",
+        "protocol": "Aura",
+        "exec_config": [
+            {
+                "function_name": "exit_1",
+                "label": "Exit_1",
+                "description": "Withdraw from Aura",
+                "parameters": [
+                    {
+                        "name": "rewards_address",
+                        "type": "constant",
+                        "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
+                    },
+                    {
+                        "name": "max_slippage",
+                        "label": "Max slippage",
+                        "type": "input",
+                        "rules": {"min": 0, "max": 100}
+                    }
+                ]
+            },
+            {
+                "function_name": "exit_2_1",
+                "label": "Exit_2_1",
+                "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way (not used for pools in recovery mode!)",
+                "parameters": [
+                    {
+                        "name": "rewards_address",
+                        "type": "constant",
+                        "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
+                    },
+                    {
+                        "name": "max_slippage",
+                        "label": "Max slippage",
+                        "type": "input",
+                        "rules": {"min": 0, "max": 100}
+                    }
+                ]
+            },
+            {
+                "function_name": "exit_2_2",
+                "label": "Exit_2_2",
+                "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
+                "parameters": [
+                    {
+                        "name": "rewards_address",
+                        "type": "constant",
+                        "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
+                    },
+                    {
+                        "name": "max_slippage",
+                        "label": "Max slippage",
+                        "type": "input",
+                        "rules": {"min": 0, "max": 100}
+                    },
+                    {
+                        "name": "token_out_address",
+                        "label": "Token out",
+                        "type": "input",
+                        "options": [
+                            {"value": "0xae78736Cd615f374D3085123A210448E74Fc6393", "label": "rETH"},
+                            {"value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "label": "WETH"}
+                        ]
+                    }
+                ]
+            },
+        ]
+    }
+]
+
+
+@pytest.mark.parametrize("args", positions_mock[0]['exec_config'])
+def test_integration_main(local_node_eth, accounts, monkeypatch, args):
+    private_key = set_up_roles(local_node_eth, accounts)
+    set_env(monkeypatch, private_key)
+
+    file_path_main = os.path.join(Path(os.path.dirname(__file__)).resolve().parent.parent.parent, 'roles_royce',
+                                  'applications', 'panic_button_app',
+                                  'panic_button_main.py')
+
+    arguments = [
+        'python', file_path_main,
+        '-p', str(23),
+        '-d', dao,
+        '-b', blockchain,
+        '-prot', positions_mock[0]['protocol'],
+        '-s', args['function_name'],
+    ]
+
+    exit_arguments_dict = {}
+    for item in args['parameters']:
+        if item['type'] == 'constant':
+            exit_arguments_dict[item['name']] = item['value']
+        elif item['name'] == 'max_slippage':
+            exit_arguments_dict[item['name']] = 0.01
+        elif item['name'] == 'token_out_address':
+            exit_arguments_dict[item['name']] = item['options'][0]['value']
+    exit_arguments = [exit_arguments_dict]
+    # Convert the parameters to a JSON string
+    parameters_json = json.dumps(exit_arguments)
+    arguments.extend(['-a', parameters_json])
+    arguments.extend(['-t', '8546'])
+    main = subprocess.run(arguments, capture_output=True, text=True)
+
+    assert main.returncode == 0
+    dict_message_stdout = json.loads(main.stdout[:-1].replace("\'", "\""))
+    assert dict_message_stdout['status'] == 200
+    assert dict_message_stdout['message'] == "Transaction executed successfully"
