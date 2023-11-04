@@ -5,6 +5,7 @@ from ..tokens import Abis as TokenAbis
 class Abis(TokenAbis):
     BaseRewardPool = ContractAbi(abi=load_abi('base_reward_pool.json'), name='base_reward_pool')
 
+
 class EthereumContractSpecs:
     Booster = ContractSpec(address='0xA57b8d98dAE62B26Ec3bcC4a365338157060B234',
                            abi=load_abi('booster.json'),

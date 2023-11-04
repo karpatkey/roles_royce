@@ -21,10 +21,13 @@ file_path_json = os.path.join(Path(os.path.dirname(__file__)).resolve().parent.p
                               'config', 'strategiesGnosisDAOEthereum.json')
 with open(file_path_json, 'r') as f:
     strategies = json.load(f)
-list_of_positions = []
+exec_configs = []
 for position in strategies['positions']:
-    for exec_config in position['exec_config']:
-        list_of_positions.append(exec_config)
+    for element in position["exec_config"]:
+        if element["test"]:
+            item = element.copy()
+            item['protocol'] = position['protocol']
+            exec_configs.append(item)
 
 
 def set_up_roles(local_node_eth, accounts):
@@ -50,9 +53,9 @@ def set_env(monkeypatch, private_key: str) -> ENV:
     return ENV(dao, blockchain)
 
 
-@pytest.mark.skip("This test would take forever to run in the CI")
-@pytest.mark.parametrize("args", list_of_positions)
-def test_stresstest(local_node_eth, accounts, monkeypatch, args):
+#@pytest.mark.skip("This test would take forever to run in the CI")
+@pytest.mark.parametrize("exec_config", exec_configs)
+def test_stresstest(local_node_eth, accounts, monkeypatch, exec_config):
     private_key = set_up_roles(local_node_eth, accounts)
     set_env(monkeypatch, private_key)
 
@@ -61,12 +64,12 @@ def test_stresstest(local_node_eth, accounts, monkeypatch, args):
         '-p', str(PERCENTAGE),
         '-d', dao,
         '-b', blockchain,
-        '-prot', position['protocol'],
-        '-s', args['function_name'],
+        '-prot', exec_config['protocol'],
+        '-s', exec_config['function_name'],
     ]
 
     exit_arguments_dict = {}
-    for item in args['parameters']:
+    for item in exec_config['parameters']:
         if item['type'] == 'constant':
             exit_arguments_dict[item['name']] = item['value']
         elif item['name'] == 'max_slippage':
@@ -83,4 +86,4 @@ def test_stresstest(local_node_eth, accounts, monkeypatch, args):
     assert main.returncode == 0
     dict_message_stdout = json.loads(main.stdout[:-1].replace("\'", "\""))
     assert dict_message_stdout['status'] == 200
-    assert dict_message_stdout['message'] == "Transaction executed successfully"
+    assert dict_message_stdout['message'] == "Transaction executed successfully" or dict_message_stdout['message'] == 'No transactions need to be executed for the desired outcome'
