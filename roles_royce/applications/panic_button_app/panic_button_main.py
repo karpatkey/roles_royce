@@ -60,37 +60,42 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
 
 def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable], private_key: str, simulate: bool) -> dict:
 
-    try:
-        disassembler_address = disassembler.w3.eth.account.from_key(private_key).address
-        if simulate:
-            tx_data, sim_link = disassembler.simulate(txns=txn_transactables,
-                                                      from_address=disassembler_address)
-            if tx_data['transaction']['status']:
-                response_message = {"status": 200, "link": sim_link,
-                                    "message": "Transaction executed successfully in Tenderly"}
-            else:
-                response_message = {"status": 422, "link": sim_link,
-                                    "message": "Transaction reverted in Tenderly simulation"}
-        else:
-            check_exit_tx = disassembler.check(txns=txn_transactables,
-                                               from_address=disassembler_address)
-
-            if check_exit_tx:
-                tx_receipt = disassembler.send(txns=txn_transactables, private_key=private_key)
-                tx_link = get_tx_link(tx_receipt, disassembler.blockchain)
-                if tx_receipt.status == 0:
-                    response_message = {"status": 422, "link": tx_link,
-                                        "message": "Transaction reverted"}
+    if txn_transactables:
+        try:
+            disassembler_address = disassembler.w3.eth.account.from_key(private_key).address
+            if simulate:
+                tx_data, sim_link = disassembler.simulate(txns=txn_transactables,
+                                                          from_address=disassembler_address)
+                if tx_data['transaction']['status']:
+                    response_message = {"status": 200, "link": sim_link,
+                                        "message": "Transaction executed successfully in Tenderly"}
                 else:
-                    response_message = {"status": 200, "link": tx_link,
-                                        "message": "Transaction executed successfully"}
+                    response_message = {"status": 422, "link": sim_link,
+                                        "message": "Transaction reverted in Tenderly simulation"}
             else:
-                response_message = {"status": 422, "link": "No link",
-                                    "message": "Transaction reverted when simulated in local execution"}
-        return response_message
-    except Exception as e:
-        response_message = {"status": 500, "message": f"Error: {e}"}
-        return response_message
+                check_exit_tx = disassembler.check(txns=txn_transactables,
+                                                   from_address=disassembler_address)
+
+                if check_exit_tx:
+                    tx_receipt = disassembler.send(txns=txn_transactables, private_key=private_key)
+                    tx_link = get_tx_link(tx_receipt, disassembler.blockchain)
+                    if tx_receipt.status == 0:
+                        response_message = {"status": 422, "link": tx_link,
+                                            "message": "Transaction reverted"}
+                    else:
+                        response_message = {"status": 200, "link": tx_link,
+                                            "message": "Transaction executed successfully"}
+                else:
+                    response_message = {"status": 422, "link": "No link",
+                                        "message": "Transaction reverted when simulated in local execution"}
+            return response_message
+        except Exception as e:
+            response_message = {"status": 500, "link": "", "message": f"Error: {e}"}
+            return response_message
+
+    else:
+        return {"status": 200, "link": "No link", "message": "No transactions need to be executed for the desired "
+                                                             "outcome"}
 
 
 def main():
