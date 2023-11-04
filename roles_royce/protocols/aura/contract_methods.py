@@ -4,178 +4,335 @@ from defabipedia.types import Blockchain
 
 
 class ApproveForBooster(BaseApproveForToken):
-    """approve LPToken with AURABooster as spender"""
-    fixed_arguments = {"spender": ETHAddr.AURABooster}
+   """
+   A class to approve LPToken with AURABooster as spender.
+
+   Attributes:
+       fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+   """
+   fixed_arguments = {"spender": ETHAddr.AURABooster}
 
 
 class ApproveTokenDepWrapper(BaseApproveForToken):
-    """approve token with AURA_rewardpool_dep_wrapper as spender"""
-    fixed_arguments = {"spender": ETHAddr.AURA_rewardpool_dep_wrapper}
+   """
+   A class to approve token with AURA_rewardpool_dep_wrapper as spender.
+
+   Attributes:
+       fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+   """
+   fixed_arguments = {"spender": ETHAddr.AURA_rewardpool_dep_wrapper}
+
 
 
 class ApproveAURABal(BaseApprove):
-    """approve AURABal with AURABAL_bal_weth_depositor as spender"""
-    fixed_arguments = {"spender": ETHAddr.AURABAL}
-    token = ETHAddr.AURABAL_stakingrewarder
+   """
+   A class to approve AURABal with AURABAL_bal_weth_depositor as spender.
+
+   Attributes:
+       fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+       token (str): The Ethereum address of the token to be approved.
+   """
+   fixed_arguments = {"spender": ETHAddr.AURABAL}
+   token = ETHAddr.AURABAL_stakingrewarder
 
 
 class ApproveB80Bal20WETH(BaseApprove):
-    """approve B80Bal20WETH with AURABAL_bal_weth_depositor as spender"""
-    fixed_arguments = {"spender": ETHAddr.AURABAL_bal_weth_depositor}
-    token = ETHAddr.B_80BAL_20WETH
+   """
+   A class to approve B80Bal20WETH with AURABAL_bal_weth_depositor as spender.
+
+   Attributes:
+       fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+       token (str): The Ethereum address of the token to be approved.
+   """
+   fixed_arguments = {"spender": ETHAddr.AURABAL_bal_weth_depositor}
+   token = ETHAddr.B_80BAL_20WETH
+
 
 
 class ApproveBAL(BaseApprove):
-    """approve BAL with AURABAL_bal_depositor as spender"""
-    fixed_arguments = {"spender": ETHAddr.AURABAL_bal_depositor}
-    token = ETHAddr.BAL
+   """
+   A class to approve BAL with AURABAL_bal_depositor as spender.
+
+   Attributes:
+       fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+       token (str): The Ethereum address of the token to be approved.
+   """
+   fixed_arguments = {"spender": ETHAddr.AURABAL_bal_depositor}
+   token = ETHAddr.BAL
+
 
 
 class ApproveAURABalStk(BaseApprove):
-    """approve AURABal with stkAURABAL as spender"""
-    fixed_arguments = {"spender": ETHAddr.stkAURABAL}
-    token = ETHAddr.AURABAL
+  """
+  A class to approve AURABal with stkAURABAL as spender.
+
+  Attributes:
+      fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+      token (str): The Ethereum address of the token to be approved.
+  """
+  fixed_arguments = {"spender": ETHAddr.stkAURABAL}
+  token = ETHAddr.AURABAL
+
 
 
 class ApproveAURA(BaseApprove):
-    """approve AURA with AURALocker as spender"""
-    fixed_arguments = {"spender": ETHAddr.AURALocker}
-    token = ETHAddr.AURA
+  """
+  A class to approve AURA with AURALocker as spender.
+
+  Attributes:
+      fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+      token (str): The Ethereum address of the token to be approved.
+  """
+  fixed_arguments = {"spender": ETHAddr.AURALocker}
+  token = ETHAddr.AURA
+
 
 
 class WithdrawAndUnwrap(ContractMethod):
-    """WIthdraws staked BPT and claims any corresponding unclaimed rewards."""
-    name = "withdrawAndUnwrap"
-    in_signature = [("amount", "uint256"), ("claim", "bool")]
-    fixed_arguments = {"claim": True}
+  """
+  A class to withdraw staked BPT and claim any corresponding unclaimed rewards.
 
-    def __init__(self,
-                 reward_address: Address,
-                 amount: int):
-        super().__init__()
-        self.target_address = reward_address
-        self.args.amount = amount
+  Attributes:
+      name (str): The name of the method.
+      in_signature (list): A list of tuples containing the method's input parameters and their types.
+      fixed_arguments (dict): A dictionary containing the method's fixed arguments.
+
+  Methods:
+      __init__(reward_address: Address, amount: int): Initializes the method with the given reward address and amount.
+  """
+  name = "withdrawAndUnwrap"
+  in_signature = [("amount", "uint256"), ("claim", "bool")]
+  fixed_arguments = {"claim": True}
+
+  def __init__(self, reward_address: Address, amount: int):
+      super().__init__()
+      self.target_address = reward_address
+      self.args.amount = amount
 
 
 class DepositBPT(ContractMethod):
-    """deposit BPT token"""
-    name = "deposit"
-    in_signature = [("pool_id", "uint256"), ("amount", "uint256"), ("stake", "bool")]
-    fixed_arguments = {"stake": True}
-    target_address = ETHAddr.AURABooster
+ """
+ A class to deposit BPT token.
 
-    def __init__(self, pool_id: int, amount: int):
-        super().__init__()
-        self.args.pool_id = pool_id
-        self.args.amount = amount
+ Attributes:
+     name (str): The name of the method.
+     in_signature (list): A list of tuples containing the method's input parameters and their types.
+     fixed_arguments (dict): A dictionary containing the method's fixed arguments.
+     target_address (str): The Ethereum address of the target.
+
+ Methods:
+     __init__(pool_id: int, amount: int): Initializes the method with the given pool id and amount.
+ """
+ name = "deposit"
+ in_signature = [("pool_id", "uint256"), ("amount", "uint256"), ("stake", "bool")]
+ fixed_arguments = {"stake": True}
+ target_address = ETHAddr.AURABooster
+
+ def __init__(self, pool_id: int, amount: int):
+     super().__init__()
+     self.args.pool_id = pool_id
+     self.args.amount = amount
 
 
 class StakeAURABal(ContractMethod):
-    """stake aurabal"""
-    name = "stake"
-    in_signature = [("amount", "uint256")]
-    target_address = ETHAddr.AURABAL_stakingrewarder
+ """
+ A class to stake aurabal.
 
-    def __init__(self, amount: int):
-        super().__init__()
-        self.args.amount = amount
+ Attributes:
+     name (str): The name of the method.
+     in_signature (list): A list of tuples containing the method's input parameters and their types.
+     target_address (str): The Ethereum address of the target.
+
+ Methods:
+     __init__(amount: int): Initializes the method with the given amount.
+ """
+ name = "stake"
+ in_signature = [("amount", "uint256")]
+ target_address = ETHAddr.AURABAL_stakingrewarder
+
+ def __init__(self, amount: int):
+     super().__init__()
+     self.args.amount = amount
 
 
 class Deposit80BAL20WETH(ContractMethod):
-    """deposit 80% BAL and 20% WETH"""
-    name = "deposit"
-    in_signature = [("amount", "uint256"), ("lock", "bool"), ("stake_address", "address")]
-    fixed_arguments = {"lock": True}
-    target_address = ETHAddr.AURABAL_bal_weth_depositor
+ """
+ A class to deposit 80% BAL and 20% WETH.
 
-    def __init__(self, amount: int, stake_address: Address):
-        super().__init__()
-        self.args.amount = amount
-        self.args.stake_address = stake_address
+ Attributes:
+     name (str): The name of the method.
+     in_signature (list): A list of tuples containing the method's input parameters and their types.
+     fixed_arguments (dict): A dictionary containing the method's fixed arguments.
+     target_address (str): The Ethereum address of the target.
 
+ Methods:
+     __init__(amount: int, stake_address: Address): Initializes the method with the given amount and stake address.
+ """
+ name = "deposit"
+ in_signature = [("amount", "uint256"), ("lock", "bool"), ("stake_address", "address")]
+ fixed_arguments = {"lock": True}
+ target_address = ETHAddr.AURABAL_bal_weth_depositor
+
+ def __init__(self, amount: int, stake_address: Address):
+     super().__init__()
+     self.args.amount = amount
+     self.args.stake_address = stake_address
 
 class DepositBAL(ContractMethod):
-    """deposit BAL"""
-    name = "deposit"
-    in_signature = [("amount", "uint256"), ("min_out", "uint256"), ("lock", "bool"), ("stake_address", "address")]
-    fixed_arguments = {"lock": True}
-    target_address = ETHAddr.AURABAL_bal_depositor
+ """
+ A class to deposit BAL.
 
-    def __init__(self, amount: int, min_out: int, stake_address: Address):
-        super().__init__()
-        self.args.amount = amount
-        self.args.min_out = min_out
-        self.args.stake_address = stake_address
+ Attributes:
+    name (str): The name of the method.
+    in_signature (list): A list of tuples containing the method's input parameters and their types.
+    fixed_arguments (dict): A dictionary containing the method's fixed arguments.
+    target_address (str): The Ethereum address of the target.
+
+ Methods:
+    __init__(amount: int, min_out: int, stake_address: Address): Initializes the method with the given amount, minimum output, and stake address.
+ """
+ name = "deposit"
+ in_signature = [("amount", "uint256"), ("min_out", "uint256"), ("lock", "bool"), ("stake_address", "address")]
+ fixed_arguments = {"lock": True}
+ target_address = ETHAddr.AURABAL_bal_depositor
+
+ def __init__(self, amount: int, min_out: int, stake_address: Address):
+    super().__init__()
+    self.args.amount = amount
+    self.args.min_out = min_out
+    self.args.stake_address = stake_address
+
 
 
 class WithdrawAuraBAL(ContractMethod):
-    """withdraw aurabal"""
-    name = "withdraw"
-    in_signature = [("amount", "uint256"), ("claim", "bool")]
-    target_address = ETHAddr.AURABAL_stakingrewarder
+ """
+ A class to withdraw aurabal.
 
-    def __init__(self, amount: int, claim: bool):
-        super().__init__()
-        self.args.amount = amount
-        self.args.claim = claim
+ Attributes:
+    name (str): The name of the method.
+    in_signature (list): A list of tuples containing the method's input parameters and their types.
+    target_address (str): The Ethereum address of the target.
+
+ Methods:
+    __init__(amount: int, claim: bool): Initializes the method with the given amount and claim status.
+ """
+ name = "withdraw"
+ in_signature = [("amount", "uint256"), ("claim", "bool")]
+ target_address = ETHAddr.AURABAL_stakingrewarder
+
+ def __init__(self, amount: int, claim: bool):
+    super().__init__()
+    self.args.amount = amount
+    self.args.claim = claim
 
 
 class CompounderStaking(ContractMethod):
-    """compounder staking"""
-    name = "deposit"
-    in_signature = [("amount", "uint256"), ("avatar", "address")]
-    target_address = ETHAddr.stkAURABAL
+ """
+ A class for compounder staking.
 
-    def __init__(self, amount: int, avatar: Address):
-        super().__init__()
-        self.args.amount = amount
-        self.args.avatar = avatar
+ Attributes:
+    name (str): The name of the method.
+    in_signature (list): A list of tuples containing the method's input parameters and their types.
+    target_address (str): The Ethereum address of the target.
+
+ Methods:
+    __init__(amount: int, avatar: Address): Initializes the method with the given amount and avatar.
+ """
+ name = "deposit"
+ in_signature = [("amount", "uint256"), ("avatar", "address")]
+ target_address = ETHAddr.stkAURABAL
+
+ def __init__(self, amount: int, avatar: Address):
+    super().__init__()
+    self.args.amount = amount
+    self.args.avatar = avatar
 
 
 class CompounderWithdraw(ContractMethod):
-    """compounder withdraw unsaking"""
-    name = "withdraw"
-    in_signature = [("amount", "uint256"), ("receiver", "address"), ("avatar", "address")]
-    target_address = ETHAddr.stkAURABAL
+ """
+ A class for compounder withdraw unsaking.
 
-    def __init__(self, amount: int, receiver: Address, avatar: Address):
-        super().__init__()
-        self.args.amount = amount
-        self.args.receiver = receiver
-        self.args.avatar = avatar
+ Attributes:
+    name (str): The name of the method.
+    in_signature (list): A list of tuples containing the method's input parameters and their types.
+    target_address (str): The Ethereum address of the target.
 
+ Methods:
+    __init__(amount: int, receiver: Address, avatar: Address): Initializes the method with the given amount, receiver, and avatar.
+ """
+ name = "withdraw"
+ in_signature = [("amount", "uint256"), ("receiver", "address"), ("avatar", "address")]
+ target_address = ETHAddr.stkAURABAL
+
+ def __init__(self, amount: int, receiver: Address, avatar: Address):
+    super().__init__()
+    self.args.amount = amount
+    self.args.receiver = receiver
+    self.args.avatar = avatar
 
 class CompounderRedeem(ContractMethod):
-    """compounder redeem"""
-    name = "redeem"
-    in_signature = [("amount", "uint256"), ("receiver", "address"), ("avatar", "address")]
-    target_address = ETHAddr.stkAURABAL
+ """
+ A class for compounder redeem.
 
-    def __init__(self, amount: int, receiver: Address, avatar: Address):
-        super().__init__()
-        self.args.amount = amount
-        self.args.receiver = receiver
-        self.args.avatar = avatar
+ Attributes:
+   name (str): The name of the method.
+   in_signature (list): A list of tuples containing the method's input parameters and their types.
+   target_address (str): The Ethereum address of the target.
+
+ Methods:
+   __init__(amount: int, receiver: Address, avatar: Address): Initializes the method with the given amount, receiver, and avatar.
+ """
+ name = "redeem"
+ in_signature = [("amount", "uint256"), ("receiver", "address"), ("avatar", "address")]
+ target_address = ETHAddr.stkAURABAL
+
+ def __init__(self, amount: int, receiver: Address, avatar: Address):
+   super().__init__()
+   self.args.amount = amount
+   self.args.receiver = receiver
+   self.args.avatar = avatar
+
 
 
 class LockAURA(ContractMethod):
-    """lock aura"""
-    name = "lock"
-    in_signature = [("receiver", "address"), ("amount", "uint256")]
-    target_address = ETHAddr.AURALocker
+ """
+ A class to lock aura.
 
-    def __init__(self, receiver: Address, amount: int):
-        super().__init__()
-        self.args.receiver = receiver
-        self.args.amount = amount
+ Attributes:
+   name (str): The name of the method.
+   in_signature (list): A list of tuples containing the method's input parameters and their types.
+   target_address (str): The Ethereum address of the target.
+
+ Methods:
+   __init__(receiver: Address, amount: int): Initializes the method with the given receiver and amount.
+ """
+ name = "lock"
+ in_signature = [("receiver", "address"), ("amount", "uint256")]
+ target_address = ETHAddr.AURALocker
+
+ def __init__(self, receiver: Address, amount: int):
+   super().__init__()
+   self.args.receiver = receiver
+   self.args.amount = amount
 
 
 class ProcessExpiredLocks(ContractMethod):
-    """process expired locks"""
-    name = "processExpiredLocks"
-    in_signature = [("relock", "bool")]
-    target_address = ETHAddr.AURALocker
+ """
+ A class to process expired locks.
 
-    def __init__(self, relock: bool):
-        super().__init__()
-        self.args.relock = relock
+ Attributes:
+   name (str): The name of the method.
+   in_signature (list): A list of tuples containing the method's input parameters and their types.
+   target_address (str): The Ethereum address of the target.
+
+ Methods:
+   __init__(relock: bool): Initializes the method with the given relock status.
+ """
+ name = "processExpiredLocks"
+ in_signature = [("relock", "bool")]
+ target_address = ETHAddr.AURALocker
+
+ def __init__(self, relock: bool):
+   super().__init__()
+   self.args.relock = relock
+
