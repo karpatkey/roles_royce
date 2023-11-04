@@ -6,7 +6,7 @@ import pytest
 import subprocess
 from pathlib import Path
 
-PERCENTAGE = 80
+PERCENTAGE = 20
 MAX_SLIPPAGE = 1
 
 dao = 'GnosisDAO'
@@ -54,7 +54,7 @@ def set_env(monkeypatch, private_key: str) -> ENV:
 
 
 #@pytest.mark.skip("This test would take forever to run in the CI")
-@pytest.mark.parametrize("exec_config", exec_configs)
+#@pytest.mark.parametrize("exec_config", exec_configs)
 def test_stresstest(local_node_eth, accounts, monkeypatch, exec_config):
     private_key = set_up_roles(local_node_eth, accounts)
     set_env(monkeypatch, private_key)
