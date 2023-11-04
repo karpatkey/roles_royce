@@ -4,4 +4,3 @@ requests_mock>=1.10.0
 prometheus_client>=0.18.0
 python-decouple>=3.8
 schedule>=1.2.1
-defabipedia @ https://github.com/karpatkey/roles_royce/tree/main/defabipedia
