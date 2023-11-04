@@ -53,8 +53,8 @@ def set_env(monkeypatch, private_key: str) -> ENV:
     return ENV(dao, blockchain)
 
 
-#@pytest.mark.skip("This test would take forever to run in the CI")
-#@pytest.mark.parametrize("exec_config", exec_configs)
+@pytest.mark.skip("This test would take forever to run in the CI")
+@pytest.mark.parametrize("exec_config", exec_configs)
 def test_stresstest(local_node_eth, accounts, monkeypatch, exec_config):
     private_key = set_up_roles(local_node_eth, accounts)
     set_env(monkeypatch, private_key)
