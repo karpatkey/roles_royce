@@ -5,7 +5,6 @@ import json
 import pytest
 import subprocess
 from pathlib import Path
-import traceback
 
 PERCENTAGE = 80
 MAX_SLIPPAGE = 1
