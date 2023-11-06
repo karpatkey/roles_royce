@@ -7,107 +7,71 @@ from .types_and_enums import SwapKind
 
 
 class StakeInGauge(ContractMethod):
- """
- StakeInGauge represents the action to stake in a gauge.
+    """
+    StakeInGauge represents the action to stake in a gauge.
 
- Attributes
- ----------
- name : str
-   The name of the function to be called in the smart contract.
- in_signature : list
-   The input signature of the function to be called in the smart contract.
+    Attributes
+        name : (str) The name of the function to be called in the smart contract.
+        in_signature : (list) The input signature of the function to be called in the smart contract.
+    """
 
- Methods
- -------
- __init__(blockchain, gauge_address, amount)
-   The constructor for the StakeInGauge class.
- """
+    def __init__(self,
+                blockchain: Blockchain,
+                gauge_address: Address,
+                amount: int):
+        """
+        Constructs all the necessary attributes for the StakeInGauge object.
 
- def __init__(self,
-            blockchain: Blockchain,
-            gauge_address: Address,
-            amount: int):
-   """
-   Constructs all the necessary attributes for the StakeInGauge object.
+        Args:
+            blockchain : (Blockchain) An instance of Blockchain, representing the blockchain network.
+            gauge_address : (Address) An instance of Address, representing the address of the gauge.
+            amount : (int) An integer representing the amount to be staked.
+        """
 
-   Parameters
-   ----------
-   blockchain : Blockchain
-       An instance of Blockchain, representing the blockchain network.
-   gauge_address : Address
-       An instance of Address, representing the address of the gauge.
-   amount : int
-       An integer representing the amount to be staked.
-   """
-
-   super().__init__()
-   self.target_address = gauge_address
-   self.args.value = amount
+        super().__init__()
+        self.target_address = gauge_address
+        self.args.value = amount
 
 
 class UnstakeFromGauge(ContractMethod):
- """
- UnstakeFromGauge represents the action to unstake from a gauge.
+    """
+    UnstakeFromGauge represents the action to unstake from a gauge.
 
- Attributes
- ----------
- name : str
-   The name of the function to be called in the smart contract.
- in_signature : list
-   The input signature of the function to be called in the smart contract.
+    Attributes
+    name : (str) The name of the function to be called in the smart contract.
+    in_signature : (list) The input signature of the function to be called in the smart contract.
+    """
 
- Methods
- -------
- __init__(blockchain, gauge_address, amount)
-   The constructor for the UnstakeFromGauge class.
- """
-
- def __init__(self,
+    def __init__(self,
             blockchain: Blockchain,
             gauge_address: Address,
             amount: int):
-   """
-   Constructs all the necessary attributes for the UnstakeFromGauge object.
+        """
+        Constructs all the necessary attributes for the UnstakeFromGauge object.
 
-   Parameters
-   ----------
-   blockchain : Blockchain
-       An instance of Blockchain, representing the blockchain network.
-   gauge_address : Address
-       An instance of Address, representing the address of the gauge.
-   amount : int
-       An integer representing the amount to be unstaked.
-   """
+        Args:
+        blockchain : (Blockchain) An instance of Blockchain, representing the blockchain network.
+        gauge_address : (Address) An instance of Address, representing the address of the gauge.
+        amount : (int) An integer representing the amount to be unstaked.
+        """
 
-   super().__init__()
-   self.target_address = gauge_address
-   self.args.value = amount
+        super().__init__()
+        self.target_address = gauge_address
+        self.args.value = amount
 
-# When providing your assets, you must ensure that the tokens are sorted numerically by token address.
-# It's also important to note that the values in minAmountsOut correspond to the same index value in assets,
-# so these arrays must be made in parallel after sorting.
+    # When providing your assets, you must ensure that the tokens are sorted numerically by token address.
+    # It's also important to note that the values in minAmountsOut correspond to the same index value in assets,
+    # so these arrays must be made in parallel after sorting.
 
 class Exit(ContractMethod):
     """
     Exit represents the action to exit a pool.
 
-    Attributes
-    ----------
-    name : str
-        The name of the function to be called in the smart contract.
-    in_signature : tuple
-        The input signature of the function to be called in the smart contract.
-    fixed_arguments : dict
-        The arguments that remain constant across all function calls.
-    user_data_abi : str
-        The Application Binary Interface (ABI) for encoding user data.
-
-    Methods
-    -------
-    __init__(blockchain, pool_id, avatar, assets, min_amounts_out, user_data)
-        The constructor for the Exit class.
-    encode_user_data(user_data)
-        Encodes the user data.
+    Attributes:
+    name : (str) The name of the function to be called in the smart contract.
+    in_signature : (tuple) The input signature of the function to be called in the smart contract.
+    fixed_arguments : (dict) The arguments that remain constant across all function calls.
+    user_data_abi : (str) The Application Binary Interface (ABI) for encoding user data.
     """
     name = "exitPool"
     in_signature = (
@@ -147,63 +111,40 @@ class Exit(ContractMethod):
         self.args.request = [self.args.assets, self.args.min_amounts_out, self.args.user_data,
                              self.fixed_arguments['to_internal_balance']]
     
-    """
-    Constructs all the necessary attributes for the Exit object.
+        """
+        Constructs all the necessary attributes for the Exit object.
 
-    Parameters
-    ----------
-    blockchain : Blockchain
-       An instance of Blockchain, representing the blockchain network.
-    pool_id : str
-       A string representing the ID of the pool.
-    avatar : Address
-       An instance of Address, representing the avatar of the pool.
-    assets : list[Address]
-       A list of Address instances, representing the addresses of the assets.
-    min_amounts_out : list[int]
-       A list of integers, representing the minimum amounts of the assets to receive.
-    user_data : list
-       A list representing the user data.
-    """
+        Args:
+        blockchain : (Blockchain) An instance of Blockchain, representing the blockchain network.
+        pool_id : (str) A string representing the ID of the pool.
+        avatar : (Address) An instance of Address, representing the avatar of the pool.
+        assets : (list[Address]) A list of Address instances, representing the addresses of the assets.
+        min_amounts_out : (list[int]) A list of integers, representing the minimum amounts of the assets to receive.
+        user_data : (list) A list representing the user data.
+        """
 
     def encode_user_data(self, user_data):
         return eth_abi.encode(self.user_data_abi, user_data)
-    """
-    Encodes the user data.
+        """
+        Encodes the user data.
 
-    Parameters
-    ----------
-    user_data : list
-       A list representing the user data.
+        Args:
+        user_data : (list) A list representing the user data.
 
-    Returns
-    -------
-    str
-       The encoded user data.
-    """
+        Returns:
+        (str) The encoded user data.
+        """
 
 
 class Join(ContractMethod):
     """
     Join represents a join action to a pool.
 
-    Attributes
-    ----------
-    name : str
-        The name of the function to be called in the smart contract.
-    in_signature : tuple
-        The input signature of the function to be called in the smart contract.
-    fixed_arguments : dict
-        The arguments that remain constant across all function calls.
-    user_data_abi : str
-        The Application Binary Interface (ABI) for encoding user data.
-
-    Methods
-    -------
-    __init__(blockchain, pool_id, avatar, assets, min_amounts_out, user_data)
-        The constructor for the Exit class.
-    encode_user_data(user_data)
-        Encodes the user data.
+    Attributes:
+    name : (str) The name of the function to be called in the smart contract.
+    in_signature : (tuple) The input signature of the function to be called in the smart contract.
+    fixed_arguments : (dict) The arguments that remain constant across all function calls.
+    user_data_abi : (str) The Application Binary Interface (ABI) for encoding user data.
     """
     name = "joinPool"
     in_signature = (
@@ -242,58 +183,40 @@ class Join(ContractMethod):
         self.args.user_data = self.encode_user_data(user_data)
         self.args.request = [self.args.assets, self.args.max_amounts_in, self.args.user_data,
                              self.fixed_arguments['to_internal_balance']]
-    """
-    Constructs all the necessary attributes for the Exit object.
+        
+        """
+        Constructs all the necessary attributes for the Exit object.
 
-    Parameters
-    ----------
-    blockchain : Blockchain
-       An instance of Blockchain, representing the blockchain network.
-    pool_id : str
-       A string representing the ID of the pool.
-    avatar : Address
-       An instance of Address, representing the avatar of the pool.
-    assets : list[Address]
-       A list of Address instances, representing the addresses of the assets.
-    min_amounts_out : list[int]
-       A list of integers, representing the minimum amounts of the assets to receive.
-    user_data : list
-       A list representing the user data.
-    """
+        Args:
+        blockchain : (Blockchain) An instance of Blockchain, representing the blockchain network.
+        pool_id : (str) A string representing the ID of the pool.
+        avatar : (Address) An instance of Address, representing the avatar of the pool.
+        assets : (list[Address]) A list of Address instances, representing the addresses of the assets.
+        min_amounts_out : (list[int]) A list of integers, representing the minimum amounts of the assets to receive.
+        user_data : (list) A list representing the user data.
+        """
 
     def encode_user_data(self, user_data):
         return eth_abi.encode(self.user_data_abi, user_data)
-    """
-    Encodes the user data.
+        """
+        Encodes the user data.
 
-    Parameters
-    ----------
-    user_data : list
-       A list representing the user data.
+        Args:
+        user_data : (list) A list representing the user data.
 
-    Returns
-    -------
-    str
-       The encoded user data.
-    """
+        Returns:
+        (str) The encoded user data.
+        """
 
 class SingleSwap(ContractMethod):
     """
     SingleSwap represents a single swap operation in a pool.
 
-    Attributes
-    ----------
-    name : str
-        The name of the function to be called in the smart contract.
-    in_signature : tuple
-        The input signature of the function to be called in the smart contract.
-    fixed_arguments : dict
-        The arguments that remain constant across all function calls.
+    Attributes:
+    name : (str) The name of the function to be called in the smart contract.
+    in_signature : (tuple) The input signature of the function to be called in the smart contract.
+    fixed_arguments : (dict) The arguments that remain constant across all function calls.
 
-    Methods
-    -------
-    __init__(blockchain, pool_id, avatar, swap_kind, token_in_address, token_out_address, amount, limit)
-        The constructor for the SingleSwap class.
     """
 
     target_address = None
@@ -337,24 +260,15 @@ class SingleSwap(ContractMethod):
         """
         Constructs all the necessary attributes for the SingleSwap object.
 
-        Parameters
-        ----------
-        blockchain : Blockchain
-            An instance of Blockchain, representing the blockchain network.
-        pool_id : str
-            A string representing the ID of the pool.
-        avatar : Address
-            An instance of Address, representing the avatar of the pool.
-        swap_kind : SwapKind
-            An instance of SwapKind, representing the type of swap operation.
-        token_in_address : Address
-            An instance of Address, representing the address of the input token.
-        token_out_address : Address
-            An instance of Address, representing the address of the output token.
-        amount : int
-            An integer representing the amount of the input token.
-        limit : int
-            An integer representing the maximum amount of the output token to be received.
+        Args:
+        blockchain : (Blockchain) An instance of Blockchain, representing the blockchain network.
+        pool_id : (str) A string representing the ID of the pool.
+        avatar : (Address) An instance of Address, representing the avatar of the pool.
+        swap_kind : (SwapKind) An instance of SwapKind, representing the type of swap operation.
+        token_in_address : (Address) An instance of Address, representing the address of the input token.
+        token_out_address : (Address) An instance of Address, representing the address of the output token.
+        amount : (int) An integer representing the amount of the input token.
+        limit : (int) An integer representing the maximum amount of the output token to be received.
         """
         self.target_address = ContractSpecs[blockchain].Vault.address
         super().__init__(avatar=avatar)

@@ -15,17 +15,9 @@ class _ExactBptSingleTokenExit(Exit):
    A class representing a single asset exit where the user sends a precise quantity of BPT, and receives an estimated but 
    unknown (computed at run time) quantity of a single token.
 
-   Attributes
-   ----------
-   user_data_abi : list
-       A list of uint256 representing the ABI of the user data.
-   exit_kind : ComposableStablePoolExitKind or StablePoolExitKind
-       The kind of exit, determined by the pool kind.
-
-   Methods
-   -------
-   __init__(blockchain, pool_kind, pool_id, avatar, assets, bpt_amount_in, exit_token_index, min_amounts_out)
-       The constructor for the _ExactBptSingleTokenExit class.
+   Attributes:
+   user_data_abi : list A list of uint256 representing the ABI of the user data.
+   exit_kind : ComposableStablePoolExitKind or StablePoolExitKind The kind of exit, determined by the pool kind.
    """
 
    user_data_abi = ['uint256', 'uint256', 'uint256']
@@ -42,24 +34,15 @@ class _ExactBptSingleTokenExit(Exit):
        """
        Constructs all the necessary attributes for the _ExactBptSingleTokenExit object.
 
-       Parameters
-       ----------
-       blockchain : Blockchain
-           The blockchain instance.
-       pool_kind : PoolKind
-           The kind of pool.
-       pool_id : str
-           The id of the pool.
-       avatar : Address
-           The avatar address.
-       assets : list[Address]
-           A list of addresses of the assets.
-       bpt_amount_in : int
-           The amount of BPT to be sent by the user.
-       exit_token_index : int
-           The index of the token to be received by the user.
-       min_amounts_out : list[int]
-           The minimum amounts of tokens to be received by the user.
+       Args:
+       blockchain : (Blockchain) The blockchain instance.
+       pool_kind : (PoolKind) The kind of pool.
+       pool_id : (str) The id of the pool.
+       avatar : (Address) The avatar address.
+       assets : (list[Address]) A list of addresses of the assets.
+       bpt_amount_in : (int) The amount of BPT to be sent by the user.
+       exit_token_index : (int) The index of the token to be received by the user.
+       min_amounts_out : (list[int]) The minimum amounts of tokens to be received by the user.
        """
 
        if pool_kind == PoolKind.ComposableStablePool:
@@ -78,29 +61,16 @@ class _ExactBptSingleTokenExit(Exit):
 class ExactBptSingleTokenExit(_ExactBptSingleTokenExit):
    """
    A class representing a single asset exit where the user sends a precise quantity of BPT, and receives an estimated but 
-   unknown (computed at run time) quantity of a single token. This class is a subclass of _ExactBptSingleTokenExit.
+   unknown (computed at run time) quantity of a single token.
 
-   Attributes
-   ----------
-   w3 : Web3
-       The Web3 instance.
-   pool_id : str
-       The id of the pool.
-   avatar : Address
-       The avatar address.
-   bpt_amount_in : int
-       The amount of BPT to be sent by the user.
-   token_out_address : Address
-       The address of the token to be received by the user.
-   min_amount_out : int
-       The minimum amount of token to be received by the user.
-   assets : list[Address]
-       A list of addresses of the assets.
-
-   Methods
-   -------
-   __init__(w3, pool_id, avatar, bpt_amount_in, token_out_address, min_amount_out, assets=None)
-       The constructor for the ExactBptSingleTokenExit class.
+   Attributes:
+   w3 : (Web3) The Web3 instance.
+   pool_id : (str) The id of the pool.
+   avatar : (Address) The avatar address.
+   bpt_amount_in : (int) The amount of BPT to be sent by the user.
+   token_out_address : (Address) The address of the token to be received by the user.
+   min_amount_out : (int) The minimum amount of token to be received by the user.
+   assets : (list[Address]) A list of addresses of the assets.
    """
 
    def __init__(self,
@@ -114,22 +84,14 @@ class ExactBptSingleTokenExit(_ExactBptSingleTokenExit):
        """
        Constructs all the necessary attributes for the ExactBptSingleTokenExit object.
 
-       Parameters
-       ----------
-       w3 : Web3
-           The Web3 instance.
-       pool_id : str
-           The id of the pool.
-       avatar : Address
-           The avatar address.
-       bpt_amount_in : int
-           The amount of BPT to be sent by the user.
-       token_out_address : Address
-           The address of the token to be received by the user.
-       min_amount_out : int
-           The minimum amount of token to be received by the user.
-       assets : list[Address], optional
-           A list of addresses of the assets. If not provided, it will be fetched from the pool.
+       Args:
+       w3 : (Web3) The Web3 instance.
+       pool_id : (str) The id of the pool.
+       avatar : (Address) The avatar address.
+       bpt_amount_in : (int) The amount of BPT to be sent by the user.
+       token_out_address : (Address) The address of the token to be received by the user.
+       min_amount_out : (int) The minimum amount of token to be received by the user.
+       assets : (list[Address]), optional A list of addresses of the assets. If not provided, it will be fetched from the pool.
        """
 
        if assets is None:
@@ -150,26 +112,19 @@ class ExactBptSingleTokenExit(_ExactBptSingleTokenExit):
 
 
 class _ExactBptProportionalExit(Exit):
-  """
-  A class representing a proportional exit where the user sends a precise quantity of BPT, and receives an estimated but 
-  unknown (computed at run time) quantities of all tokens.
+    """
+    A class representing a proportional exit where the user sends a precise quantity of BPT, and receives an estimated but 
+    unknown (computed at run time) quantities of all tokens.
 
-  Attributes
-  ----------
-  user_data_abi : list
-      A list of uint256 representing the ABI of the user data.
-  exit_kind : ComposableStablePoolExitKind or StablePoolExitKind
-      The kind of exit, determined by the pool kind.
+    Attributes:
+    user_data_abi : (list) A list of uint256 representing the ABI of the user data.
+    exit_kind : (ComposableStablePoolExitKind or StablePoolExitKind) The kind of exit, determined by the pool kind.
 
-  Methods
-  -------
-  __init__(blockchain, pool_kind, pool_id, avatar, assets, bpt_amount_in, min_amounts_out)
-      The constructor for the _ExactBptProportionalExit class.
-  """
+    """
 
-  user_data_abi = ['uint256', 'uint256']
+    user_data_abi = ['uint256', 'uint256']
 
-  def __init__(self,
+    def __init__(self,
                blockchain: Blockchain,
                pool_kind: PoolKind,
                pool_id: str,
@@ -177,33 +132,25 @@ class _ExactBptProportionalExit(Exit):
                assets: list[Address],
                bpt_amount_in: int,
                min_amounts_out: list[int]):
-      """
-      Constructs all the necessary attributes for the _ExactBptProportionalExit object.
+        """
+        Constructs all the necessary attributes for the _ExactBptProportionalExit object.
 
-      Parameters
-      ----------
-      blockchain : Blockchain
-          The blockchain instance.
-      pool_kind : PoolKind
-          The kind of pool.
-      pool_id : str
-          The id of the pool.
-      avatar : Address
-          The avatar address.
-      assets : list[Address]
-          A list of addresses of the assets.
-      bpt_amount_in : int
-          The amount of BPT to be sent by the user.
-      min_amounts_out : list[int]
-          The minimum amounts of tokens to be received by the user.
+        Args:
+        blockchain : (Blockchain) The blockchain instance.
+        pool_kind : (PoolKind) The kind of pool.
+        pool_id : (str) The id of the pool.
+        avatar : (Address) The avatar address.
+        assets : (list[Address]) A list of addresses of the assets.
+        bpt_amount_in : (int) The amount of BPT to be sent by the user.
+        min_amounts_out : (list[int]) The minimum amounts of tokens to be received by the user.
       """
 
-      if pool_kind == PoolKind.ComposableStablePool:
-          exit_kind = ComposableStablePoolExitKind.EXACT_BPT_IN_FOR_TOKENS_OUT
-      else:
-          exit_kind = StablePoolExitKind.EXACT_BPT_IN_FOR_TOKENS_OUT
+        if pool_kind == PoolKind.ComposableStablePool:
+            exit_kind = ComposableStablePoolExitKind.EXACT_BPT_IN_FOR_TOKENS_OUT
+        else:
+            exit_kind = StablePoolExitKind.EXACT_BPT_IN_FOR_TOKENS_OUT
 
-      super().__init__(blockchain=blockchain,
+        super().__init__(blockchain=blockchain,
                      pool_id=pool_id,
                      avatar=avatar,
                      assets=assets,
@@ -212,62 +159,44 @@ class _ExactBptProportionalExit(Exit):
 
 
 class ExactBptProportionalExit(_ExactBptProportionalExit):
-  """
-  A class representing a proportional exit where the user sends a precise quantity of BPT, and receives an estimated but 
-  unknown (computed at run time) quantities of all tokens. This class is a subclass of _ExactBptProportionalExit.
+    """
+    A class representing a proportional exit where the user sends a precise quantity of BPT, and receives an estimated but 
+    unknown (computed at run time) quantities of all tokens. 
+    
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    avatar : (Address) The avatar address.
+    bpt_amount_in : (int) The amount of BPT to be sent by the user.
+    min_amounts_out : (list[int]) The minimum amounts of tokens to be received by the user.
+    assets : (list[Address)] A list of addresses of the assets.
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  avatar : Address
-      The avatar address.
-  bpt_amount_in : int
-      The amount of BPT to be sent by the user.
-  min_amounts_out : list[int]
-      The minimum amounts of tokens to be received by the user.
-  assets : list[Address]
-      A list of addresses of the assets.
+    """
 
-  Methods
-  -------
-  __init__(w3, pool_id, avatar, bpt_amount_in, min_amounts_out, assets=None)
-      The constructor for the ExactBptProportionalExit class.
-  """
-
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                avatar: Address,
                bpt_amount_in: int,
                min_amounts_out: list[int],
                assets: list[Address] = None):
-      """
-      Constructs all the necessary attributes for the ExactBptProportionalExit object.
+        """
+        Constructs all the necessary attributes for the ExactBptProportionalExit object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      avatar : Address
-          The avatar address.
-      bpt_amount_in : int
-          The amount of BPT to be sent by the user.
-      min_amounts_out : list[int]
-          The minimum amounts of tokens to be received by the user.
-      assets : list[Address], optional
-          A list of addresses of the assets. If not provided, it will be fetched from the pool.
-      """
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        avatar : (Address) The avatar address.
+        bpt_amount_in : (int) The amount of BPT to be sent by the user.
+        min_amounts_out : (list[int]) The minimum amounts of tokens to be received by the user.
+        assets : (list[Address]), optional A list of addresses of the assets. If not provided, it will be fetched from the pool.
+        """
 
-      if assets is None:
-          assets = Pool(w3, pool_id).assets()
-      pool_kind = Pool(w3, pool_id).pool_kind()
+        if assets is None:
+            assets = Pool(w3, pool_id).assets()
+        pool_kind = Pool(w3, pool_id).pool_kind()
 
-      super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                      pool_kind=pool_kind,
                      pool_id=pool_id,
                      avatar=avatar,
@@ -276,26 +205,18 @@ class ExactBptProportionalExit(_ExactBptProportionalExit):
                      min_amounts_out=min_amounts_out)
 
 class _ExactTokensExit(Exit):
- """
- A class representing a custom exit where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
- and receives precise quantities of specified tokens.
+    """
+    A class representing a custom exit where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
+    and receives precise quantities of specified tokens.
 
- Attributes
- ----------
- user_data_abi : list
-     A list of uint256 representing the ABI of the user data.
- exit_kind : ComposableStablePoolExitKind or StablePoolExitKind
-     The kind of exit, determined by the pool kind.
+    Attributes:
+    user_data_abi : (list) A list of uint256 representing the ABI of the user data.
+    exit_kind : (ComposableStablePoolExitKind or StablePoolExitKind) The kind of exit, determined by the pool kind.
+    """
 
- Methods
- -------
- __init__(blockchain, pool_kind, pool_id, avatar, assets, amounts_out, max_bpt_amount_in)
-     The constructor for the _ExactTokensExit class.
- """
+    user_data_abi = ['uint256', 'uint256[]', 'uint256']
 
- user_data_abi = ['uint256', 'uint256[]', 'uint256']
-
- def __init__(self,
+    def __init__(self,
               blockchain: Blockchain,
               pool_kind: PoolKind,
               pool_id: str,
@@ -303,33 +224,25 @@ class _ExactTokensExit(Exit):
               assets: list[Address],
               amounts_out: list[int],
               max_bpt_amount_in: int):
-     """
-     Constructs all the necessary attributes for the _ExactTokensExit object.
+        """
+        Constructs all the necessary attributes for the _ExactTokensExit object.
 
-     Parameters
-     ----------
-     blockchain : Blockchain
-         The blockchain instance.
-     pool_kind : PoolKind
-         The kind of pool.
-     pool_id : str
-         The id of the pool.
-     avatar : Address
-         The avatar address.
-     assets : list[Address]
-         A list of addresses of the assets.
-     amounts_out : list[int]
-         The amounts of each token to be withdrawn from the pool.
-     max_bpt_amount_in : int
-         The minimum acceptable BPT to burn in return for withdrawn tokens.
-     """
+        Args:
+        blockchain : (Blockchain) The blockchain instance.
+        pool_kind : (PoolKind) The kind of pool.
+        pool_id : (str) The id of the pool.
+        avatar : (Address) The avatar address.
+        assets : (list[Address]) A list of addresses of the assets.
+        amounts_out : (list[int]) The amounts of each token to be withdrawn from the pool.
+        max_bpt_amount_in : (int) The minimum acceptable BPT to burn in return for withdrawn tokens.
+        """
 
-     if pool_kind == PoolKind.ComposableStablePool:
-         exit_kind = ComposableStablePoolExitKind.BPT_IN_FOR_EXACT_TOKENS_OUT
-     else:
-         exit_kind = StablePoolExitKind.BPT_IN_FOR_EXACT_TOKENS_OUT
+        if pool_kind == PoolKind.ComposableStablePool:
+            exit_kind = ComposableStablePoolExitKind.BPT_IN_FOR_EXACT_TOKENS_OUT
+        else:
+            exit_kind = StablePoolExitKind.BPT_IN_FOR_EXACT_TOKENS_OUT
 
-     super().__init__(blockchain=blockchain,
+        super().__init__(blockchain=blockchain,
                    pool_id=pool_id,
                    avatar=avatar,
                    assets=assets,
@@ -338,62 +251,43 @@ class _ExactTokensExit(Exit):
 
 
 class ExactTokensExit(_ExactTokensExit):
-  """
-  A class representing a custom exit where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
-  and receives precise quantities of specified tokens. This class is a subclass of _ExactTokensExit.
+    """
+    A class representing a custom exit where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
+    and receives precise quantities of specified tokens.
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  avatar : Address
-      The avatar address.
-  amounts_out : list[int]
-      The amounts of each token to be withdrawn from the pool.
-  max_bpt_amount_in : int
-      The minimum acceptable BPT to burn in return for withdrawn tokens.
-  assets : list[Address]
-      A list of addresses of the assets.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    avatar : (Address) The avatar address.
+    amounts_out : (list[int]) The amounts of each token to be withdrawn from the pool.
+    max_bpt_amount_in : (int) The minimum acceptable BPT to burn in return for withdrawn tokens.
+    assets : (list[Address]) A list of addresses of the assets.
+    """
 
-  Methods
-  -------
-  __init__(w3, pool_id, avatar, amounts_out, max_bpt_amount_in, assets=None)
-      The constructor for the ExactTokensExit class.
-  """
-
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                avatar: Address,
                amounts_out: list[int],
                max_bpt_amount_in: int,
                assets: list[Address] = None):
-      """
-      Constructs all the necessary attributes for the ExactTokensExit object.
+        """
+        Constructs all the necessary attributes for the ExactTokensExit object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      avatar : Address
-          The avatar address.
-      amounts_out : list[int]
-          The amounts of each token to be withdrawn from the pool.
-      max_bpt_amount_in : int
-          The minimum acceptable BPT to burn in return for withdrawn tokens.
-      assets : list[Address], optional
-          A list of addresses of the assets. If not provided, it will be fetched from the pool.
-      """
+        Args:
+        w3 : Web3 The Web3 instance.
+        pool_id : str The id of the pool.
+        avatar : Address The avatar address.
+        amounts_out : list[int] The amounts of each token to be withdrawn from the pool.
+        max_bpt_amount_in : int The minimum acceptable BPT to burn in return for withdrawn tokens.
+        assets : list[Address], optional A list of addresses of the assets. If not provided, it will be fetched from the pool.
+        """
 
-      if assets is None:
-          assets = Pool(w3, pool_id).assets()
-      pool_kind = Pool(w3, pool_id).pool_kind()
+        if assets is None:
+            assets = Pool(w3, pool_id).assets()
+        pool_kind = Pool(w3, pool_id).pool_kind()
 
-      super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                      pool_kind=pool_kind,
                      pool_id=pool_id,
                      avatar=avatar,
@@ -404,34 +298,21 @@ class ExactTokensExit(_ExactTokensExit):
 
 
 class ExactSingleTokenExit(ExactTokensExit):
-  """
-  A class representing a single token exit where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
-  and receives a precise quantity of a specified token. This class is a subclass of ExactTokensExit.
+    """
+    A class representing a single token exit where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
+    and receives a precise quantity of a specified token.
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  avatar : Address
-      The avatar address.
-  token_out_address : Address
-      The address of the token to be received by the user.
-  amount_out : int
-      The amount of token to be received by the user.
-  max_bpt_amount_in : int
-      The maximum acceptable BPT to burn in return for withdrawn tokens.
-  assets : list[Address]
-      A list of addresses of the assets.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    avatar : (Address) The avatar address.
+    token_out_address : (Address) The address of the token to be received by the user.
+    amount_out : (int) The amount of token to be received by the user.
+    max_bpt_amount_in : (int) The maximum acceptable BPT to burn in return for withdrawn tokens.
+    assets : (list[Address]) A list of addresses of the assets.
+    """
 
-  Methods
-  -------
-  __init__(w3, pool_id, avatar, token_out_address, amount_out, max_bpt_amount_in, assets=None)
-      The constructor for the ExactSingleTokenExit class.
-  """
-
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                avatar: Address,
@@ -439,34 +320,26 @@ class ExactSingleTokenExit(ExactTokensExit):
                amount_out: int,
                max_bpt_amount_in: int,
                assets: list[Address] = None):
-      """
-      Constructs all the necessary attributes for the ExactSingleTokenExit object.
+        """
+        Constructs all the necessary attributes for the ExactSingleTokenExit object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      avatar : Address
-          The avatar address.
-      token_out_address : Address
-          The address of the token to be received by the user.
-      amount_out : int
-          The amount of token to be received by the user.
-      max_bpt_amount_in : int
-          The maximum acceptable BPT to burn in return for withdrawn tokens.
-      assets : list[Address], optional
-          A list of addresses of the assets. If not provided, it will be fetched from the pool.
-      """
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        avatar : (Address) The avatar address.
+        token_out_address : (Address) The address of the token to be received by the user.
+        amount_out : (int) The amount of token to be received by the user.
+        max_bpt_amount_in : (int) The maximum acceptable BPT to burn in return for withdrawn tokens.
+        assets : (list[Address]), optional A list of addresses of the assets. If not provided, it will be fetched from the pool.
+        """
 
-      if assets is None:
-          assets = Pool(w3, pool_id).assets()
+        if assets is None:
+            assets = Pool(w3, pool_id).assets()
 
-      exit_token_index = assets.index(token_out_address)
-      amounts_out = [0] * exit_token_index + [amount_out] + [0] * (len(assets) - exit_token_index - 1)
+        exit_token_index = assets.index(token_out_address)
+        amounts_out = [0] * exit_token_index + [amount_out] + [0] * (len(assets) - exit_token_index - 1)
 
-      super().__init__(w3=w3,
+        super().__init__(w3=w3,
                      pool_id=pool_id,
                      avatar=avatar,
                      amounts_out=amounts_out,
@@ -475,54 +348,39 @@ class ExactSingleTokenExit(ExactTokensExit):
 
 
 class _ExactBptRecoveryModeExit(Exit):
-  """
-  A class representing a recovery mode exit where the user sends a precise quantity of BPT, 
-  and receives an estimated but unknown (computed at run time) quantities of all tokens.
+    """
+    A class representing a recovery mode exit where the user sends a precise quantity of BPT, 
+    and receives an estimated but unknown (computed at run time) quantities of all tokens.
 
-  Attributes
-  ----------
-  user_data_abi : list
-      A list of uint256 representing the ABI of the user data.
-  exit_kind : StablePoolv2ExitKind
-      The kind of exit, determined by the StablePoolv2ExitKind.
+    Attributes:
+    user_data_abi : (list) A list of uint256 representing the ABI of the user data.
+    exit_kind : (StablePoolv2ExitKind) The kind of exit, determined by the StablePoolv2ExitKind.
+    """
 
-  Methods
-  -------
-  __init__(blockchain, pool_id, avatar, assets, bpt_amount_in, min_amounts_out)
-      The constructor for the _ExactBptRecoveryModeExit class.
-  """
+    user_data_abi = ['uint256', 'uint256']
 
-  user_data_abi = ['uint256', 'uint256']
-
-  def __init__(self,
+    def __init__(self,
                blockchain: Blockchain,
                pool_id: str,
                avatar: Address,
                assets: list[Address],
                bpt_amount_in: int,
                min_amounts_out: list[int]):
-      """
-      Constructs all the necessary attributes for the _ExactBptRecoveryModeExit object.
+        """
+        Constructs all the necessary attributes for the _ExactBptRecoveryModeExit object.
 
-      Parameters
-      ----------
-      blockchain : Blockchain
-          The blockchain instance.
-      pool_id : str
-          The id of the pool.
-      avatar : Address
-          The avatar address.
-      assets : list[Address]
-          A list of addresses of the assets.
-      bpt_amount_in : int
-          The amount of BPT to be sent by the user.
-      min_amounts_out : list[int]
-          The minimum amounts of tokens to be received by the user.
-      """
+        Args:
+        blockchain : (Blockchain) The blockchain instance.
+        pool_id : (str) The id of the pool.
+        avatar : (Address) The avatar address.
+        assets : (list[Address]) A list of addresses of the assets.
+        bpt_amount_in : (int) The amount of BPT to be sent by the user.
+        min_amounts_out : (list[int]) The minimum amounts of tokens to be received by the user.
+        """
 
-      exit_kind = StablePoolv2ExitKind.RECOVERY_MODE_EXIT_KIND
+        exit_kind = StablePoolv2ExitKind.RECOVERY_MODE_EXIT_KIND
 
-      super().__init__(blockchain=blockchain,
+        super().__init__(blockchain=blockchain,
                      pool_id=pool_id,
                      avatar=avatar,
                      assets=assets,
@@ -531,59 +389,41 @@ class _ExactBptRecoveryModeExit(Exit):
 
 
 class ExactBptRecoveryModeExit(_ExactBptRecoveryModeExit):
-  """
-  A class representing a recovery mode exit where the user sends a precise quantity of BPT, 
-  and receives an estimated but unknown (computed at run time) quantities of all tokens. 
-  This class is a subclass of _ExactBptRecoveryModeExit.
+    """
+    A class representing a recovery mode exit where the user sends a precise quantity of BPT, 
+    and receives an estimated but unknown (computed at run time) quantities of all tokens. 
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  avatar : Address
-      The avatar address.
-  bpt_amount_in : int
-      The amount of BPT to be sent by the user.
-  assets : list[Address]
-      A list of addresses of the assets.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    avatar : (Address) The avatar address.
+    bpt_amount_in : (int) The amount of BPT to be sent by the user.
+    assets : (list[Address]) A list of addresses of the assets.
+    """
 
-  Methods
-  -------
-  __init__(w3, pool_id, avatar, bpt_amount_in, assets=None)
-      The constructor for the ExactBptRecoveryModeExit class.
-  """
-
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                avatar: Address,
                bpt_amount_in: int,
                assets: list[Address] = None):
-      """
-      Constructs all the necessary attributes for the ExactBptRecoveryModeExit object.
+        """
+        Constructs all the necessary attributes for the ExactBptRecoveryModeExit object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      avatar : Address
-          The avatar address.
-      bpt_amount_in : int
-          The amount of BPT to be sent by the user.
-      assets : list[Address], optional
-          A list of addresses of the assets. If not provided, it will be fetched from the pool.
-      """
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        avatar : (Address) The avatar address.
+        bpt_amount_in : (int) The amount of BPT to be sent by the user.
+        assets : (list[Address]), optional A list of addresses of the assets. If not provided, it will be fetched from the pool.
+        """
 
-      if assets is None:
-          assets = Pool(w3, pool_id).assets()
+        if assets is None:
+            assets = Pool(w3, pool_id).assets()
 
-      min_amounts_out = [0] * len(assets)
+        min_amounts_out = [0] * len(assets)
 
-      super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
                      pool_id=pool_id,
                      avatar=avatar,
                      assets=assets,
@@ -596,65 +436,47 @@ class ExactBptRecoveryModeExit(_ExactBptRecoveryModeExit):
 
 
 class QueryExitMixin:
-  """
-  A mixin class for query exit functionality.
+    """
+    A mixin class for query exit functionality.
 
-  Attributes
-  ----------
-  name : str
-      The name of the mixin.
-  out_signature : list
-      A list of strings representing the signature of the output.
+    Args:
+    name : (str) The name of the mixin.
+    out_signature : (list) A list of strings representing the signature of the output.
 
-  """
+    """
 
-  name = "queryExit"
-  out_signature = [("bpt_in", "uint256"), ("amounts_out", "uint256[]")]
+    name = "queryExit"
+    out_signature = [("bpt_in", "uint256"), ("amounts_out", "uint256[]")]
 
 
 class ExactBptSingleTokenQueryExit(QueryExitMixin, ExactBptSingleTokenExit):
-  """
-  A class representing a single token exit query where the user sends a precise quantity of BPT, 
-  and receives a precise quantity of a specified token. This class is a subclass of QueryExitMixin and ExactBptSingleTokenExit.
+    """
+    A class representing a single token exit query where the user sends a precise quantity of BPT, 
+    and receives a precise quantity of a specified token. 
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  bpt_amount_in : int
-      The amount of BPT to be sent by the user.
-  token_out_address : Address
-      The address of the token to be received by the user.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    bpt_amount_in : (int) The amount of BPT to be sent by the user.
+    token_out_address : (Address) The address of the token to be received by the user.  
+    """
 
-  Methods
-  -------
-  __init__(w3, pool_id, bpt_amount_in, token_out_address)
-      The constructor for the ExactBptSingleTokenQueryExit class.
-  """
-
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                bpt_amount_in: int,
                token_out_address: Address):
-      """
-      Constructs all the necessary attributes for the ExactBptSingleTokenQueryExit object.
+        """
+        Constructs all the necessary attributes for the ExactBptSingleTokenQueryExit object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      bpt_amount_in : int
-          The amount of BPT to be sent by the user.
-      token_out_address : Address
-          The address of the token to be received by the user.
-      """
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        bpt_amount_in : (int) The amount of BPT to be sent by the user.
+        token_out_address : (Address) The address of the token to be received by the user.
+        """
 
-      super().__init__(w3=w3,
+        super().__init__(w3=w3,
                      pool_id=pool_id,
                      avatar=ZERO,
                      bpt_amount_in=bpt_amount_in,
@@ -664,52 +486,36 @@ class ExactBptSingleTokenQueryExit(QueryExitMixin, ExactBptSingleTokenExit):
 
 
 class ExactBptProportionalQueryExit(QueryExitMixin, ExactBptProportionalExit):
-  """
-  A class representing a proportional exit query where the user sends a precise quantity of BPT, 
-  and receives an estimated but unknown (computed at run time) quantities of all tokens. 
-  This class is a subclass of QueryExitMixin and ExactBptProportionalExit.
+    """
+    A class representing a proportional exit query where the user sends a precise quantity of BPT, 
+    and receives an estimated but unknown (computed at run time) quantities of all tokens.
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  bpt_amount_in : int
-      The amount of BPT to be sent by the user.
-  assets : list[Address]
-      A list of addresses of the assets.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    bpt_amount_in : (int) The amount of BPT to be sent by the user.
+    assets : (list[Address]) A list of addresses of the assets.
+    """
 
-  Methods
-  -------
-  __init__(w3, pool_id, bpt_amount_in, assets=None)
-      The constructor for the ExactBptProportionalQueryExit class.
-  """
-
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                bpt_amount_in: int,
                assets: list[Address] = None):
-      """
-      Constructs all the necessary attributes for the ExactBptProportionalQueryExit object.
+        """
+        Constructs all the necessary attributes for the ExactBptProportionalQueryExit object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      bpt_amount_in : int
-          The amount of BPT to be sent by the user.
-      assets : list[Address], optional
-          A list of addresses of the assets. If not provided, it will be fetched from the pool.
-      """
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        bpt_amount_in : (int) The amount of BPT to be sent by the user.
+        assets : (list[Address]), optional A list of addresses of the assets. If not provided, it will be fetched from the pool.
+        """
 
-      if assets is None:
-          assets = Pool(w3, pool_id).assets()
+        if assets is None:
+            assets = Pool(w3, pool_id).assets()
 
-      super().__init__(w3=w3,
+        super().__init__(w3=w3,
                      pool_id=pool_id,
                      avatar=ZERO,
                      bpt_amount_in=bpt_amount_in,
@@ -719,51 +525,37 @@ class ExactBptProportionalQueryExit(QueryExitMixin, ExactBptProportionalExit):
 
 
 class ExactTokensQueryExit(QueryExitMixin, ExactTokensExit):
-  """
-  A class representing a tokens exit query where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
-  and receives precise quantities of specified tokens. This class is a subclass of QueryExitMixin and ExactTokensExit.
+    """
+    A class representing a tokens exit query where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
+    and receives precise quantities of specified tokens. 
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  amounts_out : list[int]
-      The amounts of each token to be withdrawn from the pool.
-  assets : list[Address]
-      A list of addresses of the assets.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    amounts_out : (list)[int] The amounts of each token to be withdrawn from the pool.
+    assets : (list[Address]) A list of addresses of the assets.
 
-  Methods
-  -------
-  __init__(w3, pool_id, amounts_out, assets=None)
-      The constructor for the ExactTokensQueryExit class.
-  """
+    """
 
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                amounts_out: list[int],
                assets: list[Address] = None):
-      """
-      Constructs all the necessary attributes for the ExactTokensQueryExit object.
+        """
+        Constructs all the necessary attributes for the ExactTokensQueryExit object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      amounts_out : list[int]
-          The amounts of each token to be withdrawn from the pool.
-      assets : list[Address], optional
-          A list of addresses of the assets. If not provided, it will be fetched from the pool.
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        amounts_out : (list[int]) The amounts of each token to be withdrawn from the pool.
+        assets : (list[Address]), optional A list of addresses of the assets. If not provided, it will be fetched from the pool.
       """
 
-      if assets is None:
-          assets = Pool(w3, pool_id).assets()
+        if assets is None:
+            assets = Pool(w3, pool_id).assets()
 
-      super().__init__(w3=w3,
+        super().__init__(w3=w3,
                      pool_id=pool_id,
                      avatar=ZERO,
                      amounts_out=amounts_out,
@@ -772,48 +564,34 @@ class ExactTokensQueryExit(QueryExitMixin, ExactTokensExit):
 
 
 class ExactSingleTokenQueryExit(QueryExitMixin, ExactSingleTokenExit):
-  """
-  A class representing a single token exit query where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
-  and receives a precise quantity of a specified token. This class is a subclass of QueryExitMixin and ExactSingleTokenExit.
+    """
+    A class representing a single token exit query where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
+    and receives a precise quantity of a specified token.
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  token_out_address : Address
-      The address of the token to be received by the user.
-  amount_out : int
-      The amount of token to be received by the user.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    token_out_address : (Address) The address of the token to be received by the user.
+    amount_out : (int) The amount of token to be received by the user.
 
-  Methods
-  -------
-  __init__(w3, pool_id, token_out_address, amount_out)
-      The constructor for the ExactSingleTokenQueryExit class.
-  """
+    """
 
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                token_out_address: Address,
                amount_out: int):
-      """
-      Constructs all the necessary attributes for the ExactSingleTokenQueryExit object.
+        """
+        Constructs all the necessary attributes for the ExactSingleTokenQueryExit object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      token_out_address : Address
-          The address of the token to be received by the user.
-      amount_out : int
-          The amount of token to be received by the user.
-      """
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        token_out_address : (Address) The address of the token to be received by the user.
+        amount_out : (int) The amount of token to be received by the user.
+        """
 
-      super().__init__(w3=w3,
+        super().__init__(w3=w3,
                      pool_id=pool_id,
                      avatar=ZERO,
                      token_out_address=token_out_address,
@@ -825,35 +603,22 @@ class ExactSingleTokenQueryExit(QueryExitMixin, ExactSingleTokenExit):
 # The next are the classes ready to be used inputting max slippage
 
 class ExactBptSingleTokenExitSlippage(ExactBptSingleTokenExit):
-  """
-  A class representing a single token exit with slippage control where the user sends a precise quantity of BPT, 
-  and receives a precise quantity of a specified token, with a maximum slippage tolerance.
-  This class is a subclass of ExactBptSingleTokenExit.
+    """
+    A class representing a single token exit with slippage control where the user sends a precise quantity of BPT, 
+    and receives a precise quantity of a specified token, with a maximum slippage tolerance.
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  avatar : Address
-      The avatar address.
-  bpt_amount_in : int
-      The amount of BPT to be sent by the user.
-  token_out_address : Address
-      The address of the token to be received by the user.
-  max_slippage : float
-      The maximum slippage tolerance.
-  assets : list[Address]
-      A list of addresses of the assets.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    avatar : (Address) The avatar address.
+    bpt_amount_in : (int) The amount of BPT to be sent by the user.
+    token_out_address : (Address) The address of the token to be received by the user.
+    max_slippage : (float) The maximum slippage tolerance.
+    assets : (list[Address]) A list of addresses of the assets.
+  
+    """
 
-  Methods
-  -------
-  __init__(w3, pool_id, avatar, bpt_amount_in, token_out_address, max_slippage, assets=None)
-      The constructor for the ExactBptSingleTokenExitSlippage class.
-  """
-
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                avatar: Address,
@@ -861,275 +626,198 @@ class ExactBptSingleTokenExitSlippage(ExactBptSingleTokenExit):
                token_out_address: Address,
                max_slippage: float,
                assets: list[Address] = None):
-      """
-      Constructs all the necessary attributes for the ExactBptSingleTokenExitSlippage object.
+        """
+        Constructs all the necessary attributes for the ExactBptSingleTokenExitSlippage object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      avatar : Address
-          The avatar address.
-      bpt_amount_in : int
-          The amount of BPT to be sent by the user.
-      token_out_address : Address
-          The address of the token to be received by the user.
-      max_slippage : float
-          The maximum slippage tolerance.
-      assets : list[Address], optional
-          A list of addresses of the assets. If not provided, it will be fetched from the pool.
-      """
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        avatar : (Address) The avatar address.
+        bpt_amount_in : (int) The amount of BPT to be sent by the user.
+        token_out_address : (Address) The address of the token to be received by the user.
+        max_slippage : (float) The maximum slippage tolerance.
+        assets : (list[Address]), optional A list of addresses of the assets. If not provided, it will be fetched from the pool.
+        """
 
-      if assets is None:
-          assets = Pool(w3, pool_id).assets()
+        if assets is None:
+            assets = Pool(w3, pool_id).assets()
 
-      m = ExactBptSingleTokenQueryExit(w3=w3,
+        m = ExactBptSingleTokenQueryExit(w3=w3,
                                        pool_id=pool_id,
                                        bpt_amount_in=bpt_amount_in,
                                        token_out_address=token_out_address)
-      exit_token_index = assets.index(token_out_address)
-      bpt_amount_in_sim, amounts_out_sim = m.call(web3=w3)
+        exit_token_index = assets.index(token_out_address)
+        bpt_amount_in_sim, amounts_out_sim = m.call(web3=w3)
 
-      if not bpt_amount_in - 1 <= bpt_amount_in_sim <= bpt_amount_in + 1:
-          raise ValueError(
-              f"The bpt_amount_in = {bpt_amount_in} specified is not the same as the bpt_amount_in = {bpt_amount_in_sim} calculated by the query contract.")
+        if not bpt_amount_in - 1 <= bpt_amount_in_sim <= bpt_amount_in + 1:
+            raise ValueError(
+                f"The bpt_amount_in = {bpt_amount_in} specified is not the same as the bpt_amount_in = {bpt_amount_in_sim} calculated by the query contract.")
 
-      min_amount_out = int(Decimal(amounts_out_sim[exit_token_index]) * Decimal(1 - max_slippage))
+        min_amount_out = int(Decimal(amounts_out_sim[exit_token_index]) * Decimal(1 - max_slippage))
 
-      super().__init__(w3, pool_id, avatar, bpt_amount_in, token_out_address, min_amount_out, assets=assets)
+        super().__init__(w3, pool_id, avatar, bpt_amount_in, token_out_address, min_amount_out, assets=assets)
 
 
 class ExactSingleTokenExitSlippage(ExactSingleTokenExit):
-  """
-  A class representing a single token exit with slippage control where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
-  and receives a precise quantity of a specified token, with a maximum slippage tolerance.
-  This class is a subclass of ExactSingleTokenExit.
+    """
+    A class representing a single token exit with slippage control where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
+    and receives a precise quantity of a specified token, with a maximum slippage tolerance.
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  avatar : Address
-      The avatar address.
-  token_out_address : Address
-      The address of the token to be received by the user.
-  amount_out : int
-      The amount of token to be received by the user.
-  max_slippage : float
-      The maximum slippage tolerance.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    avatar : (Address) The avatar address.
+    token_out_address : (Address) The address of the token to be received by the user.
+    amount_out : (int) The amount of token to be received by the user.
+    max_slippage : (float) The maximum slippage tolerance.
+    """
 
-  Methods
-  -------
-  __init__(w3, pool_id, avatar, token_out_address, amount_out, max_slippage)
-      The constructor for the ExactSingleTokenExitSlippage class.
-  """
-
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                avatar: Address,
                token_out_address: Address,
                amount_out: int,
                max_slippage: float):
-      """
-      Constructs all the necessary attributes for the ExactSingleTokenExitSlippage object.
+        """
+        Constructs all the necessary attributes for the ExactSingleTokenExitSlippage object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      avatar : Address
-          The avatar address.
-      token_out_address : Address
-          The address of the token to be received by the user.
-      amount_out : int
-          The amount of token to be received by the user.
-      max_slippage : float
-          The maximum slippage tolerance.
-      """
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        avatar : (Address) The avatar address.
+        token_out_address : (Address) The address of the token to be received by the user.
+        amount_out : (int) The amount of token to be received by the user.
+        max_slippage : (float) The maximum slippage tolerance.
+        """
 
-      m = ExactSingleTokenQueryExit(w3=w3,
+        m = ExactSingleTokenQueryExit(w3=w3,
                                     pool_id=pool_id,
                                     token_out_address=token_out_address,
                                     amount_out=amount_out)
-      assets = Pool(w3, pool_id).assets()
-      exit_token_index = assets.index(token_out_address)
-      bpt_amount_in_sim, amounts_out_sim = m.call(web3=w3)
+        assets = Pool(w3, pool_id).assets()
+        exit_token_index = assets.index(token_out_address)
+        bpt_amount_in_sim, amounts_out_sim = m.call(web3=w3)
 
-      if amount_out - 1 <= amounts_out_sim[exit_token_index] <= amount_out + 1:
-          raise ValueError(
-              f"The amount_out = {amount_out} specified is not the same as the amount_out = {amounts_out_sim[exit_token_index]} calculated by the query contract.")
-      max_bpt_amount_in = int(Decimal(bpt_amount_in_sim) * Decimal(1 + max_slippage))
+        if amount_out - 1 <= amounts_out_sim[exit_token_index] <= amount_out + 1:
+            raise ValueError(
+                f"The amount_out = {amount_out} specified is not the same as the amount_out = {amounts_out_sim[exit_token_index]} calculated by the query contract.")
+        max_bpt_amount_in = int(Decimal(bpt_amount_in_sim) * Decimal(1 + max_slippage))
 
-      super().__init__(w3, pool_id, avatar, token_out_address, amount_out, max_bpt_amount_in, assets=assets)
+        super().__init__(w3, pool_id, avatar, token_out_address, amount_out, max_bpt_amount_in, assets=assets)
 
 
 class ExactBptProportionalExitSlippage(ExactBptProportionalExit):
-  """
-  A class representing a proportional exit with slippage control where the user sends a precise quantity of BPT, 
-  and receives an estimated but unknown (computed at run time) quantities of all tokens, with a maximum slippage tolerance.
-  This class is a subclass of ExactBptProportionalExit.
+    """
+    A class representing a proportional exit with slippage control where the user sends a precise quantity of BPT, 
+    and receives an estimated but unknown (computed at run time) quantities of all tokens, with a maximum slippage tolerance.
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  avatar : Address
-      The avatar address.
-  bpt_amount_in : int
-      The amount of BPT to be sent by the user.
-  max_slippage : float
-      The maximum slippage tolerance.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    avatar : (Address) The avatar address.
+    bpt_amount_in : (int) The amount of BPT to be sent by the user.
+    max_slippage : (float) The maximum slippage tolerance.
+    """
 
-  Methods
-  -------
-  __init__(w3, pool_id, avatar, bpt_amount_in, max_slippage)
-      The constructor for the ExactBptProportionalExitSlippage class.
-  """
-
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                avatar: Address,
                bpt_amount_in: int,
                max_slippage: float):
-      """
-      Constructs all the necessary attributes for the ExactBptProportionalExitSlippage object.
+        """
+        Constructs all the necessary attributes for the ExactBptProportionalExitSlippage object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      avatar : Address
-          The avatar address.
-      bpt_amount_in : int
-          The amount of BPT to be sent by the user.
-      max_slippage : float
-          The maximum slippage tolerance.
-      """
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        avatar : (Address) The avatar address.
+        bpt_amount_in : (int) The amount of BPT to be sent by the user.
+        max_slippage : (float) The maximum slippage tolerance.
+        """
 
-      m = ExactBptProportionalQueryExit(w3=w3,
+        m = ExactBptProportionalQueryExit(w3=w3,
                                         pool_id=pool_id,
                                         bpt_amount_in=bpt_amount_in)
 
-      bpt_amount_in_sim, amounts_out_sim = m.call(web3=w3)
+        bpt_amount_in_sim, amounts_out_sim = m.call(web3=w3)
 
-      if not bpt_amount_in - 1 <= bpt_amount_in_sim <= bpt_amount_in + 1:
-          raise ValueError(
-              f"The bpt_amount_in = {bpt_amount_in} specified is not the same as the bpt_amount_in = {bpt_amount_in_sim} calculated by the query contract.")
+        if not bpt_amount_in - 1 <= bpt_amount_in_sim <= bpt_amount_in + 1:
+            raise ValueError(
+                f"The bpt_amount_in = {bpt_amount_in} specified is not the same as the bpt_amount_in = {bpt_amount_in_sim} calculated by the query contract.")
 
-      min_amounts_out = [int(Decimal(amount) * Decimal(1 - max_slippage)) for amount in amounts_out_sim]
+        min_amounts_out = [int(Decimal(amount) * Decimal(1 - max_slippage)) for amount in amounts_out_sim]
 
-      super().__init__(w3, pool_id, avatar, bpt_amount_in, min_amounts_out)
+        super().__init__(w3, pool_id, avatar, bpt_amount_in, min_amounts_out)
 
 class ExactTokensExitSlippage(ExactTokensExit):
-  """
-  A class representing a tokens exit with slippage control where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
-  and receives precise quantities of specified tokens, with a maximum slippage tolerance.
-  This class is a subclass of ExactTokensExit.
+    """
+    A class representing a tokens exit with slippage control where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
+    and receives precise quantities of specified tokens, with a maximum slippage tolerance.
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  avatar : Address
-      The avatar address.
-  amounts_out : list[int]
-      The amounts of each token to be withdrawn from the pool.
-  max_slippage : float
-      The maximum slippage tolerance.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    avatar : (Address) The avatar address.
+    amounts_out : (list[int]) The amounts of each token to be withdrawn from the pool.
+    max_slippage : (float) The maximum slippage tolerance.
 
-  Methods
-  -------
-  __init__(w3, pool_id, avatar, amounts_out, max_slippage)
-      The constructor for the ExactTokensExitSlippage class.
-  """
+    """
 
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                avatar: Address,
                amounts_out: list[int],
                max_slippage: float):
-      """
-      Constructs all the necessary attributes for the ExactTokensExitSlippage object.
+        """
+        Constructs all the necessary attributes for the ExactTokensExitSlippage object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      avatar : Address
-          The avatar address.
-      amounts_out : list[int]
-          The amounts of each token to be withdrawn from the pool.
-      max_slippage : float
-          The maximum slippage tolerance.
-      """
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        avatar : (Address) The avatar address.
+        amounts_out : (list[int]) The amounts of each token to be withdrawn from the pool.
+        max_slippage : (float) The maximum slippage tolerance.
+        """
 
-      m = ExactTokensQueryExit(w3=w3,
+        m = ExactTokensQueryExit(w3=w3,
                                pool_id=pool_id,
                                amounts_out=amounts_out)
-      bpt_in, amounts_out_sim = m.call(web3=w3)
+        bpt_in, amounts_out_sim = m.call(web3=w3)
 
-      # If the pool is composable stable, remove the amount corresponding to the bpt
-      pool_kind = Pool(w3, pool_id).pool_kind()
-      if pool_kind == PoolKind.ComposableStablePool:
-          bpt_index = Pool(w3, pool_id).bpt_index_from_composable()
-          del amounts_out_sim[bpt_index]
+        # If the pool is composable stable, remove the amount corresponding to the bpt
+        pool_kind = Pool(w3, pool_id).pool_kind()
+        if pool_kind == PoolKind.ComposableStablePool:
+            bpt_index = Pool(w3, pool_id).bpt_index_from_composable()
+            del amounts_out_sim[bpt_index]
 
-      for index in range(len(amounts_out)):
-          if not amounts_out[index] - 1 <= amounts_out_sim[index] <= amounts_out[index] + 1:
-              raise ValueError(
-                  f"The amounts_out = {amounts_out} specified are not the same as the amounts_out = {amounts_out_sim} calculated by the query contract.")
+        for index in range(len(amounts_out)):
+            if not amounts_out[index] - 1 <= amounts_out_sim[index] <= amounts_out[index] + 1:
+                raise ValueError(
+                    f"The amounts_out = {amounts_out} specified are not the same as the amounts_out = {amounts_out_sim} calculated by the query contract.")
 
-      max_bpt_amount_in = int(Decimal(bpt_in) * Decimal(1 + max_slippage))
+        max_bpt_amount_in = int(Decimal(bpt_in) * Decimal(1 + max_slippage))
 
-      super().__init__(w3, pool_id, avatar, amounts_out, max_bpt_amount_in)
+        super().__init__(w3, pool_id, avatar, amounts_out, max_bpt_amount_in)
 
 class ExactSingleTokenProportionalExitSlippage(ExactTokensExit):
-  """
-  A class representing a single token proportional exit with slippage control where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
-  and receives a precise quantity of a specified token proportional to the pool's balances, with a maximum slippage tolerance.
-  This class is a subclass of ExactTokensExit.
+    """
+    A class representing a single token proportional exit with slippage control where the user sends an estimated but unknown (computed at run time) quantity of BPT, 
+    and receives a precise quantity of a specified token proportional to the pool's balances, with a maximum slippage tolerance.
 
-  Attributes
-  ----------
-  w3 : Web3
-      The Web3 instance.
-  pool_id : str
-      The id of the pool.
-  avatar : Address
-      The avatar address.
-  token_out_address : Address
-      The address of the token to be received by the user.
-  amount_out : int
-      The amount of token to be received by the user.
-  max_slippage : float
-      The maximum slippage tolerance.
-  assets : list[Address]
-      A list of addresses of the assets.
+    Attributes:
+    w3 : (Web3) The Web3 instance.
+    pool_id : (str) The id of the pool.
+    avatar : (Address) The avatar address.
+    token_out_address : (Address) The address of the token to be received by the user.
+    amount_out : (int) The amount of token to be received by the user.
+    max_slippage : (float) The maximum slippage tolerance.
+    assets : (list[Address]) A list of addresses of the assets.
+    """
 
-  Methods
-  -------
-  __init__(w3, pool_id, avatar, token_out_address, amount_out, max_slippage, assets=None)
-      The constructor for the ExactSingleTokenProportionalExitSlippage class.
-  """
-
-  def __init__(self,
+    def __init__(self,
                w3: Web3,
                pool_id: str,
                avatar: Address,
@@ -1137,52 +825,44 @@ class ExactSingleTokenProportionalExitSlippage(ExactTokensExit):
                amount_out: int,
                max_slippage: float,
                assets: list[Address] = None):
-      """
-      Constructs all the necessary attributes for the ExactSingleTokenProportionalExitSlippage object.
+        """
+        Constructs all the necessary attributes for the ExactSingleTokenProportionalExitSlippage object.
 
-      Parameters
-      ----------
-      w3 : Web3
-          The Web3 instance.
-      pool_id : str
-          The id of the pool.
-      avatar : Address
-          The avatar address.
-      token_out_address : Address
-          The address of the token to be received by the user.
-      amount_out : int
-          The amount of token to be received by the user.
-      max_slippage : float
-          The maximum slippage tolerance.
-      assets : list[Address], optional
-          A list of addresses of the assets. If not provided, it will be fetched from the pool.
+        Args:
+        w3 : (Web3) The Web3 instance.
+        pool_id : (str) The id of the pool.
+        avatar : (Address) The avatar address.
+        token_out_address : (Address) The address of the token to be received by the user.
+        amount_out : (int) The amount of token to be received by the user.
+        max_slippage : (float) The maximum slippage tolerance.
+        assets : (list[Address]), optional A list of addresses of the assets. If not provided, it will be fetched from the pool.
       """
 
-      if assets is None:
-          assets = Pool(w3, pool_id).assets()
+        if assets is None:
+            assets = Pool(w3, pool_id).assets()
 
-      token_index = assets.index(token_out_address)
-      balances = Pool(w3, pool_id).pool_balances()
+        token_index = assets.index(token_out_address)
+        balances = Pool(w3, pool_id).pool_balances()
 
-      # Get the corresponding proportional amounts out
-      amounts_out = [int(Decimal(balance) * Decimal(amount_out) / Decimal(balances[token_index])) for balance in
+        # Get the corresponding proportional amounts out
+        amounts_out = [int(Decimal(balance) * Decimal(amount_out) / Decimal(balances[token_index])) for balance in
                      balances]
 
-      # If the pool is composable stable, remove the amount corresponding to the bpt
-      pool_kind = Pool(w3, pool_id).pool_kind()
-      if pool_kind == PoolKind.ComposableStablePool:
-          bpt_index = Pool(w3, pool_id).bpt_index_from_composable()
-          del amounts_out[bpt_index]
+        # If the pool is composable stable, remove the amount corresponding to the bpt
+        pool_kind = Pool(w3, pool_id).pool_kind()
+        if pool_kind == PoolKind.ComposableStablePool:
+            bpt_index = Pool(w3, pool_id).bpt_index_from_composable()
+            del amounts_out[bpt_index]
 
-      m = ExactTokensQueryExit(w3=w3,
+        m = ExactTokensQueryExit(w3=w3,
                                pool_id=pool_id,
                                amounts_out=amounts_out)
 
-      bpt_amount_in_sim, amounts_out_sim = m.call(web3=w3)
-      if not amount_out - 1 <= amounts_out_sim[token_index] <= amount_out + 1:
-          raise ValueError(
-              f"The amount_out = {amount_out} specified is not the same as the amount_out = {amounts_out_sim[token_index]} calculated by the query contract.")
+        bpt_amount_in_sim, amounts_out_sim = m.call(web3=w3)
+        if not amount_out - 1 <= amounts_out_sim[token_index] <= amount_out + 1:
+            raise ValueError(
+                f"The amount_out = {amount_out} specified is not the same as the amount_out = {amounts_out_sim[token_index]} calculated by the query contract.")
 
-      max_bpt_amount_in = int(Decimal(bpt_amount_in_sim) * Decimal(1 + max_slippage))
+        max_bpt_amount_in = int(Decimal(bpt_amount_in_sim) * Decimal(1 + max_slippage))
 
-      super().__init__(w3, pool_id, avatar, amounts_out, max_bpt_amount_in, assets=assets)
+        super().__init__(w3, pool_id, avatar, amounts_out, max_bpt_amount_in, assets=assets)
