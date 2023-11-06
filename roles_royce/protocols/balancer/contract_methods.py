@@ -8,8 +8,7 @@ from .types_and_enums import SwapKind
 
 class StakeInGauge(ContractMethod):
  """
- StakeInGauge is a class that inherits from ContractMethod.
- It represents a stake operation in a gauge.
+ StakeInGauge represents the action to stake in a gauge.
 
  Attributes
  ----------
@@ -48,8 +47,7 @@ class StakeInGauge(ContractMethod):
 
 class UnstakeFromGauge(ContractMethod):
  """
- UnstakeFromGauge is a class that inherits from ContractMethod.
- It represents an unstake operation from a gauge.
+ UnstakeFromGauge represents the action to unstake from a gauge.
 
  Attributes
  ----------
@@ -91,8 +89,7 @@ class UnstakeFromGauge(ContractMethod):
 
 class Exit(ContractMethod):
     """
-    Exit is a class that inherits from ContractMethod.
-    It represents an exit operation in a pool.
+    Exit represents the action to exit a pool.
 
     Attributes
     ----------
@@ -188,8 +185,7 @@ class Exit(ContractMethod):
 
 class Join(ContractMethod):
     """
-    Exit is a class that inherits from ContractMethod.
-    It represents an exit operation in a pool.
+    Join represents a join action to a pool.
 
     Attributes
     ----------
@@ -283,8 +279,7 @@ class Join(ContractMethod):
 
 class SingleSwap(ContractMethod):
     """
-    SingleSwap is a class that inherits from ContractMethod.
-    It represents a single swap operation in a pool.
+    SingleSwap represents a single swap operation in a pool.
 
     Attributes
     ----------
