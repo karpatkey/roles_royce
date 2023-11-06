@@ -262,7 +262,7 @@ class ClaimABPTRewards(ClaimAAVERewards):
 class SwapAndRepay(ContractMethod):
     """Repay debt using collateral"""
     name = 'swapAndRepay'
-    in_signature = (
+    in_signature = [
         ("collateral_asset", "address"),
         ("debt_asset", "address"),
         ("collateral_amount", "uint256"),
@@ -280,7 +280,7 @@ class SwapAndRepay(ContractMethod):
             ),
             "tuple"),
         ),
-    )
+    ]
     target_address = AddressesAndAbis[Chain.Ethereum].ParaSwapRepayAdapter.address
     fixed_arguments = {}
 
