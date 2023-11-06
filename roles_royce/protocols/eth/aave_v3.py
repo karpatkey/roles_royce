@@ -30,7 +30,7 @@ class ApproveToken(BaseApproveForToken):
     """approve Token with AaveLendingPoolV3 as spender"""
     fixed_arguments = {"spender": AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address}
 
-class ApproveAEthWETH(BaseApproveForToken):
+class ApproveAEthWETH(BaseApprove):
     """approve aEthWETH with WrappedTokenGatewayV3 as spender"""
     fixed_arguments = {"spender": AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address}
     token = AddressesAndAbis[Chain.Ethereum].aEthWETH.address
@@ -152,7 +152,7 @@ class Repay(ContractMethod):
         self.args.asset = asset
         self.args.amount = amount
         InterestRateMode.check(interest_rate_mode)
-        self.args.rate_mode = interest_rate_mode
+        self.args.interest_rate_mode = interest_rate_mode
 
 class BorrowETH(ContractMethod):
     """Sender receives ETH and debtETH (stable or variable debt) token"""
@@ -262,7 +262,7 @@ class ClaimABPTRewards(ClaimAAVERewards):
 class SwapAndRepay(ContractMethod):
     """Repay debt using collateral"""
     name = 'swapAndRepay'
-    in_signature = [
+    in_signature = (
         ("collateral_asset", "address"),
         ("debt_asset", "address"),
         ("collateral_amount", "uint256"),
@@ -271,22 +271,26 @@ class SwapAndRepay(ContractMethod):
         ("buy_all_balance_offset", "uint256"),
         ("paraswap_data", "bytes"),
         ("permit", (
-            ("amount", "uint256"),
-            ("deadline", "uint256"),
-            ("v", "uint8"),
-            ("r", "bytes32"),
-            ("s", "bytes32"))
-         )
-    ]
+            (
+                ("amount", "uint256"),
+                ("deadline", "uint256"),
+                ("v", "uint8"),
+                ("r", "bytes32"),
+                ("s", "bytes32")
+            ),
+            "tuple"),
+        ),
+    )
     target_address = AddressesAndAbis[Chain.Ethereum].ParaSwapRepayAdapter.address
     fixed_arguments = {}
 
     def __init__(self, collateral_asset: Address, debt_asset: Address, collateral_amount: int,
-                 debt_repay_amount: int, debt_rate_mode: int, buy_all_balance_offset: int,
+                 debt_repay_amount: int, debt_rate_mode: InterestRateMode, buy_all_balance_offset: int,
                  calldata, permit_amount, permit_deadline, permit_v, permit_r, permit_s):
         super().__init__()
         self.args.collateral_asset, self.args.collateral_amount = collateral_asset, collateral_amount
         self.args.debt_asset, self.args.debt_repay_amount = debt_asset, debt_repay_amount
+        InterestRateMode.check(debt_rate_mode)
         self.args.debt_rate_mode = debt_rate_mode
         self.args.buy_all_balance_offset = buy_all_balance_offset
         self.args.paraswap_data = calldata
