@@ -166,8 +166,9 @@ def test_submit_vote():
 
 def test_liquidation_call():
     method = aave_v3.LiquidationCall(collateral_asset=ETHAddr.WETH, debt_asset=ETHAddr.USDC, user=USER, debt_to_cover=123, receive_a_token=False)
-    assert method.data == '0x612c56fa000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000001'
-    assert method.contract_address == AddressesAndAbis[Chain.Ethereum].GovernanceV2.address
+    assert method.data == '0x00a718a9000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000df3a7a27704196af5149cd67d881279e32af2c21000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000000'
+    assert method.contract_address == AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address
+
 
 #-----------------------------------------------------#
 """Integration Tests"""
