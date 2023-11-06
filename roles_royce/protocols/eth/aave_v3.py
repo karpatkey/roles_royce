@@ -294,7 +294,11 @@ class SwapAndRepay(ContractMethod):
         self.args.debt_rate_mode = debt_rate_mode
         self.args.buy_all_balance_offset = buy_all_balance_offset
         self.args.paraswap_data = calldata
-        self.args.permit = [permit_amount, permit_deadline, permit_v, permit_r, permit_s]
+        self.args.amount = permit_amount
+        self.args.deadline = permit_deadline
+        self.args.v = permit_v
+        self.args.r = permit_r
+        self.args.s = permit_s
 
 class SwapAndDeposit(ContractMethod):
     """Swaps an existing amount of a given collateral asset for another one"""
@@ -308,12 +312,15 @@ class SwapAndDeposit(ContractMethod):
         ("swap_calldata", "bytes"),
         ("augustus", "address"),
         ("permit", (
-            ("amount", "uint256"),
-            ("deadline", "uint256"),
-            ("v", "uint8"),
-            ("r", "bytes32"),
-            ("s", "bytes32"))
-         )
+            (
+                ("amount", "uint256"),
+                ("deadline", "uint256"),
+                ("v", "uint8"),
+                ("r", "bytes32"),
+                ("s", "bytes32")
+            ),
+            "tuple"),
+        ),
     ]
     target_address = AddressesAndAbis[Chain.Ethereum].ParaSwapLiquidityAdapter.address
 
@@ -327,7 +334,11 @@ class SwapAndDeposit(ContractMethod):
         self.args.swap_all_balance_offset = swap_all_balance_offset
         self.args.swap_calldata = calldata
         self.args.augustus = augustus
-        self.args.permit = [permit_amount, permit_deadline, permit_v, permit_r, permit_s]
+        self.args.amount = permit_amount
+        self.args.deadline = permit_deadline
+        self.args.v = permit_v
+        self.args.r = permit_r
+        self.args.s = permit_s
 
 class DelegateAAVE(ContractMethod):
     """Delegate the AAVE voting power for all type of actions (Voting and Proposition)"""
