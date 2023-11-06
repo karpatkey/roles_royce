@@ -53,6 +53,8 @@ def set_env(monkeypatch, private_key: str) -> ENV:
     return ENV(dao, blockchain)
 
 
+@pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False),
+                    reason="Long position integration test not running by default.")
 @pytest.mark.skip("This test would take forever to run in the CI")
 @pytest.mark.parametrize("exec_config", exec_configs)
 def test_stresstest(local_node_eth, accounts, monkeypatch, exec_config):
