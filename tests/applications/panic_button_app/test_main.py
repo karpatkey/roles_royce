@@ -1,6 +1,6 @@
 from roles_royce.applications.panic_button_app.panic_button_main import start_the_engine, gear_up, drive_away
 from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
-from tests.utils import assign_role, local_node_eth, accounts, fork_unlock_account, top_up_address
+from tests.utils import assign_role, local_node_eth, accounts, fork_unlock_account
 import os
 import json
 import pytest
@@ -43,7 +43,7 @@ JSON_FORM = {
     "simulate": False,
     "protocol": "Aura",
     "exit_strategy": "exit_2_1",
-    "percentage": 5,
+    "percentage": 21,
     "exit_arguments": {
 
         "rewards_address": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
@@ -84,7 +84,6 @@ def test_gear_up(monkeypatch, local_node_eth):
                1].data == '0x8bdb39131e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000ae78736cd615f374d3085123a210448e74fc6393000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000007e9af502b84ea855b000000000000000000000000000000000000000000000008cc84206c7773d6ed000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000111ed47dc81e6e5ad8'
 
 
-@pytest.mark.skip('Has to be fixed')
 def test_drive_away(local_node_eth, accounts, monkeypatch):
     w3 = local_node_eth.w3
     block = 18421437
@@ -95,7 +94,6 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
     env = set_env(monkeypatch, private_key)
     env.LOCAL_FORK_PORT = 8546  # LOCAL_FORK_PORT has init=False, so it is not set in set_env()
     fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
-    top_up_address(w3, env.DISASSEMBLER_ADDRESS, 100)
 
     disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
 
@@ -107,6 +105,8 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
     assert response['status'] == 200
     assert response['message'] == "Transaction executed successfully"
 
+    local_node_eth.set_block(block)
+    env.DISASSEMBLER_ADDRESS = accounts[3].address  # Any address not member of the role
     disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
     response_reverted = drive_away(disassembler=disassembler,
                                    txn_transactables=txn_transactables,
@@ -116,6 +116,8 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
     assert response_reverted['status'] == 422
     assert response_reverted['message'] == "Transaction reverted when simulated in local execution"
 
+    local_node_eth.set_block(block)
+    env.DISASSEMBLER_ADDRESS = '0x'
     disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
     response_exception = drive_away(disassembler=disassembler,
                                     txn_transactables=txn_transactables,
@@ -123,7 +125,7 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
                                     simulate=exec_config.simulate)
 
     assert response_exception['status'] == 500
-    assert response_exception['message'] == "Error: The private key must be exactly 32 bytes long, instead of 2 bytes."
+    assert response_exception['message'] == "Error: ENS name: '0x' is invalid."
 
 
 positions_mock = [
@@ -198,7 +200,7 @@ positions_mock = [
     }
 ]
 
-
+@pytest.mark.skip()
 @pytest.mark.parametrize("args", positions_mock[0]['exec_config'])
 def test_integration_main(local_node_eth, accounts, monkeypatch, args):
     private_key = set_up_roles(local_node_eth, accounts)

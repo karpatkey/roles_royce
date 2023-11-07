@@ -35,15 +35,13 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
                                                project=env.TENDERLY_PROJECT,
                                                api_token=env.TENDERLY_API_TOKEN)
 
-    disassembler_address = w3.eth.account.from_key(env.PRIVATE_KEY).address
-
     if exec_config.protocol == "Aura":
         disassembler = AuraDisassembler(w3=w3,
                                         avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
                                         roles_mod_address=env.ROLES_MOD_ADDRESS,
                                         role=env.ROLE,
                                         tenderly_credentials=tenderly_credentials,
-                                        signer_address=disassembler_address)
+                                        signer_address=env.DISASSEMBLER_ADDRESS)
 
     elif exec_config.protocol == "Balancer":
         disassembler = BalancerDisassembler(w3=w3,
@@ -51,7 +49,7 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
                                             roles_mod_address=env.ROLES_MOD_ADDRESS,
                                             role=env.ROLE,
                                             tenderly_credentials=tenderly_credentials,
-                                            signer_address=disassembler_address)
+                                            signer_address=env.DISASSEMBLER_ADDRESS)
     else:
         raise Exception("Invalid protocol")
 
@@ -85,7 +83,7 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
                     else:  # If running local fork, send the transaction to the local fork with the unlocked account
                         tx = disassembler.build(txns=txn_transactables, from_address=env.DISASSEMBLER_ADDRESS)
                         tx_hash = disassembler.w3.eth.send_transaction(tx)
-                        tx_receipt = disassembler.w3.eth.get_transaction_receipt(tx_hash)
+                        tx_receipt = disassembler.w3.eth.wait_for_transaction_receipt(tx_hash)
 
                     tx_link = get_tx_link(tx_receipt, disassembler.blockchain)
                     if tx_receipt.status == 0:
