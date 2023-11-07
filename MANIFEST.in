@@ -1,7 +1,6 @@
 # Manifest syntax https://docs.python.org/2/distutils/sourcedist.html
 graft roles_royce
 graft defabipedia
-graft tests
 
 global-exclude __pycache__  *.pyc *.pyo *.orig *,cover
 

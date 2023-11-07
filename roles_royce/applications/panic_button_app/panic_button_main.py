@@ -2,12 +2,11 @@ import argparse
 from web3 import Web3
 from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler
 from roles_royce.utils import TenderlyCredentials
-from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Environment
+from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Environment, fork_unlock_account, top_up_address
 import time
 from roles_royce.generic_method import Transactable
 from roles_royce.toolshed.alerting.utils import get_tx_link
 import json
-from tests.utils import fork_unlock_account, top_up_address
 
 
 def start_the_engine(env: ENV) -> Web3:
