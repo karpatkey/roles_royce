@@ -1,5 +1,5 @@
 from roles_royce.applications.panic_button_app.panic_button_main import start_the_engine, gear_up, drive_away
-from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
+from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Environment
 from tests.utils import assign_role, local_node_eth, accounts, fork_unlock_account
 import os
 import json
@@ -14,16 +14,14 @@ roles_mod_address = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
 role = 4
 
 
-def set_env(monkeypatch, environment: str,  private_key: str) -> ENV:
+def set_env(monkeypatch, private_key: str) -> ENV:
     monkeypatch.setenv('ETHEREUM_RPC_ENDPOINT', 'DummyString')
     monkeypatch.setenv('ETHEREUM_FALLBACK_RPC_ENDPOINT', 'DummyString')
     monkeypatch.setenv('GNOSISDAO_ETHEREUM_AVATAR_SAFE_ADDRESS', avatar_safe_address)
     monkeypatch.setenv('GNOSISDAO_ETHEREUM_ROLES_MOD_ADDRESS', roles_mod_address)
     monkeypatch.setenv('GNOSISDAO_ETHEREUM_ROLE', role)
     monkeypatch.setenv('GNOSISDAO_ETHEREUM_PRIVATE_KEY', private_key)
-    monkeypatch.setenv('ENVIRONMENT', environment)
-    monkeypatch.setenv('LOCAL_FORK_PORT_ETHEREUM', '')
-    monkeypatch.setenv('LOCAL_FORK_PORT_GNOSIS', '')
+    # Without setting the ENVIRONMENT env it will default to DEVELOPMENT and use the local fork
     return ENV(dao, blockchain)
 
 
@@ -64,14 +62,19 @@ exec_config = ExecConfig(percentage=JSON_FORM["percentage"],
 
 
 def test_start_the_engine(monkeypatch):
-    env = set_env(monkeypatch, 'production', "0x0000000000000000000000000000000000000000000000000000000000000000")
+    env = set_env(monkeypatch, "0x0000000000000000000000000000000000000000000000000000000000000000")
+
     w3 = start_the_engine(env)
     assert w3.is_connected()
+
+    env.ENVIRONMENT = Environment.PRODUCTION
+    with pytest.raises(Exception):
+        start_the_engine(env)  # RPC endpoints are 'DummyString'
 
 
 def test_gear_up(monkeypatch, local_node_eth):
     private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-    env = set_env(monkeypatch, 'production', private_key)
+    env = set_env(monkeypatch, private_key)
 
     w3 = local_node_eth.w3
     local_node_eth.set_block(18437790)
@@ -91,8 +94,7 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
 
     private_key = set_up_roles(local_node_eth, accounts)
 
-    env = set_env(monkeypatch,'production', private_key)
-    env.LOCAL_FORK_PORT = 8546  # LOCAL_FORK_PORT has init=False, so it is not set in set_env()
+    env = set_env(monkeypatch, private_key)
     fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
 
     disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
@@ -114,7 +116,7 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
                                    simulate=exec_config.simulate)
 
     assert response_reverted['status'] == 422
-    assert response_reverted['message'] == "Transaction reverted when simulated in local execution"
+    assert response_reverted['message'] == "Transaction reverted when simulated with local eth_call"
 
     local_node_eth.set_block(block)
     env.DISASSEMBLER_ADDRESS = '0x'
@@ -199,11 +201,11 @@ positions_mock = [
         ]
     }
 ]
-@pytest.mark.skip('Needs fixing...')
+
 @pytest.mark.parametrize("args", positions_mock[0]['exec_config'])
 def test_integration_main(local_node_eth, accounts, monkeypatch, args):
     private_key = set_up_roles(local_node_eth, accounts)
-    set_env(monkeypatch, 'production', private_key)
+    set_env(monkeypatch, private_key)
 
     file_path_main = os.path.join(Path(os.path.dirname(__file__)).resolve().parent.parent.parent, 'roles_royce',
                                   'applications', 'panic_button_app',
@@ -230,7 +232,6 @@ def test_integration_main(local_node_eth, accounts, monkeypatch, args):
     # Convert the parameters to a JSON string
     parameters_json = json.dumps(exit_arguments)
     arguments.extend(['-a', parameters_json])
-    arguments.extend(['-t', '8546'])
     main = subprocess.run(arguments, capture_output=True, text=True)
 
     assert main.returncode == 0

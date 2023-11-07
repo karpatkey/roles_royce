@@ -53,9 +53,7 @@ def set_env(monkeypatch, private_key: str) -> ENV:
     return ENV(dao, blockchain)
 
 
-@pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False),
-                    reason="Long position integration test not running by default.")
-@pytest.mark.skip("This test would take forever to run in the CI")
+@pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False), reason="Long position integration test not running by default.")
 @pytest.mark.parametrize("exec_config", exec_configs)
 def test_stresstest(local_node_eth, accounts, monkeypatch, exec_config):
     private_key = set_up_roles(local_node_eth, accounts)
@@ -82,7 +80,6 @@ def test_stresstest(local_node_eth, accounts, monkeypatch, exec_config):
     # Convert the parameters to a JSON string
     parameters_json = json.dumps(exit_arguments)
     arguments.extend(['-a', parameters_json])
-    arguments.extend(['-t', '8546'])
     main = subprocess.run(arguments, capture_output=True, text=True)
 
     assert main.returncode == 0

@@ -5,11 +5,20 @@ from web3 import Web3
 from roles_royce.protocols.base import Address
 from defabipedia.types import Blockchain
 from eth_account import Account
+from roles_royce.constants import StrEnum
+import os
 
 
-# The next helper function allows to leave variables unfilled in the .env file
+class Environment(StrEnum):
+    DEVELOPMENT = 'development'
+    PRODUCTION = 'production'
+
+
+# The next helper function allows to leave env variables unfilled in the .env file
 def custom_config(variable, default, cast):
+    """Attempts to read variable from .env file, if not found or empty it returns 'default' cast as type 'cast'"""
     value = config(variable, default=default)
+
     return default if value == '' else config(variable, default=default, cast=cast)
 
 
@@ -18,9 +27,9 @@ class ENV:
     DAO: str
     BLOCKCHAIN: str
 
-    TENDERLY_ACCOUNT_ID: str = config('TENDERLY_ACCOUNT_ID', default='')
-    TENDERLY_PROJECT: str = config('TENDERLY_PROJECT', default='')
-    TENDERLY_API_TOKEN: str = config('TENDERLY_API_TOKEN', default='')
+    TENDERLY_ACCOUNT_ID: str = field(init=False)
+    TENDERLY_PROJECT: str = field(init=False)
+    TENDERLY_API_TOKEN: str = field(init=False)
 
     RPC_ENDPOINT: str = field(init=False)
     FALLBACK_RPC_ENDPOINT: str = field(init=False)
@@ -28,12 +37,15 @@ class ENV:
     ROLES_MOD_ADDRESS: Address = field(init=False)
     ROLE: int = field(init=False)
     PRIVATE_KEY: str = field(init=False)
-    SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
+    SLACK_WEBHOOK_URL: str = field(init=False)
     DISASSEMBLER_ADDRESS: Address = field(init=False)
-    ENVIRONMENT: str = custom_config('ENVIRONMENT', cast=str, default='development')
+    ENVIRONMENT: Environment = field(init=False)
     LOCAL_FORK_PORT: int | None = field(init=False)
 
     def __post_init__(self):
+        self.TENDERLY_ACCOUNT_ID: str = config('TENDERLY_ACCOUNT_ID', default='')
+        self.TENDERLY_PROJECT: str = config('TENDERLY_PROJECT', default='')
+        self.TENDERLY_API_TOKEN: str = config('TENDERLY_API_TOKEN', default='')
         if self.DAO not in ['GnosisDAO', 'GnosisLTD']:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
         if self.BLOCKCHAIN.lower() not in ['mainnet', 'ethereum', 'gnosis']:
@@ -43,8 +55,10 @@ class ENV:
         self.BLOCKCHAIN = self.BLOCKCHAIN.lower()
         self.RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT', default='')
         self.FALLBACK_RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_FALLBACK_RPC_ENDPOINT', default='')
-        self.AVATAR_SAFE_ADDRESS: Address = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_AVATAR_SAFE_ADDRESS', default='')
-        self.ROLES_MOD_ADDRESS: Address = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_ROLES_MOD_ADDRESS', default='')
+        self.AVATAR_SAFE_ADDRESS: Address = config(
+            self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_AVATAR_SAFE_ADDRESS', default='')
+        self.ROLES_MOD_ADDRESS: Address = config(
+            self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_ROLES_MOD_ADDRESS', default='')
         self.ROLE: int = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_ROLE', cast=int, default=0)
         self.PRIVATE_KEY: str = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_PRIVATE_KEY', default='')
         self.SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
@@ -53,18 +67,22 @@ class ENV:
         if self.PRIVATE_KEY != '':
             self.DISASSEMBLER_ADDRESS = Account.from_key(self.PRIVATE_KEY).address
         else:
-            self.DISASSEMBLER_ADDRESS = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_DISASSEMBLER_ADDRESS', default='')
+            self.DISASSEMBLER_ADDRESS = config(
+                self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_DISASSEMBLER_ADDRESS', default='')
+        self.ENVIRONMENT: Environment = custom_config('ENVIRONMENT', cast=Environment, default=Environment.DEVELOPMENT)
         if self.ENVIRONMENT.lower() not in ['development', 'production']:
-            raise ValueError(f"ENVIRONMENT is not valid: {self.ENVIRONMENT}. Options are either 'development' or 'production'.")
+            raise ValueError(
+                f"ENVIRONMENT is not valid: {self.ENVIRONMENT}. Options are either 'development' or 'production'.")
         else:
             self.ENVIRONMENT = self.ENVIRONMENT.lower()
-        if self.ENVIRONMENT == 'development':
+        if self.ENVIRONMENT == Environment.DEVELOPMENT:
             if self.BLOCKCHAIN == 'ethereum':
                 self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_ETHEREUM', cast=int, default=8546)
             else:
                 self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_GNOSIS', cast=int, default=8547)
         else:
             self.LOCAL_FORK_PORT = None
+        self.SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
 
     def __repr__(self):
         return 'Environment variables'

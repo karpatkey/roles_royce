@@ -2,7 +2,7 @@ import argparse
 from web3 import Web3
 from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler
 from roles_royce.utils import TenderlyCredentials
-from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
+from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Environment
 import time
 from roles_royce.generic_method import Transactable
 from roles_royce.toolshed.alerting.utils import get_tx_link
@@ -11,7 +11,7 @@ from tests.utils import fork_unlock_account, top_up_address
 
 
 def start_the_engine(env: ENV) -> Web3:
-    if env.ENVIRONMENT == 'development':
+    if env.ENVIRONMENT == Environment.DEVELOPMENT:
         w3 = Web3(Web3.HTTPProvider(f'http://localhost:{env.LOCAL_FORK_PORT}'))
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
         top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)
@@ -93,7 +93,7 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
                                             "message": "Transaction executed successfully"}
                 else:
                     response_message = {"status": 422, "link": "No link",
-                                        "message": "Transaction reverted when simulated in local execution"}
+                                        "message": "Transaction reverted when simulated with local eth_call"}
             return response_message
         except Exception as e:
             response_message = {"status": 500, "link": "", "message": f"Error: {e}"}
