@@ -31,7 +31,7 @@ class ENV:
     SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
     DISASSEMBLER_ADDRESS: Address = field(init=False)
     ENVIRONMENT: str = custom_config('ENVIRONMENT', cast=str, default='development')
-    LOCAL_FORK_PORT: int | None = custom_config('LOCAL_FORK_PORT', cast=int, default=None)
+    LOCAL_FORK_PORT: int | None = field(init=False)
 
     def __post_init__(self):
         if self.DAO not in ['GnosisDAO', 'GnosisLTD']:
@@ -58,10 +58,13 @@ class ENV:
             raise ValueError(f"ENVIRONMENT is not valid: {self.ENVIRONMENT}. Options are either 'development' or 'production'.")
         else:
             self.ENVIRONMENT = self.ENVIRONMENT.lower()
-        if self.BLOCKCHAIN == 'ethereum':
-            self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_ETHEREUM', cast=int, default=8546)
+        if self.ENVIRONMENT == 'development':
+            if self.BLOCKCHAIN == 'ethereum':
+                self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_ETHEREUM', cast=int, default=8546)
+            else:
+                self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_GNOSIS', cast=int, default=8547)
         else:
-            self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_GNOSIS', cast=int, default=8547)
+            self.LOCAL_FORK_PORT = None
 
     def __repr__(self):
         return 'Environment variables'
