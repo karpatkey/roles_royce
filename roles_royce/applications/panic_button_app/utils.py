@@ -4,6 +4,7 @@ from web3.types import Address
 from web3 import Web3
 from roles_royce.protocols.base import Address
 from defabipedia.types import Blockchain
+from eth_account import Account
 
 
 # The next helper function allows to leave variables unfilled in the .env file
@@ -28,7 +29,8 @@ class ENV:
     ROLE: int = field(init=False)
     PRIVATE_KEY: str = field(init=False)
     SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
-    BOT_ADDRESS: Address = field(init=False)
+    DISASSEMBLER_ADDRESS: Address = field(init=False)
+    LOCAL_FORK_PORT: int = field(init=False, default=None)
 
     def __post_init__(self):
         if self.DAO not in ['GnosisDAO', 'GnosisLTD']:
@@ -46,6 +48,10 @@ class ENV:
         self.SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
         self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
         self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
+        if self.PRIVATE_KEY != '':
+            self.DISASSEMBLER_ADDRESS = Account.from_key(self.PRIVATE_KEY).address
+        else:
+            self.DISASSEMBLER_ADDRESS = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_DISASSEMBLER_ADDRESS', default='')
 
     def __repr__(self):
         return 'Environment variables'

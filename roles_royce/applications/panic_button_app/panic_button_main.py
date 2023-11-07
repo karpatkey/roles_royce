@@ -7,11 +7,15 @@ import time
 from roles_royce.generic_method import Transactable
 from roles_royce.toolshed.alerting.utils import get_tx_link
 import json
+from tests.utils import fork_unlock_account, top_up_address
 
 
 def start_the_engine(env: ENV, local_fork_port: int = None) -> Web3:
     if local_fork_port is not None:
         w3 = Web3(Web3.HTTPProvider(f'http://localhost:{local_fork_port}'))
+        fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
+        top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)
+        env.LOCAL_FORK_PORT = local_fork_port
     else:
         w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
         if not w3.is_connected():
@@ -58,26 +62,31 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
     return disassembler, txn_transactables
 
 
-def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable], private_key: str, simulate: bool) -> dict:
-
+def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable], env: ENV, simulate: bool) -> dict:
     if txn_transactables:
         try:
-            disassembler_address = disassembler.w3.eth.account.from_key(private_key).address
-            if simulate:
+            if simulate:  # Simulate in Tenderly
                 tx_data, sim_link = disassembler.simulate(txns=txn_transactables,
-                                                          from_address=disassembler_address)
+                                                          from_address=env.DISASSEMBLER_ADDRESS)
                 if tx_data['transaction']['status']:
                     response_message = {"status": 200, "link": sim_link,
                                         "message": "Transaction executed successfully in Tenderly"}
                 else:
                     response_message = {"status": 422, "link": sim_link,
                                         "message": "Transaction reverted in Tenderly simulation"}
-            else:
+            else:  # Simulate in local execution with eth_call
                 check_exit_tx = disassembler.check(txns=txn_transactables,
-                                                   from_address=disassembler_address)
+                                                   from_address=env.DISASSEMBLER_ADDRESS)
 
                 if check_exit_tx:
-                    tx_receipt = disassembler.send(txns=txn_transactables, private_key=private_key)
+                    if env.LOCAL_FORK_PORT is None:  # If not running local fork, send the transaction to the real blockchain
+                        tx_receipt = disassembler.send(txns=txn_transactables, private_key=env.PRIVATE_KEY)
+
+                    else:  # If running local fork, send the transaction to the local fork with the unlocked account
+                        tx = disassembler.build(txns=txn_transactables, from_address=env.DISASSEMBLER_ADDRESS)
+                        tx_hash = disassembler.w3.eth.send_transaction(tx)
+                        tx_receipt = disassembler.w3.eth.get_transaction_receipt(tx_hash)
+
                     tx_link = get_tx_link(tx_receipt, disassembler.blockchain)
                     if tx_receipt.status == 0:
                         response_message = {"status": 422, "link": tx_link,
@@ -100,7 +109,7 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
 
 def main():
     parser = argparse.ArgumentParser(description="This is the real Gnosis DAO disassembling script",
-                                     epilog='Build by karpatkey',
+                                     epilog='Built by karpatkey',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument("-sim", "--simulate", default=False, action='store_true',
@@ -117,11 +126,11 @@ def main():
                         help="List of dictionaries (cast as a string) with the custom exit arguments for each "
                              "position and exit strategy, e.g. [{ 'bpt_address': '0xsOmEAddResS', 'max_slippage': 0.01}]")
 
-    parser.add_argument("-t", "--test", type=int, help="Local fork port to test the script.")
+    parser.add_argument("-t", "--test", type=int, help="Port running local fork to test the script.")
     args = parser.parse_args()
 
     simulate = args.simulate
-    
+
     exec_config = ExecConfig(percentage=args.percentage,
                              simulate=args.simulate,
                              dao=args.dao,
@@ -133,7 +142,7 @@ def main():
     env = ENV(DAO=exec_config.dao, BLOCKCHAIN=exec_config.blockchain)
     w3 = start_the_engine(env, local_fork_port=args.test)
     disassembler, txn_transactables = gear_up(w3, env, exec_config)
-    tx_message = drive_away(disassembler, txn_transactables, env.PRIVATE_KEY, simulate)
+    tx_message = drive_away(disassembler, txn_transactables, env, simulate)
     print(tx_message)
 
 
