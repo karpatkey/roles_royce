@@ -10,12 +10,11 @@ import json
 from tests.utils import fork_unlock_account, top_up_address
 
 
-def start_the_engine(env: ENV, local_fork_port: int = None) -> Web3:
-    if local_fork_port is not None:
-        w3 = Web3(Web3.HTTPProvider(f'http://localhost:{local_fork_port}'))
+def start_the_engine(env: ENV) -> Web3:
+    if env.ENVIRONMENT == 'development':
+        w3 = Web3(Web3.HTTPProvider(f'http://localhost:{env.LOCAL_FORK_PORT}'))
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
         top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)
-        env.LOCAL_FORK_PORT = local_fork_port
     else:
         w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
         if not w3.is_connected():
@@ -77,7 +76,7 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
                                                    from_address=env.DISASSEMBLER_ADDRESS)
 
                 if check_exit_tx:
-                    if env.LOCAL_FORK_PORT is None:  # If not running local fork, send the transaction to the real blockchain
+                    if env.ENVIRONMENT == 'development':  # If not running local fork, send the transaction to the real blockchain
                         tx_receipt = disassembler.send(txns=txn_transactables, private_key=env.PRIVATE_KEY)
 
                     else:  # If running local fork, send the transaction to the local fork with the unlocked account
@@ -124,7 +123,6 @@ def main():
                         help="List of dictionaries (cast as a string) with the custom exit arguments for each "
                              "position and exit strategy, e.g. [{ 'bpt_address': '0xsOmEAddResS', 'max_slippage': 0.01}]")
 
-    parser.add_argument("-t", "--test", type=int, help="Port running local fork to test the script.")
     args = parser.parse_args()
 
     simulate = args.simulate
@@ -138,7 +136,7 @@ def main():
                              exit_arguments=json.loads(args.exitArguments))
 
     env = ENV(DAO=exec_config.dao, BLOCKCHAIN=exec_config.blockchain)
-    w3 = start_the_engine(env, local_fork_port=args.test)
+    w3 = start_the_engine(env)
     disassembler, txn_transactables = gear_up(w3, env, exec_config)
     tx_message = drive_away(disassembler, txn_transactables, env, simulate)
     print(tx_message)

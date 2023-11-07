@@ -30,15 +30,17 @@ class ENV:
     PRIVATE_KEY: str = field(init=False)
     SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
     DISASSEMBLER_ADDRESS: Address = field(init=False)
-    LOCAL_FORK_PORT: int = field(init=False, default=None)
+    ENVIRONMENT: str = custom_config('ENVIRONMENT', cast=str, default='development')
+    LOCAL_FORK_PORT: int | None = custom_config('LOCAL_FORK_PORT', cast=int, default=None)
 
     def __post_init__(self):
         if self.DAO not in ['GnosisDAO', 'GnosisLTD']:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
         if self.BLOCKCHAIN.lower() not in ['mainnet', 'ethereum', 'gnosis']:
-            raise ValueError(f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}.")
+            raise ValueError(f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}. Options are either 'ethereum' or 'gnosis'.")
         elif self.BLOCKCHAIN.lower() == 'mainnet':
             self.BLOCKCHAIN = 'ethereum'
+        self.BLOCKCHAIN = self.BLOCKCHAIN.lower()
         self.RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT', default='')
         self.FALLBACK_RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_FALLBACK_RPC_ENDPOINT', default='')
         self.AVATAR_SAFE_ADDRESS: Address = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_AVATAR_SAFE_ADDRESS', default='')
@@ -52,6 +54,14 @@ class ENV:
             self.DISASSEMBLER_ADDRESS = Account.from_key(self.PRIVATE_KEY).address
         else:
             self.DISASSEMBLER_ADDRESS = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_DISASSEMBLER_ADDRESS', default='')
+        if self.ENVIRONMENT.lower() not in ['development', 'production']:
+            raise ValueError(f"ENVIRONMENT is not valid: {self.ENVIRONMENT}. Options are either 'development' or 'production'.")
+        else:
+            self.ENVIRONMENT = self.ENVIRONMENT.lower()
+        if self.BLOCKCHAIN == 'ethereum':
+            self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_ETHEREUM', cast=int, default=8546)
+        else:
+            self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_GNOSIS', cast=int, default=8547)
 
     def __repr__(self):
         return 'Environment variables'
