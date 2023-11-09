@@ -2,30 +2,40 @@ import argparse
 from web3 import Web3
 from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler
 from roles_royce.utils import TenderlyCredentials
-from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Environment, fork_unlock_account, top_up_address
+from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Environment, fork_unlock_account, \
+    top_up_address
 import time
 from roles_royce.generic_method import Transactable
 from roles_royce.toolshed.alerting.utils import get_tx_link
 import json
 
 
-def start_the_engine(env: ENV) -> Web3:
+def start_the_engine(env: ENV) -> (Web3, Web3):
     if env.ENVIRONMENT == Environment.DEVELOPMENT:
-        w3 = Web3(Web3.HTTPProvider(f'http://localhost:{env.LOCAL_FORK_PORT}'))
+        w3 = Web3(Web3.HTTPProvider(f'http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}'))
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
-        top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)
+        top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)  # Topping up disassembler address for testing
+        w3_MEV = w3
     else:
         w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
         if not w3.is_connected():
-            w3 = Web3(Web3.HTTPProvider(env.FALLBACK_RPC_ENDPOINT))
+            w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
             if not w3.is_connected():
                 time.sleep(2)
                 w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
                 if not w3.is_connected():
-                    w3 = Web3(Web3.HTTPProvider(env.FALLBACK_RPC_ENDPOINT))
+                    w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
                     if not w3.is_connected():
                         raise Exception("No connection to RPC endpoint")
-    return w3
+                    w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_MEV))
+                    if not w3_MEV.is_connected():
+                        w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+                        if not w3_MEV.is_connected():
+                            w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
+                            if not w3_MEV.is_connected():
+                                raise Exception("No connection to RPC endpoint")
+
+    return w3, w3_MEV
 
 
 def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[Transactable]):
@@ -58,7 +68,8 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
     return disassembler, txn_transactables
 
 
-def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable], env: ENV, simulate: bool) -> dict:
+def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable], env: ENV, simulate: bool,
+               w3: Web3 = None) -> dict:
     if txn_transactables:
         try:
             if simulate:  # Simulate in Tenderly
@@ -66,7 +77,7 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
                                                           from_address=env.DISASSEMBLER_ADDRESS)
                 if tx_data['transaction']['status']:
                     response_message = {"status": 200, "link": sim_link,
-                                        "message": "Transaction executed successfully in Tenderly"}
+                                        "message": "Transaction simulated successfully in Tenderly"}
                 else:
                     response_message = {"status": 422, "link": sim_link,
                                         "message": "Transaction reverted in Tenderly simulation"}
@@ -75,10 +86,12 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
                                                    from_address=env.DISASSEMBLER_ADDRESS)
 
                 if check_exit_tx:
-                    if env.ENVIRONMENT == 'development':  # If not running local fork, send the transaction to the real blockchain
-                        tx_receipt = disassembler.send(txns=txn_transactables, private_key=env.PRIVATE_KEY)
+                    if env.ENVIRONMENT == 'production':  # In production environment, send the transaction to the real blockchain
+                        if w3 is None:
+                            w3 = disassembler.w3  # Overriding of the w3 instance for MEV protection
+                        tx_receipt = disassembler.send(txns=txn_transactables, private_key=env.PRIVATE_KEY, w3=w3)
 
-                    else:  # If running local fork, send the transaction to the local fork with the unlocked account
+                    else:  # In development environment, send the transaction to the local fork with the unlocked account
                         tx = disassembler.build(txns=txn_transactables, from_address=env.DISASSEMBLER_ADDRESS)
                         tx_hash = disassembler.w3.eth.send_transaction(tx)
                         tx_receipt = disassembler.w3.eth.wait_for_transaction_receipt(tx_hash)
@@ -135,9 +148,10 @@ def main():
                              exit_arguments=json.loads(args.exitArguments))
 
     env = ENV(DAO=exec_config.dao, BLOCKCHAIN=exec_config.blockchain)
-    w3 = start_the_engine(env)
-    disassembler, txn_transactables = gear_up(w3, env, exec_config)
-    tx_message = drive_away(disassembler, txn_transactables, env, simulate)
+    w3, w3_MEV = start_the_engine(env)
+    disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
+    tx_message = drive_away(disassembler=disassembler, txn_transactables=txn_transactables, env=env, simulate=simulate,
+                            w3=w3_MEV)
     print(tx_message)
 
 

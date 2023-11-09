@@ -32,20 +32,29 @@ class ENV:
     TENDERLY_API_TOKEN: str = field(init=False)
 
     RPC_ENDPOINT: str = field(init=False)
-    FALLBACK_RPC_ENDPOINT: str = field(init=False)
+    RPC_ENDPOINT_FALLBACK: str = field(init=False)
+    RPC_ENDPOINT_MEV: str = field(init=False)
+
     AVATAR_SAFE_ADDRESS: Address = field(init=False)
     ROLES_MOD_ADDRESS: Address = field(init=False)
     ROLE: int = field(init=False)
     PRIVATE_KEY: str = field(init=False)
-    SLACK_WEBHOOK_URL: str = field(init=False)
     DISASSEMBLER_ADDRESS: Address = field(init=False)
+
     ENVIRONMENT: Environment = field(init=False)
     LOCAL_FORK_PORT: int | None = field(init=False)
+    LOCAL_FORK_HOST: str = field(init=False)
+
+    SLACK_WEBHOOK_URL: str = field(init=False)
+
 
     def __post_init__(self):
+        # Tenderly credentials
         self.TENDERLY_ACCOUNT_ID: str = config('TENDERLY_ACCOUNT_ID', default='')
         self.TENDERLY_PROJECT: str = config('TENDERLY_PROJECT', default='')
         self.TENDERLY_API_TOKEN: str = config('TENDERLY_API_TOKEN', default='')
+
+        # DAO and blockchain
         if self.DAO not in ['GnosisDAO', 'GnosisLTD']:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
         if self.BLOCKCHAIN.lower() not in ['mainnet', 'ethereum', 'gnosis']:
@@ -53,15 +62,20 @@ class ENV:
         elif self.BLOCKCHAIN.lower() == 'mainnet':
             self.BLOCKCHAIN = 'ethereum'
         self.BLOCKCHAIN = self.BLOCKCHAIN.lower()
+
+        # RPC endpoints
         self.RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT', default='')
-        self.FALLBACK_RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_FALLBACK_RPC_ENDPOINT', default='')
+        self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_FALLBACK', default='')
+        self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_MEV', default='')
+
+
+        # Configuration addresses and key
         self.AVATAR_SAFE_ADDRESS: Address = config(
             self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_AVATAR_SAFE_ADDRESS', default='')
         self.ROLES_MOD_ADDRESS: Address = config(
             self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_ROLES_MOD_ADDRESS', default='')
         self.ROLE: int = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_ROLE', cast=int, default=0)
         self.PRIVATE_KEY: str = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_PRIVATE_KEY', default='')
-        self.SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
         self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
         self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
         if self.PRIVATE_KEY != '':
@@ -69,6 +83,8 @@ class ENV:
         else:
             self.DISASSEMBLER_ADDRESS = config(
                 self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_DISASSEMBLER_ADDRESS', default='')
+
+        # Environment: development or production
         self.ENVIRONMENT: Environment = custom_config('ENVIRONMENT', cast=Environment, default=Environment.DEVELOPMENT)
         if self.ENVIRONMENT.lower() not in ['development', 'production']:
             raise ValueError(
@@ -82,6 +98,8 @@ class ENV:
                 self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_GNOSIS', cast=int, default=8547)
         else:
             self.LOCAL_FORK_PORT = None
+        self.LOCAL_FORK_HOST: str = custom_config('LOCAL_FORK_HOST', default='localhost', cast=str)
+
         self.SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
 
     def __repr__(self):

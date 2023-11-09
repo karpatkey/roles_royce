@@ -64,7 +64,7 @@ exec_config = ExecConfig(percentage=JSON_FORM["percentage"],
 def test_start_the_engine(monkeypatch):
     env = set_env(monkeypatch, "0x0000000000000000000000000000000000000000000000000000000000000000")
 
-    w3 = start_the_engine(env)
+    w3,w3_MEV = start_the_engine(env)
     assert w3.is_connected()
 
     env.ENVIRONMENT = Environment.PRODUCTION
