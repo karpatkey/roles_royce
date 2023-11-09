@@ -59,21 +59,25 @@ class Disassembler:
                                                   simulation_id=sim_data['simulation']['id'])
         return sim_data, simulate_link
 
-    def send(self, txns: list[Transactable], private_key: str) -> TxReceipt:
+    def send(self, txns: list[Transactable], private_key: str, w3: Web3 = None) -> TxReceipt:
         """Execute the multisend batched transactions.
 
         Args:
             txns (list[Transactable]): List of transactions to execute
             private_key (str): Private key of the account to execute the transactions from
+            w3 (Web3): Web3 instance to execute the transactions from that would override the self.w3 instance if w3 is
+                not None. Useful for nodes with MEV protection to be used only for eth_sendTransaction. Defaults to None
 
         Returns:
             TxReceipt: Transaction receipt
         """
+        if w3 is None:
+            w3 = self.w3
         return roles.send(txns,
                           role=self.role,
                           private_key=private_key,
                           roles_mod_address=self.roles_mod_address,
-                          web3=self.w3)
+                          web3=w3)
 
     def check(self, txns: list[Transactable], block: int | str = 'latest', from_address: Address | ChecksumAddress | str | None = None) -> TxParams:
         """Checks the multisend batched transactions with static call.
