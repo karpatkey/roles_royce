@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 
 from decouple import config
+from prometheus_client import Gauge
 from web3 import Web3
 from web3.types import Address, ChecksumAddress
 
@@ -53,3 +54,17 @@ class ENV:
         return 'Environment variables'
     
 
+@dataclass
+class Gauges:
+    health_factor = Gauge('health_factor', """numeric representation of the safety 
+        of your deposited assets against the borrowed assets and its underlying value.
+        The higher the value is, the safer the state of your funds are against a liquidation scenario.
+        If the health factor reaches 1, the liquidation of your deposits will be triggered.""")
+    address = Gauge('address', 'Address of the user.')
+    underlying_address = Gauge('underlying_address', 'description')
+    interest_bearing_balance = Gauge('interest_bearing_balance', 'description')
+    stable_debt_balance = Gauge('stable_debt_balance', 'description')
+    variable_debt_balance = Gauge('variable_debt_balance', 'description')
+    underlying_price_usd= Gauge('underlying_price_usd', 'description')
+    collateral_enabled = Gauge('collateral_enabled', 'description')
+    liquidation_threshold = Gauge('liquidation_threshold', 'description')
