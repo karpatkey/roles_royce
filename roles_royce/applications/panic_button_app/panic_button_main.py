@@ -69,7 +69,7 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
 
 
 def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable], env: ENV, simulate: bool,
-               w3: Web3 = None) -> dict:
+               w3: Web3 = None) -> str:
     if txn_transactables:
         try:
             if simulate:  # Simulate in Tenderly
@@ -106,13 +106,13 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
                 else:
                     response_message = {"status": 422, "link": "No link",
                                         "message": "Transaction reverted when simulated with local eth_call"}
-            return response_message
         except Exception as e:
             response_message = {"status": 500, "link": "", "message": f"Error: {e}"}
-            return response_message
+            return json.dumps(response_message)
 
     else:
-        return {"status": 200, "link": "No link", "message": "There are no funds in the position, no transaction needs to be executed"}
+        response_message = {"status": 200, "link": "No link", "message": "There are no funds in the position, no transaction needs to be executed"}
+    return json.dumps(response_message)
 
 
 def main():
