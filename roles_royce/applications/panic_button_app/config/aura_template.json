@@ -1,0 +1,105 @@
+{
+  "position_id": "FillMeWIthPositionId",
+  "protocol": "Aura",
+  "position_exec_config": [
+    {
+      "function_name": "exit_1",
+      "label": "Exit_1",
+      "test": true,
+      "description": "Withdraw from Aura",
+      "parameters": [
+        {
+          "name": "rewards_address",
+          "type": "constant",
+          "value": "FillMeWithRewardsAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max Slippage",
+          "type": "input",
+          "rules": {
+            "min": 0,
+            "max": 100
+          }
+        }
+      ]
+    },
+    {
+      "function_name": "exit_2_1",
+      "label": "Exit_2_1",
+      "test": true,
+      "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way (not used for pools in recovery mode!)",
+      "parameters": [
+        {
+          "name": "rewards_address",
+          "type": "constant",
+          "value": "FillMeWithRewardsAddress"
+        },
+        {
+          "name": "max_slippage",
+          "type": "input",
+          "label": "Max Slippage",
+          "rules": {
+            "min": 0,
+            "max": 100
+          }
+        }
+      ]
+    },
+    {
+      "function_name": "exit_2_2",
+      "label": "Exit_2_2",
+      "test": true,
+      "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
+      "parameters": [
+        {
+          "name": "rewards_address",
+          "type": "constant",
+          "value": "FillMeWithRewardsAddress"
+        },
+        {
+          "name": "max_slippage",
+          "type": "input",
+          "scale": {
+            "min": 0,
+            "max": 100,
+            "step": 0.5
+          }
+        },
+        {
+          "name": "token_out_address",
+          "label": "Token Out Address",
+          "type": "input",
+          "options": [
+            {
+              "value": "FillMewithTokenAddress",
+              "label": "FillMeWithTokenSymbol"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "function_name": "exit_2_3",
+      "label": "Exit_2_3",
+      "test": false,
+      "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way when pool is in recovery mode",
+      "parameters": [
+        {
+          "name": "rewards_address",
+          "type": "constant",
+          "value": "FillMeWithRewardsAddress"
+        },
+        {
+          "name": "max_slippage",
+          "type": "input",
+          "scale": {
+            "min": 0,
+            "max": 100,
+            "step": 0.5
+          }
+        }
+      ]
+    }
+  ]
+}

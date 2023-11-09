@@ -15,6 +15,7 @@ from eth_account import Account
 from eth_account.signers.local import LocalAccount
 
 from web3 import Web3, HTTPProvider
+from web3.exceptions import ContractLogicError
 from web3.types import TxReceipt
 from roles_royce.evm_utils import erc20_abi
 from roles_royce.constants import ETHAddr
@@ -241,8 +242,9 @@ def accounts() -> list[LocalAccount]:
 
 
 def steal_token(w3, token, holder, to, amount):
-    """Steal tokens from a holder to another address"""
+    """Steal tokens from a holder sending them to another address (sends 1 ETH to the holder first)"""
     fork_unlock_account(w3, holder)
+    top_up_address(w3=w3, address=holder, amount=1)
     ctract = w3.eth.contract(address=token, abi=erc20_abi)
     tx = ctract.functions.transfer(to, amount).transact({"from": holder})
     return tx
@@ -264,17 +266,22 @@ def get_allowance(w3, token, owner_address, spender_address):
 
 
 def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
-    """Create a Safe with one owner and 100 ETH in balance"""
+    """Create a Safe with one owner and 1 ETH in balance"""
 
     safe = SimpleSafe.build(owner, ETH_LOCAL_NODE_URL)
-    top_up_address(w3=w3, address=safe.address, amount=100)
+    top_up_address(w3=w3, address=safe.address, amount=1)
     fork_unlock_account(w3, safe.address)
     return safe
 
 
 def top_up_address(w3: Web3, address: str, amount: int) -> None:
     """Top up an address with ETH"""
-    w3.eth.send_transaction({"to": address, "value": Web3.to_wei(amount, "ether"), "from": SCRAPE_ACCOUNT.address})
+    if amount > (w3.eth.get_balance(SCRAPE_ACCOUNT.address) * 1e18) * 0.99:
+        raise ValueError("Not enough ETH in the faucet account")
+    try:
+        w3.eth.send_transaction({"to": address, "value": Web3.to_wei(amount, "ether"), "from": SCRAPE_ACCOUNT.address})
+    except ContractLogicError:
+        raise Exception("Address is a smart contract address with no payable function.")
 
 
 def to_hex_32_bytes(value: str | int) -> str:

@@ -166,7 +166,8 @@ class ProxyActionLockGemAndDraw(_ProxyActionCDP):
     """combines lockGem and draw"""
     short_signature = "lockGemAndDraw(address,address,address,address,uint256,uint256,uint256,bool)"
 
-    def __init__(self, proxy: Address, gem_join: Address, cdp_id: int, wad_c: int, wad_d: int, transfer_from: bool = True):
+    def __init__(self, proxy: Address, gem_join: Address, cdp_id: int, wad_c: int, wad_d: int,
+                 transfer_from: bool = True):
         super().__init__(proxy,
                          [MakerAddr.CdpManager, MakerAddr.Jug, gem_join, MakerAddr.DaiJoin, cdp_id, wad_c, wad_d,
                           transfer_from])
