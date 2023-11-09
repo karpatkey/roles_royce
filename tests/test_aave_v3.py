@@ -6,7 +6,7 @@ from roles_royce.constants import ETHAddr
 from decimal import Decimal
 from pytest import approx
 from roles_royce.toolshed.protocol_utils.aave_v3.addresses_and_abis import AddressesAndAbis
-from roles_royce.toolshed.protocol_utils.aave_v3.cdp import AaveV3CDPManager
+from roles_royce.toolshed.protocol_utils.aave_v3.cdp import AaveV3CDPManager, CDPData
 from roles_royce.constants import Chain
 
 USER = "0xDf3A7a27704196Af5149CD67D881279e32AF2C21"
@@ -198,7 +198,40 @@ def test_integration_liquidation_call(local_node_eth):
     cdp = AaveV3CDPManager(w3=w3, owner_address=USER)
 
     balances = cdp.get_cdp_balances_data(block=block)
-    health_factor = cdp.get_health_factor(block=block)
-    cdp_data = cdp.get_cdp_data(block=block)
+    # print(balances)
+    # health_factor = cdp.get_health_factor(block=block)
+    # print(health_factor)
+    # # cdp_data = cdp.get_cdp_data(block=block)
 
+    pdp = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].ProtocolDataProvider.address, abi=AddressesAndAbis[Chain.Ethereum].ProtocolDataProvider.abi)
+    bonus = pdp.functions.getReserveConfigurationData(ETHAddr.USDC).call(block_identifier=block)[3] / 1000
+
+    fee = pdp.functions.getLiquidationProtocolFee(ETHAddr.USDC).call(block_identifier=block)
+
+    collateral = 0
+    debt = 0
+    for balance in balances:
+        if balance[CDPData.CollateralEnabled]:
+            collateral += balance[CDPData.InterestBearingBalance] * balance[CDPData.UnderlyingPriceUSD] * balance[CDPData.LiquidationThreshold]
+            debt += balance[CDPData.VariableDebtBalance] * balance[CDPData.UnderlyingPriceUSD]
+
+    wallet = '0x5313b39bf226ced2332C81eB97BB28c6fD50d1a3'
+    local_node_eth.unlock_account(wallet)
+
+    # if health_factor < 1:
+    wstETH = w3.eth.contract(address=ETHAddr.wstETH, abi=AddressesAndAbis[Chain.Ethereum].ERC20.abi)
+    wstETH.functions.approve(AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address, 115792089237316195423570985008687907853269984665640564039457584007913129639935).transact({"from": wallet})
+    lending_pool_v3 = w3.eth.contract(address=AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address, abi=AddressesAndAbis[Chain.Ethereum].LendingPoolV3.abi)
+
+    print('USDC Balance before liquidationCall: ', get_balance(w3, ETHAddr.USDC, wallet))
+    print('wstETH Balance before liquidationCall: ', get_balance(w3, ETHAddr.wstETH, wallet))
+    
+    liquidation_call = lending_pool_v3.functions.liquidationCall(ETHAddr.USDC, ETHAddr.wstETH, USER, 115792089237316195423570985008687907853269984665640564039457584007913129639935, False).transact({"from": wallet})
+    
+    print('USDC Balance after liquidationCall: ', get_balance(w3, ETHAddr.USDC, wallet))
+    print('wstETH Balance after liquidationCall: ', get_balance(w3, ETHAddr.wstETH, wallet))
+
+    balances = cdp.get_cdp_balances_data(block='latest')
+    print(balances)
+    health_factor = cdp.get_health_factor(block='latest')
     print(health_factor)
