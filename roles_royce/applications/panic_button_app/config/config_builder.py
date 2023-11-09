@@ -109,25 +109,27 @@ def add_lido_positions(protocol, template, position_id):
     return template 
 
 
-def add_positions(w3: Web3, file: str, protocol: str, position_ids: list[str], addresses: list[Address] = None):
+def add_positions(w3: Web3, file: str, templates_folder: str, protocol: str, position_ids: list[str], addresses: list[Address] = None):
     with open(file, "r") as f:
         data = json.load(f)
 
     if protocol == 'balancer':
-        with open('balancer_template.json', 'r') as f:
+        with open(templates_folder / 'balancer_template.json', 'r') as f:
             template = json.load(f)
         result = add_balancer_positions(w3, template, position_ids, addresses)
         
     elif protocol == 'aura':
-        with open('aura_template.json', 'r') as f:
+        with open(templates_folder / 'aura_template.json', 'r') as f:
             template = json.load(f)
         result = add_aura_positions(w3, template, position_ids, addresses)
 
     elif protocol == 'lido':
-        with open('lido_template.json', 'r') as f:
+        with open(templates_folder / 'lido_template.json', 'r') as f:
             template = json.load(f)
         result = add_lido_positions(w3, template, position_ids)
 
     data['positions'] = result
     with open(file, "w") as f:
         json.dump(data, f)
+
+
