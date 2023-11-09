@@ -9,7 +9,7 @@ from roles_royce.constants import StrEnum
 from web3.exceptions import ContractLogicError
 
 
-class Environment(StrEnum):
+class Modes(StrEnum):
     DEVELOPMENT = 'development'
     PRODUCTION = 'production'
 
@@ -41,7 +41,7 @@ class ENV:
     PRIVATE_KEY: str = field(init=False)
     DISASSEMBLER_ADDRESS: Address = field(init=False)
 
-    ENVIRONMENT: Environment = field(init=False)
+    MODE: Modes = field(init=False)
     LOCAL_FORK_PORT: int | None = field(init=False)
     LOCAL_FORK_HOST: str = field(init=False)
 
@@ -84,14 +84,14 @@ class ENV:
             self.DISASSEMBLER_ADDRESS = config(
                 self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_DISASSEMBLER_ADDRESS', default='')
 
-        # Environment: development or production
-        self.ENVIRONMENT: Environment = custom_config('ENVIRONMENT', cast=Environment, default=Environment.DEVELOPMENT)
-        if self.ENVIRONMENT.lower() not in ['development', 'production']:
+        # Environment mode: development or production
+        self.MODE: Modes = custom_config('ENVIRONMENT', cast=Modes, default=Modes.DEVELOPMENT)
+        if self.MODE.lower() not in ['development', 'production']:
             raise ValueError(
-                f"ENVIRONMENT is not valid: {self.ENVIRONMENT}. Options are either 'development' or 'production'.")
+                f"ENVIRONMENT is not valid: {self.MODE}. Options are either 'development' or 'production'.")
         else:
-            self.ENVIRONMENT = self.ENVIRONMENT.lower()
-        if self.ENVIRONMENT == Environment.DEVELOPMENT:
+            self.MODE = self.MODE.lower()
+        if self.MODE == Modes.DEVELOPMENT:
             if self.BLOCKCHAIN == 'ethereum':
                 self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_ETHEREUM', cast=int, default=8546)
             else:

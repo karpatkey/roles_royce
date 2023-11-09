@@ -2,7 +2,7 @@ import argparse
 from web3 import Web3
 from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler
 from roles_royce.utils import TenderlyCredentials
-from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Environment, fork_unlock_account, \
+from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Modes, fork_unlock_account, \
     top_up_address
 import time
 from roles_royce.generic_method import Transactable
@@ -11,7 +11,7 @@ import json
 
 
 def start_the_engine(env: ENV) -> (Web3, Web3):
-    if env.ENVIRONMENT == Environment.DEVELOPMENT:
+    if env.MODE == Modes.DEVELOPMENT:
         w3 = Web3(Web3.HTTPProvider(f'http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}'))
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
         top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)  # Topping up disassembler address for testing
@@ -86,7 +86,7 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
                                                    from_address=env.DISASSEMBLER_ADDRESS)
 
                 if check_exit_tx:
-                    if env.ENVIRONMENT == 'production':  # In production environment, send the transaction to the real blockchain
+                    if env.MODE == 'production':  # In production environment, send the transaction to the real blockchain
                         if w3 is None:
                             w3 = disassembler.w3  # Overriding of the w3 instance for MEV protection
                         tx_receipt = disassembler.send(txns=txn_transactables, private_key=env.PRIVATE_KEY, w3=w3)
@@ -112,8 +112,7 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
             return response_message
 
     else:
-        return {"status": 200, "link": "No link", "message": "No transactions need to be executed for the desired "
-                                                             "outcome"}
+        return {"status": 200, "link": "No link", "message": "There are no funds in the position, no transaction needs to be executed"}
 
 
 def main():

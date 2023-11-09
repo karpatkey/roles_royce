@@ -1,5 +1,5 @@
 from roles_royce.applications.panic_button_app.panic_button_main import start_the_engine, gear_up, drive_away
-from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Environment
+from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Modes
 from tests.utils import assign_role, local_node_eth, accounts, fork_unlock_account
 import os
 import json
@@ -16,12 +16,12 @@ role = 4
 
 def set_env(monkeypatch, private_key: str) -> ENV:
     monkeypatch.setenv('ETHEREUM_RPC_ENDPOINT', 'DummyString')
-    monkeypatch.setenv('ETHEREUM_FALLBACK_RPC_ENDPOINT', 'DummyString')
+    monkeypatch.setenv('ETHEREUM_RPC_ENDPOINT_FALLBACK', 'DummyString')
     monkeypatch.setenv('GNOSISDAO_ETHEREUM_AVATAR_SAFE_ADDRESS', avatar_safe_address)
     monkeypatch.setenv('GNOSISDAO_ETHEREUM_ROLES_MOD_ADDRESS', roles_mod_address)
     monkeypatch.setenv('GNOSISDAO_ETHEREUM_ROLE', role)
     monkeypatch.setenv('GNOSISDAO_ETHEREUM_PRIVATE_KEY', private_key)
-    # Without setting the ENVIRONMENT env it will default to DEVELOPMENT and use the local fork
+    # Without setting the MODE env it will default to DEVELOPMENT and use the local fork
     return ENV(dao, blockchain)
 
 
@@ -64,10 +64,10 @@ exec_config = ExecConfig(percentage=JSON_FORM["percentage"],
 def test_start_the_engine(monkeypatch):
     env = set_env(monkeypatch, "0x0000000000000000000000000000000000000000000000000000000000000000")
 
-    w3,w3_MEV = start_the_engine(env)
+    w3, w3_MEV = start_the_engine(env)
     assert w3.is_connected()
 
-    env.ENVIRONMENT = Environment.PRODUCTION
+    env.MODE = Modes.PRODUCTION
     with pytest.raises(Exception):
         start_the_engine(env)  # RPC endpoints are 'DummyString'
 

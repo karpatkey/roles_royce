@@ -53,7 +53,7 @@ def set_env(monkeypatch, private_key: str) -> ENV:
     return ENV(dao, blockchain)
 
 
-@pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False), reason="Long position integration test not running by default.")
+#@pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False), reason="Long position integration test not running by default.")
 @pytest.mark.parametrize("exec_config", exec_configs)
 def test_stresstest(local_node_eth, accounts, monkeypatch, exec_config):
     private_key = set_up_roles(local_node_eth, accounts)
@@ -85,4 +85,4 @@ def test_stresstest(local_node_eth, accounts, monkeypatch, exec_config):
     assert main.returncode == 0
     dict_message_stdout = json.loads(main.stdout[:-1].replace("\'", "\""))
     assert dict_message_stdout['status'] == 200
-    assert dict_message_stdout['message'] == "Transaction executed successfully" or dict_message_stdout['message'] == 'No transactions need to be executed for the desired outcome'
+    assert dict_message_stdout['message'] == "Transaction executed successfully" or dict_message_stdout['message'] == 'There are no funds in the position, no transaction needs to be executed'
