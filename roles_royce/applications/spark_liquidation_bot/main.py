@@ -104,9 +104,9 @@ def check_health_for_address(address):
             list_values = [x for x in cdp_data[0].values()]
 
             # Update prometheus gauges
-            gauges.address.set(address)
+            # gauges.address.set(address)
             gauges.health_factor.set(health_factor)
-            gauges.underlying_address.set(list_values[0])
+            # gauges.underlying_address.set(list_values[0])
             gauges.interest_bearing_balance.set(list_values[1])
             gauges.stable_debt_balance.set(list_values[2])
             gauges.variable_debt_balance.set(list_values[3])
@@ -127,7 +127,7 @@ def main():
     while True:
         current_time = time.time()
 
-        if current_time - last_address_update > ENV.ADDRESS_UPDATE_INTERVAL:
+        if current_time - last_address_update > ENV.ADDRESS_UPDATE_INTERVAL:    
             update_address_list()
             last_address_update = current_time
 
@@ -138,4 +138,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

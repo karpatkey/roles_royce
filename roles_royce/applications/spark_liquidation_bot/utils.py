@@ -60,8 +60,9 @@ class Gauges:
         of your deposited assets against the borrowed assets and its underlying value.
         The higher the value is, the safer the state of your funds are against a liquidation scenario.
         If the health factor reaches 1, the liquidation of your deposits will be triggered.""")
-    address = Gauge('address', 'Address of the user.')
-    underlying_address = Gauge('underlying_address', 'description')
+    # address = Gauge('address', 'Address of the user.')
+    # underlying_address = Gauge('underlying_address', 'description')
+    last_updated = Gauge('last_updated', 'Last updated time and date')
     interest_bearing_balance = Gauge('interest_bearing_balance', 'description')
     stable_debt_balance = Gauge('stable_debt_balance', 'description')
     variable_debt_balance = Gauge('variable_debt_balance', 'description')
