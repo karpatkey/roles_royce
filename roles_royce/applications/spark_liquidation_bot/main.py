@@ -41,7 +41,6 @@ current_addresses = []
 # Needs the ENV variable that points to the file for credentials 
 def get_addresses_from_bigquery():
     """Get addresses from the bigquery list"""
-    addresses = []
     client = bigquery.Client.from_service_account_json(ENV.BIGQUERY_CREDENTIALS_PATH)
 
     query = """
