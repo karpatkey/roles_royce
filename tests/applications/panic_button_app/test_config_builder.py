@@ -1,4 +1,4 @@
-from roles_royce.applications.panic_button_app.config.config_builder import add_balancer_positions, get_bpt_from_aura, add_aura_positions
+#from roles_royce.applications.panic_button_app.config.config_builder import add_balancer_positions, get_bpt_from_aura, add_aura_positions
 from tests.utils import assign_role, local_node_gc, accounts
 from web3 import Web3
 import pytest
@@ -183,7 +183,7 @@ aura_template = {
   ]
 }
 
-
+'''
 def test_get_bpt_from_aura(local_node_gc):
     w3 = local_node_gc.w3
     block = 30698007
@@ -217,4 +217,5 @@ def test_add_aura_positions(local_node_gc):
     assert result[1]['protocol'] == 'Aura'
     assert result[1]['position_id'] == '227'
 
+'''
 

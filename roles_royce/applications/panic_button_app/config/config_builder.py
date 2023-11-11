@@ -5,9 +5,9 @@ from defabipedia import balancer, aura
 from defabipedia.types import Chains
 from roles_royce.protocols.balancer.utils import Pool, PoolKind
 from roles_royce.constants import StrEnum
-from utils import get_bpt_from_aura, get_tokens_from_bpt
+from .utils import get_bpt_from_aura, get_tokens_from_bpt
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -73,11 +73,21 @@ def seed_file(dao: str, blockchain: str) -> None:
 class BalancerPosition:
     position_id: str
     bpt_address: Address
+    position_id_tech: Address = field(init=False)
+
+    def __post_init__(self):
+        self.position_id_tech = self.bpt_address
+
 
 @dataclass
 class AuraPosition:
     position_id: str
     bpt_address: Address
+    position_id_tech: Address = field(init=False)
+
+    def __post_init__(self):
+        self.position_id_tech = self.bpt_address
+
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -118,11 +128,9 @@ def add_aura_positions(w3: Web3, template: dict, position_ids: list[str], bpt_ad
     return result
 
 
-
 def add_lido_positions(protocol, template, position_id):
     template['position_id'] = f"{protocol}_{position_id}"
     return template
-
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -137,10 +145,11 @@ class DAOStrategiesBuilder:
     lido: bool = False  # We either have funds in Lido or we don't
 
     def build_json(self, w3: Web3):
-        self.add_balancer_positions(w3, self.balancer)
+        self.add_to_json(self.build_balancer_positions(w3, self.balancer))
         # TODO: add_aura_positions
+        # TODO: add_lido_position
 
-    def add_balancer_positions(self, w3: Web3, positions: list[BalancerPosition]):
+    def add_to_json(self, positions: list[dict]):
         file = f"strategies/{self.dao}{self.blockchain}.json"
 
         if not os.path.isfile(file):
@@ -149,13 +158,24 @@ class DAOStrategiesBuilder:
         with open(file, "r") as f:
             strategies = json.load(f)
 
+        for position in positions:
+            if position['position_id_tech'] in [item for position in strategies["positions"] for item in
+                                                position['position_id_tech']]:
+                continue
+            strategies['positions'].append(position)
+
+        with open(file, "w") as f:
+            json.dump(strategies, f)
+
+    @staticmethod
+    def build_balancer_positions(w3: Web3, positions: list[BalancerPosition]) -> list[dict]:
         with open('templates/balancer_template.json', 'r') as f:
             balancer_template = json.load(f)
 
+        result = []
         for balancer_position in positions:
-            bpt_address = Web3.to_checksum_address(balancer_position.bpt_address)
-            if bpt_address in [item for position in strategies["positions"] for item in position['position_id_tech']]:
-                continue
+            bpt_address = Web3.to_checksum_address(balancer_position.position_id_tech)
+
             position = balancer_template.copy()
             del position["exec_config"][1]["parameters"][2]["options"][0]  # Remove the dummy element in template
 
@@ -171,8 +191,11 @@ class DAOStrategiesBuilder:
                     "value": token['address'],
                     "label": token['symbol']
                 })
-                position["position_id_human_readable"] = position["position_id_human_readable"] + f"_{token['symbol']}"
-            strategies['positions'].append(position)
+                position["position_id_human_readable"] = position[
+                                                             "position_id_human_readable"] + f"_{token['symbol']}"
+            result.append(position)
 
-        with open(file, "w") as f:
-            json.dump(strategies, f)
+        return result
+
+        #TODO: add_aura_positions
+        #TODO: add_lido_position
