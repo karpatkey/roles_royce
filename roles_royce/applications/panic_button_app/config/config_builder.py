@@ -197,5 +197,42 @@ class DAOStrategiesBuilder:
 
         return result
 
-        #TODO: add_aura_positions
+    @staticmethod
+    def build_aura_positions(w3: Web3, positions: list[AuraPosition]) -> list[dict]:
+        with open('templates/aura_template.json', 'r') as f:
+            aura_template = json.load(f)
+        
+        aura_addresses = get_bpt_from_aura(w3)
+        result = []
+        for aura_position in positions:
+            bpt_address = Web3.to_checksum_address(balancer_position.position_id_tech)
+
+            for item in aura_balancer_list:
+                if item.get('bpt_address') == bpt_address:
+                    aura_address = item.get('aura_address')
+                    break
+
+            position = aura_template.copy()
+            del position["exec_config"][1]["parameters"][2]["options"][0]  # Remove the dummy element in template
+
+            position["position_id"] = balancer_position.position_id
+            position["position_id_tech"] = bpt_address
+            for i in range(3):
+                position["exec_config"][i]["parameters"][0]["value"] = aura_address
+            pool_tokens = get_tokens_from_bpt(w3, bpt_address)
+
+            position["position_id_human_readable"] = 'Aura'
+            for token in pool_tokens:
+                position["exec_config"][1]["parameters"][2]["options"].append({
+                    "value": token['address'],
+                    "label": token['symbol']
+                })
+                position["position_id_human_readable"] = position[
+                                                             "position_id_human_readable"] + f"_{token['symbol']}"
+            result.append(position)
+
+        return result        
+
+
+        
         #TODO: add_lido_position
