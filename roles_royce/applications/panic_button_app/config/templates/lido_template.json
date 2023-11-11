@@ -1,5 +1,7 @@
 {
   "position_id": "stETH",
+  "position_id_tech": "Lido",
+  "position_id_human_readable": "Lido",
   "protocol": "Lido",
   "position_exec_config": [
     {
