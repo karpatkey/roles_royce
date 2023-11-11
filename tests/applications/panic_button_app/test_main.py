@@ -99,10 +99,10 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
 
     disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
 
-    response = drive_away(disassembler=disassembler,
+    response = json.loads(drive_away(disassembler=disassembler,
                           txn_transactables=txn_transactables,
                           env=env,
-                          simulate=exec_config.simulate)
+                          simulate=exec_config.simulate))
 
     assert response['status'] == 200
     assert response['message'] == "Transaction executed successfully"
@@ -110,10 +110,10 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
     local_node_eth.set_block(block)
     env.DISASSEMBLER_ADDRESS = accounts[3].address  # Any address not member of the role
     disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
-    response_reverted = drive_away(disassembler=disassembler,
+    response_reverted = json.loads(drive_away(disassembler=disassembler,
                                    txn_transactables=txn_transactables,
                                    env=env,
-                                   simulate=exec_config.simulate)
+                                   simulate=exec_config.simulate))
 
     assert response_reverted['status'] == 422
     assert response_reverted['message'] == "Transaction reverted when simulated with local eth_call"
@@ -121,10 +121,10 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
     local_node_eth.set_block(block)
     env.DISASSEMBLER_ADDRESS = '0x'
     disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
-    response_exception = drive_away(disassembler=disassembler,
+    response_exception = json.loads(drive_away(disassembler=disassembler,
                                     txn_transactables=txn_transactables,
                                     env=env,
-                                    simulate=exec_config.simulate)
+                                    simulate=exec_config.simulate))
 
     assert response_exception['status'] == 500
     assert response_exception['message'] == "Error: ENS name: '0x' is invalid."
