@@ -146,7 +146,7 @@ class DAOStrategiesBuilder:
 
     def build_json(self, w3: Web3):
         self.add_to_json(self.build_balancer_positions(w3, self.balancer))
-        # TODO: add_aura_positions
+        self.add_to_json(self.build_aura_positions(w3, self.aura))
         # TODO: add_lido_position
 
     def add_to_json(self, positions: list[dict]):
@@ -205,25 +205,27 @@ class DAOStrategiesBuilder:
         aura_addresses = get_bpt_from_aura(w3)
         result = []
         for aura_position in positions:
-            bpt_address = Web3.to_checksum_address(balancer_position.position_id_tech)
-
-            for item in aura_balancer_list:
-                if item.get('bpt_address') == bpt_address:
+            
+            bpt_address = Web3.to_checksum_address(aura_position.position_id_tech)
+            for item in aura_addresses:
+                if Web3.to_checksum_address(item.get('bpt_address')) == bpt_address:
                     aura_address = item.get('aura_address')
                     break
 
-            position = aura_template.copy()
-            del position["exec_config"][1]["parameters"][2]["options"][0]  # Remove the dummy element in template
+            
 
-            position["position_id"] = balancer_position.position_id
-            position["position_id_tech"] = bpt_address
-            for i in range(3):
+            position = aura_template.copy()
+            del position["exec_config"][2]["parameters"][2]["options"][0]  # Remove the dummy element in template
+
+            position["position_id"] = aura_position.position_id
+            position["position_id_tech"] = aura_address
+            for i in range(4):
                 position["exec_config"][i]["parameters"][0]["value"] = aura_address
             pool_tokens = get_tokens_from_bpt(w3, bpt_address)
 
             position["position_id_human_readable"] = 'Aura'
             for token in pool_tokens:
-                position["exec_config"][1]["parameters"][2]["options"].append({
+                position["exec_config"][2]["parameters"][2]["options"].append({
                     "value": token['address'],
                     "label": token['symbol']
                 })
