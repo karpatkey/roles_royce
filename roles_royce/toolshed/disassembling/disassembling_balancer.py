@@ -5,7 +5,41 @@ from defabipedia.balancer import Abis
 from roles_royce.toolshed.disassembling.disassembler import Disassembler, validate_percentage
 from web3 import Web3
 from web3.exceptions import ContractLogicError
+from typing_extensions import TypedDict
 from roles_royce.protocols.base import Address
+
+
+
+
+class Exit11ArgumentElement(TypedDict):
+    bpt_address: str
+    max_slippage: float
+
+
+class Exit12ArgumemntElement(TypedDict):
+    bpt_address: str
+    max_slippage: float
+    token_out_address: str
+
+
+class Exit13ArgumentElement(TypedDict):
+    bpt_address: str
+
+
+class Exit21ArgumentElement(TypedDict):
+    gauge_address: str
+    max_slippage: float
+
+
+class Exit22ArgumentElement(TypedDict):
+    gauge_address: str
+    max_slippage: float
+    token_out_address: str
+
+
+class Exit23ArgumentElement(TypedDict):
+    gauge_address: str
+    max_slippage: float
 
 
 class BalancerDisassembler(Disassembler):
@@ -21,8 +55,7 @@ class BalancerDisassembler(Disassembler):
 
         return int(Decimal(bpt_contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
 
-    def exit_1_1(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[
-        Transactable]:
+    def exit_1_1(self, percentage: float, exit_arguments: list[Exit11ArgumentElement], amount_to_redeem: int = None) -> list[Transactable]:
         """
         Withdraw funds from the Balancer pool withdrawing all assets in proportional way (not used for pools in recovery mode!).
 
@@ -80,7 +113,7 @@ class BalancerDisassembler(Disassembler):
             txns.append(withdraw_balancer)
         return txns
 
-    def exit_1_2(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[
+    def exit_1_2(self, percentage: float, exit_arguments: list[Exit12ArgumemntElement], amount_to_redeem: int = None) -> list[
         Transactable]:
         """
         Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.
@@ -138,7 +171,7 @@ class BalancerDisassembler(Disassembler):
             txns.append(withdraw_balancer)
         return txns
 
-    def exit_1_3(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[
+    def exit_1_3(self, percentage: float, exit_arguments: list[Exit13ArgumentElement], amount_to_redeem: int = None) -> list[
         Transactable]:
         """
         Withdraw funds from the Balancer pool withdrawing all assets in proportional way for pools in recovery mode.
@@ -188,7 +221,7 @@ class BalancerDisassembler(Disassembler):
 
         return txns
 
-    def exit_2_1(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[
+    def exit_2_1(self, percentage: float, exit_arguments: list[Exit21ArgumentElement], amount_to_redeem: int = None) -> list[
         Transactable]:
         """
         Unstake from gauge and withdraw funds from the Balancer pool withdrawing all assets in proportional way (not used for pools in recovery mode!).
@@ -235,7 +268,7 @@ class BalancerDisassembler(Disassembler):
 
         return txns
 
-    def exit_2_2(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[
+    def exit_2_2(self, percentage: float, exit_arguments: list[Exit22ArgumentElement], amount_to_redeem: int = None) -> list[
         Transactable]:
         """
         Unstake from gauge and withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.
@@ -285,7 +318,7 @@ class BalancerDisassembler(Disassembler):
 
         return txns
 
-    def exit_2_3(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[
+    def exit_2_3(self, percentage: float, exit_arguments: list[Exit23ArgumentElement], amount_to_redeem: int = None) -> list[
         Transactable]:
         """
         Unstake from gauge and withdraw funds from the Balancer pool withdrawing all assets in proportional way for pools in recovery mode.
