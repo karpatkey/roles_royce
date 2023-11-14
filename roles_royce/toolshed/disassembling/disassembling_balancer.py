@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from decimal import Decimal
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols import balancer
@@ -9,7 +8,6 @@ from web3.exceptions import ContractLogicError
 from roles_royce.protocols.base import Address
 
 
-@dataclass
 class BalancerDisassembler(Disassembler):
     def get_bpt_amount_to_redeem_from_gauge(self, gauge_address: Address, fraction: float | Decimal) -> int:
         gauge_contract = self.w3.eth.contract(address=gauge_address,
@@ -327,7 +325,7 @@ class BalancerDisassembler(Disassembler):
             bpt_address = gauge_contract.functions.lp_token().call()
 
             withdraw_balancer = self.exit_1_3(percentage=fraction, exit_arguments=[
-                {"bpt_address": bpt_address, "max_slippage": max_slippage}], amount_to_redeem=amount_to_redeem)
+                {"bpt_address": bpt_address}], amount_to_redeem=amount_to_redeem)
             for transactable in withdraw_balancer:
                 txns.append(transactable)
 

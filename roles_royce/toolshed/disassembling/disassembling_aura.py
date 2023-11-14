@@ -10,7 +10,6 @@ from roles_royce.toolshed.disassembling import Disassembler, validate_percentage
 from defabipedia.aura import Abis
 
 
-@dataclass
 class AuraDisassembler(Disassembler):
     def aura_contracts_helper(self, aura_rewards_address: Address | ChecksumAddress, fraction: float | Decimal) -> \
             (str, int):
