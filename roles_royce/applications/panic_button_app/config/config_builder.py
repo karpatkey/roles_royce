@@ -44,7 +44,7 @@ class Protocol(StrEnum):
 # -----------------------------------------------------------------------------------------------------------------------
 
 def seed_file(dao: str, blockchain: str) -> None:
-    file = f"strategies/{dao}{blockchain}.json"
+    file = os.path.join(os.path.dirname(__file__), 'strategies', f"{dao}{blockchain}.json")
     with open(file, "w") as f:
         data = {
             "dao": dao,
@@ -91,43 +91,6 @@ class AuraPosition:
 
 # -----------------------------------------------------------------------------------------------------------------------
 
-
-def add_aura_positions(w3: Web3, template: dict, position_ids: list[str], bpt_addresses: list[Address]):
-    aura_balancer_list = get_bpt_from_aura(w3)
-    result = []
-    for bpt_address in bpt_addresses:
-        position = template.copy()
-        position["position_id"] = position_ids[bpt_addresses.index(bpt_address)]
-        bpt_address = Web3.to_checksum_address(bpt_address)
-        for item in aura_balancer_list:
-            if item.get('bpt_address') == bpt_address:
-                aura_address = item.get('aura_address')
-                break
-        for i in range(4):
-            position["exec_config"][i]["parameters"][0]["value"] = aura_address
-
-        bpt_contract = w3.eth.contract(address=bpt_address,
-                                       abi=balancer.Abis[Chains.get_blockchain_from_web3(w3)].UniversalBPT.abi)
-        pool_id = bpt_contract.functions.getPoolId().call()
-        vault_contract = balancer.ContractSpecs[Chains.get_blockchain_from_web3(w3)].Vault.contract(w3)
-        pool_tokens = vault_contract.functions.getPoolTokens(pool_id).call()[0]
-        pool = Pool(w3=w3, pool_id=pool_id)
-        if pool.pool_kind() == PoolKind.ComposableStablePool:
-            del pool_tokens[pool.bpt_index_from_composable()]  # Remove the BPT if it is a composable stable
-        del position["exec_config"][2]["parameters"][2]["options"][
-            0]  # Remove the dummy element in template
-        for token_address in pool_tokens:
-            token_contract = w3.eth.contract(address=token_address,
-                                             abi=balancer.Abis[Chains.get_blockchain_from_web3(w3)].ERC20.abi)
-            token_symbol = token_contract.functions.symbol().call()
-            position["exec_config"][2]["parameters"][2]["options"].append({
-                "value": token_address,
-                "label": token_symbol
-            })
-        result.append(position)
-    return result
-
-
 def add_lido_positions(protocol, template, position_id):
     template['position_id'] = f"{protocol}_{position_id}"
     return template
@@ -150,7 +113,7 @@ class DAOStrategiesBuilder:
         # TODO: add_lido_position
 
     def add_to_json(self, positions: list[dict]):
-        file = f"strategies/{self.dao}{self.blockchain}.json"
+        file = os.path.join(os.path.dirname(__file__), 'strategies', f"{self.dao}{self.blockchain}.json")
 
         if not os.path.isfile(file):
             seed_file(self.dao, self.blockchain)
@@ -169,7 +132,7 @@ class DAOStrategiesBuilder:
 
     @staticmethod
     def build_balancer_positions(w3: Web3, positions: list[BalancerPosition]) -> list[dict]:
-        with open('templates/balancer_template.json', 'r') as f:
+        with open(os.path.join(os.path.dirname(__file__), 'templates', 'balancer_template.json'), 'r') as f:
             balancer_template = json.load(f)
 
         result = []
@@ -199,7 +162,7 @@ class DAOStrategiesBuilder:
 
     @staticmethod
     def build_aura_positions(w3: Web3, positions: list[AuraPosition]) -> list[dict]:
-        with open('templates/aura_template.json', 'r') as f:
+        with open(os.path.join(os.path.dirname(__file__), 'templates', 'aura_template.json'), 'r') as f:
             aura_template = json.load(f)
         
         aura_addresses = get_bpt_from_aura(w3)
@@ -211,8 +174,6 @@ class DAOStrategiesBuilder:
                 if Web3.to_checksum_address(item.get('bpt_address')) == bpt_address:
                     aura_address = item.get('aura_address')
                     break
-
-            
 
             position = aura_template.copy()
             del position["exec_config"][2]["parameters"][2]["options"][0]  # Remove the dummy element in template
