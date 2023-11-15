@@ -7,23 +7,24 @@ from roles_royce import roles
 from roles_royce.generic_method import Transactable
 
 
-@dataclass
 class Disassembler:
-    w3: Web3
-    avatar_safe_address: Address | ChecksumAddress | str
-    roles_mod_address: Address | ChecksumAddress | str
-    role: int
-    blockchain: Blockchain = field(init=False)
-    tenderly_credentials: TenderlyCredentials = None
-    signer_address: Address | ChecksumAddress | str | None = None
+    def __init__(self,
+                 w3: Web3,
+                 avatar_safe_address: Address | ChecksumAddress | str,
+                 roles_mod_address: Address | ChecksumAddress | str,
+                 role: int,
+                 tenderly_credentials: TenderlyCredentials = None,
+                 signer_address: Address | ChecksumAddress | str | None = None
+                 ):
+        self.w3 = w3
+        self.avatar_safe_address = Web3.to_checksum_address(avatar_safe_address)
+        self.roles_mod_address = Web3.to_checksum_address(roles_mod_address)
+        self.role = role
+        self.blockchain: Blockchain = Chains.get_blockchain_from_web3(self.w3)
+        self.tenderly_credentials = tenderly_credentials
+        self.signer_address = signer_address
 
-    def __post_init__(self):
-
-        self.avatar_safe_address = Web3.to_checksum_address(self.avatar_safe_address)
-        self.roles_mod_address = Web3.to_checksum_address(self.roles_mod_address)
-        self.blockchain = Chains.get_blockchain_from_web3(self.w3)
-
-    def simulate(self, txns: list[Transactable], from_address: Address | ChecksumAddress | str | None = None) -> (object,str):
+    def simulate(self, txns: list[Transactable], from_address: Address | ChecksumAddress | str | None = None) -> (object, str):
         """Simulate the multisend batched transactions with Tenderly.
 
         Args:
@@ -79,7 +80,8 @@ class Disassembler:
                           roles_mod_address=self.roles_mod_address,
                           web3=w3)
 
-    def check(self, txns: list[Transactable], block: int | str = 'latest', from_address: Address | ChecksumAddress | str | None = None) -> TxParams:
+    def check(self, txns: list[Transactable], block: int | str = 'latest',
+              from_address: Address | ChecksumAddress | str | None = None) -> TxParams:
         """Checks the multisend batched transactions with static call.
 
         Args:
@@ -128,4 +130,4 @@ def validate_percentage(percentage: float) -> float:
     if percentage <= 0 or percentage > 100:
         raise ValueError("Percentage of liquidity to remove must be greater than 0 and less or equal than 100.")
     else:
-        return percentage/100
+        return percentage / 100
