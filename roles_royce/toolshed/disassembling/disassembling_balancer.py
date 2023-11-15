@@ -257,7 +257,7 @@ class BalancerDisassembler(Disassembler):
             unstake_gauge = balancer.Unstake(w3=self.w3, gauge_address=gauge_address, amount=amount_to_redeem)
             txns.append(unstake_gauge)
 
-            gauge_contract = self.w3.eth.contract(address=gauge_contract,
+            gauge_contract = self.w3.eth.contract(address=gauge_address,
                                                   abi=Abis[self.blockchain].Gauge.abi)
             bpt_address = gauge_contract.functions.lp_token().call()
 
@@ -306,7 +306,7 @@ class BalancerDisassembler(Disassembler):
             unstake_gauge = balancer.Unstake(w3=self.w3, gauge_address=gauge_address, amount=amount_to_redeem)
             txns.append(unstake_gauge)
 
-            gauge_contract = self.w3.eth.contract(address=gauge_contract,
+            gauge_contract = self.w3.eth.contract(address=gauge_address,
                                                   abi=Abis[self.blockchain].Gauge.abi)
             bpt_address = gauge_contract.functions.lp_token().call()
 
@@ -353,7 +353,7 @@ class BalancerDisassembler(Disassembler):
             unstake_gauge = balancer.Unstake(w3=self.w3, gauge_address=gauge_address, amount=amount_to_redeem)
             txns.append(unstake_gauge)
 
-            gauge_contract = self.w3.eth.contract(address=gauge_contract,
+            gauge_contract = self.w3.eth.contract(address=gauge_address,
                                                   abi=Abis[self.blockchain].Gauge.abi)
             bpt_address = gauge_contract.functions.lp_token().call()
 
