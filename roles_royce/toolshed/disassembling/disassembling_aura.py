@@ -1,7 +1,6 @@
-from dataclasses import dataclass
 from decimal import Decimal
-
-from web3.types import Address, ChecksumAddress
+from typing_extensions import TypedDict
+from web3.types import ChecksumAddress
 from web3 import Web3
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.eth import aura
@@ -10,8 +9,21 @@ from roles_royce.toolshed.disassembling import Disassembler, validate_percentage
 from defabipedia.aura import Abis
 
 
+class Exit1ArgumentElement(TypedDict):
+    rewards_address: str
+
+class Exit21ArgumentElement(TypedDict):
+    rewards_address: str
+    max_slippage: float
+
+class Exit22ArgumentElement(TypedDict):
+    rewards_address: str
+    max_slippage: float
+    token_out_address: str
+
+
 class AuraDisassembler(Disassembler):
-    def aura_contracts_helper(self, aura_rewards_address: Address | ChecksumAddress, fraction: float | Decimal) -> \
+    def aura_contracts_helper(self, aura_rewards_address: ChecksumAddress, fraction: float | Decimal) -> \
             (str, int):
         aura_rewards_contract = self.w3.eth.contract(address=aura_rewards_address,
                                                      abi=Abis[self.blockchain].BaseRewardPool.abi)
@@ -22,7 +34,7 @@ class AuraDisassembler(Disassembler):
 
         return bpt_address, amount_to_redeem
 
-    def exit_1(self, percentage: float, exit_arguments: list[dict]) -> list[Transactable]:
+    def exit_1(self, percentage: float, exit_arguments: list[Exit1ArgumentElement]) -> list[Transactable]:
         """Withdraw funds from Aura.
 
         Args:
@@ -55,7 +67,7 @@ class AuraDisassembler(Disassembler):
 
         return txns
 
-    def exit_2_1(self, percentage: float, exit_arguments: list[dict]) -> list[Transactable]:
+    def exit_2_1(self, percentage: float, exit_arguments: list[Exit21ArgumentElement]) -> list[Transactable]:
         """Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way (not used for pools in recovery mode!).
 
         Args:
@@ -107,7 +119,7 @@ class AuraDisassembler(Disassembler):
 
         return txns
 
-    def exit_2_2(self, percentage: float, exit_arguments: list[dict]) -> list[Transactable]:
+    def exit_2_2(self, percentage: float, exit_arguments: list[Exit22ArgumentElement]) -> list[Transactable]:
         """Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.
 
         Args:
@@ -162,7 +174,7 @@ class AuraDisassembler(Disassembler):
 
         return txns
 
-    def exit_2_3(self, percentage: float, exit_arguments: list[dict]) -> list[Transactable]:
+    def exit_2_3(self, percentage: float, exit_arguments: list[Exit1ArgumentElement]) -> list[Transactable]:
         """Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way when pool is in recovery mode.
 
         Args:
