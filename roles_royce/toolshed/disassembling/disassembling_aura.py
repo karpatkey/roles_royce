@@ -216,8 +216,7 @@ class AuraDisassembler(Disassembler):
 
             withdraw_balancer = balancer_disassembler.exit_1_3(percentage=100,
                                                                exit_arguments=[
-                                                                   {"bpt_address": bpt_address,
-                                                                    "max_slippage": max_slippage}],
+                                                                   {"bpt_address": bpt_address}],
                                                                amount_to_redeem=amount_to_redeem)
 
             txns.append(withdraw_aura)
