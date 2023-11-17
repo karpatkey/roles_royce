@@ -1,13 +1,11 @@
 import json
 from web3.types import Address
 from web3 import Web3
-from defabipedia import balancer, aura
-from defabipedia.types import Chains
-from roles_royce.protocols.balancer.utils import Pool, PoolKind
 from roles_royce.constants import StrEnum
 from .utils import get_bpt_from_aura, get_tokens_from_bpt
 import os
 from dataclasses import dataclass, field
+from defabipedia.types import Blockchain
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -17,14 +15,6 @@ from dataclasses import dataclass, field
 class DAO(StrEnum):
     GnosisDAO = "GnosisDAO"
     GnosisLTD = "GnosisLTD"
-
-    def __str__(self):
-        return self.name
-
-
-class Blockchain(StrEnum):
-    Ethereum = "Ethereum"
-    Gnosis = "Gnosis"
 
     def __str__(self):
         return self.name
@@ -43,12 +33,12 @@ class Protocol(StrEnum):
 # General
 # -----------------------------------------------------------------------------------------------------------------------
 
-def seed_file(dao: str, blockchain: str) -> None:
-    file = os.path.join(os.path.dirname(__file__), 'strategies', f"{dao}{blockchain}.json")
+def seed_file(dao: DAO, blockchain: Blockchain) -> None:
+    file = os.path.join(os.path.dirname(__file__), 'strategies', f"{dao}-{blockchain}.json")
     with open(file, "w") as f:
         data = {
             "dao": dao,
-            "blockchain": blockchain,
+            "blockchain": f'{blockchain}',
             "general_parameters": [
                 {
                     "name": "percentage",
@@ -113,7 +103,7 @@ class DAOStrategiesBuilder:
         # TODO: add_lido_position
 
     def add_to_json(self, positions: list[dict]):
-        file = os.path.join(os.path.dirname(__file__), 'strategies', f"{self.dao}{self.blockchain}.json")
+        file = os.path.join(os.path.dirname(__file__), 'strategies', f"{self.dao}-{self.blockchain}.json")
 
         if not os.path.isfile(file):
             seed_file(self.dao, self.blockchain)
@@ -164,11 +154,11 @@ class DAOStrategiesBuilder:
     def build_aura_positions(w3: Web3, positions: list[AuraPosition]) -> list[dict]:
         with open(os.path.join(os.path.dirname(__file__), 'templates', 'aura_template.json'), 'r') as f:
             aura_template = json.load(f)
-        
+
         aura_addresses = get_bpt_from_aura(w3)
         result = []
         for aura_position in positions:
-            
+
             bpt_address = Web3.to_checksum_address(aura_position.position_id_tech)
             for item in aura_addresses:
                 if Web3.to_checksum_address(item.get('bpt_address')) == bpt_address:
@@ -194,8 +184,6 @@ class DAOStrategiesBuilder:
                                                              "position_id_human_readable"] + f"_{token['symbol']}"
             result.append(position)
 
-        return result        
+        return result
 
-
-        
-        #TODO: add_lido_position
+        # TODO: add_lido_position

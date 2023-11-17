@@ -5,9 +5,23 @@ from defabipedia.types import Chains
 from roles_royce.protocols.balancer.utils import Pool, PoolKind
 
 
-def get_bpt_from_aura(w3: Web3):
-    booster_ctr = aura.ContractSpecs[Chains.get_blockchain_from_web3(w3)].Booster.contract(w3)
+def get_bpt_from_aura(w3: Web3) -> list[dict]:
+    """
+    Fetches all the Aura gauge token addresses with their corresponding BPT addresses
+
+    Args:
+        w3: Web3 instance
+
+    Returns:
+        List of dictionaries with the BPT address and the Aura gauge address for each pool
+         e.g. [{
+                    "blockchain": "ethereum",
+                    "aura_address": "0xAura_gauge_token_address",
+                    "bpt_address": "0xBpt_address"
+              }]
+    """
     blockchain = Chains.get_blockchain_from_web3(w3)
+    booster_ctr = aura.ContractSpecs[blockchain].Booster.contract(w3)
     pool_length = booster_ctr.functions.poolLength().call()
     result = []
     for i in range(0, pool_length, 1):
@@ -26,6 +40,20 @@ def get_bpt_from_aura(w3: Web3):
 
 
 def get_tokens_from_bpt(w3: Web3, bpt_address: Address) -> list[dict]:
+    """
+    Fetches all the token addresses with their symbols from the BPT address
+
+    Args:
+        w3: Web3 instance
+        bpt_address: BPT address of the pool
+
+    Returns:
+        List of dictionaries with the token address and symbol for each token in the pool
+            e.g. [{
+                    "address": token_address,
+                    "symbol": token_symbol
+                }]
+    """
     bpt_contract = w3.eth.contract(address=bpt_address,
                                    abi=balancer.Abis[Chains.get_blockchain_from_web3(w3)].UniversalBPT.abi)
     pool_id = bpt_contract.functions.getPoolId().call()

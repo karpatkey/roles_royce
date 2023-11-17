@@ -131,8 +131,8 @@ def main():
     parser.add_argument("-prot", "--protocol", type=str, help="Protocol where the funds are deposited.")
     parser.add_argument("-s", "--exitStrategy", type=str, help="Exit strategy to execute, e.g. exit_2_1, exit_3")
     parser.add_argument("-a", "--exitArguments", type=str,
-                        help="List of dictionaries (cast as a string) with the custom exit arguments for each "
-                             "position and exit strategy, e.g. [{ 'bpt_address': '0xsOmEAddResS', 'max_slippage': 0.01}]")
+                        help='List of dictionaries (cast as a string) with the custom exit arguments for each '
+                             'position and exit strategy, e.g. [{ "bpt_address": "0xsOmEAddResS", "max_slippage": 0.01}]')
 
     args = parser.parse_args()
 
