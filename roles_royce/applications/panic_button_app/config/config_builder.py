@@ -98,8 +98,10 @@ class DAOStrategiesBuilder:
     lido: bool = False  # We either have funds in Lido or we don't
 
     def build_json(self, w3: Web3):
-        self.add_to_json(self.build_balancer_positions(w3, self.balancer))
-        self.add_to_json(self.build_aura_positions(w3, self.aura))
+        if self.balancer:
+            self.add_to_json(self.build_balancer_positions(w3, self.balancer))
+        if self.aura:    
+            self.add_to_json(self.build_aura_positions(w3, self.aura))
         # TODO: add_lido_position
 
     def add_to_json(self, positions: list[dict]):
@@ -127,6 +129,7 @@ class DAOStrategiesBuilder:
 
         result = []
         for balancer_position in positions:
+            print("we are at: ", balancer_position)
             bpt_address = Web3.to_checksum_address(balancer_position.position_id_tech)
 
             position = balancer_template.copy()
@@ -154,11 +157,11 @@ class DAOStrategiesBuilder:
     def build_aura_positions(w3: Web3, positions: list[AuraPosition]) -> list[dict]:
         with open(os.path.join(os.path.dirname(__file__), 'templates', 'aura_template.json'), 'r') as f:
             aura_template = json.load(f)
-
+        
         aura_addresses = get_bpt_from_aura(w3)
         result = []
         for aura_position in positions:
-
+            print("we are at: ", aura_position)
             bpt_address = Web3.to_checksum_address(aura_position.position_id_tech)
             for item in aura_addresses:
                 if Web3.to_checksum_address(item.get('bpt_address')) == bpt_address:
