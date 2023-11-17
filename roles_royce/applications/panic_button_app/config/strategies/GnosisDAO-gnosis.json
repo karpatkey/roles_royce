@@ -25,7 +25,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xa99FD9950B5D5dCeEaf4939E221dcA8cA9B938aB"
             },
             {
               "name": "max_slippage",
@@ -44,7 +44,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xa99FD9950B5D5dCeEaf4939E221dcA8cA9B938aB"
             },
             {
               "name": "max_slippage",
@@ -58,88 +58,20 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
-                {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
+                  "value": "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1",
+                  "label": "WETH"
                 },
                 {
                   "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
                   "label": "BAL"
                 },
                 {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
+                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
+                  "label": "GNO"
                 },
                 {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
+                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
+                  "label": "WXDAI"
                 }
               ]
             }
@@ -154,7 +86,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xa99FD9950B5D5dCeEaf4939E221dcA8cA9B938aB"
             },
             {
               "name": "max_slippage",
@@ -181,7 +113,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x388Cae2f7d3704C937313d990298Ba67D70a3709"
             },
             {
               "name": "max_slippage",
@@ -200,7 +132,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x388Cae2f7d3704C937313d990298Ba67D70a3709"
             },
             {
               "name": "max_slippage",
@@ -214,88 +146,12 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
+                  "value": "0x3a97704a1b25F08aa230ae53B352e2e72ef52843",
+                  "label": "AGVE"
                 },
                 {
                   "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
                   "label": "GNO"
-                },
-                {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
-                  "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
                 }
               ]
             }
@@ -310,7 +166,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x388Cae2f7d3704C937313d990298Ba67D70a3709"
             },
             {
               "name": "max_slippage",
@@ -337,7 +193,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xbAd20c15A773bf03ab973302F61FAbceA5101f0A"
             },
             {
               "name": "max_slippage",
@@ -356,7 +212,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xbAd20c15A773bf03ab973302F61FAbceA5101f0A"
             },
             {
               "name": "max_slippage",
@@ -370,88 +226,12 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
+                  "value": "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1",
+                  "label": "WETH"
                 },
                 {
                   "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
                   "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
-                {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
-                  "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
                 }
               ]
             }
@@ -466,7 +246,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xbAd20c15A773bf03ab973302F61FAbceA5101f0A"
             },
             {
               "name": "max_slippage",
@@ -493,7 +273,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x5519E2d8A0af0944EA639C6DBAD69A174DE3ECF8"
             },
             {
               "name": "max_slippage",
@@ -512,7 +292,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x5519E2d8A0af0944EA639C6DBAD69A174DE3ECF8"
             },
             {
               "name": "max_slippage",
@@ -526,88 +306,20 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
+                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
+                  "label": "BAL"
                 },
                 {
                   "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
                   "label": "GNO"
                 },
                 {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
+                  "value": "0xbAd20c15A773bf03ab973302F61FAbceA5101f0A",
+                  "label": "bb-WETH-wstETH"
                 },
                 {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
-                  "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
+                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
+                  "label": "WXDAI"
                 }
               ]
             }
@@ -622,7 +334,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x5519E2d8A0af0944EA639C6DBAD69A174DE3ECF8"
             },
             {
               "name": "max_slippage",
@@ -649,7 +361,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x2086f52651837600180dE173B09470F54EF74910"
             },
             {
               "name": "max_slippage",
@@ -668,7 +380,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x2086f52651837600180dE173B09470F54EF74910"
             },
             {
               "name": "max_slippage",
@@ -692,78 +404,6 @@
                 {
                   "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
                   "label": "WXDAI"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
-                {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
-                  "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
                 }
               ]
             }
@@ -778,7 +418,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x2086f52651837600180dE173B09470F54EF74910"
             },
             {
               "name": "max_slippage",
@@ -805,7 +445,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xEb30C85CC528537f5350CF5684Ce6a4538e13394"
             },
             {
               "name": "max_slippage",
@@ -824,7 +464,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xEb30C85CC528537f5350CF5684Ce6a4538e13394"
             },
             {
               "name": "max_slippage",
@@ -838,88 +478,12 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
                   "value": "0x2086f52651837600180dE173B09470F54EF74910",
                   "label": "staBAL3"
                 },
                 {
                   "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
                   "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
-                {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
-                  "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
                 }
               ]
             }
@@ -934,7 +498,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xEb30C85CC528537f5350CF5684Ce6a4538e13394"
             },
             {
               "name": "max_slippage",
@@ -961,7 +525,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x4683e340a8049261057D5aB1b29C8d840E75695e"
             },
             {
               "name": "max_slippage",
@@ -980,7 +544,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x4683e340a8049261057D5aB1b29C8d840E75695e"
             },
             {
               "name": "max_slippage",
@@ -994,88 +558,12 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
                   "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
                   "label": "wstETH"
                 },
                 {
                   "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
                   "label": "GNO"
-                },
-                {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
-                  "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
                 }
               ]
             }
@@ -1090,7 +578,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x4683e340a8049261057D5aB1b29C8d840E75695e"
             },
             {
               "name": "max_slippage",
@@ -1117,7 +605,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x00dF7f58e1Cf932eBe5f54De5970Fb2Bdf0ef06D"
             },
             {
               "name": "max_slippage",
@@ -1136,7 +624,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x00dF7f58e1Cf932eBe5f54De5970Fb2Bdf0ef06D"
             },
             {
               "name": "max_slippage",
@@ -1150,34 +638,6 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
-                {
                   "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
                   "label": "AURA"
                 },
@@ -1188,50 +648,6 @@
                 {
                   "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
                   "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
                 }
               ]
             }
@@ -1246,7 +662,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x00dF7f58e1Cf932eBe5f54De5970Fb2Bdf0ef06D"
             },
             {
               "name": "max_slippage",
@@ -1273,7 +689,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x0C1B9CE6Bf6C01f587C2ee98b0ef4B20C6648753"
             },
             {
               "name": "max_slippage",
@@ -1292,7 +708,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x0C1B9CE6Bf6C01f587C2ee98b0ef4B20C6648753"
             },
             {
               "name": "max_slippage",
@@ -1306,84 +722,8 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
                   "value": "0x2086f52651837600180dE173B09470F54EF74910",
                   "label": "staBAL3"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
-                {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
-                  "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
                 },
                 {
                   "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
@@ -1402,7 +742,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x0C1B9CE6Bf6C01f587C2ee98b0ef4B20C6648753"
             },
             {
               "name": "max_slippage",
@@ -1429,7 +769,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x4cdABE9E07ca393943AcFB9286bBbd0D0a310Ff6"
             },
             {
               "name": "max_slippage",
@@ -1448,7 +788,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x4cdABE9E07ca393943AcFB9286bBbd0D0a310Ff6"
             },
             {
               "name": "max_slippage",
@@ -1462,88 +802,12 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
-                {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
-                  "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
                   "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
                   "label": "COW"
                 },
                 {
                   "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
                   "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
                 }
               ]
             }
@@ -1558,7 +822,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x4cdABE9E07ca393943AcFB9286bBbd0D0a310Ff6"
             },
             {
               "name": "max_slippage",
@@ -1585,7 +849,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xBc2acf5E821c5c9f8667A36bB1131dAd26Ed64F9"
             },
             {
               "name": "max_slippage",
@@ -1604,7 +868,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xBc2acf5E821c5c9f8667A36bB1131dAd26Ed64F9"
             },
             {
               "name": "max_slippage",
@@ -1618,88 +882,12 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
-                {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
-                  "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
                   "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
                   "label": "wstETH"
                 },
                 {
                   "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
                   "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
                 }
               ]
             }
@@ -1714,7 +902,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0xBc2acf5E821c5c9f8667A36bB1131dAd26Ed64F9"
             },
             {
               "name": "max_slippage",
@@ -1741,7 +929,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x7644fA5D0eA14FcF3E813Fdf93ca9544f8567655"
             },
             {
               "name": "max_slippage",
@@ -1760,7 +948,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x7644fA5D0eA14FcF3E813Fdf93ca9544f8567655"
             },
             {
               "name": "max_slippage",
@@ -1778,84 +966,12 @@
                   "label": "USDT"
                 },
                 {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
-                {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
-                  "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
                   "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
                   "label": "sDAI"
                 },
                 {
                   "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
                   "label": "USDC"
-                },
-                {
-                  "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
-                  "label": "stEUR"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
                 }
               ]
             }
@@ -1870,7 +986,7 @@
             {
               "name": "bpt_address",
               "type": "constant",
-              "value": "0x06135A9Ae830476d3a941baE9010B63732a055F4"
+              "value": "0x7644fA5D0eA14FcF3E813Fdf93ca9544f8567655"
             },
             {
               "name": "max_slippage",
@@ -1930,82 +1046,6 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
-                  "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                  "label": "WXDAI"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
-                {
-                  "value": "0x1509706a6c66CA549ff0cB464de88231DDBe213B",
-                  "label": "AURA"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x7eF541E2a22058048904fE5744f9c7E4C57AF717",
-                  "label": "BAL"
-                },
-                {
-                  "value": "0x2086f52651837600180dE173B09470F54EF74910",
-                  "label": "staBAL3"
-                },
-                {
-                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-                  "label": "EURe"
-                },
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                  "label": "USDT"
-                },
-                {
-                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                  "label": "sDAI"
-                },
-                {
-                  "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                  "label": "USDC"
-                },
-                {
                   "value": "0x004626A008B1aCdC4c74ab51644093b155e59A23",
                   "label": "stEUR"
                 },
@@ -2053,7 +1093,7 @@
             {
               "name": "rewards_address",
               "type": "constant",
-              "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+              "value": "0xDE151980d461696543aa07A19BbE2603B20ECbAE"
             },
             {
               "name": "max_slippage",
@@ -2072,7 +1112,7 @@
             {
               "name": "rewards_address",
               "type": "constant",
-              "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+              "value": "0xDE151980d461696543aa07A19BbE2603B20ECbAE"
             },
             {
               "name": "max_slippage",
@@ -2091,7 +1131,7 @@
             {
               "name": "rewards_address",
               "type": "constant",
-              "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+              "value": "0xDE151980d461696543aa07A19BbE2603B20ECbAE"
             },
             {
               "name": "max_slippage",
@@ -2104,20 +1144,12 @@
               "type": "input",
               "options": [
                 {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
+                  "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
+                  "label": "sDAI"
                 },
                 {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
-                {
-                  "value": "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1",
-                  "label": "WETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
+                  "value": "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
+                  "label": "EURe"
                 }
               ]
             }
@@ -2132,7 +1164,7 @@
             {
               "name": "rewards_address",
               "type": "constant",
-              "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+              "value": "0xDE151980d461696543aa07A19BbE2603B20ECbAE"
             },
             {
               "name": "max_slippage",
@@ -2158,7 +1190,7 @@
             {
               "name": "rewards_address",
               "type": "constant",
-              "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+              "value": "0x8B59F9d4F24A266630756131fE62C3476886e496"
             },
             {
               "name": "max_slippage",
@@ -2177,7 +1209,7 @@
             {
               "name": "rewards_address",
               "type": "constant",
-              "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+              "value": "0x8B59F9d4F24A266630756131fE62C3476886e496"
             },
             {
               "name": "max_slippage",
@@ -2196,7 +1228,7 @@
             {
               "name": "rewards_address",
               "type": "constant",
-              "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+              "value": "0x8B59F9d4F24A266630756131fE62C3476886e496"
             },
             {
               "name": "max_slippage",
@@ -2215,14 +1247,6 @@
                 {
                   "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
                   "label": "GNO"
-                },
-                {
-                  "value": "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1",
-                  "label": "WETH"
-                },
-                {
-                  "value": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-                  "label": "wstETH"
                 }
               ]
             }
@@ -2237,7 +1261,7 @@
             {
               "name": "rewards_address",
               "type": "constant",
-              "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+              "value": "0x8B59F9d4F24A266630756131fE62C3476886e496"
             },
             {
               "name": "max_slippage",
@@ -2313,14 +1337,6 @@
               "label": "Token Out Address",
               "type": "input",
               "options": [
-                {
-                  "value": "0x177127622c4A00F3d409B75571e12cB3c8973d3c",
-                  "label": "COW"
-                },
-                {
-                  "value": "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb",
-                  "label": "GNO"
-                },
                 {
                   "value": "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1",
                   "label": "WETH"
