@@ -123,16 +123,14 @@ class DAOStrategiesBuilder:
             json.dump(strategies, f)
 
     @staticmethod
-    def build_balancer_positions(w3: Web3, positions: list[BalancerPosition]) -> list[dict]:
-        with open(os.path.join(os.path.dirname(__file__), 'templates', 'balancer_template.json'), 'r') as f:
-            balancer_template = json.load(f)
-
+    def build_balancer_positions(w3: Web3, positions: list[BalancerPosition]) -> list[dict]:            
         result = []
         for balancer_position in positions:
-            print("we are at: ", balancer_position)
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'balancer_template.json'), 'r') as f:
+                balancer_template = json.load(f)
             bpt_address = Web3.to_checksum_address(balancer_position.position_id_tech)
-
             position = balancer_template.copy()
+            
             del position["exec_config"][1]["parameters"][2]["options"][0]  # Remove the dummy element in template
 
             position["position_id"] = balancer_position.position_id
@@ -155,13 +153,12 @@ class DAOStrategiesBuilder:
 
     @staticmethod
     def build_aura_positions(w3: Web3, positions: list[AuraPosition]) -> list[dict]:
-        with open(os.path.join(os.path.dirname(__file__), 'templates', 'aura_template.json'), 'r') as f:
-            aura_template = json.load(f)
         
         aura_addresses = get_bpt_from_aura(w3)
         result = []
         for aura_position in positions:
-            print("we are at: ", aura_position)
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'aura_template.json'), 'r') as f:
+                aura_template = json.load(f)
             bpt_address = Web3.to_checksum_address(aura_position.position_id_tech)
             for item in aura_addresses:
                 if Web3.to_checksum_address(item.get('bpt_address')) == bpt_address:
