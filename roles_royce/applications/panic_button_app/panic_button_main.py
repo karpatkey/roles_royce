@@ -1,7 +1,7 @@
 import argparse
 from web3 import Web3
 from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler
-from roles_royce.utils import TenderlyCredentials
+from roles_royce.toolshed.simulation import TenderlyCredentials
 from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Modes, fork_unlock_account, \
     top_up_address
 import time
@@ -48,7 +48,6 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
                                         avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
                                         roles_mod_address=env.ROLES_MOD_ADDRESS,
                                         role=env.ROLE,
-                                        tenderly_credentials=tenderly_credentials,
                                         signer_address=env.DISASSEMBLER_ADDRESS)
 
     elif exec_config.protocol == "Balancer":
@@ -56,7 +55,6 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
                                             avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
                                             roles_mod_address=env.ROLES_MOD_ADDRESS,
                                             role=env.ROLE,
-                                            tenderly_credentials=tenderly_credentials,
                                             signer_address=env.DISASSEMBLER_ADDRESS)
     else:
         raise Exception("Invalid protocol")
@@ -116,11 +114,9 @@ def drive_away(disassembler: Disassembler, txn_transactables: list[Transactable]
 
 
 def main():
-    parser = argparse.ArgumentParser(description="This is the real Gnosis DAO disassembling script",
-                                     epilog='Built by karpatkey',
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("-sim", "--simulate", default=False, action='store_true',
+    parser.add_argument("--simulate", default=False, action='store_true',
                         help="If set simulates transaction in Tenderly")
     parser.add_argument("-p", "--percentage", type=int, default=100,
                         help="Percentage of liquidity to be removed, defaults to 100.")
@@ -128,11 +124,11 @@ def main():
     parser.add_argument("-d", "--dao", type=str, help="DAO whose funds are to be removed.")
     parser.add_argument("-b", "--blockchain", type=str, help="Blockchain where the funds are deposited.")
 
-    parser.add_argument("-prot", "--protocol", type=str, help="Protocol where the funds are deposited.")
-    parser.add_argument("-s", "--exitStrategy", type=str, help="Exit strategy to execute, e.g. exit_2_1, exit_3")
-    parser.add_argument("-a", "--exitArguments", type=str,
-                        help="List of dictionaries (cast as a string) with the custom exit arguments for each "
-                             "position and exit strategy, e.g. [{ 'bpt_address': '0xsOmEAddResS', 'max_slippage': 0.01}]")
+    parser.add_argument("--protocol", type=str, help="Protocol where the funds are deposited.")
+    parser.add_argument("-s", "--exit-strategy", type=str, help="Exit strategy to execute, e.g. exit_2_1, exit_3")
+    parser.add_argument("-a", "--exit-arguments", type=str,
+                        help='List of jsons with the custom exit arguments for each '
+                             'position and exit strategy, e.g. [{ "bpt_address": "0xsOmEAddResS", "max_slippage": 0.01}]')
 
     args = parser.parse_args()
 

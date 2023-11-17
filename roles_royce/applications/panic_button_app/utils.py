@@ -7,6 +7,7 @@ from defabipedia.types import Chains
 from eth_account import Account
 from roles_royce.constants import StrEnum
 from web3.exceptions import ContractLogicError
+import time
 
 
 class Modes(StrEnum):
@@ -47,7 +48,6 @@ class ENV:
 
     SLACK_WEBHOOK_URL: str = field(init=False)
 
-
     def __post_init__(self):
         # Tenderly credentials
         self.TENDERLY_ACCOUNT_ID: str = config('TENDERLY_ACCOUNT_ID', default='')
@@ -67,7 +67,6 @@ class ENV:
         self.RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT', default='')
         self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_FALLBACK', default='')
         self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_MEV', default='')
-
 
         # Configuration addresses and key
         self.AVATAR_SAFE_ADDRESS: Address = config(
@@ -119,10 +118,41 @@ class ExecConfig:
 
 # -----------------------------------------------------------------------------------------------------------------------
 
+def start_the_engine(env: ENV) -> (Web3, Web3):
+    if env.MODE == Modes.DEVELOPMENT:
+        w3 = Web3(Web3.HTTPProvider(f'http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}'))
+        fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
+        top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)  # Topping up disassembler address for testing
+        w3_MEV = w3
+    else:
+        w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+        if not w3.is_connected():
+            w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
+            if not w3.is_connected():
+                time.sleep(2)
+                w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+                if not w3.is_connected():
+                    w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
+                    if not w3.is_connected():
+                        raise Exception("No connection to RPC endpoint")
+                    w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_MEV))
+                    if not w3_MEV.is_connected():
+                        w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+                        if not w3_MEV.is_connected():
+                            w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
+                            if not w3_MEV.is_connected():
+                                raise Exception("No connection to RPC endpoint")
+
+    return w3, w3_MEV
+
+
+# -----------------------------------------------------------------------------------------------------------------------
+
 # TODO: all tools for dev environment should be in roles_royce
 def fork_unlock_account(w3, address):
     """Unlock the given address on the forked node."""
     return w3.provider.make_request("anvil_impersonateAccount", [address])
+
 
 # This accounts are not guaranteed to hold tokens forever...
 Holders = {

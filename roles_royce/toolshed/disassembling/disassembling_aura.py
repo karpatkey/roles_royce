@@ -94,7 +94,6 @@ class AuraDisassembler(Disassembler):
                                                          avatar_safe_address=self.avatar_safe_address,
                                                          roles_mod_address=self.roles_mod_address,
                                                          role=self.role,
-                                                         tenderly_credentials=self.tenderly_credentials,
                                                          signer_address=self.signer_address)
 
             withdraw_balancer = balancer_disassembler.exit_1_1(percentage=100,
@@ -148,7 +147,6 @@ class AuraDisassembler(Disassembler):
                                                          avatar_safe_address=self.avatar_safe_address,
                                                          roles_mod_address=self.roles_mod_address,
                                                          role=self.role,
-                                                         tenderly_credentials=self.tenderly_credentials,
                                                          signer_address=self.signer_address)
 
             withdraw_balancer = balancer_disassembler.exit_1_2(percentage=100,
