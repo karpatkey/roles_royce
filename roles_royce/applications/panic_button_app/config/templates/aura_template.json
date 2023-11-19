@@ -6,9 +6,9 @@
   "exec_config": [
     {
       "function_name": "exit_1",
-      "label": "Exit_1",
+      "label": "Unstake",
       "test": true,
-      "description": "Withdraw from Aura",
+      "description": "Unstake the BPT from Aura",
       "parameters": [
         {
           "name": "rewards_address",
@@ -28,9 +28,9 @@
     },
     {
       "function_name": "exit_2_1",
-      "label": "Exit_2_1",
+      "label": "Unstake + Withdraw (Single Token)",
       "test": true,
-      "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way (not used for pools in recovery mode!)",
+      "description": "Unstake the BPT from Aura and withdraw in single token from Balancer",
       "parameters": [
         {
           "name": "rewards_address",
@@ -50,9 +50,9 @@
     },
     {
       "function_name": "exit_2_2",
-      "label": "Exit_2_2",
+      "label": "Unstake + Withdraw (Proportional)",
       "test": true,
-      "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
+      "description": "Unstake the BPT from Aura and withdraw in proportional token from Balancer",
       "parameters": [
         {
           "name": "rewards_address",
@@ -83,9 +83,9 @@
     },
     {
       "function_name": "exit_2_3",
-      "label": "Exit_2_3",
+      "label": "Unstake + Withdraw (Proportional) (Emergnecy mode)",
       "test": false,
-      "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way when pool is in recovery mode",
+      "description": "Unstake the BPT from Aura and withdraw in proportional token from Balancer",
       "parameters": [
         {
           "name": "rewards_address",
