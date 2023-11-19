@@ -65,5 +65,6 @@ class ETHAddr(StrEnum):
 
 class GCAddr(StrEnum):
     USDT = "0x4ECaBa5870353805a9F068101A40E0f32ed605C6"
+    CowSwapSigner = "0xe522f854b978650dc838ade0e39fbc1417a2ffb0"
 
 
