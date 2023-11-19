@@ -83,7 +83,7 @@
     },
     {
       "function_name": "exit_2_3",
-      "label": "Unstake + Withdraw (Proportional) (Emergnecy mode)",
+      "label": "Unstake + Withdraw (Proportional) (Emergency mode)",
       "test": false,
       "description": "Unstake the BPT from Aura and withdraw in proportional token from Balancer",
       "parameters": [
