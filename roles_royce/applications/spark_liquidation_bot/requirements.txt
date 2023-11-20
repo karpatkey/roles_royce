@@ -1,0 +1,6 @@
+prometheus_client
+google-cloud==0.34.0
+google-cloud-bigquery
+web3
+python-decouple
+schedule
