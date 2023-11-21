@@ -91,7 +91,7 @@ def check_health_for_address(address):
         health_factor = spark_cdp_manager.get_health_factor()
         prom = Prometheus_metrics()
         prom.health_factor.set(health_factor)
-        prom.address.info({'address':f'{address}'})
+        prom.address.info({'address':f'{address}', 'health_factor':f'{health_factor}'})
 
 
         if health_factor <= ENV.THRESHOLD_HEALTH_FACTOR:
