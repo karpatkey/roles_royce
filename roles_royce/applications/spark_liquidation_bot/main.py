@@ -7,7 +7,8 @@ from google.cloud import bigquery
 from prometheus_client import start_http_server as prometheus_start_http_server
 from web3 import Web3
 
-from roles_royce.applications.spark_liquidation_bot.utils import ENV, Gauges
+from roles_royce.applications.spark_liquidation_bot.utils import (
+    ENV, Prometheus_metrics)
 from roles_royce.toolshed.alerting import (LoggingLevel, Messenger,
                                            SlackMessenger, TelegramMessenger)
 from roles_royce.toolshed.anti_liquidation.spark import SparkCDPManager
@@ -16,8 +17,6 @@ ENV = ENV()
 
 # Prometheus metrics from prometheus_client import Info
 prometheus_start_http_server(ENV.PROMETHEUS_PORT)
-gauges = Gauges()
-
 # Alert flag
 threshold_health_factor_flag = Event()
 
@@ -90,6 +89,10 @@ def check_health_for_address(address):
     try:
         spark_cdp_manager = SparkCDPManager(w3=Web3(Web3.HTTPProvider("https://gcarch.karpatkey.dev")), owner_address=address)
         health_factor = spark_cdp_manager.get_health_factor()
+        prom = Prometheus_metrics()
+        prom.health_factor.set(health_factor)
+        prom.address.info({'address':f'{address}'})
+
 
         if health_factor <= ENV.THRESHOLD_HEALTH_FACTOR:
             title = "Health factor dropped below the critical threshold"
@@ -100,20 +103,18 @@ def check_health_for_address(address):
             logger.info([title, message])
 
             # Get CDP data for the address to update prometheus gauges
-            cdp_data = spark_cdp_manager.get_cdp_balances_data()
-            list_values = [x for x in cdp_data[0].values()]
-
+            # cdp_data = spark_cdp_manager.get_cdp_balances_data()
+            # list_values = [x for x in cdp_data[0].values()]
             # Update prometheus gauges
             # gauges.address.set(address)
-            gauges.health_factor.set(health_factor)
             # gauges.underlying_address.set(list_values[0])
-            gauges.interest_bearing_balance.set(list_values[1])
-            gauges.stable_debt_balance.set(list_values[2])
-            gauges.variable_debt_balance.set(list_values[3])
-            gauges.underlying_price_usd.set(list_values[4])
-            gauges.collateral_enabled.set(list_values[5])
-            gauges.liquidation_threshold.set(list_values[6])
-            gauges.last_updated.set_to_current_time()
+            # gauges.interest_bearing_balance.set(list_values[1])
+            # gauges.stable_debt_balance.set(list_values[2])
+            # gauges.variable_debt_balance.set(list_values[3])
+            # gauges.underlying_price_usd.set(list_values[4])
+            # gauges.collateral_enabled.set(list_values[5])
+            # gauges.liquidation_threshold.set(list_values[6])
+            # gauges.last_updated.set_to_current_time()
 
     except Exception as e:
         logger.error(f"Error while checking health factor for address {address}. Error: {e}")
