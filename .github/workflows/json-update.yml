@@ -1,10 +1,12 @@
 name: Update and Push Json
 
-on: workflow_dispatch
-  # schedule:
-  #   - cron: '0 0 * * *'  # Scheduled every night at 12
-  # workflow_dispatch:  # Manual triggering
-
+on: 
+  schedule:
+    - cron: '0 0 * * *'  # Scheduled every night at 12
+  workflow_dispatch: {} # Manual triggering
+  push:
+    branches:
+      - 'json_config_builder'
 jobs:
   update_and_push:
     runs-on: self-hosted
