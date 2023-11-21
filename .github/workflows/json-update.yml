@@ -1,0 +1,43 @@
+name: Update and Push Json
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Scheduled every night at 12
+  workflow_dispatch:  # Manual triggering
+
+jobs:
+  update_and_push:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+      - name: Configure Git Identity
+        run: |
+          git config user.email "dharmendra@karpatkey.com"
+          git config user.name "dharmendrakariya"
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10  # Choose your Python version
+
+      - name: Run Python script
+        run: |
+          pip3 install web3
+          python3 roles_royce/applications/panic_button_app/config/dao_config_builder.py
+
+      - name: Commit and Push changes
+        run: |
+          git add .
+          git commit -m "Nightly json update"
+          current_branch=$(git branch --show-current)
+          git push origin "$current_branch"
