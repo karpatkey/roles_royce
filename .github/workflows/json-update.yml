@@ -35,6 +35,7 @@ jobs:
       - name: Run Python script
         run: |
           pip3 install web3
+          pip install -e .
           pip3 install --upgrade setuptools
           python3 roles_royce/applications/panic_button_app/config/dao_config_builder.py
 
