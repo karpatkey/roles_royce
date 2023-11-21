@@ -35,13 +35,13 @@ def test_cowswap_signer_v1():
     
     assert signer_tx.data == "0x569d3489000000000000000000000000e91d153e0b41518a2ce8dd3d7944fa863463a97d0000000000000000000000009c58bacc331c9aa871afd802db6379a98e80cedb000000000000000000000000458cd345b4c05e8df39d0a07220feb4ec19f5e6f0000000000000000000000000000000000000000000000000ddfd287b5761c630000000000000000000000000000000000000000000000000013abe20a3708210000000000000000000000000000000000000000000000000000000065599fbce09e64f0458093a33addd5c6c3e089b0acfdd59b92edd5be4a762a32131b49a40000000000000000000000000000000000000000000000000000e42bf1ede39df3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee34677500000000000000000000000000000000000000000000000000000000000000005a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc95a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc90000000000000000000000000000000000000000000000000000000065599fbc0000000000000000000000000000000000000000000000000000e42bf1ede39d"
 
-@pytest.mark.skip("WIP")
+#@pytest.mark.skip("WIP")
 def test_cowswap_signer(local_node_gc, accounts):
     w3 = local_node_gc.w3
     block = 31032252
     
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
-    steal_token(w3, "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d", "0x8cd67407f05526c57760d0e911d60c57b7e85c8e", avatar_safe.address, 100)
+    steal_token(w3, "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6", "0x4D8027E6e6e3E1Caa9AC23267D10Fb7d20f85A37", avatar_safe.address, 100)
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
     presets = """{"version": "1.0","chainId": "100","meta": {"name": null,"description": "","txBuilderVersion": "1.8.0"},
@@ -59,18 +59,18 @@ def test_cowswap_signer(local_node_gc, accounts):
     private_key = accounts[4].key
     role = 4
 
-    sell_token = "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"
+    sell_token = "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"
     buy_token = "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb"
-    sell_amount = 999277405098102636
-    buy_amount = 5493316812227537
-    fee_amount = 722594901897364
+    sell_amount = 290704006280142
+    buy_amount = 3445312896845187
+    fee_amount = 1700598708
     kind = "sell"
     valid_duration = 60 ** 30
-    valid_to = int(time.time()) + 120
-    fee_amount_bp = (fee_amount / sell_amount) *10000  
+    valid_to = int(time()) + 120
+    fee_amount_bp = int((fee_amount / sell_amount) *10000  )
 
     signer_tx = cowswap_signer.SignOrder(blockchain=Chains.Gnosis,
-                                         avatar=avatar_safe,
+                                         avatar=avatar_safe_address,
                                          sell_token=sell_token,
                                          buy_token=buy_token,
                                          sell_amount=sell_amount,
