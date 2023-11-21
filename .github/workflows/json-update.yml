@@ -10,7 +10,7 @@ on:
 jobs:
   update_and_push:
     runs-on: self-hosted
-
+    timeout-minutes: 20
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
