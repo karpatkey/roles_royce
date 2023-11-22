@@ -14,6 +14,9 @@ class EthereumContractSpecs:
     PoolAddressesProvider = ContractSpec(address='0x02C3eA4e34C0cBd694D2adFa2c690EECbC1793eE',
                                          abi=load_abi('pool_addresses_provider.json'),
                                          name='pool_addresses_provider')
+    LendingPoolV3 = ContractSpec(address='0xC13e21B648A5Ee794902342038FF3aDAB66BE987',
+                                abi=load_abi('lending_pool.json'),
+                                name='LendingPoolV3')
 
 class GnosisContractSpecs:
     ProtocolDataProvider = ContractSpec(address='0x2a002054A06546bB5a264D57A81347e23Af91D18',

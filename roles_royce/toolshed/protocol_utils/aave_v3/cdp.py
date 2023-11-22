@@ -1,6 +1,7 @@
 from decimal import Decimal
-from .addresses_and_abis import AddressesAndAbis
-from roles_royce.constants import Chain
+from defabipedia.aave_v3 import ContractSpecs, Abis
+from defabipedia.tokens import Abis as TokenAbis
+from defabipedia.types import Blockchain, Chains
 from roles_royce.protocols.eth.aave_v3 import InterestRateMode
 from roles_royce.toolshed.protocol_utils.aave_v3.utils import AaveV3Utils, AaveV3Token
 from roles_royce.protocols.eth import aave_v3
@@ -27,7 +28,7 @@ class CDPData(Enum):
 @dataclass
 class AaveV3CDP:
     owner_address: Address | ChecksumAddress | str
-    blockchain: Chain
+    blockchain: Blockchain
     block: int
     balances_data: list[dict]
     health_factor: Decimal
@@ -62,7 +63,7 @@ class AaveV3CDPManager:
     """A class to handle a CDP in AaveV3 protocol."""
     w3: Web3
     owner_address: Address | ChecksumAddress | str
-    blockchain: Chain = field(init=False)
+    blockchain: Blockchain = field(init=False)
     token_addresses: list[dict] = field(init=False)
     token_addresses_block: int | str = 'latest'
 
@@ -72,7 +73,7 @@ class AaveV3CDPManager:
         if not self.owner_address:
             raise ValueError("'owner_address' must be filled.")
         self.owner_address = Web3.to_checksum_address(self.owner_address)
-        self.blockchain = Chain.get_blockchain_from_web3(self.w3)
+        self.blockchain = Chains.get_blockchain_from_web3(self.w3)
         if self.token_addresses_block == 'latest':
             self.token_addresses_block = self.w3.eth.block_number
         self.token_addresses = AaveV3Utils.get_aave_v3_token_addresses(self.w3, block=self.token_addresses_block)
@@ -93,21 +94,21 @@ class AaveV3CDPManager:
             block = self.w3.eth.block_number
 
         pool_addresses_provider_contract = self.w3.eth.contract(
-            address=AddressesAndAbis[self.blockchain].PoolAddressesProvider.address,
-            abi=AddressesAndAbis[self.blockchain].PoolAddressesProvider.abi)
+            address=ContractSpecs[self.blockchain].PoolAddressesProvider.address,
+            abi=ContractSpecs[self.blockchain].PoolAddressesProvider.abi)
         price_oracle_address = pool_addresses_provider_contract.functions.getPriceOracle().call(block_identifier=block)
         price_oracle_contract = self.w3.eth.contract(price_oracle_address,
-                                                     abi=AddressesAndAbis[self.blockchain].PriceOracle.abi)
+                                                     abi=Abis[Chains.Ethereum].PriceOracle.abi)
         protocol_data_provider_contract = self.w3.eth.contract(
-            address=AddressesAndAbis[self.blockchain].ProtocolDataProvider.address,
-            abi=AddressesAndAbis[self.blockchain].ProtocolDataProvider.abi)
+            address=ContractSpecs[self.blockchain].ProtocolDataProvider.address,
+            abi=ContractSpecs[self.blockchain].ProtocolDataProvider.abi)
 
         result = []
 
         for element in aave_v3_tokens:
             # Decimals
             token_contract = self.w3.eth.contract(address=element[AaveV3Token.UNDERLYING],
-                                                  abi=AddressesAndAbis[self.blockchain].ERC20.abi)
+                                                  abi=TokenAbis.ERC20.abi)
             decimals = token_contract.functions.decimals().call(block_identifier=block)
 
             # Wallet balances
@@ -156,11 +157,11 @@ class AaveV3CDPManager:
         if block == 'latest':
             block = self.w3.eth.block_number
         pool_addresses_provider_contract = self.w3.eth.contract(
-            address=AddressesAndAbis[self.blockchain].PoolAddressesProvider.address,
-            abi=AddressesAndAbis[self.blockchain].PoolAddressesProvider.abi)
+            address=ContractSpecs[self.blockchain].PoolAddressesProvider.address,
+            abi=ContractSpecs[self.blockchain].PoolAddressesProvider.abi)
         lending_pool_address = pool_addresses_provider_contract.functions.getPool().call(block_identifier=block)
         lending_pool_contract = self.w3.eth.contract(address=lending_pool_address,
-                                                     abi=AddressesAndAbis[self.blockchain].LendingPoolV3.abi)
+                                                     abi=ContractSpecs[self.blockchain].LendingPoolV3.abi)
         health_factor = \
             lending_pool_contract.functions.getUserAccountData(self.owner_address).call(block_identifier=block)[
                 5] / Decimal(
@@ -208,8 +209,7 @@ class AaveV3CDPManager:
 
         if block == 'latest':
             block = self.w3.eth.block_number
-        token_in_decimals = self.w3.eth.contract(address=token_in_address, abi=AddressesAndAbis[
-            self.blockchain].ERC20.abi).functions.decimals().call(block_identifier=block)
+        token_in_decimals = self.w3.eth.contract(address=token_in_address, abi=TokenAbis.ERC20.abi).functions.decimals().call(block_identifier=block)
 
         health_factor = aave_v3_cdp.health_factor
         balances_data = aave_v3_cdp.balances_data
@@ -279,10 +279,10 @@ class AaveV3CDPManager:
             raise ValueError('There is no variable borrowed amount of token %s.' % token_in_address)
 
         token_in_contract = self.w3.eth.contract(address=token_in_address,
-                                                 abi=AddressesAndAbis[self.blockchain].ERC20.abi)
+                                                 abi=TokenAbis.ERC20.abi)
         pool_addresses_provider_contract = self.w3.eth.contract(
-            address=AddressesAndAbis[self.blockchain].PoolAddressesProvider.address,
-            abi=AddressesAndAbis[self.blockchain].PoolAddressesProvider.abi)
+            address=ContractSpecs[self.blockchain].PoolAddressesProvider.address,
+            abi=ContractSpecs[self.blockchain].PoolAddressesProvider.abi)
         lending_pool_address = pool_addresses_provider_contract.functions.getPool().call()
         allowance = token_in_contract.functions.allowance(self.owner_address, lending_pool_address).call()
 

@@ -1,7 +1,8 @@
 from enum import IntEnum
-from roles_royce.constants import Chain
-from roles_royce.toolshed.protocol_utils.aave_v3.addresses_and_abis import AddressesAndAbis
+from defabipedia.aave_v3 import ContractSpecs
+from defabipedia.types import Chains
 from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, InvalidArgument, BaseApprove, BaseApproveForToken
+from roles_royce.constants import ETHAddr
 
 
 class InterestRateMode(IntEnum):
@@ -14,8 +15,8 @@ class InterestRateMode(IntEnum):
             raise InvalidArgument(f"Invalid interestRateMode={value}")
 
 class DelegationTarget():
-    targets = [AddressesAndAbis[Chain.Ethereum].variableDebtWETH.address,
-                AddressesAndAbis[Chain.Ethereum].stableDebtWETH.address]
+    targets = [ContractSpecs[Chains.Ethereum].variableDebtWETH.address,
+                ContractSpecs[Chains.Ethereum].stableDebtWETH.address]
 
     @staticmethod
     def check_delegation_target(target: Address):
@@ -28,22 +29,22 @@ class DelegationType(IntEnum):
 
 class ApproveToken(BaseApproveForToken):
     """approve Token with AaveLendingPoolV3 as spender"""
-    fixed_arguments = {"spender": AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address}
+    fixed_arguments = {"spender": ContractSpecs[Chains.Ethereum].LendingPoolV3.address}
 
 class ApproveAEthWETH(BaseApprove):
     """approve aEthWETH with WrappedTokenGatewayV3 as spender"""
-    fixed_arguments = {"spender": AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address}
-    token = AddressesAndAbis[Chain.Ethereum].aEthWETH.address
+    fixed_arguments = {"spender": ContractSpecs[Chains.Ethereum].LendingPoolV3.address}
+    token = ContractSpecs[Chains.Ethereum].aEthWETH.address
 
 class ApproveForStkAAVE(BaseApprove):
     """Approve AAVE with stkAAVE as spender"""
-    fixed_arguments = {"spender": AddressesAndAbis[Chain.Ethereum].stkAAVE.address}
-    token = AddressesAndAbis[Chain.Ethereum].AAVE.address
+    fixed_arguments = {"spender": ContractSpecs[Chains.Ethereum].stkAAVE.address}
+    token = ContractSpecs[Chains.Ethereum].AAVE.address
 
 class ApproveForStkABPT(BaseApprove):
     """Approve ABPT with stkABPT as spender"""
-    fixed_arguments = {"spender": AddressesAndAbis[Chain.Ethereum].stkABPT.address}
-    token = AddressesAndAbis[Chain.Ethereum].ABPT.address
+    fixed_arguments = {"spender": ContractSpecs[Chains.Ethereum].stkABPT.address}
+    token = ContractSpecs[Chains.Ethereum].ABPT.address
 
 class ApproveDelegation(ContractMethod):
     """sets the amount of allowance for WrappedTokenGatewayV3 to borrow 
@@ -51,7 +52,7 @@ class ApproveDelegation(ContractMethod):
     name = "approveDelegation"
     in_signature = (("delegatee", "address"),
                     ("amount", "uint256"))
-    fixed_arguments = {"delegatee": AddressesAndAbis[Chain.Ethereum].WrappedTokenGatewayV3.address}
+    fixed_arguments = {"delegatee": ContractSpecs[Chains.Ethereum].WrappedTokenGatewayV3.address}
     
     def __init__(self, target: DelegationTarget, amount: int):
         super().__init__()
@@ -67,7 +68,7 @@ class DepositToken(ContractMethod):
                     ("on_behalf_of", "address"),
                     ("referral_code", "uint16"))
     fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
-    target_address = AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address
+    target_address = ContractSpecs[Chains.Ethereum].LendingPoolV3.address
 
     def __init__(self, asset: Address, amount: int, avatar: Address):
         super().__init__(avatar=avatar)
@@ -79,7 +80,7 @@ class WithdrawToken(ContractMethod):
     name = "withdraw"
     in_signature = [("asset", "address"), ("amount", "uint256"), ("receiver", "address")]
     fixed_arguments = {"receiver": AvatarAddress}
-    target_address = AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address
+    target_address = ContractSpecs[Chains.Ethereum].LendingPoolV3.address
 
     def __init__(self, asset: Address, amount: int, avatar: Address):
         super().__init__(avatar=avatar)
@@ -90,8 +91,8 @@ class DepositETH(ContractMethod):
     """Sender deposits ETH and receives aETH in exchange"""
     name = "depositETH"
     in_signature = [("address", "address"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
-    fixed_arguments = {"address": AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address, "on_behalf_of": AvatarAddress, "referral_code": 0}
-    target_address = AddressesAndAbis[Chain.Ethereum].WrappedTokenGatewayV3.address
+    fixed_arguments = {"address": ContractSpecs[Chains.Ethereum].LendingPoolV3.address, "on_behalf_of": AvatarAddress, "referral_code": 0}
+    target_address = ContractSpecs[Chains.Ethereum].WrappedTokenGatewayV3.address
 
     def __init__(self, eth_amount: int, avatar: Address):
         super().__init__(value=eth_amount, avatar=avatar)
@@ -100,8 +101,8 @@ class WithdrawETH(ContractMethod):
     """Sender redeems aETH and withdraws ETH"""
     name = "withdrawETH"
     in_signature = [("address", "address"), ("amount", "uint256"), ("to", "address")]
-    fixed_arguments = {"address": AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address, "to": AvatarAddress}
-    target_address = AddressesAndAbis[Chain.Ethereum].WrappedTokenGatewayV3.address
+    fixed_arguments = {"address": ContractSpecs[Chains.Ethereum].LendingPoolV3.address, "to": AvatarAddress}
+    target_address = ContractSpecs[Chains.Ethereum].WrappedTokenGatewayV3.address
 
     def __init__(self, amount: int, avatar: Address):
         super().__init__(avatar=avatar)
@@ -112,7 +113,7 @@ class Collateralize(ContractMethod):
     name = "setUserUseReserveAsCollateral"
     in_signature = [("asset", "address"), ("use_as_collateral", "bool")]
     fixed_arguments = {}
-    target_address = AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address
+    target_address = ContractSpecs[Chains.Ethereum].LendingPoolV3.address
 
     def __init__(self, asset: Address, use_as_collateral: bool):
         super().__init__()
@@ -128,7 +129,7 @@ class Borrow(ContractMethod):
                     ("referral_code", "uint16"),
                     ("on_behalf_of", "address"))
     fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
-    target_address = AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address
+    target_address = ContractSpecs[Chains.Ethereum].LendingPoolV3.address
 
     def __init__(self, asset: Address, amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
         super().__init__(avatar=avatar)
@@ -145,7 +146,7 @@ class Repay(ContractMethod):
                     ("interest_rate_mode", "uint256"),
                     ("on_behalf_of", "address"))
     fixed_arguments = {"on_behalf_of": AvatarAddress}
-    target_address = AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address
+    target_address = ContractSpecs[Chains.Ethereum].LendingPoolV3.address
 
     def __init__(self, asset: Address, amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
         super().__init__(avatar=avatar)
@@ -158,8 +159,8 @@ class BorrowETH(ContractMethod):
     """Sender receives ETH and debtETH (stable or variable debt) token"""
     name = "borrowETH"
     in_signature = [("address", "address"), ("amount", "uint256"), ("interest_rate_mode", "uint256"), ("referral_code", "uint16")]
-    fixed_arguments = {"address": AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address, "referral_code": 0}
-    target_address = AddressesAndAbis[Chain.Ethereum].WrappedTokenGatewayV3.address
+    fixed_arguments = {"address": ContractSpecs[Chains.Ethereum].LendingPoolV3.address, "referral_code": 0}
+    target_address = ContractSpecs[Chains.Ethereum].WrappedTokenGatewayV3.address
 
     def __init__(self, amount: int, interest_rate_mode: InterestRateMode):
         super().__init__()
@@ -171,8 +172,8 @@ class RepayETH(ContractMethod):
     """Repay borrowed ETH"""
     name = 'repayETH'
     in_signature = [('address', 'address'), ('amount', 'uint256'), ('interest_rate_mode', 'uint256'), ('on_behalf_of', 'address')]
-    fixed_arguments = {'address': AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address, 'on_behalf_of': AvatarAddress}
-    target_address = AddressesAndAbis[Chain.Ethereum].WrappedTokenGatewayV3.address
+    fixed_arguments = {'address': ContractSpecs[Chains.Ethereum].LendingPoolV3.address, 'on_behalf_of': AvatarAddress}
+    target_address = ContractSpecs[Chains.Ethereum].WrappedTokenGatewayV3.address
 
     def __init__(self, eth_amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
         super().__init__(value=eth_amount, avatar=avatar)
@@ -184,7 +185,7 @@ class SwapBorrowRateMode(ContractMethod):
     """Swaps the borrow rate mode"""
     name = "swapBorrowRateMode"
     in_signature = [("asset", "address"), ("interest_rate_mode", "uint256")]
-    target_address = AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address
+    target_address = ContractSpecs[Chains.Ethereum].LendingPoolV3.address
 
     def __init__(self, asset: Address, interest_rate_mode: InterestRateMode):
         super().__init__()
@@ -197,7 +198,7 @@ class StakeAAVE(ContractMethod):
     name = 'stake'
     in_signature = [("on_behalf_of", "address"), ("amount", "uint256")]
     fixed_arguments = {"on_behalf_of": AvatarAddress}
-    target_address = AddressesAndAbis[Chain.Ethereum].stkAAVE.address
+    target_address = ContractSpecs[Chains.Ethereum].stkAAVE.address
 
     def __init__(self, avatar: Address, amount: int):
         super().__init__(avatar=avatar)
@@ -205,14 +206,14 @@ class StakeAAVE(ContractMethod):
 
 class StakeABPT(StakeAAVE):
     """Stake ABPT in Aave’s safety module"""
-    target_address = AddressesAndAbis[Chain.Ethereum].stkABPT.address
+    target_address = ContractSpecs[Chains.Ethereum].stkABPT.address
 
 class ClaimRewardsAndStake(ContractMethod):
     """claim AAVE rewards accrued from staking AAVE and restake"""
     name = 'claimRewardsAndStake'
     in_signature = [("to", "address"), ("amount", "uint256")]
     fixed_arguments = {"to": AvatarAddress}
-    target_address = AddressesAndAbis[Chain.Ethereum].stkAAVE.address
+    target_address = ContractSpecs[Chains.Ethereum].stkAAVE.address
 
     def __init__(self, avatar: Address, amount: int):
         super().__init__(avatar=avatar)
@@ -223,7 +224,7 @@ class UnstakeAAVE(ContractMethod):
     name = 'redeem'
     in_signature = [('to', 'address'), ('amount', 'uint256')]
     fixed_arguments = {'to': AvatarAddress}
-    target_address = AddressesAndAbis[Chain.Ethereum].stkAAVE.address
+    target_address = ContractSpecs[Chains.Ethereum].stkAAVE.address
 
     def __init__(self, avatar: Address, amount: int):
         super().__init__(avatar=avatar)
@@ -231,25 +232,25 @@ class UnstakeAAVE(ContractMethod):
 
 class UnstakeABPT(UnstakeAAVE):
     """Unstake ABPT. Can only be called during the 2 days unstaking window after the 10 days cooldown period"""
-    target_address = AddressesAndAbis[Chain.Ethereum].stkABPT.address
+    target_address = ContractSpecs[Chains.Ethereum].stkABPT.address
 
 class CooldownStkAAVE(ContractMethod):
     """Initiates a 10 days cooldown period, once this is over the 2 days unstaking window opens"""
     name = 'cooldown'
     in_signature = []
     fixed_arguments = {}
-    target_address = AddressesAndAbis[Chain.Ethereum].stkAAVE.address
+    target_address = ContractSpecs[Chains.Ethereum].stkAAVE.address
 
 class CooldownStkABPT(CooldownStkAAVE):
     """Initiates a 10 days cooldown period, once this is over the 2 days unstaking window opens"""
-    target_address = AddressesAndAbis[Chain.Ethereum].stkABPT.address
+    target_address = ContractSpecs[Chains.Ethereum].stkABPT.address
 
 class ClaimAAVERewards(ContractMethod):
     """Claim AAVE rewards accrued from staking AAVE"""
     name = 'claimRewards'
     in_signature = [('to', 'address'), ('amount', 'uint256')]
     fixed_arguments = {'to': AvatarAddress}
-    target_address = AddressesAndAbis[Chain.Ethereum].stkAAVE.address
+    target_address = ContractSpecs[Chains.Ethereum].stkAAVE.address
 
     def __init__(self, avatar: Address, amount: int):
         super().__init__(avatar=avatar)
@@ -257,7 +258,7 @@ class ClaimAAVERewards(ContractMethod):
 
 class ClaimABPTRewards(ClaimAAVERewards):
     """Claim AAVE rewards accrued from staking ABPT"""
-    target_address = AddressesAndAbis[Chain.Ethereum].stkABPT.address
+    target_address = ContractSpecs[Chains.Ethereum].stkABPT.address
 
 class SwapAndRepay(ContractMethod):
     """Repay debt using collateral"""
@@ -281,7 +282,7 @@ class SwapAndRepay(ContractMethod):
             "tuple"),
         ),
     ]
-    target_address = AddressesAndAbis[Chain.Ethereum].ParaSwapRepayAdapter.address
+    target_address = ContractSpecs[Chains.Ethereum].ParaSwapRepayAdapter.address
     fixed_arguments = {}
 
     def __init__(self, collateral_asset: Address, debt_asset: Address, collateral_amount: int,
@@ -322,7 +323,7 @@ class SwapAndDeposit(ContractMethod):
             "tuple"),
         ),
     ]
-    target_address = AddressesAndAbis[Chain.Ethereum].ParaSwapLiquidityAdapter.address
+    target_address = ContractSpecs[Chains.Ethereum].ParaSwapLiquidityAdapter.address
 
     def __init__(self, from_asset: Address, to_asset: Address, amount: int,
                  min_amount_to_receive: int, swap_all_balance_offset: int, calldata,
@@ -344,7 +345,7 @@ class DelegateAAVE(ContractMethod):
     """Delegate the AAVE voting power for all type of actions (Voting and Proposition)"""
     name = "delegate"
     in_signature = [("delegatee", "address")]
-    target_address = AddressesAndAbis[Chain.Ethereum].AAVE.address
+    target_address = ContractSpecs[Chains.Ethereum].AAVE.address
 
     def __init__(self, delegatee: Address):
         super().__init__()
@@ -354,7 +355,7 @@ class DelegateAAVEByType(ContractMethod):
     """Delegate the AAVE voting power by type of action"""
     name = "delegateByType"
     in_signature = [("delegatee", "address"), ("delegation_type", "uint8")]
-    target_address = AddressesAndAbis[Chain.Ethereum].AAVE.address
+    target_address = ContractSpecs[Chains.Ethereum].AAVE.address
 
     def __init__(self, delegatee: Address, delegation_type: DelegationType):
         super().__init__()
@@ -363,17 +364,17 @@ class DelegateAAVEByType(ContractMethod):
 
 class DelegatestkAAVE(DelegateAAVE):
     """Delegate the stkAAVE voting power for all type of actions (Voting and Proposition)"""
-    target_address = AddressesAndAbis[Chain.Ethereum].stkAAVE.address
+    target_address = ContractSpecs[Chains.Ethereum].stkAAVE.address
 
 class DelegatestkAAVEByType(DelegateAAVEByType):
     """Delegate the stkAAVE voting power by type of action"""
-    target_address = AddressesAndAbis[Chain.Ethereum].stkAAVE.address
+    target_address = ContractSpecs[Chains.Ethereum].stkAAVE.address
 
 class SubmitVote(ContractMethod):
     """Submit vote for a specific snapshot"""
     name = "submitVote"
     in_signature = [("proposal_id", "uint256"), ("support", "bool")]
-    target_address = AddressesAndAbis[Chain.Ethereum].GovernanceV2.address
+    target_address = ContractSpecs[Chains.Ethereum].GovernanceV2.address
 
     def __init__(self, proposal_id: int, support: bool):
         super().__init__()
@@ -388,7 +389,7 @@ class LiquidationCall(ContractMethod):
                     ("user", "address"),
                     ("debt_to_cover", "uint256"),
                     ("receive_a_token", "bool")]
-    target_address = AddressesAndAbis[Chain.Ethereum].LendingPoolV3.address
+    target_address = ContractSpecs[Chains.Ethereum].LendingPoolV3.address
 
     def __init__(self, collateral_asset: Address, debt_asset: Address, user: Address,
                  debt_to_cover: int, receive_a_token: bool):

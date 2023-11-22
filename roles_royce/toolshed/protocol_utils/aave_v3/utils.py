@@ -1,8 +1,8 @@
 from web3 import Web3
-from .addresses_and_abis import AddressesAndAbis
+from defabipedia.aave_v3 import ContractSpecs
 from dataclasses import dataclass
 from enum import Enum
-from roles_royce.constants import Chain
+from defabipedia.types import Chains
 
 
 class AaveV3Token(Enum):
@@ -19,9 +19,9 @@ class AaveV3Utils:
 
     @staticmethod
     def get_aave_v3_token_addresses(w3: Web3, block: int | str = 'latest') -> list[dict]:
-        blockchain = Chain.get_blockchain_from_web3(w3)
-        protocol_data_provider_contract = w3.eth.contract(address=AddressesAndAbis[blockchain].ProtocolDataProvider.address,
-                                                          abi=AddressesAndAbis[blockchain].ProtocolDataProvider.abi)
+        blockchain = Chains.get_blockchain_from_web3(w3)
+        protocol_data_provider_contract = w3.eth.contract(address=ContractSpecs[blockchain].ProtocolDataProvider.address,
+                                                          abi=ContractSpecs[blockchain].ProtocolDataProvider.abi)
         reserve_tokens = protocol_data_provider_contract.functions.getAllReservesTokens().call(block_identifier=block)
         aave_v3_tokens = []
         for token in reserve_tokens:
