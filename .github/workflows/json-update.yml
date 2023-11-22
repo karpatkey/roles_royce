@@ -37,14 +37,14 @@ jobs:
           pip3 install web3
           pip3 install -e .
           pip3 install --upgrade setuptools
-          
-      
+           
       - name: Run Python script
         run: |
           python3 roles_royce/applications/panic_button_app/config/dao_config_builder.py
 
       - name: Commit and Push changes
         run: |
+          git status
           git add .
           git commit -m "Nightly json update"
           current_branch=$(git branch --show-current)
