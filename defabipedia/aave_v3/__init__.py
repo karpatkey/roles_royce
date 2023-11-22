@@ -22,7 +22,7 @@ class EthereumContractSpecs:
                                         abi=load_abi('wrapped_token_gateway_v3.json'),
                                         name='WrappedTokenGatewayV3')
     AAVE = ContractSpec(address='0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
-                        abi=load_abi('Aave.json'),
+                        abi=load_abi('AAVE.json'),
                         name='Aave')
     ABPT = ContractSpec(address='0x41A08648C3766F9F9d85598fF102a08f4ef84F84',
                         abi=load_abi('ABPT.json'),
