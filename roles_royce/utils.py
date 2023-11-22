@@ -5,26 +5,29 @@ from web3 import Web3
 import requests
 from gnosis.safe.multi_send import MultiSend, MultiSendOperation, MultiSendTx
 from .roles_modifier import Operation
-from .constants import Blockchain, Chain
+from defabipedia.types import Blockchain, Chains
 from .generic_method import Transactable, TxData
+from dataclasses import dataclass
 
 TENDERLY_API_URL = "https://api.tenderly.co/api/v1/"
 TENDERLY_DASHBOARD_URL = "https://dashboard.tenderly.co/"
 
 logger = logging.getLogger(__name__)
 
+
 def to_selector(short_signature):
     return Web3.keccak(text=short_signature).hex()[:10]
 
+
 def to_data_input(name, signature, args):
-    encoded_signature = to_selector(name+signature)
+    encoded_signature = to_selector(name + signature)
     encoded_args = abi.encode([signature], [args]).hex()
     return f"{encoded_signature}{encoded_args}"
 
 
 MULTISENDS = {
-    Chain.Ethereum: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
-    Chain.GnosisChain: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
+    Chains.Ethereum: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
+    Chains.Gnosis: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
 }
 
 
@@ -209,3 +212,10 @@ def tenderly_share_simulation(account_id: str,
     response.raise_for_status()
 
     return f"{TENDERLY_DASHBOARD_URL}shared/simulation/{simulation_id}"
+
+
+@dataclass
+class TenderlyCredentials:
+    account_id: str
+    project: str
+    api_token: str

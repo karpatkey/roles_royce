@@ -1,4 +1,4 @@
-from roles_royce.toolshed.anti_liquidation.spark.cdp import SparkCDPManager, CDPData
+from roles_royce.toolshed.anti_liquidation.spark import SparkCDPManager, CDPData
 from web3 import Web3
 from roles_royce.protocols.eth import spark
 from roles_royce.constants import ETHAddr

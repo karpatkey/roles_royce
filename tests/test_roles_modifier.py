@@ -1,6 +1,6 @@
 from unittest.mock import patch
 from roles_royce.roles_modifier import RolesMod
-from .utils import web3_gnosis
+from .utils import web3_gnosis, local_node_gc
 import pytest
 
 ROLE = 2
@@ -25,19 +25,21 @@ class RolesModTester(RolesMod):
         return super().estimate_gas(contract_address, data, block=TEST_BLOCK)
 
 
-def test_check_and_execute(web3_gnosis):
+def test_check_and_execute(local_node_gc):
+    w3 = local_node_gc.w3
+    local_node_gc.set_block(TEST_BLOCK)
     usdt_approve = "0x095ea7b30000000000000000000000007f90122bf0700f9e7e1f688fe926940e8839f35300000000000000000000000000000000000000000000000000000000000003e8"
-    roles = RolesModTester(role=ROLE, contract_address="0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503", web3=web3_gnosis,
+    roles = RolesModTester(role=ROLE, contract_address="0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503", web3=w3,
                            account=ACCOUNT)
 
-    assert roles.check(contract_address=USDT, data=usdt_approve, block=TEST_BLOCK)
+    assert roles.check(contract_address=USDT, data=usdt_approve)
 
     roles.private_key = '0xa60429f7d6b751ca19d52302826b4a611893fbb138f0059f354b79846f2ab125'
     with patch.object(roles.web3.eth, "get_transaction_count", lambda x: 42):
         roles.execute(contract_address="0x4ECaBa5870353805a9F068101A40E0f32ed605C6", data=usdt_approve, check=False)
         assert roles._tx['value'] == 0
         assert roles._tx['chainId'] == 0x64
-        # Different Roc endpoints return different values for the gas
+        # Different Rpc endpoints return different values for the gas
         # "https://rpc.ankr.com/gnosis" returns 132_451
         # "https://gnosis-mainnet.public.blastapi.io" returns 142_641
         # Some endpoints fail when calling the estimate_gas method
@@ -45,14 +47,15 @@ def test_check_and_execute(web3_gnosis):
         assert roles._tx['nonce'] == 42
 
 
-def test_gas_limit_estimation(web3_gnosis):
+def test_gas_limit_estimation(local_node_gc):
+    w3 = local_node_gc.w3
+    local_node_gc.set_block(TEST_BLOCK)
     usdt_approve = "0x095ea7b30000000000000000000000007f90122bf0700f9e7e1f688fe926940e8839f35300000000000000000000000000000000000000000000000000000000000003e8"
-    roles = RolesModTester(role=ROLE, contract_address="0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503", web3=web3_gnosis,
+    roles = RolesModTester(role=ROLE, contract_address="0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503", web3=w3,
                            account=ACCOUNT)
-    # Different Roc endpoints return different values for the gas
-    # "https://rpc.ankr.com/gnosis" returns 132_451
+    # Different Rpc endpoints return different values for the gas
+    # "https://rpc.ankr.com/gnosis" returns 101887
     # "https://gnosis-mainnet.public.blastapi.io" returns 94608
     # Some endpoints fail when calling the estimate_gas method
     assert roles.estimate_gas(contract_address=USDT, data=usdt_approve,
-                              block=TEST_BLOCK) == 94608 or roles.estimate_gas(contract_address=USDT, data=usdt_approve,
-                                                                               block=TEST_BLOCK) == 101887
+                              block=TEST_BLOCK) == 94608 or roles.estimate_gas(contract_address=USDT, data=usdt_approve) == 101887

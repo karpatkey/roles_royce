@@ -1,0 +1,74 @@
+{
+  "position_id": "FllMeWithPositionId",
+  "protocol": "Balancer",
+  "position_exec_config": [
+    {
+      "function_name": "exit_1_1",
+      "label": "Exit_1_1",
+      "test": true,
+      "description": "Withdraw funds from the Balancer pool withdrawing all assets in proportional way (not used for pools in recovery mode!)",
+      "parameters": [
+        {
+          "name": "bpt_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        }
+      ]
+    },
+    {
+      "function_name": "exit_1_2",
+      "label": "Exit_1_2",
+      "test": true,
+      "description": "Withdraw funds from the Balancer pool withdrawing a single asset specified by the token index.",
+      "parameters": [
+        {
+          "name": "bpt_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        },
+        {
+          "name": "token_out_address",
+          "label": "Token out",
+          "type": "input",
+          "options": [
+            {
+              "value": "FillMewithTokenAddress",
+              "label": "FillMeWithTokenSymbol"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "function_name": "exit_1_3",
+      "label": "Exit_1_3",
+      "test": false,
+      "description": "Withdraw funds from the Balancer pool withdrawing all assets in proportional way for pools in recovery mode.",
+      "parameters": [
+        {
+          "name": "bpt_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        }
+      ]
+    }
+  ]
+}

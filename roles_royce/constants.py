@@ -1,6 +1,4 @@
-from dataclasses import dataclass
 from enum import Enum
-from web3 import Web3
 
 
 class StrEnum(str, Enum):
@@ -16,6 +14,10 @@ class StrEnum(str, Enum):
 
 class CrossChainAddr(StrEnum):
     BalancerVault = "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
+
+
+MAX_UINT256 = 115792089237316195423570985008687907853269984665640564039457584007913129639935
+ZERO = "0x0000000000000000000000000000000000000000"
 
 
 class ETHAddr(StrEnum):
@@ -35,27 +37,31 @@ class ETHAddr(StrEnum):
     AURABAL_bal_depositor = "0x68655AD9852a99C87C0934c7290BB62CFa5D4123"
     AURABooster = "0xA57b8d98dAE62B26Ec3bcC4a365338157060B234"
     AURALocker = "0x3Fa73f1E5d8A792C80F426fc8F84FBF7Ce9bBCAC"
-    stkAURABAL = "0xfAA2eD111B4F580fCb85C48E6DC6782Dc5FCD7a6"
     AURA_rewardpool_dep_wrapper = "0xB188b1CB84Fb0bA13cb9ee1292769F903A9feC59"
     BAL = "0xba100000625a3754423978a60c9317c58a424e3D"
     B_80BAL_20WETH = "0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56"
     BALANCER_Queries = "0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5"
     COMPOUND_Bulker = "0xa397a8C2086C554B531c02E29f3291c9704B00c7"
     COMPOUND_CometRewards = "0x1B0e765F6224C21223AeA2af16c1C46E38885a40"
+    COMPOUND_V2_Comptroller = "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B"
+    COMPOUND_V2_Maximillion = "0xf859A1AD94BcF445A406B892eF0d3082f4174088"
+    DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    GHO = "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f"
     GNO = "0x6810e776880C02933D47DB1b9fc05908e5386b96"
+    OHM = "0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D5"
+    sDAI = "0x83F20F44975D03b1b09e64809B757c47f942BEeA"
+    SparkLendingPoolV3 = "0xC13e21B648A5Ee794902342038FF3aDAB66BE987"
     spGNO = "0x7b481aCC9fDADDc9af2cBEA1Ff2342CB1733E50F"
     stkAAVE = "0x4da27a545c0c5B758a6BA100e3a049001de870f5"
     stkABPT = "0xa1116930326D21fB917d5A27F1E9943A9595fb47"
-    WETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+    stkAURABAL = "0xfAA2eD111B4F580fCb85C48E6DC6782Dc5FCD7a6"
     stETH = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+    WETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
     wstETH = "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
-    unstETH = "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
-    DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
-    sDAI = "0x83F20F44975D03b1b09e64809B757c47f942BEeA"
-    SparkLendingPoolV3 = "0xC13e21B648A5Ee794902342038FF3aDAB66BE987"
     USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-    COMPOUND_V2_Comptroller = "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B"
-    COMPOUND_V2_Maximillion = "0xf859A1AD94BcF445A406B892eF0d3082f4174088"
+    USDT = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+    unstETH = "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
+    rETH = '0xae78736Cd615f374D3085123A210448E74Fc6393'
     WBTC = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
     LINK = "0x514910771AF9Ca656af840dff83E8264EcF986CA"
 
@@ -64,35 +70,3 @@ class GCAddr(StrEnum):
     USDT = "0x4ECaBa5870353805a9F068101A40E0f32ed605C6"
 
 
-@dataclass
-class Blockchain:
-    name: str
-    chain_id: int
-
-    def __str__(self):
-        return self.name
-
-    def __hash__(self):
-        return self.chain_id
-
-
-class Chain:
-    Ethereum = Blockchain("ethereum", 0x1)
-    Polygon = Blockchain("polygon", 0x89)
-    GnosisChain = Blockchain("gnosisChain", 0x64)
-
-    _by_id = {}
-    for attr_name, attr_value in locals().copy().items():
-        if isinstance(attr_value, Blockchain):
-            _by_id[attr_value.chain_id] = attr_value
-
-    @classmethod
-    def get_blockchain_by_chain_id(cls, chain_id):
-        try:
-            return cls._by_id.get(chain_id, None)
-        except KeyError:
-            raise ValueError(f"No Blockchain with chain_id {chain_id} found in Chain.")
-
-    @classmethod
-    def get_blockchain_from_web3(cls, w3: Web3):
-        return cls.get_blockchain_by_chain_id(w3.eth.chain_id)
