@@ -1,5 +1,4 @@
-from .utils import to_hex_32_bytes
-from .utils import local_node_gc, accounts, assign_role
+from .utils import to_hex_32_bytes, local_node_gc, accounts, assign_role, create_simple_safe
 
 
 def test_to_hex_32_bytes():
@@ -15,3 +14,8 @@ def test_assign_role(local_node_gc, accounts):
     role = 1
     tx_receipt = assign_role(local_node_gc, avatar_safe_address, roles_mod_address, role, accounts[0].address)
     assert tx_receipt['status'] == 1
+
+def test_crete_safe_gnosis(local_node_gc, accounts):
+    owner = accounts[0]
+    safe = create_simple_safe(local_node_gc.w3, owner)
+    assert safe.retrieve_owners() == [owner.address]
