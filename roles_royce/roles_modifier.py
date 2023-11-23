@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import IntEnum
+from enum import Enum, IntEnum
 import logging
 from typing import Optional
 
@@ -9,8 +9,10 @@ from eth_account import Account
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_GAS_LIMIT_MULTIPLIER = 1.4
-DEFAULT_FEE_MULTIPLER = 1.2
+NORMAL_GAS_LIMIT_MULTIPLIER = 1.4
+AGGRESIVE_GAS_LIMIT_MULTIPLIER = 3
+NORMAL_FEE_MULTIPLER = 1.2
+AGGRESIVE_FEE_MULTIPLER = 2
 
 ROLES_ABI = (
     '[{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},'
@@ -18,6 +20,7 @@ ROLES_ABI = (
     '{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"bool","name":"shouldRevert","type":"bool"}],"name":"execTransactionWithRole",'
     '"outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]'
 )
+
 
 class TransactionWouldBeReverted(Exception):
     """It is used to indicate that if a transaction is executed, it will be reverted."""
@@ -27,6 +30,31 @@ class Operation(IntEnum):
     """Types of operations."""
     CALL = 0
     DELEGATE_CALL = 1
+
+
+@dataclass
+class GasStrategy:
+    limit_multiplier: float
+    fee_multiplier: float
+
+
+class GasStrategies(GasStrategy, Enum):
+    NORMAL = (NORMAL_GAS_LIMIT_MULTIPLIER, NORMAL_FEE_MULTIPLER)
+    AGGRESIVE = (AGGRESIVE_GAS_LIMIT_MULTIPLIER, AGGRESIVE_FEE_MULTIPLER)
+
+
+_gas_strategy = GasStrategies.NORMAL
+
+
+def get_gas_strategy():
+    """Get the global default gas strategy"""
+    return _gas_strategy
+
+
+def set_gas_strategy(strategy: GasStrategies):
+    """Set a global default gas strategy"""
+    global _gas_strategy
+    _gas_strategy = strategy
 
 
 @dataclass
@@ -62,18 +90,16 @@ class RolesMod:
     def build(self,
               contract_address: str,
               data: str,
-              max_priority_fee: int = None,
-              max_fee_per_gas: int = None,
-              fee_multiplier: float = DEFAULT_FEE_MULTIPLER,
-              gas_limit_multiplier: float = DEFAULT_GAS_LIMIT_MULTIPLIER):
+              max_priority_fee: int | None = None,
+              max_fee_per_gas: int | None = None):
         """Creates a transaction ready to be sent"""
+        gas_strategy = get_gas_strategy()
         if not max_priority_fee:
             max_priority_fee = self.web3.eth.max_priority_fee
-
         if not max_fee_per_gas:
-            max_fee_per_gas = max_priority_fee + int(self.get_base_fee_per_gas() * fee_multiplier)
+            max_fee_per_gas = max_priority_fee + int(self.get_base_fee_per_gas() * gas_strategy.fee_multiplier)
 
-        gas_limit = int(self.estimate_gas(contract_address, data) * gas_limit_multiplier)
+        gas_limit = int(self.estimate_gas(contract_address, data) * gas_strategy.limit_multiplier)
 
         nonce = self.nonce or self.web3.eth.get_transaction_count(self.account)
 
@@ -95,18 +121,16 @@ class RolesMod:
     def execute(self,
                 contract_address: str,
                 data: str,
-                max_priority_fee: int = None,
-                max_fee_per_gas: int = None,
+                max_priority_fee: int | None = None,
+                max_fee_per_gas: int | None = None,
                 check: bool = True,
-                fee_multiplier: float = DEFAULT_FEE_MULTIPLER,
-                gas_limit_multiplier: float = DEFAULT_GAS_LIMIT_MULTIPLIER
                 ) -> str:
         """Execute a role-based transaction. Returns the transaction hash as a str."""
 
         if check and not self.check(contract_address, data):
             raise TransactionWouldBeReverted()
 
-        tx = self.build(contract_address, data, max_priority_fee, max_fee_per_gas, fee_multiplier, gas_limit_multiplier)
+        tx = self.build(contract_address, data, max_priority_fee, max_fee_per_gas)
         logger.debug(f"Executing tx: {tx}")
         signed_txn = self._sign_transaction(tx)
         executed_txn = self._send_raw_transaction(signed_txn.rawTransaction)
@@ -125,16 +149,16 @@ class RolesMod:
     def _build_transaction(self, contract_address: str,
                            data: str,
                            gas_limit: int,
-                           max_priority_fee: int,
-                           max_gas: int,
+                           max_priority_fee_per_gas: int,
+                           max_fee_per_gas: int,
                            nonce: int):
 
         tx = self._build_exec_transaction(contract_address, data).build_transaction(
             {
                 "chainId": self.web3.eth.chain_id,
                 "gas": gas_limit,
-                "maxFeePerGas": max_gas,
-                "maxPriorityFeePerGas": max_priority_fee,
+                "maxFeePerGas": max_fee_per_gas,  # base + priority. The base is always 12.5% higher than the last block
+                "maxPriorityFeePerGas": max_priority_fee_per_gas,
                 "nonce": nonce,
             }
         )
