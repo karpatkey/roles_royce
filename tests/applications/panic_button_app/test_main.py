@@ -53,7 +53,6 @@ JSON_FORM = {
 }
 
 exec_config = ExecConfig(percentage=JSON_FORM["percentage"],
-                         simulate=JSON_FORM["simulate"],
                          dao=dao,
                          blockchain=blockchain,
                          protocol=JSON_FORM["protocol"],
@@ -102,7 +101,7 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
     response = json.loads(drive_away(disassembler=disassembler,
                                      txn_transactables=txn_transactables,
                                      env=env,
-                                     simulate=exec_config.simulate))
+                                     simulate=False))
 
     assert response['status'] == 200
     assert response['message'] == "Transaction executed successfully"
@@ -113,7 +112,7 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
     response_reverted = json.loads(drive_away(disassembler=disassembler,
                                               txn_transactables=txn_transactables,
                                               env=env,
-                                              simulate=exec_config.simulate))
+                                              simulate=False))
 
     assert response_reverted['status'] == 422
     assert response_reverted['message'] == "Transaction reverted when simulated with local eth_call"
@@ -124,7 +123,7 @@ def test_drive_away(local_node_eth, accounts, monkeypatch):
     response_exception = json.loads(drive_away(disassembler=disassembler,
                                                txn_transactables=txn_transactables,
                                                env=env,
-                                               simulate=exec_config.simulate))
+                                               simulate=False))
 
     assert response_exception['status'] == 500
     assert response_exception['message'] == "Error: ENS name: '0x' is invalid."
