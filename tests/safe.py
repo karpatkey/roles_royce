@@ -31,7 +31,8 @@ class SimpleSafe(Safe):
         super().__init__(address, ethereum_client)
 
     def send(self, txs: list[Transactable]) -> TxResult:
-        tx = multi_or_one(txs, Chains.Ethereum)
+
+        tx = multi_or_one(txs, Chains.get_blockchain_from_web3(self.w3))
         safe_tx = self.build_multisig_tx(to=tx.contract_address, value=tx.value,
                                          data=tx.data, operation=tx.operation,
                                          safe_tx_gas=14_000_000,
@@ -49,12 +50,13 @@ class SimpleSafe(Safe):
     @classmethod
     def build(cls, owner: LocalAccount, node_url) -> "SimpleSafe":
         ethereum_client = EthereumClient(node_url)
+        network = EthereumNetwork(ethereum_client.w3.eth.chain_id)
         ethereum_tx_sent = cls.create(ethereum_client, deployer_account=owner,
-                                      master_copy_address=addresses.MASTER_COPIES[EthereumNetwork.MAINNET][0][0],
+                                      master_copy_address=addresses.MASTER_COPIES[network][0][0],
                                       owners=[owner.address], threshold=1,
                                       # using a proxy factory address as without it
                                       # the gas estimation is too high because of a bug in gnosis/safe/safe.py
-                                      proxy_factory_address="0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2")
+                                      proxy_factory_address=addresses.PROXY_FACTORIES[network][1][0])
 
         safe = SimpleSafe(ethereum_tx_sent.contract_address, ethereum_client, signer_key=owner.key)
         return safe
