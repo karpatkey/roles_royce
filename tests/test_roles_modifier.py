@@ -1,5 +1,7 @@
 from unittest.mock import patch
-from roles_royce.roles_modifier import RolesMod
+from roles_royce.roles_modifier import (RolesMod, NORMAL_FEE_MULTIPLER, AGGRESIVE_FEE_MULTIPLER,
+                                        NORMAL_GAS_LIMIT_MULTIPLIER, AGGRESIVE_GAS_LIMIT_MULTIPLIER,
+                                        set_gas_strategy, GasStrategies)
 from .utils import web3_gnosis, local_node_gc
 import pytest
 
@@ -59,3 +61,33 @@ def test_gas_limit_estimation(local_node_gc):
     # Some endpoints fail when calling the estimate_gas method
     assert roles.estimate_gas(contract_address=USDT, data=usdt_approve,
                               block=TEST_BLOCK) == 94608 or roles.estimate_gas(contract_address=USDT, data=usdt_approve) == 101887
+
+
+def test_gas_strategy(local_node_gc):
+    w3 = local_node_gc.w3
+    local_node_gc.set_block(TEST_BLOCK)
+    usdt_approve = "0x095ea7b30000000000000000000000007f90122bf0700f9e7e1f688fe926940e8839f35300000000000000000000000000000000000000000000000000000000000003e8"
+
+    estimated_gas = 100
+    base_fee_per_gas = 50
+    with patch.object(RolesModTester, "estimate_gas", lambda *args, **kwargs: estimated_gas):
+        with patch.object(RolesModTester, "get_base_fee_per_gas", lambda *args, **kwargs: base_fee_per_gas):
+            roles = RolesModTester(role=ROLE, contract_address="0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503", web3=w3,
+                                   account=ACCOUNT)
+            tx = roles.build(contract_address=USDT, data=usdt_approve, max_priority_fee=2000)
+            assert tx['gas'] == estimated_gas * NORMAL_GAS_LIMIT_MULTIPLIER
+            assert tx['maxPriorityFeePerGas'] == 2000
+            assert tx['maxFeePerGas'] == 2000 + base_fee_per_gas * NORMAL_FEE_MULTIPLER
+
+    set_gas_strategy(GasStrategies.AGGRESIVE)
+
+    estimated_gas = 100
+    base_fee_per_gas = 50
+    with patch.object(RolesModTester, "estimate_gas", lambda *args, **kwargs: estimated_gas):
+        with patch.object(RolesModTester, "get_base_fee_per_gas", lambda *args, **kwargs: base_fee_per_gas):
+            roles = RolesModTester(role=ROLE, contract_address="0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503", web3=w3,
+                                   account=ACCOUNT)
+            tx = roles.build(contract_address=USDT, data=usdt_approve, max_priority_fee=2000)
+            assert tx['gas'] == estimated_gas * AGGRESIVE_GAS_LIMIT_MULTIPLIER
+            assert tx['maxPriorityFeePerGas'] == 2000
+            assert tx['maxFeePerGas'] == 2000 + base_fee_per_gas * AGGRESIVE_FEE_MULTIPLER
