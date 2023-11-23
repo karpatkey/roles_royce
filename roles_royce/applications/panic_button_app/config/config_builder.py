@@ -125,15 +125,15 @@ class DAOStrategiesBuilder:
 
     @staticmethod
     def build_balancer_positions(w3: Web3, positions: list[BalancerPosition]) -> list[dict]:
-        with open(os.path.join(os.path.dirname(__file__), 'templates', 'balancer_template.json'), 'r') as f:
-            balancer_template = json.load(f)
+
 
         result = []
         for balancer_position in positions:
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'balancer_template.json'), 'r') as f:
+                position = json.load(f)
             print("we are at: ", balancer_position)
             bpt_address = Web3.to_checksum_address(balancer_position.position_id_tech)
 
-            position = balancer_template.copy()
             if balancer_position.staked:
                 for item in range(3):
                     position['exec_config'].pop(0)
@@ -170,12 +170,11 @@ class DAOStrategiesBuilder:
 
     @staticmethod
     def build_aura_positions(w3: Web3, positions: list[AuraPosition]) -> list[dict]:
-        with open(os.path.join(os.path.dirname(__file__), 'templates', 'aura_template.json'), 'r') as f:
-            aura_template = json.load(f)
-        
         aura_addresses = get_bpt_from_aura(w3)
         result = []
         for aura_position in positions:
+            with open(os.path.join(os.path.dirname(__file__), 'templates', 'aura_template.json'), 'r') as f:
+                position = json.load(f)
             print("we are at: ", aura_position)
             bpt_address = Web3.to_checksum_address(aura_position.position_id_tech)
             try:
@@ -184,7 +183,6 @@ class DAOStrategiesBuilder:
                         aura_address = item.get('aura_address')
                         break
 
-                position = aura_template.copy()
                 del position["exec_config"][2]["parameters"][2]["options"][0]  # Remove the dummy element in template
 
                 position["position_id"] = aura_position.position_id
