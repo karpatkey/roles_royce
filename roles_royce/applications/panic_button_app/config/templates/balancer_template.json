@@ -1,0 +1,76 @@
+{
+  "protocol": "Balancer",
+  "position_id": "FllMeWithPositionId",
+  "position_id_tech": "FillMeWithBptAddress",
+  "position_id_human_readable": "FillMeWithPositionIdHumanReadable",
+  "exec_config": [
+    {
+      "function_name": "exit_1_1",
+      "label": "Withdraw (single token)",
+      "test": true,
+      "description": "Withdraw a single token from a BPT",
+      "parameters": [
+        {
+          "name": "bpt_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        }
+      ]
+    },
+    {
+      "function_name": "exit_1_2",
+      "label": "Withdraw (Proportional)",
+      "test": true,
+      "description": "Withdraw the proportional token amounts from a BPT",
+      "parameters": [
+        {
+          "name": "bpt_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        },
+        {
+          "name": "token_out_address",
+          "label": "Token out",
+          "type": "input",
+          "options": [
+            {
+              "value": "FillMewithTokenAddress",
+              "label": "FillMeWithTokenSymbol"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "function_name": "exit_1_3",
+      "label": "Withdraw (proportional) (Emergency mode)",
+      "test": false,
+      "description": "Withdraw the proportional token amounts from a BPT",
+      "parameters": [
+        {
+          "name": "bpt_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        }
+      ]
+    }
+  ]
+}

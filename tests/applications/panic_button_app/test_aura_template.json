@@ -1,7 +1,9 @@
 {
   "position_id": "FillMeWIthPositionId",
+  "position_id_tech": "FillMeWithBptAddress",
+  "position_id_human_readable": "FillMeWithPositionIdHumanReadable",
   "protocol": "Aura",
-  "position_exec_config": [
+  "exec_config": [
     {
       "function_name": "exit_1",
       "label": "Exit_1",

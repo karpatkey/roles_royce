@@ -26,25 +26,42 @@ class Chains:
     Avalanche = Blockchain("avalanche", 0xA86A)
     Binance = Blockchain("binance", 0x38)
     Fantom = Blockchain("fantom", 0xFA)
-    Gnosis = Blockchain("gnosisChain", 0x64)
+    Gnosis = Blockchain("gnosis", 0x64)
     Arbitrum = Blockchain("arbitrum", 0xA4B1)
     Optimism = Blockchain("optimism", 0xA)
 
     _by_id = {}
+    _by_name = {}
     for attr_name, attr_value in locals().copy().items():
         if isinstance(attr_value, Blockchain):
             _by_id[attr_value.chain_id] = attr_value
+            _by_name[attr_value.name] = attr_value
 
     @classmethod
     def get_blockchain_by_chain_id(cls, chain_id) -> Blockchain:
         try:
-            return cls._by_id.get(chain_id, None)
+            return cls._by_id.get(chain_id)
         except KeyError:
             raise ValueError(f"No Blockchain with chain_id {chain_id} found in Chain.")
 
     @classmethod
+    def get_blockchain_by_name(cls, name) -> Blockchain:
+        try:
+            return cls._by_name.get(name)
+        except KeyError:
+            raise ValueError(f"No Blockchain with name {name} found in Chain.")
+
+    @classmethod
     def get_blockchain_from_web3(cls, w3: Web3) -> Blockchain:
         return cls.get_blockchain_by_chain_id(w3.eth.chain_id)
+
+    @classmethod
+    def names(cls):
+        return cls._by_name.keys()
+
+    @classmethod
+    def chain_ids(cls):
+        return cls._by_id.keys()
 
 
 def load_abi(abi_filename):

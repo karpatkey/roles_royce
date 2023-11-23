@@ -21,15 +21,15 @@ class Pool:
         try:
             self.bpt_contract.functions.getNormalizedWeights().call()
             return PoolKind.WeightedPool
-        except ContractLogicError:
+        except (ContractLogicError, ValueError):
             try:
                 self.bpt_contract.functions.getBptIndex().call()
                 return PoolKind.ComposableStablePool
-            except ContractLogicError:
+            except (ContractLogicError, ValueError):
                 try:
                     self.bpt_contract.functions.inRecoveryMode().call()
                     return PoolKind.StablePool
-                except ContractLogicError:
+                except (ContractLogicError, ValueError):
                     return PoolKind.MetaStablePool
 
     def assets(self) -> list[str]:

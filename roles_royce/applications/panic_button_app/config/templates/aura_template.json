@@ -1,0 +1,107 @@
+{
+  "position_id": "FillMeWIthPositionId",
+  "position_id_tech": "FillMeWithBptAddress",
+  "position_id_human_readable": "FillMeWithPositionIdHumanReadable",
+  "protocol": "Aura",
+  "exec_config": [
+    {
+      "function_name": "exit_1",
+      "label": "Unstake",
+      "test": true,
+      "description": "Unstake the BPT from Aura",
+      "parameters": [
+        {
+          "name": "rewards_address",
+          "type": "constant",
+          "value": "FillMeWithRewardsAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max Slippage",
+          "type": "input",
+          "rules": {
+            "min": 0,
+            "max": 100
+          }
+        }
+      ]
+    },
+    {
+      "function_name": "exit_2_1",
+      "label": "Unstake + Withdraw (Single Token)",
+      "test": true,
+      "description": "Unstake the BPT from Aura and withdraw in single token from Balancer",
+      "parameters": [
+        {
+          "name": "rewards_address",
+          "type": "constant",
+          "value": "FillMeWithRewardsAddress"
+        },
+        {
+          "name": "max_slippage",
+          "type": "input",
+          "label": "Max Slippage",
+          "rules": {
+            "min": 0,
+            "max": 100
+          }
+        }
+      ]
+    },
+    {
+      "function_name": "exit_2_2",
+      "label": "Unstake + Withdraw (Proportional)",
+      "test": true,
+      "description": "Unstake the BPT from Aura and withdraw in proportional token from Balancer",
+      "parameters": [
+        {
+          "name": "rewards_address",
+          "type": "constant",
+          "value": "FillMeWithRewardsAddress"
+        },
+        {
+          "name": "max_slippage",
+          "type": "input",
+          "scale": {
+            "min": 0,
+            "max": 100,
+            "step": 0.5
+          }
+        },
+        {
+          "name": "token_out_address",
+          "label": "Token Out Address",
+          "type": "input",
+          "options": [
+            {
+              "value": "FillMewithTokenAddress",
+              "label": "FillMeWithTokenSymbol"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "function_name": "exit_2_3",
+      "label": "Unstake + Withdraw (Proportional) (Emergency mode)",
+      "test": false,
+      "description": "Unstake the BPT from Aura and withdraw in proportional token from Balancer",
+      "parameters": [
+        {
+          "name": "rewards_address",
+          "type": "constant",
+          "value": "FillMeWithRewardsAddress"
+        },
+        {
+          "name": "max_slippage",
+          "type": "input",
+          "scale": {
+            "min": 0,
+            "max": 100,
+            "step": 0.5
+          }
+        }
+      ]
+    }
+  ]
+}
