@@ -3,6 +3,7 @@ from roles_royce.applications.panic_button_app.utils import ENV, start_the_engin
 import json
 from roles_royce.roles_modifier import update_gas_fees_parameters
 
+
 def main():
     try:
         parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)

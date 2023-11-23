@@ -4,7 +4,7 @@ import logging
 from typing import Optional
 
 from web3 import Web3, exceptions
-from web3.types import Address, ChecksumAddress
+from web3.types import Address, ChecksumAddress, TxParams, TxReceipt
 from eth_account import Account
 
 logger = logging.getLogger(__name__)
@@ -171,7 +171,15 @@ class RolesMod:
     def _send_raw_transaction(self, raw_transaction):
         return self.web3.eth.send_raw_transaction(raw_transaction)
 
-    def get_tx_receipt(self, tx_hash: str):
+    def get_tx_receipt(self, tx_hash: str) -> TxReceipt:
+        """Get the transaction receipt from the blockchain.
+
+        Args:
+            tx_hash (str): Transaction hash.
+
+        Returns:
+            Transaction receipt as a TxReceipt object.
+        """
         try:
             transaction_receipt = self.web3.eth.wait_for_transaction_receipt(tx_hash)
             return transaction_receipt
@@ -179,8 +187,16 @@ class RolesMod:
             return "Transaction not yet on blockchain"
 
 
-def update_gas_fees_parameters(w3: Web3, tx: dict):
-    """Updates the gas fees parameters of a transaction fetching the data from the blockchain and using the global gas strategy multipliers"""
+def update_gas_fees_parameters(w3: Web3, tx: dict) -> TxParams:
+    """Updates the gas fees parameters of a transaction fetching the data from the blockchain and using the global gas strategy multipliers
+
+    Args:
+        w3 (Web3): Web3 instance.
+        tx (dict): Transaction dictionary as a TxParams object.
+
+    Returns:
+            Transaction dictionary as a TxParams object.
+    """
     gas_strategy = get_gas_strategy()
     max_priority_fee = w3.eth.max_priority_fee
     latest_block = w3.eth.get_block("latest")
