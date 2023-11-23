@@ -116,7 +116,8 @@ class RolesMod:
 
     def estimate_gas(self, contract_address: str, data: str, block='latest') -> int:
         """Estimate the gas that would be needed."""
-        return self._build_exec_transaction(contract_address, data).estimate_gas({"from": self.account}, block_identifier=block)
+        return self._build_exec_transaction(contract_address, data).estimate_gas({"from": self.account},
+                                                                                 block_identifier=block)
 
     def execute(self,
                 contract_address: str,
@@ -176,3 +177,15 @@ class RolesMod:
             return transaction_receipt
         except exceptions.TransactionNotFound:
             return "Transaction not yet on blockchain"
+
+
+def update_gas_fees_parameters(w3: Web3, tx: dict):
+    """Updates the gas fees parameters of a transaction fetching the data from the blockchain and using the global gas strategy multipliers"""
+    gas_strategy = get_gas_strategy()
+    max_priority_fee = w3.eth.max_priority_fee
+    latest_block = w3.eth.get_block("latest")
+    base_fee_per_gas = latest_block["baseFeePerGas"]
+    max_fee_per_gas = max_priority_fee + int(base_fee_per_gas * gas_strategy.fee_multiplier)
+    tx["maxFeePerGas"] = max_fee_per_gas
+    tx["maxPriorityFeePerGas"] = max_priority_fee
+    return tx
