@@ -72,3 +72,19 @@ def get_tokens_from_bpt(w3: Web3, bpt_address: Address) -> list[dict]:
             "symbol": token_symbol
         })
     return result
+
+def get_gauge_address_from_bpt(w3: Web3, bpt_address: Address) -> Address:
+    """get the gauge address from a bpt
+
+    Args:
+        w3 (Web3): Web3 instance
+        bpt_address (Address): BPT address of the pool
+
+    Returns:
+        Address: The gauge address
+    """
+    
+    blockchain = Chains.get_blockchain_from_web3(w3)
+    get_gauge_contract = balancer.ContractSpecs[blockchain].LiquidityGaugeFactory.contract(w3)
+    gauge_address = get_gauge_contract.functions.getPoolGauge(bpt_address).call()    
+    return gauge_address

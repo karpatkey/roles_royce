@@ -19,6 +19,9 @@ class EthereumContractSpecs:
     Queries = ContractSpec(address="0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5",
                            abi=load_abi('queries.json'),
                            name='queries')
+    LiquidityGaugeFactory = ContractSpec(address='0x4E7bBd911cf1EFa442BC1b2e9Ea01ffE785412EC',
+                                         abi=load_abi('liquidity_gauge_factory.json'),
+                                         name='liquidity_gauge_factory')
     BPT_COW_WETH = ContractSpec(address="0xde8C195Aa41C11a0c4787372deFBbDdAa31306D2",
                                 abi=load_abi('weighted_pool.json'),
                                 name='bpt_COW_WETH')
@@ -37,6 +40,9 @@ class GnosisContractSpecs:
     Queries = ContractSpec(address="0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5",
                            abi=load_abi('queries.json'),
                            name='queries')
+    LiquidityGaugeFactory = ContractSpec(address='0x4E7bBd911cf1EFa442BC1b2e9Ea01ffE785412EC',
+                                         abi=load_abi('cc_liquidity_gauge_factory.json'),
+                                         name='cc_liquidity_gauge_factory')
 
 
 ContractSpecs = {

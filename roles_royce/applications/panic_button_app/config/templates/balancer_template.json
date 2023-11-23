@@ -71,6 +71,74 @@
           "rules": { "min": 0, "max": 100 }
         }
       ]
+    },
+    {
+      "function_name": "exit_2_1",
+      "label": "Unstake from gauge and Withdraw (single token)",
+      "test": true,
+      "description": "Unstake BPT from gauge and withdraw a single token from a BPT",
+      "parameters": [
+        {
+          "name": "gauge_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        }
+      ]
+    },
+    {
+      "function_name": "exit_2_2",
+      "label": "Unstake from gauge and withdraw (Proportional)",
+      "test": true,
+      "description": "Withdraw the proportional token amounts from a BPT",
+      "parameters": [
+        {
+          "name": "gauge_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        },
+        {
+          "name": "token_out_address",
+          "label": "Token out",
+          "type": "input",
+          "options": [
+            {
+              "value": "FillMewithTokenAddress",
+              "label": "FillMeWithTokenSymbol"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "function_name": "exit_2_3",
+      "label": "Unstake and withdraw (proportional) (Emergency mode)",
+      "test": false,
+      "description": "Withdraw the proportional token amounts from a BPT",
+      "parameters": [
+        {
+          "name": "gauge_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        }
+      ]
     }
   ]
 }

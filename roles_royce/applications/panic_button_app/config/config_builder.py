@@ -2,10 +2,10 @@ import json
 from web3.types import Address
 from web3 import Web3
 from roles_royce.constants import StrEnum
-from .utils import get_bpt_from_aura, get_tokens_from_bpt
+from .utils import get_bpt_from_aura, get_tokens_from_bpt, get_gauge_address_from_bpt
 import os
 from dataclasses import dataclass, field
-from defabipedia.types import Blockchain
+from defabipedia.types import Blockchain, ContractSpec
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -63,6 +63,7 @@ def seed_file(dao: DAO, blockchain: Blockchain) -> None:
 class BalancerPosition:
     position_id: str
     bpt_address: Address
+    staked: bool
     position_id_tech: Address = field(init=False)
 
     def __post_init__(self):
@@ -133,12 +134,23 @@ class DAOStrategiesBuilder:
             bpt_address = Web3.to_checksum_address(balancer_position.position_id_tech)
 
             position = balancer_template.copy()
+            if balancer_position.staked:
+                for item in range(3):
+                    position['exec_config'].pop(0)
+                    gauge_address = get_gauge_address_from_bpt(w3, bpt_address)
+                for i in range(3):
+                    position["exec_config"][i]["parameters"][0]["value"] = gauge_address
+            else:
+                for item in range(3):
+                    position['exec_config'].pop(-1)    
+                for i in range(3):
+                    position["exec_config"][i]["parameters"][0]["value"] = bpt_address
+
             del position["exec_config"][1]["parameters"][2]["options"][0]  # Remove the dummy element in template
 
             position["position_id"] = balancer_position.position_id
             position["position_id_tech"] = bpt_address
-            for i in range(3):
-                position["exec_config"][i]["parameters"][0]["value"] = bpt_address
+            
             try:
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
                 position["position_id_human_readable"] = 'Balancer'
