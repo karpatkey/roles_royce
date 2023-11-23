@@ -254,12 +254,13 @@ class BalancerDisassembler(Disassembler):
             if amount_to_redeem == 0:
                 return []
 
-            unstake_gauge = balancer.Unstake(w3=self.w3, gauge_address=gauge_address, amount=amount_to_redeem)
+            unstake_gauge = balancer.UnstakeFromGauge(blockchain=self.blockchain, gauge_address=gauge_address, amount=amount_to_redeem,)
             txns.append(unstake_gauge)
 
             gauge_contract = self.w3.eth.contract(address=gauge_address,
                                                   abi=Abis[self.blockchain].Gauge.abi)
             bpt_address = gauge_contract.functions.lp_token().call()
+
 
             withdraw_balancer = self.exit_1_1(percentage=fraction, exit_arguments=[
                 {"bpt_address": bpt_address, "max_slippage": max_slippage}], amount_to_redeem=amount_to_redeem)
