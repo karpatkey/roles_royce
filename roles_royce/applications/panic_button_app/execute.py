@@ -1,7 +1,7 @@
 import argparse
 from roles_royce.applications.panic_button_app.utils import ENV, start_the_engine
 import json
-from roles_royce.roles_modifier import update_gas_fees_parameters, set_gas_strategy, GasStrategies
+from roles_royce.roles_modifier import update_gas_fees_parameters_and_nonce, set_gas_strategy, GasStrategies
 
 
 def main():
@@ -19,7 +19,7 @@ def main():
         w3, w3_MEV = start_the_engine(env)
 
         set_gas_strategy(GasStrategies.AGGRESIVE)
-        tx = update_gas_fees_parameters(w3, tx)
+        tx = update_gas_fees_parameters_and_nonce(w3, tx)
 
         if env.MODE == 'production':  # In production environment, send the transaction to the real blockchain
             signed = w3.eth.account.sign_transaction(tx, env.PRIVATE_KEY)

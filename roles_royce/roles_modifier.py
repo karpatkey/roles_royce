@@ -187,8 +187,8 @@ class RolesMod:
             return "Transaction not yet on blockchain"
 
 
-def update_gas_fees_parameters(w3: Web3, tx: dict) -> TxParams:
-    """Updates the gas fees parameters of a transaction fetching the data from the blockchain and using the global gas strategy multipliers
+def update_gas_fees_parameters_and_nonce(w3: Web3, tx: dict) -> TxParams:
+    """Updates the gas fees parameters and the nonce of a transaction fetching the data from the blockchain and using the global gas strategy multipliers
 
     Args:
         w3 (Web3): Web3 instance.
@@ -204,4 +204,5 @@ def update_gas_fees_parameters(w3: Web3, tx: dict) -> TxParams:
     max_fee_per_gas = max_priority_fee + int(base_fee_per_gas * gas_strategy.fee_multiplier)
     tx["maxFeePerGas"] = max_fee_per_gas
     tx["maxPriorityFeePerGas"] = max_priority_fee
+    tx['nonce'] = w3.eth.get_transaction_count(tx['from'])
     return tx
