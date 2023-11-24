@@ -65,7 +65,7 @@ class BalancerDisassembler(Disassembler):
                 arg_dicts = [
                     {
                         "bpt_address": "0xsOmEAddResS",
-                        "max_slippage": 0.01
+                        "max_slippage": 1.25
                     }
                 ]
             amount_to_redeem (int, optional): Amount of BPT to redeem. Defaults to None. If None, the 'percentage' of the balance of the BPT will be redeemed.
@@ -80,7 +80,7 @@ class BalancerDisassembler(Disassembler):
 
         for element in exit_arguments:
             bpt_address = Web3.to_checksum_address(element["bpt_address"])
-            max_slippage = element["max_slippage"]
+            max_slippage = element["max_slippage"] / 100
 
             bpt_contract = self.w3.eth.contract(address=bpt_address,
                                                 abi=Abis[self.blockchain].UniversalBPT.abi)
@@ -124,7 +124,7 @@ class BalancerDisassembler(Disassembler):
                 arg_dicts = [
                     {
                         "bpt_address": "0xsOmEAddResS",
-                        "max_slippage": 0.01,
+                        "max_slippage": 1.25,
                         "token_out_address": "0xAnoThERAdDResS"
                     }
                 ]
@@ -139,7 +139,7 @@ class BalancerDisassembler(Disassembler):
 
         for element in exit_arguments:
             bpt_address = Web3.to_checksum_address(element["bpt_address"])
-            max_slippage = element["max_slippage"]
+            max_slippage = element["max_slippage"] / 100
             token_out_address = Web3.to_checksum_address(element["token_out_address"])
 
             bpt_contract = self.w3.eth.contract(address=bpt_address,
@@ -232,7 +232,7 @@ class BalancerDisassembler(Disassembler):
                 e.g.= [
                         {
                             "gauge_address": "0xsOmEAddResS",
-                            "max_slippage": 0.01
+                            "max_slippage": 1.25
                         }
                     ]
             amount_to_redeem (int, optional): Amount of BPT to redeem. Defaults to None. IfNone, the 'percentage' of the
@@ -246,7 +246,7 @@ class BalancerDisassembler(Disassembler):
         txns = []
         for element in exit_arguments:
             gauge_address = Web3.to_checksum_address(element['gauge_address'])
-            max_slippage = element['max_slippage']
+            max_slippage = element['max_slippage'] / 100
 
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem_from_gauge(gauge_address, fraction)
@@ -281,7 +281,7 @@ class BalancerDisassembler(Disassembler):
                     {
                         "gauge_address": "0xsOmEAddResS",
                         "token_out_address" : "0xsOmEAddResS",
-                        "max_slippage": 0.01
+                        "max_slippage": 1.25
                     }
                 ]
             amount_to_redeem (int, optional): Amount of BPT to redeem. Defaults to None. If None, the 'percentage' of the balance of the BPT will be redeemed.
@@ -296,7 +296,7 @@ class BalancerDisassembler(Disassembler):
             gauge_address = Web3.to_checksum_address(element['gauge_address'])
             token_out_address = Web3.to_checksum_address(element['token_out_address'])
 
-            max_slippage = element['max_slippage']
+            max_slippage = element['max_slippage'] / 100
 
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem_from_gauge(gauge_address, fraction)
@@ -330,7 +330,6 @@ class BalancerDisassembler(Disassembler):
                 arg_dicts = [
                     {
                         "gauge_address": "0xsOmEAddResS",
-                        "max_slippage": 0.01
                     }
                 ]
             amount_to_redeem (int, optional): Amount of BPT to redeem. Defaults to None. If None, the 'percentage' of the balance of the BPT will be redeemed.
@@ -343,7 +342,6 @@ class BalancerDisassembler(Disassembler):
         txns = []
         for element in exit_arguments:
             gauge_address = Web3.to_checksum_address(element['gauge_address'])
-            max_slippage = element['max_slippage']
 
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem_from_gauge(gauge_address, fraction)

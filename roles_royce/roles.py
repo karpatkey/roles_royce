@@ -1,6 +1,5 @@
 import logging
 from typing import List
-
 from web3 import Web3
 from web3.types import TxReceipt
 from .roles_modifier import RolesMod
@@ -17,7 +16,7 @@ def build(txs: List[Transactable],
           roles_mod_address: str,
           web3: Web3,
           tx_kwargs: dict | None = None
-          ):
+          ) -> dict:
     """Create a transaction to later be sent to the blockchain or other uses
     such as studying it or composing it with other contracts.
 
@@ -28,6 +27,9 @@ def build(txs: List[Transactable],
         roles_mod_address: Address to call execTransactionWithRole.
         web3: Web3 object.
         tx_kwargs: Kwargs for the transaction, for example ``max_priority_fee``.
+
+    Returns:
+        Transaction dict.
     """
     tx_data = multi_or_one(txs, Chains.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(

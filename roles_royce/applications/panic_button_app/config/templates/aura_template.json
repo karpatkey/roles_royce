@@ -1,6 +1,6 @@
 {
   "position_id": "FillMeWIthPositionId",
-  "position_id_tech": "FillMeWithBptAddress",
+  "position_id_tech": "FillMeWithGaugeAddress",
   "position_id_human_readable": "FillMeWithPositionIdHumanReadable",
   "protocol": "Aura",
   "exec_config": [
@@ -8,12 +8,12 @@
       "function_name": "exit_1",
       "label": "Unstake",
       "test": true,
-      "description": "Unstake the BPT from Aura",
+      "description": "Unstake BPT from Aura gauge",
       "parameters": [
         {
           "name": "rewards_address",
           "type": "constant",
-          "value": "FillMeWithRewardsAddress"
+          "value": "FillMeWithGaugeAddress"
         },
         {
           "name": "max_slippage",
@@ -30,21 +30,18 @@
       "function_name": "exit_2_1",
       "label": "Unstake + Withdraw (Single Token)",
       "test": true,
-      "description": "Unstake the BPT from Aura and withdraw in single token from Balancer",
+      "description": "Unstake BPT from Aura gauge and withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT",
       "parameters": [
         {
           "name": "rewards_address",
           "type": "constant",
-          "value": "FillMeWithRewardsAddress"
+          "value": "FillMeWithGaugeAddress"
         },
         {
           "name": "max_slippage",
           "type": "input",
           "label": "Max Slippage",
-          "rules": {
-            "min": 0,
-            "max": 100
-          }
+          "rules": { "min": 0, "max": 100 }
         }
       ]
     },
@@ -52,21 +49,17 @@
       "function_name": "exit_2_2",
       "label": "Unstake + Withdraw (Proportional)",
       "test": true,
-      "description": "Unstake the BPT from Aura and withdraw in proportional token from Balancer",
+      "description": "Unstake BPT from gauge and withdraw a single token (specified by the user) by redeeming the BPT",
       "parameters": [
         {
           "name": "rewards_address",
           "type": "constant",
-          "value": "FillMeWithRewardsAddress"
+          "value": "FillMeWithGaugeAddress"
         },
         {
           "name": "max_slippage",
           "type": "input",
-          "scale": {
-            "min": 0,
-            "max": 100,
-            "step": 0.5
-          }
+          "rules": { "min": 0, "max": 100 }
         },
         {
           "name": "token_out_address",
@@ -83,23 +76,19 @@
     },
     {
       "function_name": "exit_2_3",
-      "label": "Unstake + Withdraw (Proportional) (Emergency mode)",
+      "label": "Unstake + Withdraw (Proportional - Recovery Mode)",
       "test": false,
-      "description": "Unstake the BPT from Aura and withdraw in proportional token from Balancer",
+      "description": "Unstake BPT from Aura gauge and withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT for a pool in Recovery Mode",
       "parameters": [
         {
           "name": "rewards_address",
           "type": "constant",
-          "value": "FillMeWithRewardsAddress"
+          "value": "FillMeWithGaugeAddress"
         },
         {
           "name": "max_slippage",
           "type": "input",
-          "scale": {
-            "min": 0,
-            "max": 100,
-            "step": 0.5
-          }
+          "rules": { "min": 0, "max": 100 }
         }
       ]
     }

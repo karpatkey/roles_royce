@@ -1,0 +1,117 @@
+[
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0xbAd20c15A773bf03ab973302F61FAbceA5101f0A",
+        "aura_address": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0xFEdb19Ec000d38d92Af4B21436870F115db22725",
+        "aura_address": "0x76757c8f977D2024aa9cF9485AD77Ef57D7942DC"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0xF48f01DCB2CbB3ee1f6AaB0e742c2D3941039d56",
+        "aura_address": "0x750c5ED835d300d4ba5054cf2Fad946f0a0df0CD"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x66F33Ae36dD80327744207a48122F874634B3adA",
+        "aura_address": "0x39Fc1Ea8f83aF3bF7d0A43226987056987C162Bd"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0xB973Ca96a3f0D61045f53255E319AEDb6ED49240",
+        "aura_address": "0x4aceA385d20b276ce793e1671BCBA5cd3d7A2F73"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x21d4c792Ea7E38e0D0819c2011A2b1Cb7252Bd99",
+        "aura_address": "0x8B59F9d4F24A266630756131fE62C3476886e496"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x5C78d05b8ECF97507d1cf70646082c54FaA4dA95",
+        "aura_address": "0x1A57f9b77F6d5342181Eb8B6ad0eF5a921172fdf"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0xba1a5B19D09A79DADA039B1f974015c5A989d5FD",
+        "aura_address": "0x22fEa9972ef027f6Da55CB4c4da63Af1b6e36A98"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x4De21b365D6543661D0e105E579A34B963862497",
+        "aura_address": "0x237C69abEC126Bb86f9986F60344680788d96219"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0xe15CaC1DF3621e001f76210Ab12A7f1A1691481f",
+        "aura_address": "0x02aF6056e597624E522D54Ef8B9A3B76318E0053"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x2086f52651837600180dE173B09470F54EF74910",
+        "aura_address": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0xB8bB1ce9C6E5401D66fE2126dB6E7387E1E24fFE",
+        "aura_address": "0xB26baAF9fB85e925a8a38ECBcfFE1B23b199aFD7"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x274DEDB9356C3E1E24Bfe2BF3D4349fBdBFA0d14",
+        "aura_address": "0x7e6ccd111B56dD650aF9d598e23F0CB0DA7E59E7"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x66888E4F35063Ad8bb11506A6fde5024fb4f1dB0",
+        "aura_address": "0x112EA63D3A70bB7926F95DA81EaDF71Aba0f0955"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x0C1B9CE6Bf6C01f587C2ee98b0ef4B20C6648753",
+        "aura_address": "0xF4116F1be90057E6f85b0dcC14c47c84cc4575da"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x4683e340a8049261057D5aB1b29C8d840E75695e",
+        "aura_address": "0x14A81C9283CC16897DaA3f466847Baa260b770eB"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0xEb30C85CC528537f5350CF5684Ce6a4538e13394",
+        "aura_address": "0xDdB26F9864da5CF70C680942Be91FC7E9aA2401C"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x00dF7f58e1Cf932eBe5f54De5970Fb2Bdf0ef06D",
+        "aura_address": "0x51867537e5532186E76BA5380235512A9A4ca52a"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0xDd439304A77f54B1F7854751Ac1169b279591Ef7",
+        "aura_address": "0xDE151980d461696543aa07A19BbE2603B20ECbAE"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0xBc2acf5E821c5c9f8667A36bB1131dAd26Ed64F9",
+        "aura_address": "0x49AaDc30B5cCC57bddd55aC8BD7D8DB7cf1f2b8b"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x4cdABE9E07ca393943AcFB9286bBbd0D0a310Ff6",
+        "aura_address": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x7644fA5D0eA14FcF3E813Fdf93ca9544f8567655",
+        "aura_address": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0x06135A9Ae830476d3a941baE9010B63732a055F4",
+        "aura_address": "0x408883E983695DeC78CF66480e6eFeF907a73c21"
+    }
+]

@@ -12,9 +12,11 @@ from defabipedia.aura import Abis
 class Exit1ArgumentElement(TypedDict):
     rewards_address: str
 
+
 class Exit21ArgumentElement(TypedDict):
     rewards_address: str
     max_slippage: float
+
 
 class Exit22ArgumentElement(TypedDict):
     rewards_address: str
@@ -68,7 +70,8 @@ class AuraDisassembler(Disassembler):
         return txns
 
     def exit_2_1(self, percentage: float, exit_arguments: list[Exit21ArgumentElement]) -> list[Transactable]:
-        """Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way (not used for pools in recovery mode!).
+        """Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way
+        (not used for pools in recovery mode!).
 
         Args:
             percentage (float): Percentage of liquidity to remove from Aura.
@@ -76,7 +79,7 @@ class AuraDisassembler(Disassembler):
                 arg_dicts = [
                     {
                         "rewards_address": 0xsOmEAddResS",
-                        max_slippage": 0.1
+                        "max_slippage": 1.27
                     }
                 ]
 
@@ -105,7 +108,6 @@ class AuraDisassembler(Disassembler):
                                                          avatar_safe_address=self.avatar_safe_address,
                                                          roles_mod_address=self.roles_mod_address,
                                                          role=self.role,
-                                                         tenderly_credentials=self.tenderly_credentials,
                                                          signer_address=self.signer_address)
 
             withdraw_balancer = balancer_disassembler.exit_1_1(percentage=100,
@@ -120,7 +122,8 @@ class AuraDisassembler(Disassembler):
         return txns
 
     def exit_2_2(self, percentage: float, exit_arguments: list[Exit22ArgumentElement]) -> list[Transactable]:
-        """Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the token index.
+        """Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset specified by the
+        token index.
 
         Args:
             percentage (float): Percentage of liquidity to remove from Aura.
@@ -159,7 +162,6 @@ class AuraDisassembler(Disassembler):
                                                          avatar_safe_address=self.avatar_safe_address,
                                                          roles_mod_address=self.roles_mod_address,
                                                          role=self.role,
-                                                         tenderly_credentials=self.tenderly_credentials,
                                                          signer_address=self.signer_address)
 
             withdraw_balancer = balancer_disassembler.exit_1_2(percentage=100,
@@ -175,7 +177,8 @@ class AuraDisassembler(Disassembler):
         return txns
 
     def exit_2_3(self, percentage: float, exit_arguments: list[Exit1ArgumentElement]) -> list[Transactable]:
-        """Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way when pool is in recovery mode.
+        """Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way when
+        pool is in recovery mode.
 
         Args:
             percentage (float): Percentage of liquidity to remove from Aura.
@@ -196,7 +199,6 @@ class AuraDisassembler(Disassembler):
 
         for element in exit_arguments:
             aura_rewards_address = Web3.to_checksum_address(element[0]["value"])
-            max_slippage = element[1]["value"]
 
             bpt_address, amount_to_redeem = self.aura_contracts_helper(aura_rewards_address=aura_rewards_address,
                                                                        fraction=fraction)
@@ -211,7 +213,6 @@ class AuraDisassembler(Disassembler):
                                                          avatar_safe_address=self.avatar_safe_address,
                                                          roles_mod_address=self.roles_mod_address,
                                                          role=self.role,
-                                                         tenderly_credentials=self.tenderly_credentials,
                                                          signer_address=self.signer_address)
 
             withdraw_balancer = balancer_disassembler.exit_1_3(percentage=100,
