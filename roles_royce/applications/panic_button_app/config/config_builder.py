@@ -5,7 +5,7 @@ from roles_royce.constants import StrEnum
 from .utils import get_tokens_from_bpt, get_gauge_address_from_bpt, get_aura_gauge_from_bpt
 import os
 from dataclasses import dataclass
-from defabipedia.types import Blockchain
+from defabipedia.types import Blockchain, Chains
 import copy
 
 
@@ -100,7 +100,7 @@ class BalancerPosition:
         """
         if pool_tokens is None:
             pool_tokens = get_tokens_from_bpt(w3, self.bpt_address)
-        result = 'Balancer'
+        result = f'{Chains.get_blockchain_from_web3(w3)}_Balancer'
         for token in pool_tokens:
             result= result + f"_{token['symbol']}"
         if self.staked:
@@ -123,7 +123,7 @@ class AuraPosition:
     def position_id_human_readable(self, w3: Web3, pool_tokens: list[dict] = None) -> str:
         if pool_tokens is None:
             pool_tokens = get_tokens_from_bpt(w3, self.bpt_address)
-        result = 'Aura'
+        result = f'{Chains.get_blockchain_from_web3(w3)}_Aura'
         for token in pool_tokens:
             result = result + f"_{token['symbol']}"
         return result
