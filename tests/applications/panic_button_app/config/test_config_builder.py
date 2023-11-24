@@ -1,8 +1,6 @@
 from tests.utils import local_node_gc
-import pytest
 from unittest.mock import patch, mock_open
-from web3 import Web3
-from roles_royce.applications.panic_button_app.config.config_builder import DAO, Blockchain, AuraPosition, \
+from roles_royce.applications.panic_button_app.config.config_builder import DAO, AuraPosition, \
     DAOStrategiesBuilder, BalancerPosition
 import json
 from defabipedia.types import Chains
@@ -17,13 +15,12 @@ test_data_str = json.dumps(test_data)
 
 
 # Use patch to replace the open function
-@pytest.mark.skip(reason="FIXME: fix this test to work with the new config builder")
 @patch('builtins.open', mock_open(read_data=test_data_str))
 def test_build_aura_positions(local_node_gc):
     with patch(
-            'roles_royce.applications.panic_button_app.config.utils.get_aura_gauge_from_bpt') as mock_get_aura_gauge_from_bpt, \
+            'roles_royce.applications.panic_button_app.config.config_builder.get_aura_gauge_from_bpt') as mock_get_aura_gauge_from_bpt, \
             patch(
-                'roles_royce.applications.panic_button_app.config.utils.get_tokens_from_bpt') as mock_get_tokens_from_bpt:
+                'roles_royce.applications.panic_button_app.config.config_builder.get_tokens_from_bpt') as mock_get_tokens_from_bpt:
         dao = DAO.GnosisDAO
         blockchain = Chains.Gnosis
         aura_position = AuraPosition(position_id='226', bpt_address='0xf48f01dcb2cbb3ee1f6aab0e742c2d3941039d56')
@@ -44,9 +41,35 @@ def test_build_aura_positions(local_node_gc):
         builder = DAOStrategiesBuilder(dao, blockchain, aura=[aura_position])
         result = builder.build_aura_positions(w3, [aura_position])
 
-        assert len(result) == 1
-        assert result[0]['position_id'] == aura_position.position_id
-        assert len(result[0]['exec_config']) == 4
+        assert result == [{'position_id': '226', 'position_id_tech': '0x750c5ED835d300d4ba5054cf2Fad946f0a0df0CD',
+                           'position_id_human_readable': 'gnosis_Aura_WETH_wstETH', 'protocol': 'Aura', 'exec_config': [
+                {'function_name': 'exit_1', 'label': 'Unstake', 'test': True,
+                 'description': 'Unstake BPT from Aura gauge', 'parameters': [
+                    {'name': 'rewards_address', 'type': 'constant',
+                     'value': '0x750c5ED835d300d4ba5054cf2Fad946f0a0df0CD'},
+                    {'name': 'max_slippage', 'label': 'Max Slippage', 'type': 'input',
+                     'rules': {'min': 0, 'max': 100}}]},
+                {'function_name': 'exit_2_1', 'label': 'Unstake + Withdraw (Single Token)', 'test': True,
+                 'description': 'Unstake BPT from Aura gauge and withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT',
+                 'parameters': [{'name': 'rewards_address', 'type': 'constant',
+                                 'value': '0x750c5ED835d300d4ba5054cf2Fad946f0a0df0CD'},
+                                {'name': 'max_slippage', 'type': 'input', 'label': 'Max Slippage',
+                                 'rules': {'min': 0, 'max': 100}}]},
+                {'function_name': 'exit_2_2', 'label': 'Unstake + Withdraw (Proportional)', 'test': True,
+                 'description': 'Unstake BPT from gauge and withdraw a single token (specified by the user) by redeeming the BPT',
+                 'parameters': [{'name': 'rewards_address', 'type': 'constant',
+                                 'value': '0x750c5ED835d300d4ba5054cf2Fad946f0a0df0CD'},
+                                {'name': 'max_slippage', 'type': 'input', 'rules': {'min': 0, 'max': 100}},
+                                {'name': 'token_out_address', 'label': 'Token Out Address', 'type': 'input',
+                                 'options': [{'value': '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1', 'label': 'WETH'},
+                                             {'value': '0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6',
+                                              'label': 'wstETH'}]}]},
+                {'function_name': 'exit_2_3', 'label': 'Unstake + Withdraw (Proportional - Recovery Mode)',
+                 'test': False,
+                 'description': 'Unstake BPT from Aura gauge and withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT for a pool in Recovery Mode',
+                 'parameters': [{'name': 'rewards_address', 'type': 'constant',
+                                 'value': '0x750c5ED835d300d4ba5054cf2Fad946f0a0df0CD'},
+                                {'name': 'max_slippage', 'type': 'input', 'rules': {'min': 0, 'max': 100}}]}]}]
 
 
 # Load the contents of your test JSON file
@@ -83,6 +106,25 @@ def test_build_balancer_positions(local_node_gc):
         builder = DAOStrategiesBuilder(dao, blockchain, balancer=[balancer_position])
         result = builder.build_balancer_positions(w3, [balancer_position])
 
-        assert len(result) == 1
-        assert result[0]['position_id'] == balancer_position.position_id
-        assert len(result[0]['exec_config']) == 3
+        assert result == [{'protocol': 'Balancer', 'position_id': '226',
+                           'position_id_tech': '0xF48f01DCB2CbB3ee1f6AaB0e742c2D3941039d56',
+                           'position_id_human_readable': 'gnosis_Balancer_WETH_wstETH', 'exec_config': [
+                {'function_name': 'exit_1_1', 'label': 'Withdraw (Proportional)', 'test': True,
+                 'description': 'Withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT',
+                 'parameters': [
+                     {'name': 'bpt_address', 'type': 'constant', 'value': '0xF48f01DCB2CbB3ee1f6AaB0e742c2D3941039d56'},
+                     {'name': 'max_slippage', 'label': 'Max slippage', 'type': 'input',
+                      'rules': {'min': 0, 'max': 100}}]},
+                {'function_name': 'exit_1_2', 'label': 'Withdraw (Single Token)', 'test': True,
+                 'description': 'Withdraw a single token (specified by the user) by redeeming the BPT', 'parameters': [
+                    {'name': 'bpt_address', 'type': 'constant', 'value': '0xF48f01DCB2CbB3ee1f6AaB0e742c2D3941039d56'},
+                    {'name': 'max_slippage', 'label': 'Max slippage', 'type': 'input', 'rules': {'min': 0, 'max': 100}},
+                    {'name': 'token_out_address', 'label': 'Token out', 'type': 'input',
+                     'options': [{'value': '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1', 'label': 'WETH'},
+                                 {'value': '0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6', 'label': 'wstETH'}]}]},
+                {'function_name': 'exit_1_3', 'label': 'Withdraw (Proportional - Recovery Mode)', 'test': False,
+                 'description': 'Withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT for a pool in Recovery Mode',
+                 'parameters': [
+                     {'name': 'bpt_address', 'type': 'constant', 'value': '0xF48f01DCB2CbB3ee1f6AaB0e742c2D3941039d56'},
+                     {'name': 'max_slippage', 'label': 'Max slippage', 'type': 'input',
+                      'rules': {'min': 0, 'max': 100}}]}]}]
