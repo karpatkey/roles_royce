@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Protocol
 from web3 import Web3
 from web3.types import HexStr
-from roles_royce.roles_modifier import Operation
+from .roles_modifier import Operation
 
 
 class Transactable(Protocol):

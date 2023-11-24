@@ -1,0 +1,144 @@
+{
+  "protocol": "Balancer",
+  "position_id": "FllMeWithPositionId",
+  "position_id_tech": "FillMeWithBptAddressAndStakedOrNot",
+  "position_id_human_readable": "FillMeWithPositionIdHumanReadable",
+  "exec_config": [
+    {
+      "function_name": "exit_1_1",
+      "label": "Withdraw (Proportional)",
+      "test": true,
+      "description": "Withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT",
+      "parameters": [
+        {
+          "name": "bpt_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        }
+      ]
+    },
+    {
+      "function_name": "exit_1_2",
+      "label": "Withdraw (Single Token)",
+      "test": true,
+      "description": "Withdraw a single token (specified by the user) by redeeming the BPT",
+      "parameters": [
+        {
+          "name": "bpt_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        },
+        {
+          "name": "token_out_address",
+          "label": "Token out",
+          "type": "input",
+          "options": [
+            {
+              "value": "FillMewithTokenAddress",
+              "label": "FillMeWithTokenSymbol"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "function_name": "exit_1_3",
+      "label": "Withdraw (Proportional - Recovery Mode)",
+      "test": false,
+      "description": "Withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT for a pool in Recovery Mode",
+      "parameters": [
+        {
+          "name": "bpt_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        }
+      ]
+    },
+    {
+      "function_name": "exit_2_1",
+      "label": "Unstake from gauge and Withdraw (Single Token)",
+      "test": true,
+      "description": "Unstake BPT from gauge and withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT",
+      "parameters": [
+        {
+          "name": "gauge_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        }
+      ]
+    },
+    {
+      "function_name": "exit_2_2",
+      "label": "Unstake from gauge and withdraw (Proportional)",
+      "test": true,
+      "description": "Unstake BPT from gauge and withdraw a single token (specified by the user) by redeeming the BPT",
+      "parameters": [
+        {
+          "name": "gauge_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        },
+        {
+          "name": "token_out_address",
+          "label": "Token out",
+          "type": "input",
+          "options": [
+            {
+              "value": "FillMewithTokenAddress",
+              "label": "FillMeWithTokenSymbol"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "function_name": "exit_2_3",
+      "label": "Unstake and withdraw (Proportional - Recovery Mode)",
+      "test": false,
+      "description": "Unstake BPT from gauge and withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT for a pool in Recovery Mode",
+      "parameters": [
+        {
+          "name": "gauge_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        }
+      ]
+    }
+  ]
+}

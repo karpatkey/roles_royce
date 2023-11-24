@@ -1,4 +1,3 @@
-import requests
 from .utils import local_node_eth
 from roles_royce import roles
 from roles_royce.protocols.eth import aura

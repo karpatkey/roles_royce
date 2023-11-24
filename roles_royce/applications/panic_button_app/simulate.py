@@ -6,7 +6,7 @@ from roles_royce.toolshed.simulation import simulate_tx, TenderlyCredentials
 
 def main():
     try:
-        parser = argparse.ArgumentParser(description='Script to simulate a transaction with Tenderly',
+        parser = argparse.ArgumentParser(description='Script to simulate an exit transaction with Tenderly',
                                          formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
         parser.add_argument("-d", "--dao", type=str, help="DAO whose funds are to be removed.")
@@ -22,7 +22,7 @@ def main():
                                                    api_token=env.TENDERLY_API_TOKEN)
         w3, w3_MEV = start_the_engine(env)
         block = w3.eth.block_number
-        sim_data = simulate_tx(tx=args.transaction,
+        sim_data = simulate_tx(tx=json.loads(args.transaction),
                                block=block,
                                tenderly_credentials=tenderly_credentials,
                                sim_type='full',  # TODO: check if 'quick' is enough

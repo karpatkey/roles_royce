@@ -29,7 +29,7 @@ JSON_FORM = {
     "exit_arguments": {
 
         "rewards_address": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
-        "max_slippage": 0.01
+        "max_slippage": 1
     }
 }
 
@@ -118,3 +118,4 @@ def test_decode_transaction(local_node_eth, accounts, monkeypatch):
             'to_address': '0xBA12222222228d8Ba445958a75a0704d566BF2C8',
             'type': 'function',
             'value': 0}]
+

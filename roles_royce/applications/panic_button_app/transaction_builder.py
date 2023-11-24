@@ -35,6 +35,13 @@ def main():
         env = ENV(DAO=exec_config.dao, BLOCKCHAIN=exec_config.blockchain)
         w3, w3_MEV = start_the_engine(env)
         disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
+
+        if not txn_transactables:
+            response_message = {"status": 200,
+                                "message": "There no funds in the position, no transactions to build"}
+            print(json.dumps(response_message))
+            return
+
         check_exit_tx = disassembler.check(txns=txn_transactables, from_address=env.DISASSEMBLER_ADDRESS)
 
         if check_exit_tx:

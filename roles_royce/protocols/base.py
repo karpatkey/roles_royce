@@ -1,6 +1,6 @@
 import json
 from types import SimpleNamespace
-from roles_royce import Operation
+from roles_royce.roles_modifier import Operation
 from web3 import Web3
 
 

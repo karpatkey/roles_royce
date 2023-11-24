@@ -94,12 +94,12 @@ def test_execute(local_node_eth, accounts, monkeypatch, tx):
     private_key = set_up_roles(local_node_eth, accounts)
     set_env(monkeypatch, private_key)
 
-    file_path_main = os.path.join(Path(os.path.dirname(__file__)).resolve().parent.parent.parent, 'roles_royce',
-                                  'applications', 'panic_button_app',
-                                  'execute.py')
+    file_path_execute = os.path.join(Path(os.path.dirname(__file__)).resolve().parent.parent.parent, 'roles_royce',
+                                     'applications', 'panic_button_app',
+                                     'execute.py')
 
     arguments = [
-        'python', file_path_main,
+        'python', file_path_execute,
         '--dao', dao,
         '--blockchain', blockchain,
         '--transaction', json.dumps(tx)
