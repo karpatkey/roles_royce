@@ -1,4 +1,4 @@
-from web3._utils.threads import Timeout
+from web3.exceptions import TimeExhausted
 from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
 from tests.utils import assign_role, local_node_eth, accounts
 import os
@@ -6,6 +6,7 @@ import json
 import pytest
 import subprocess
 from pathlib import Path
+import time
 
 dao = 'GnosisDAO'
 blockchain = 'ETHEREUM'
@@ -110,8 +111,9 @@ def test_execute(local_node_eth, accounts, monkeypatch, tx):
     dict_message_stdout = json.loads(main.stdout[:-1])
     assert dict_message_stdout['status'] == 200
     #  If we don't wait for the transaction to be validated, the next test will fail when trying to reset Anvil
+    time.sleep(5)
     w3 = local_node_eth.w3
     try:
-        w3.eth.wait_for_transaction_receipt(dict_message_stdout['tx_hash'], timeout=10)
-    except Timeout:
+        w3.eth.wait_for_transaction_receipt(dict_message_stdout['tx_hash'], timeout=40, poll_latency=5)
+    except TimeExhausted:
         pass
