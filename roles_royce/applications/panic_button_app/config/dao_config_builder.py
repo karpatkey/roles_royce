@@ -2,11 +2,10 @@ from web3 import Web3
 from roles_royce.applications.panic_button_app.config.config_builder import DAOStrategiesBuilder, DAO, \
     BalancerPosition, AuraPosition
 import os
-from defabipedia.balancer import ContractSpecs as BalancerContractSpecs
-from defabipedia.types import Chains
+from defabipedia.types import Chains, Blockchain
 
 
-def main(dao, blockchain, balancer, aura):
+def main(dao: DAO, blockchain: Blockchain, balancer: list[BalancerPosition], aura: list[AuraPosition]):
     PUBLIC_ETH_NODE_URL = 'https://eth.llamarpc.com'
     PUBLIC_GC_NODE_URL = 'https://rpc.ankr.com/gnosis'
 
