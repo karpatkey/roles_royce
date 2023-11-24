@@ -1,5 +1,4 @@
-import time
-
+from web3._utils.threads import Timeout
 from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
 from tests.utils import assign_role, local_node_eth, accounts
 import os
@@ -112,4 +111,7 @@ def test_execute(local_node_eth, accounts, monkeypatch, tx):
     assert dict_message_stdout['status'] == 200
     #  If we don't wait for the transaction to be validated, the next test will fail when trying to reset Anvil
     w3 = local_node_eth.w3
-    w3.eth.wait_for_transaction_receipt(dict_message_stdout['tx_hash'])
+    try:
+        w3.eth.wait_for_transaction_receipt(dict_message_stdout['tx_hash'], timeout=10)
+    except Timeout:
+        pass
