@@ -4,61 +4,128 @@ from defabipedia.types import Blockchain
 
 
 class ApproveForBooster(BaseApproveForToken):
-    """approve LPToken with AURABooster as spender"""
+    """
+    A class to approve LPToken with AURABooster as spender.
+
+    Attributes:
+        fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+    """
+
     fixed_arguments = {"spender": ETHAddr.AURABooster}
 
 
 class ApproveTokenDepWrapper(BaseApproveForToken):
-    """approve token with AURA_rewardpool_dep_wrapper as spender"""
+    """
+    A class to approve token with AURA_rewardpool_dep_wrapper as spender.
+
+    Attributes:
+        fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+    """
+
     fixed_arguments = {"spender": ETHAddr.AURA_rewardpool_dep_wrapper}
 
 
+
 class ApproveAURABal(BaseApprove):
-    """approve AURABal with AURABAL_bal_weth_depositor as spender"""
+    """
+    A class to approve AURABal with AURABAL_bal_weth_depositor as spender.
+
+    Attributes:
+        fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+        token (str): The Ethereum address of the token to be approved.
+    """
+
     fixed_arguments = {"spender": ETHAddr.AURABAL}
     token = ETHAddr.AURABAL_stakingrewarder
 
 
 class ApproveB80Bal20WETH(BaseApprove):
-    """approve B80Bal20WETH with AURABAL_bal_weth_depositor as spender"""
+    """
+    A class to approve B80Bal20WETH with AURABAL_bal_weth_depositor as spender.
+
+    Attributes:
+        fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+        token (str): The Ethereum address of the token to be approved.
+    """
+
     fixed_arguments = {"spender": ETHAddr.AURABAL_bal_weth_depositor}
     token = ETHAddr.B_80BAL_20WETH
 
 
+
 class ApproveBAL(BaseApprove):
-    """approve BAL with AURABAL_bal_depositor as spender"""
+    """
+    A class to approve BAL with AURABAL_bal_depositor as spender.
+
+    Attributes:
+        fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+        token (str): The Ethereum address of the token to be approved.
+    """
+
     fixed_arguments = {"spender": ETHAddr.AURABAL_bal_depositor}
     token = ETHAddr.BAL
 
 
+
 class ApproveAURABalStk(BaseApprove):
-    """approve AURABal with stkAURABAL as spender"""
+    """
+    A class to approve AURABal with stkAURABAL as spender.
+
+    Attributes:
+        fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+        token (str): The Ethereum address of the token to be approved.
+    """
+
     fixed_arguments = {"spender": ETHAddr.stkAURABAL}
     token = ETHAddr.AURABAL
 
 
+
 class ApproveAURA(BaseApprove):
-    """approve AURA with AURALocker as spender"""
+    """
+    A class to approve AURA with AURALocker as spender.
+
+    Attributes:
+        fixed_arguments (dict): A dictionary containing the spender's Ethereum address.
+        token (str): The Ethereum address of the token to be approved.
+    """
+
     fixed_arguments = {"spender": ETHAddr.AURALocker}
     token = ETHAddr.AURA
 
 
+
 class WithdrawAndUnwrap(ContractMethod):
-    """WIthdraws staked BPT and claims any corresponding unclaimed rewards."""
+    """
+    A class to withdraw staked BPT and claim any corresponding unclaimed rewards.
+
+    Attributes:
+        name (str): The name of the contract method.
+        in_signature (list): A list of tuples containing the method's input parameters and their types.
+        fixed_arguments (dict): A dictionary containing the method's fixed arguments.
+    """
+
     name = "withdrawAndUnwrap"
     in_signature = [("amount", "uint256"), ("claim", "bool")]
     fixed_arguments = {"claim": True}
 
-    def __init__(self,
-                 reward_address: Address,
-                 amount: int):
+    def __init__(self, reward_address: Address, amount: int):
         super().__init__()
         self.target_address = reward_address
         self.args.amount = amount
 
 
 class DepositBPT(ContractMethod):
-    """deposit BPT token"""
+    """
+    A class to deposit BPT token.
+
+    Attributes:
+        name (str): The name of the contract method.
+        in_signature (list): A list of tuples containing the method's input parameters and their types.
+        fixed_arguments (dict): A dictionary containing the method's fixed arguments.
+        target_address (str): The Ethereum address of the target.
+    """
+
     name = "deposit"
     in_signature = [("pool_id", "uint256"), ("amount", "uint256"), ("stake", "bool")]
     fixed_arguments = {"stake": True}
@@ -71,7 +138,15 @@ class DepositBPT(ContractMethod):
 
 
 class StakeAURABal(ContractMethod):
-    """stake aurabal"""
+    """
+    A class to stake aurabal.
+
+    Attributes:
+        name (str): The name of the contract method.
+        in_signature (list): A list of tuples containing the method's input parameters and their types.
+        target_address (str): The Ethereum address of the target.
+    """
+
     name = "stake"
     in_signature = [("amount", "uint256")]
     target_address = ETHAddr.AURABAL_stakingrewarder
@@ -82,7 +157,16 @@ class StakeAURABal(ContractMethod):
 
 
 class Deposit80BAL20WETH(ContractMethod):
-    """deposit 80% BAL and 20% WETH"""
+    """
+    A class to deposit 80% BAL and 20% WETH.
+
+    Attributes:
+        name (str): The name of the contract method.
+        in_signature (list): A list of tuples containing the method's input parameters and their types.
+        fixed_arguments (dict): A dictionary containing the method's fixed arguments.
+        target_address (str): The Ethereum address of the target.
+    """
+
     name = "deposit"
     in_signature = [("amount", "uint256"), ("lock", "bool"), ("stake_address", "address")]
     fixed_arguments = {"lock": True}
@@ -93,9 +177,17 @@ class Deposit80BAL20WETH(ContractMethod):
         self.args.amount = amount
         self.args.stake_address = stake_address
 
-
 class DepositBAL(ContractMethod):
-    """deposit BAL"""
+    """
+    A class to deposit BAL.
+
+    Attributes:
+        name (str): The name of the contract method.
+        in_signature (list): A list of tuples containing the method's input parameters and their types.
+        fixed_arguments (dict): A dictionary containing the method's fixed arguments.
+        target_address (str): The Ethereum address of the target.
+    """
+
     name = "deposit"
     in_signature = [("amount", "uint256"), ("min_out", "uint256"), ("lock", "bool"), ("stake_address", "address")]
     fixed_arguments = {"lock": True}
@@ -108,8 +200,17 @@ class DepositBAL(ContractMethod):
         self.args.stake_address = stake_address
 
 
+
 class WithdrawAuraBAL(ContractMethod):
-    """withdraw aurabal"""
+    """
+    A class to withdraw aurabal.
+
+    Attributes:
+        name (str): The name of the contract method.
+        in_signature (list): A list of tuples containing the method's input parameters and their types.
+        target_address (str): The Ethereum address of the target.
+    """
+
     name = "withdraw"
     in_signature = [("amount", "uint256"), ("claim", "bool")]
     target_address = ETHAddr.AURABAL_stakingrewarder
@@ -121,7 +222,15 @@ class WithdrawAuraBAL(ContractMethod):
 
 
 class CompounderStaking(ContractMethod):
-    """compounder staking"""
+    """
+    A class for compounder staking.
+
+    Attributes:
+        name (str): The name of the contract method.
+        in_signature (list): A list of tuples containing the method's input parameters and their types.
+        target_address (str): The Ethereum address of the target.
+    """
+
     name = "deposit"
     in_signature = [("amount", "uint256"), ("avatar", "address")]
     target_address = ETHAddr.stkAURABAL
@@ -133,7 +242,15 @@ class CompounderStaking(ContractMethod):
 
 
 class CompounderWithdraw(ContractMethod):
-    """compounder withdraw unsaking"""
+    """
+    A class for compounder withdraw unsaking.
+
+    Attributes:
+        name (str): The name of the contract method.
+        in_signature (list): A list of tuples containing the method's input parameters and their types.
+        target_address (str): The Ethereum address of the target.
+    """
+
     name = "withdraw"
     in_signature = [("amount", "uint256"), ("receiver", "address"), ("avatar", "address")]
     target_address = ETHAddr.stkAURABAL
@@ -144,38 +261,63 @@ class CompounderWithdraw(ContractMethod):
         self.args.receiver = receiver
         self.args.avatar = avatar
 
-
 class CompounderRedeem(ContractMethod):
-    """compounder redeem"""
+    """
+    A class for compounder redeem.
+
+    Attributes:
+        name (str): The name of the contract method.
+        in_signature (list): A list of tuples containing the method's input parameters and their types.
+        target_address (str): The Ethereum address of the target.
+    """
+
     name = "redeem"
     in_signature = [("amount", "uint256"), ("receiver", "address"), ("avatar", "address")]
     target_address = ETHAddr.stkAURABAL
 
     def __init__(self, amount: int, receiver: Address, avatar: Address):
-        super().__init__()
-        self.args.amount = amount
-        self.args.receiver = receiver
-        self.args.avatar = avatar
+      super().__init__()
+      self.args.amount = amount
+      self.args.receiver = receiver
+      self.args.avatar = avatar
+
 
 
 class LockAURA(ContractMethod):
-    """lock aura"""
+    """
+    A class to lock aura.
+
+    Attributes:
+        name (str): The name of the contract method.
+        in_signature (list): A list of tuples containing the method's input parameters and their types.
+        target_address (str): The Ethereum address of the target.
+    """
+
     name = "lock"
     in_signature = [("receiver", "address"), ("amount", "uint256")]
     target_address = ETHAddr.AURALocker
 
     def __init__(self, receiver: Address, amount: int):
-        super().__init__()
-        self.args.receiver = receiver
-        self.args.amount = amount
+      super().__init__()
+      self.args.receiver = receiver
+      self.args.amount = amount
 
 
 class ProcessExpiredLocks(ContractMethod):
-    """process expired locks"""
+    """
+    A class to process expired locks.
+
+    Attributes:
+        name (str): The name of the contract method.
+        in_signature (list): A list of tuples containing the method's input parameters and their types.
+        target_address (str): The Ethereum address of the target.
+    """
+
     name = "processExpiredLocks"
     in_signature = [("relock", "bool")]
     target_address = ETHAddr.AURALocker
 
     def __init__(self, relock: bool):
-        super().__init__()
-        self.args.relock = relock
+      super().__init__()
+      self.args.relock = relock
+
