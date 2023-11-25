@@ -1,18 +1,13 @@
-from roles_royce import roles
-from roles_royce.utils import TenderlyCredentials
 from roles_royce.constants import ETHAddr
 from tests.utils import (local_node_eth, accounts, fork_unlock_account, create_simple_safe, steal_token, top_up_address)
 from roles_royce.toolshed.disassembling import BalancerDisassembler
 from defabipedia.balancer import Abis
 from defabipedia.types import Chains
 from decimal import Decimal
-import pytest
 from roles_royce.evm_utils import erc20_abi
 from tests.roles import setup_common_roles, deploy_roles, apply_presets
 from pytest import approx
-from roles_royce.roles_modifier import (RolesMod, NORMAL_FEE_MULTIPLER, AGGRESIVE_FEE_MULTIPLER,
-                                        NORMAL_GAS_LIMIT_MULTIPLIER, AGGRESIVE_GAS_LIMIT_MULTIPLIER,
-                                        set_gas_strategy, GasStrategies)
+from roles_royce.roles_modifier import set_gas_strategy, GasStrategies
 
 # Preset with the permission to call the exit() function in the Balancer vault (the avatar address is
 # 0xc01318bab7ee1f5ba734172bf7718b5dc6ec90e1)
