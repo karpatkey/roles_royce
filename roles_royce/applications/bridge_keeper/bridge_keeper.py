@@ -4,12 +4,11 @@ from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Mes
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
 from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
-from utils import ENV, SchedulerThread, Gauges, refill_bridge, invest_DAI, pay_interest, decimals_DAI, Flags, \
+from utils import ENV, Gauges, refill_bridge, invest_DAI, pay_interest, decimals_DAI, Flags, \
     log_initial_data, log_status_update
 import time
 import sys
-import datetime
-import schedule
+from datetime import datetime
 from defabipedia.xDAI_bridge import ContractSpecs
 from defabipedia.tokens import EthereumContractSpecs as Tokens
 from defabipedia.types import Chains
@@ -66,7 +65,21 @@ def bot_do(w3_eth, w3_gnosis):
     global gauges
     global flags
 
+    # Contracts
+    DAI_contract = Tokens.DAI.contract(w3_eth)
+    bridge_contract = ContractSpecs[Chains.Ethereum].xDaiBridge.contract(w3_eth)
+    interest_receiver_contract = ContractSpecs[Chains.Gnosis].BridgeInterestReceiver.contract(w3_gnosis)
+
+    # Data
+    bridge_DAI_balance = DAI_contract.functions.balanceOf(ContractSpecs[Chains.Ethereum].xDaiBridge.address).call()
+    min_cash_threshold = bridge_contract.functions.minCashThreshold(Tokens.DAI.address).call()
+    next_claim_epoch = interest_receiver_contract.functions.nextClaimEpoch().call()
     bot_ETH_balance = w3_eth.eth.get_balance(ENV.BOT_ADDRESS)
+
+    log_status_update(ENV, bridge_DAI_balance, bot_ETH_balance, next_claim_epoch, min_cash_threshold)
+    gauges.update(bridge_DAI_balance, bot_ETH_balance, next_claim_epoch, min_cash_threshold)
+
+    # -----------------------------------------------------------------------------------------------------------------------
 
     if bot_ETH_balance < ENV.GAS_ETH_THRESHOLD * (10 ** 18):
         title = 'Lack of ETH for gas'
@@ -77,39 +90,41 @@ def bot_do(w3_eth, w3_gnosis):
     if bot_ETH_balance >= ENV.GAS_ETH_THRESHOLD and flags.lack_of_gas_warning.is_set():
         flags.lack_of_gas_warning.clear()
 
-    DAI_contract = Tokens.DAI.contract(w3_eth)
-    bridge_DAI_balance = DAI_contract.functions.balanceOf('0x4aa42145Aa6Ebf72e164C9bBC74fbD3788045016').call()
+    # -----------------------------------------------------------------------------------------------------------------------
 
-    interest_receiver_contract = ContractSpecs[Chains.Gnosis].BridgeInterestReceiver.contract(w3_gnosis)
-    next_claim_epoch = interest_receiver_contract.functions.nextClaimEpoch().call()
-
-    log_status_update(ENV, bridge_DAI_balance, bot_ETH_balance, next_claim_epoch)
-    gauges.update(bridge_DAI_balance, bot_ETH_balance, next_claim_epoch)
-
-    if bridge_DAI_balance < ENV.REFILL_THRESHOLD * (10 ** decimals_DAI):
+    # see minCashThreshold in https://etherscan.io/address/0x166124b75c798cedf1b43655e9b5284ebd5203db#code#F1#L47
+    if bridge_DAI_balance < ENV.REFILL_THRESHOLD * (10 ** decimals_DAI) and bridge_DAI_balance < min_cash_threshold:
         title = 'Refilling the bridge...'
-        message = f'  The bridge"s DAI balance {bridge_DAI_balance / (10 ** decimals_DAI):.2f} dropped below the refill threshold {ENV.REFILL_THRESHOLD * (10 ** 18)}.'
-        messenger.log_and_alert(LoggingLevel.Info, title, message)
+        message = f'  The bridge"s DAI balance {bridge_DAI_balance / (10 ** decimals_DAI):.2f} dropped below the refill threshold {ENV.REFILL_THRESHOLD}.'
+        logger.info(title + '\n' + message)
         tx_receipt = refill_bridge(w3_eth, ENV)
+        flags.tx_executed.set()
 
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt, ContractSpecs[
             Chains.Ethereum].xDaiBridge.address, w3_eth)
         messenger.log_and_alert(LoggingLevel.Info, f'Bridge refilled', message,
                                 slack_msg=message_slack)
 
-    elif bridge_DAI_balance > ENV.INVEST_THRESHOLD * (10 ** decimals_DAI):
+    # see minCashThreshold in https://etherscan.io/address/0x166124b75c798cedf1b43655e9b5284ebd5203db#code#F7#L168
+    elif bridge_DAI_balance > ENV.INVEST_THRESHOLD * (10 ** decimals_DAI) and bridge_DAI_balance > min_cash_threshold:
         title = 'Investing DAI...'
-        message = f'  The bridge"s DAI balance {bridge_DAI_balance / (10 ** decimals_DAI):.2f} surpassed the invest threshold {ENV.INVEST_THRESHOLD * (10 ** 18)}.'
-        messenger.log_and_alert(LoggingLevel.Info, title, message)
+        message = f'  The bridge"s DAI balance {bridge_DAI_balance / (10 ** decimals_DAI):.2f} surpassed the invest threshold {ENV.INVEST_THRESHOLD}.'
+        logger.info(title + '\n' + message)
         tx_receipt = invest_DAI(w3_eth, ENV)
+        flags.tx_executed.set()
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt, ContractSpecs[
             Chains.Ethereum].xDaiBridge.address, w3_eth)
         messenger.log_and_alert(LoggingLevel.Info, f'DAI invested', message,
                                 slack_msg=message_slack)
 
+    # -----------------------------------------------------------------------------------------------------------------------
+
     if next_claim_epoch - 60 * ENV.MINUTES_BEFORE_CLAIM_EPOCH < time.time() < next_claim_epoch and not flags.interest_payed.is_set():
         title = 'Paying interest to interest receiver contract on Gnosis Chain...'
+        message = f'  The next claim epoch {datetime.utcfromtimestamp(next_claim_epoch)} is in less than {ENV.MINUTES_BEFORE_CLAIM_EPOCH} minutes.'
+        logger.info(title + '\n' + message)
         tx_receipt = pay_interest(w3_eth, ENV, int(Decimal(ENV.AMOUNT_OF_INTEREST_TO_PAY) * Decimal(10 ** decimals_DAI)))
+        flags.tx_executed.set()
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt, ContractSpecs[
             Chains.Ethereum].xDaiBridge.address, w3_eth)
         messenger.log_and_alert(LoggingLevel.Info, f'Interest payed', message,
@@ -118,19 +133,21 @@ def bot_do(w3_eth, w3_gnosis):
     elif time.time() > next_claim_epoch:
         flags.interest_payed.clear()
 
-    log_status_update(ENV, bridge_DAI_balance, bot_ETH_balance, next_claim_epoch)
-    gauges.update(bridge_DAI_balance, bot_ETH_balance, next_claim_epoch)
+    if flags.tx_executed.is_set():
+        # Update dataData
+        bridge_DAI_balance = DAI_contract.functions.balanceOf(ContractSpecs[Chains.Ethereum].xDaiBridge.address).call()
+        min_cash_threshold = bridge_contract.functions.minCashThreshold(Tokens.DAI.address).call()
+        next_claim_epoch = interest_receiver_contract.functions.nextClaimEpoch().call()
+        bot_ETH_balance = w3_eth.eth.get_balance(ENV.BOT_ADDRESS)
+
+        log_status_update(ENV, bridge_DAI_balance, bot_ETH_balance, next_claim_epoch, min_cash_threshold)
+        gauges.update(bridge_DAI_balance, bot_ETH_balance, next_claim_epoch, min_cash_threshold)
+
+        flags.tx_executed.clear()
 
 
 # -----------------------------MAIN LOOP-----------------------------------------
 
-# Status notification scheduling
-if ENV.STATUS_NOTIFICATION_HOUR != '':
-    # FIXME: make sure the scheduling job is set at UTC time
-    status_run_time = datetime.time(hour=ENV.STATUS_NOTIFICATION_HOUR, minute=0, second=0)
-    schedule.every().day.at(str(status_run_time)).do(lambda: send_status_flag.set())
-    scheduler_thread = SchedulerThread()
-    scheduler_thread.start()
 
 while True:
 

@@ -30,7 +30,7 @@ class ENV:
     RPC_ENDPOINT_ETHEREUM_FALLBACK: str = config('RPC_ENDPOINT_ETHEREUM_FALLBACK', default='')
     RPC_ENDPOINT_GNOSIS_FALLBACK: str = config('RPC_ENDPOINT_GNOSIS_FALLBACK', default='')
     PRIVATE_KEY: str = config('PRIVATE_KEY')
-    COOLDOWN_MINUTES: int = custom_config('COOLDOWN_MINUTES', default=5, cast=int)
+    COOLDOWN_MINUTES: float = custom_config('COOLDOWN_MINUTES', default=5, cast=float)
     SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
     TELEGRAM_BOT_TOKEN: str = config('TELEGRAM_BOT_TOKEN', default='')
     TELEGRAM_CHAT_ID: int = custom_config('TELEGRAM_CHAT_ID', default='', cast=int)
@@ -69,21 +69,6 @@ class ENV:
         return 'Environment variables'
 
 
-class SchedulerThread(threading.Thread):
-    def __init__(self):
-        super().__init__()
-        self.daemon = True
-        self.running = True
-
-    def run(self):
-        while self.running:
-            schedule.run_pending()
-            time.sleep(1)
-
-    def stop(self):
-        self.running = False
-
-
 @dataclass
 class Gauges:
     bridge_DAI_balance = Gauge('bridge_DAI_balance', 'Bridge"s DAI balance')
@@ -91,19 +76,22 @@ class Gauges:
     next_claim_epoch = Gauge('next_claim_epoch', 'Next claim epoch')
     refill_threshold = Gauge('refill_threshold', 'Refill threshold')
     invest_threshold = Gauge('invest_threshold', 'Invest threshold')
+    min_cash_threshold = Gauge('min_cash_threshold', 'Minimum cash threshold')
 
-    def update(self, bridge_DAI_balance: int, bot_ETH_balance: int, next_claim_epoch: int):
+    def update(self, bridge_DAI_balance: int, bot_ETH_balance: int, next_claim_epoch: int, min_cash_threshold: int):
         self.bot_ETH_balance.set(bot_ETH_balance / (10 ** 18))
         self.bridge_DAI_balance.set(bridge_DAI_balance / (10 ** decimals_DAI))
         self.next_claim_epoch.set(next_claim_epoch)
         self.invest_threshold.set(ENV.INVEST_THRESHOLD)
         self.refill_threshold.set(ENV.REFILL_THRESHOLD)
+        self.min_cash_threshold.set(min_cash_threshold / (10 ** decimals_DAI))
 
 
 @dataclass
 class Flags:
     lack_of_gas_warning: threading.Event = field(default_factory=threading.Event)
     interest_payed: threading.Event = field(default_factory=threading.Event)
+    tx_executed: threading.Event = field(default_factory=threading.Event)
 
 
 def refill_bridge(w3: Web3, env: ENV) -> TxReceipt:
@@ -158,14 +146,14 @@ def log_initial_data(env: ENV, messenger: Messenger):
     messenger.log_and_alert(LoggingLevel.Info, title, message)
 
 
-def log_status_update(env: ENV, bridge_DAI_balance: int, bot_ETH_balance: int, next_claim_epoch: int):
+def log_status_update(env: ENV, bridge_DAI_balance: int, bot_ETH_balance: int, next_claim_epoch: int, min_cash_threshold: int):
     title = 'Status update'
     message = (f'  Bridge"s DAI balance: {bridge_DAI_balance / (10 ** decimals_DAI):.2f} DAI.\n'
                f'  Bot"s ETH balance: {bot_ETH_balance / (10 ** 18):.5f} ETH.\n'
                f'  Next claim epoch: {datetime.utcfromtimestamp(next_claim_epoch)} UTC.\n'
+               f'  Minimum cash threshold: {min_cash_threshold / (10 ** decimals_DAI):.2f} DAI.\n'
                f'  Refill threshold: {ENV.REFILL_THRESHOLD:.2f} DAI.\n'
                f'  Invest threshold: {ENV.INVEST_THRESHOLD:.2f} DAI.\n'
-               f"  Refill threshold: {env.REFILL_THRESHOLD} DAI\n"
                f"  Invest threshold: {env.INVEST_THRESHOLD} DAI\n"
                f"  Amount of interest to pay: {env.AMOUNT_OF_INTEREST_TO_PAY} DAI\n"
                f"  Minutes before claim epoch to pay interest: {env.MINUTES_BEFORE_CLAIM_EPOCH}\n"
