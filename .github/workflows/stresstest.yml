@@ -9,7 +9,7 @@ on:
       - 'ci/stresstest'
 
 jobs:
-  update_and_push:
+  Stresstest cron:
     runs-on: self-hosted
     timeout-minutes: 35
 
