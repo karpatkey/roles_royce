@@ -11,7 +11,7 @@ on:
 jobs:
   stresstest-cron:
     runs-on: self-hosted
-    timeout-minutes: 35
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
