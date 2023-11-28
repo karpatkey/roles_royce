@@ -209,7 +209,7 @@ def fork_unlock_account(w3, address):
 # These accounts are not guaranteed to hold tokens forever...
 Holders = {
     Chains.Ethereum: '0x00000000219ab540356cBB839Cbe05303d7705Fa',  # BINANCE_ACCOUNT_WITH_LOTS_OF_ETH =
-    Chains.Gnosis: '0xe91d153e0b41518a2ce8dd3d7944fa863463a97d'  # WXDAI_CONTRACT_WITH_LOTS_OF_XDAI =
+    Chains.Gnosis: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'  # WXDAI_CONTRACT_WITH_LOTS_OF_XDAI =
 }
 
 
