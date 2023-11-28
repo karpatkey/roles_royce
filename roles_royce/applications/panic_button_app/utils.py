@@ -100,7 +100,7 @@ class ENV:
                 self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_GNOSIS', cast=int, default=8547)
         else:
             self.LOCAL_FORK_PORT = None
-        self.LOCAL_FORK_HOST: str = custom_config('LOCAL_FORK_HOST', default='localhost', cast=str)
+        self.LOCAL_FORK_HOST: str = custom_config('LOCAL_FORK_HOST' + '_' + self.BLOCKCHAIN.upper(), default='localhost', cast=str)
 
         self.SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
 
