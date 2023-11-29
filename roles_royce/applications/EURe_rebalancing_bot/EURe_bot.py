@@ -151,21 +151,12 @@ def bot_do(w3):
 
     # -----------------------------------------------------------------------------------------------------------------------
 
-    gauges.safe_WXDAI_balance.set(float(Decimal(balance_WXDAI)/Decimal(10**decimalsWXDAI)))
-    gauges.amount_WXDAI.set(amount_WXDAI)
+    gauges.update(EUR_price_feed=data.EUR_price, EURe_price_curve=data.EURe_to_WXDAI / data.amount_EURe,
+                  bot_xDAI_balance=bot_xDAI_balance, safe_WXDAI_balance=balance_WXDAI,
+                  safe_EURe_balance=balance_EURe, amount_WXDAI=amount_WXDAI, amount_EURe=amount_EURe,
+                  drift_threshold=ENV.DRIFT_THRESHOLD, drift_EURe_to_WXDAI=drift_EURe_to_WXDAI,
+                  drift_WXDAI_to_EURe=drift_WXDAI_to_EURe)
 
-    gauges.safe_EURe_balance.set(float(Decimal(balance_EURe)/Decimal(10**decimalsEURe)))
-    gauges.amount_EURe.set(amount_EURe)
-
-    gauges.bot_ETH_balance.set(float(Decimal(bot_xDAI_balance) / Decimal(1e18)))
-
-    gauges.last_updated.set_to_current_time()
-
-    gauges.EURe_price_curve.set(data.EURe_to_WXDAI / data.amount_EURe)
-    gauges.EUR_price_feed.set(data.EUR_price)
-
-    gauges.drift_EURe_to_WXDAI.set(drift_EURe_to_WXDAI)
-    gauges.drift_WXDAI_to_EURe.set(drift_WXDAI_to_EURe)
     # -----------------------------------------------------------------------------------------------------------------------
 
     if drift_EURe_to_WXDAI > ENV.DRIFT_THRESHOLD and balance_EURe >= amount_EURe * (10 ** decimalsEURe):
@@ -196,23 +187,15 @@ def bot_do(w3):
         balance_EURe = EURe_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
         balance_WXDAI = WXDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
         bot_xDAI_balance = w3.eth.get_balance(ENV.BOT_ADDRESS)
-
-        gauges.safe_WXDAI_balance.set(float(Decimal(balance_WXDAI) / Decimal(10 ** decimalsWXDAI)))
-        gauges.amount_WXDAI.set(amount_WXDAI)
-        gauges.safe_EURe_balance.set(float(Decimal(balance_EURe) / Decimal((10 ** decimalsEURe))))
-        gauges.amount_EURe.set(amount_EURe)
-        gauges.bot_ETH_balance.set(float(Decimal(bot_xDAI_balance) / Decimal(10 ** 18)))
-
-        gauges.EURe_price_curve.set(data.EURe_to_WXDAI / data.amount_EURe)
-        gauges.EUR_price_feed.set(data.EUR_price)
-
         drift_EURe_to_WXDAI = data.drift_EURe_to_WXDAI
         drift_WXDAI_to_EURe = data.drift_WXDAI_to_EURe
 
-        gauges.drift_EURe_to_WXDAI.set(drift_EURe_to_WXDAI)
-        gauges.drift_WXDAI_to_EURe.set(drift_WXDAI_to_EURe)
-
         gauges.last_updated.set_to_current_time()
+        gauges.update(EUR_price_feed=data.EUR_price, EURe_price_curve=data.EURe_to_WXDAI / data.amount_EURe,
+                      bot_xDAI_balance=bot_xDAI_balance, safe_WXDAI_balance=balance_WXDAI,
+                      safe_EURe_balance=balance_EURe, amount_WXDAI=amount_WXDAI, amount_EURe=amount_EURe,
+                      drift_threshold=ENV.DRIFT_THRESHOLD, drift_EURe_to_WXDAI=drift_EURe_to_WXDAI,
+                      drift_WXDAI_to_EURe=drift_WXDAI_to_EURe)
 
         logger.info(
             f'Status update after swap:\n'
