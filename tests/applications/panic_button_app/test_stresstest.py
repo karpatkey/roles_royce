@@ -94,8 +94,8 @@ def set_env(monkeypatch, private_key: str, dao: DAO) -> ENV:
     return ENV(dao.name, dao.blockchain)
 
 
-#@pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False),
-#                    reason="Long position integration test not running by default.")
+@pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False),
+                    reason="Long position integration test not running by default.")
 @pytest.mark.parametrize("dao, exec_config", test_parameters)
 def test_stresstest(local_node_eth, accounts, monkeypatch, dao, exec_config):
     private_key = set_up_roles(local_node_eth, accounts, dao)
@@ -148,7 +148,7 @@ def test_stresstest(local_node_eth, accounts, monkeypatch, dao, exec_config):
 
 # The following test is meant to test individual exit strategies by specifying the index. If left empty ([]) the test
 # will be skipped, if [3] is set, test_parameters[3] will be tested.
-@pytest.mark.parametrize("index", [47])
+@pytest.mark.parametrize("index", [])
 def test_stresstest_single(local_node_eth, accounts, monkeypatch, index):
     dao = test_parameters[index][0]
     exec_config = test_parameters[index][1]
