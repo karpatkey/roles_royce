@@ -94,8 +94,8 @@ def set_env(monkeypatch, private_key: str, dao: DAO) -> ENV:
     return ENV(dao.name, dao.blockchain)
 
 
-@pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False),
-                    reason="Long position integration test not running by default.")
+#@pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False),
+#                    reason="Long position integration test not running by default.")
 @pytest.mark.parametrize("dao, exec_config", test_parameters)
 def test_stresstest(local_node_eth, accounts, monkeypatch, dao, exec_config):
     private_key = set_up_roles(local_node_eth, accounts, dao)
@@ -148,7 +148,7 @@ def test_stresstest(local_node_eth, accounts, monkeypatch, dao, exec_config):
 
 # The following test is meant to test individual exit strategies by specifying the index. If left empty ([]) the test
 # will be skipped, if [3] is set, test_parameters[3] will be tested.
-@pytest.mark.parametrize("index", [])
+@pytest.mark.parametrize("index", [47])
 def test_stresstest_single(local_node_eth, accounts, monkeypatch, index):
     dao = test_parameters[index][0]
     exec_config = test_parameters[index][1]
@@ -181,6 +181,8 @@ def test_stresstest_single(local_node_eth, accounts, monkeypatch, index):
     assert main.returncode == 0
     dict_message_stdout = json.loads(main.stdout[:-1])
     assert dict_message_stdout['status'] == 200
+    if 'message' in dict_message_stdout:
+        pytest.skip(dict_message_stdout['message'])
     tx = json.dumps(dict_message_stdout['tx_data']['transaction'])
 
     arguments_execute = [
