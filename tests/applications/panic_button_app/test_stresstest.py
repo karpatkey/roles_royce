@@ -181,6 +181,8 @@ def test_stresstest_single(local_node_eth, accounts, monkeypatch, index):
     assert main.returncode == 0
     dict_message_stdout = json.loads(main.stdout[:-1])
     assert dict_message_stdout['status'] == 200
+    if 'message' in dict_message_stdout:
+        pytest.skip(dict_message_stdout['message'])
     tx = json.dumps(dict_message_stdout['tx_data']['transaction'])
 
     arguments_execute = [

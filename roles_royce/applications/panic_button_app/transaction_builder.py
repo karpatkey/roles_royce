@@ -38,7 +38,7 @@ def main():
 
         if not txn_transactables:
             response_message = {"status": 200,
-                                "message": "There no funds in the position, no transactions to build"}
+                                "message": "There are no funds in the position, no transactions to build"}
             print(json.dumps(response_message))
             return
 

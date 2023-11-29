@@ -1,7 +1,7 @@
 from web3 import Web3
 from defabipedia.types import Chains
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
-from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
+from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel, web3_connection_check
 from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
 from utils import ENV, log_initial_data, Gauges
@@ -16,11 +16,9 @@ ENV = ENV()
 test_mode = ENV.TEST_MODE
 if test_mode:
     from tests.utils import top_up_address
-
     w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
     top_up_address(w3, ENV.BOT_ADDRESS, 1)
-else:
-    w3 = Web3(Web3.HTTPProvider(ENV.RPC_ENDPOINT))
+
 
 # Messenger system
 slack_messenger = SlackMessenger(webhook=ENV.SLACK_WEBHOOK_URL)
@@ -57,8 +55,7 @@ lack_of_WXDAI_flag = False  # flag to stop alerting when the WXDAI balance is be
 lack_of_EURe_flag = False  # flag to stop alerting when the EURe balance is below 1
 
 
-def bot_do():
-    global w3
+def bot_do(w3):
     global amount_WXDAI
     global amount_EURe
     global gauges
@@ -154,21 +151,12 @@ def bot_do():
 
     # -----------------------------------------------------------------------------------------------------------------------
 
-    gauges.safe_WXDAI_balance.set(float(Decimal(balance_WXDAI)/Decimal(10**decimalsWXDAI)))
-    gauges.amount_WXDAI.set(amount_WXDAI)
+    gauges.update(EUR_price_feed=data.EUR_price, EURe_price_curve=data.EURe_to_WXDAI / data.amount_EURe,
+                  bot_xDAI_balance=bot_xDAI_balance, safe_WXDAI_balance=balance_WXDAI,
+                  safe_EURe_balance=balance_EURe, amount_WXDAI=amount_WXDAI, amount_EURe=amount_EURe,
+                  drift_threshold=ENV.DRIFT_THRESHOLD, drift_EURe_to_WXDAI=drift_EURe_to_WXDAI,
+                  drift_WXDAI_to_EURe=drift_WXDAI_to_EURe)
 
-    gauges.safe_EURe_balance.set(float(Decimal(balance_EURe)/Decimal(10**decimalsEURe)))
-    gauges.amount_EURe.set(amount_EURe)
-
-    gauges.bot_ETH_balance.set(float(Decimal(bot_xDAI_balance) / Decimal(1e18)))
-
-    gauges.last_updated.set_to_current_time()
-
-    gauges.EURe_price_curve.set(data.EURe_to_WXDAI / data.amount_EURe)
-    gauges.EUR_price_feed.set(data.EUR_price)
-
-    gauges.drift_EURe_to_WXDAI.set(drift_EURe_to_WXDAI)
-    gauges.drift_WXDAI_to_EURe.set(drift_WXDAI_to_EURe)
     # -----------------------------------------------------------------------------------------------------------------------
 
     if drift_EURe_to_WXDAI > ENV.DRIFT_THRESHOLD and balance_EURe >= amount_EURe * (10 ** decimalsEURe):
@@ -199,23 +187,15 @@ def bot_do():
         balance_EURe = EURe_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
         balance_WXDAI = WXDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
         bot_xDAI_balance = w3.eth.get_balance(ENV.BOT_ADDRESS)
-
-        gauges.safe_WXDAI_balance.set(float(Decimal(balance_WXDAI) / Decimal(10 ** decimalsWXDAI)))
-        gauges.amount_WXDAI.set(amount_WXDAI)
-        gauges.safe_EURe_balance.set(float(Decimal(balance_EURe) / Decimal((10 ** decimalsEURe))))
-        gauges.amount_EURe.set(amount_EURe)
-        gauges.bot_ETH_balance.set(float(Decimal(bot_xDAI_balance) / Decimal(10 ** 18)))
-
-        gauges.EURe_price_curve.set(data.EURe_to_WXDAI / data.amount_EURe)
-        gauges.EUR_price_feed.set(data.EUR_price)
-
         drift_EURe_to_WXDAI = data.drift_EURe_to_WXDAI
         drift_WXDAI_to_EURe = data.drift_WXDAI_to_EURe
 
-        gauges.drift_EURe_to_WXDAI.set(drift_EURe_to_WXDAI)
-        gauges.drift_WXDAI_to_EURe.set(drift_WXDAI_to_EURe)
-
         gauges.last_updated.set_to_current_time()
+        gauges.update(EUR_price_feed=data.EUR_price, EURe_price_curve=data.EURe_to_WXDAI / data.amount_EURe,
+                      bot_xDAI_balance=bot_xDAI_balance, safe_WXDAI_balance=balance_WXDAI,
+                      safe_EURe_balance=balance_EURe, amount_WXDAI=amount_WXDAI, amount_EURe=amount_EURe,
+                      drift_threshold=ENV.DRIFT_THRESHOLD, drift_EURe_to_WXDAI=drift_EURe_to_WXDAI,
+                      drift_WXDAI_to_EURe=drift_WXDAI_to_EURe)
 
         logger.info(
             f'Status update after swap:\n'
@@ -241,39 +221,17 @@ while True:
 
     try:
         if not test_mode:
-            w3 = Web3(Web3.HTTPProvider(ENV.RPC_ENDPOINT))
-            if not w3.is_connected(show_traceback=True):
-                time.sleep(5)
-                if not w3.is_connected(show_traceback=True):
-                    if ENV.FALLBACK_RPC_ENDPOINT != '':
-                        messenger.log_and_alert(LoggingLevel.Warning, title='Warning',
-                                                message=f'  RPC endpoint {ENV.RPC_ENDPOINT} is not working.')
-                        w3 = Web3(Web3.HTTPProvider(ENV.FALLBACK_RPC_ENDPOINT))
-                        if not w3.is_connected(show_traceback=True):
-                            time.sleep(5)
-                            if not w3.is_connected(show_traceback=True):
-                                messenger.log_and_alert(LoggingLevel.Error, title='Error',
-                                                        message=f'  RPC endpoint {ENV.RPC_ENDPOINT} and fallback RPC '
-                                                                f'endpoint {ENV.FALLBACK_RPC_ENDPOINT} are both not '
-                                                                f'working.')
-                                rpc_endpoint_failure_counter += 1
-                                continue
-                    else:
-                        messenger.log_and_alert(LoggingLevel.Error, title='Error',
-                                                message=f'  RPC endpoint {ENV.RPC_ENDPOINT} is not working.')
-                        rpc_endpoint_failure_counter += 1
-                        continue
+            w3, connection_check = web3_connection_check(ENV.RPC_ENDPOINT, messenger, rpc_endpoint_failure_counter,
+                                                         ENV.FALLBACK_RPC_ENDPOINT)
+            if not connection_check:
+                continue
+        else:
+            w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
 
-            if rpc_endpoint_failure_counter == 5:  # TODO: this can be added as an environment variable
-                messenger.log_and_alert(LoggingLevel.Error, title='Too many RPC endpoint failures, exiting...',
-                                        message='')
-                time.sleep(5)  # Cooldown time for the messenger system to send messages in queue
-                sys.exit(1)
-
-        bot_do()
+        bot_do(w3)
 
     except Exception as e:
-        messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e))
+        messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e.args[0]))
         exception_counter += 1
         if exception_counter == 5:  # TODO: this can be added as an environment variable
             messenger.log_and_alert(LoggingLevel.Error, title='Too many exceptions, exiting...', message='')

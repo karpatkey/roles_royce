@@ -1,1 +1,1 @@
-from .alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
+from .alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel, web3_connection_check

@@ -34,7 +34,7 @@ class GnosisContractSpecs:
     Vault = ContractSpec(address='0xBA12222222228d8Ba445958a75a0704d566BF2C8',
                          abi=load_abi('vault.json'),
                          name='vault')
-    Queries = ContractSpec(address="0xE39B5e3B6D74016b2F6A9673D7d7493B6DF549d5",
+    Queries = ContractSpec(address='0x0F3e0c4218b7b0108a3643cFe9D3ec0d4F57c54e',
                            abi=load_abi('queries.json'),
                            name='queries')
 
