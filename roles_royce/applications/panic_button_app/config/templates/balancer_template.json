@@ -8,7 +8,7 @@
       "function_name": "exit_1_1",
       "label": "Withdraw (Proportional)",
       "test": true,
-      "description": "Withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT",
+      "description": "Exit pool on Balancer with Proportional exit (Not Recovery Mode)",
       "parameters": [
         {
           "name": "bpt_address",
@@ -27,7 +27,7 @@
       "function_name": "exit_1_2",
       "label": "Withdraw (Single Token)",
       "test": true,
-      "description": "Withdraw a single token (specified by the user) by redeeming the BPT",
+      "description": "Exit pool on Balancer with Single Token exit",
       "parameters": [
         {
           "name": "bpt_address",
@@ -55,9 +55,9 @@
     },
     {
       "function_name": "exit_1_3",
-      "label": "Withdraw (Proportional - Recovery Mode)",
+      "label": "Withdraw (proportional) (Emergency mode)",
       "test": false,
-      "description": "Withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT for a pool in Recovery Mode",
+      "description": "Exit pool on Balancer with Proportional exit (Recovery Mode)",
       "parameters": [
         {
           "name": "bpt_address",
@@ -74,9 +74,9 @@
     },
     {
       "function_name": "exit_2_1",
-      "label": "Unstake from gauge and Withdraw (Single Token)",
+      "label": "Unstake + Withdraw (Proportional)",
       "test": true,
-      "description": "Unstake BPT from gauge and withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT",
+      "description": "Unstake the BPT from the gauge and exit pool on Balancer with Proportional exit (Not Recovery Mode)",
       "parameters": [
         {
           "name": "gauge_address",
@@ -93,9 +93,9 @@
     },
     {
       "function_name": "exit_2_2",
-      "label": "Unstake from gauge and withdraw (Proportional)",
+      "label": "Unstake + Withdraw (Single Token)",
       "test": true,
-      "description": "Unstake BPT from gauge and withdraw a single token (specified by the user) by redeeming the BPT",
+      "description": "Unstake the BPT from the gauge and exit pool on Balancer with Single Token exit",
       "parameters": [
         {
           "name": "gauge_address",
@@ -123,9 +123,9 @@
     },
     {
       "function_name": "exit_2_3",
-      "label": "Unstake and withdraw (Proportional - Recovery Mode)",
+      "label": "Unstake + Withdraw (Proportional) (Emergency mode)",
       "test": false,
-      "description": "Unstake BPT from gauge and withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT for a pool in Recovery Mode",
+      "description": "Unstake the BPT from the gauge and exit pool on Balancer with Proportional exit (Recovery Mode)",
       "parameters": [
         {
           "name": "gauge_address",
