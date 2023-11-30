@@ -29,15 +29,6 @@
                             "name": "rewards_address",
                             "type": "constant",
                             "value": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max Slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
                         }
                     ]
                 },
@@ -45,7 +36,7 @@
                     "function_name": "exit_2_1",
                     "label": "Unstake + withdraw (proportional)",
                     "test": true,
-                    "description": "Unstake the BPT from Aura  and exit pool on Balancer with proportional exit (Not for recovery mode)",
+                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
                     "parameters": [
                         {
                             "name": "rewards_address",
@@ -144,15 +135,6 @@
                             "name": "rewards_address",
                             "type": "constant",
                             "value": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max Slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
                         }
                     ]
                 },
@@ -160,7 +142,7 @@
                     "function_name": "exit_2_1",
                     "label": "Unstake + withdraw (proportional)",
                     "test": true,
-                    "description": "Unstake the BPT from Aura  and exit pool on Balancer with proportional exit (Not for recovery mode)",
+                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
                     "parameters": [
                         {
                             "name": "rewards_address",

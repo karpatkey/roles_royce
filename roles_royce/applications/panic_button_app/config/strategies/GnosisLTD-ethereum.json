@@ -211,15 +211,6 @@
                             "name": "rewards_address",
                             "type": "constant",
                             "value": "0xA6e54eA1C67396Bde9e92cA462197bE59Af3E875"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max Slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
                         }
                     ]
                 },
@@ -227,7 +218,7 @@
                     "function_name": "exit_2_1",
                     "label": "Unstake + withdraw (proportional)",
                     "test": true,
-                    "description": "Unstake the BPT from Aura  and exit pool on Balancer with proportional exit (Not for recovery mode)",
+                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
                     "parameters": [
                         {
                             "name": "rewards_address",
