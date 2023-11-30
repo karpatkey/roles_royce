@@ -17,13 +17,13 @@
             "protocol": "Balancer",
             "position_id": "123",
             "position_id_tech": "0xde8C195Aa41C11a0c4787372deFBbDdAa31306D2",
-            "position_id_human_readable": "Balancer_WETH_COW",
+            "position_id_human_readable": "ethereum_Balancer_WETH_COW",
             "exec_config": [
                 {
                     "function_name": "exit_1_1",
-                    "label": "Withdraw (Proportional)",
+                    "label": "Withdraw (proportional)",
                     "test": true,
-                    "description": "Withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT",
+                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
                     "parameters": [
                         {
                             "name": "bpt_address",
@@ -43,9 +43,9 @@
                 },
                 {
                     "function_name": "exit_1_2",
-                    "label": "Withdraw (Single Token)",
+                    "label": "Withdraw (single token)",
                     "test": true,
-                    "description": "Withdraw a single token (specified by the user) by redeeming the BPT",
+                    "description": "Exit pool on Balancer with single token exit",
                     "parameters": [
                         {
                             "name": "bpt_address",
@@ -80,9 +80,9 @@
                 },
                 {
                     "function_name": "exit_1_3",
-                    "label": "Withdraw (Proportional - Recovery Mode)",
+                    "label": "Withdraw (proportional) (Recovery mode)",
                     "test": false,
-                    "description": "Withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT for a pool in Recovery Mode",
+                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
                     "parameters": [
                         {
                             "name": "bpt_address",
@@ -106,13 +106,13 @@
             "protocol": "Balancer",
             "position_id": "174",
             "position_id_tech": "0x7B50775383d3D6f0215A8F290f2C9e2eEBBEceb2",
-            "position_id_human_readable": "Balancer_bb-a-USDT_bb-a-DAI_bb-a-USDC",
+            "position_id_human_readable": "ethereum_Balancer_bb-a-USDT_bb-a-DAI_bb-a-USDC",
             "exec_config": [
                 {
                     "function_name": "exit_1_1",
-                    "label": "Withdraw (Proportional)",
+                    "label": "Withdraw (proportional)",
                     "test": true,
-                    "description": "Withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT",
+                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
                     "parameters": [
                         {
                             "name": "bpt_address",
@@ -132,9 +132,9 @@
                 },
                 {
                     "function_name": "exit_1_2",
-                    "label": "Withdraw (Single Token)",
+                    "label": "Withdraw (single token)",
                     "test": true,
-                    "description": "Withdraw a single token (specified by the user) by redeeming the BPT",
+                    "description": "Exit pool on Balancer with single token exit",
                     "parameters": [
                         {
                             "name": "bpt_address",
@@ -173,9 +173,9 @@
                 },
                 {
                     "function_name": "exit_1_3",
-                    "label": "Withdraw (Proportional - Recovery Mode)",
+                    "label": "Withdraw (proportional) (Recovery mode)",
                     "test": false,
-                    "description": "Withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT for a pool in Recovery Mode",
+                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
                     "parameters": [
                         {
                             "name": "bpt_address",
@@ -198,7 +198,7 @@
         {
             "position_id": "19",
             "position_id_tech": "0xA6e54eA1C67396Bde9e92cA462197bE59Af3E875",
-            "position_id_human_readable": "Aura_WETH_COW",
+            "position_id_human_readable": "ethereum_Aura_WETH_COW",
             "protocol": "Aura",
             "exec_config": [
                 {
@@ -225,9 +225,9 @@
                 },
                 {
                     "function_name": "exit_2_1",
-                    "label": "Unstake + Withdraw (Single Token)",
+                    "label": "Unstake + withdraw (proportional)",
                     "test": true,
-                    "description": "Unstake BPT from Aura gauge and withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT",
+                    "description": "Unstake the BPT from Aura  and exit pool on Balancer with proportional exit (Not for recovery mode)",
                     "parameters": [
                         {
                             "name": "rewards_address",
@@ -236,8 +236,8 @@
                         },
                         {
                             "name": "max_slippage",
-                            "type": "input",
                             "label": "Max Slippage",
+                            "type": "input",
                             "rules": {
                                 "min": 0,
                                 "max": 100
@@ -247,92 +247,14 @@
                 },
                 {
                     "function_name": "exit_2_2",
-                    "label": "Unstake + Withdraw (Proportional)",
+                    "label": "Unstake + withdraw (single token)",
                     "test": true,
-                    "description": "Unstake BPT from gauge and withdraw a single token (specified by the user) by redeeming the BPT",
+                    "description": "Unstake BPT from Aura and exit pool on Balancer with single token exit",
                     "parameters": [
                         {
                             "name": "rewards_address",
                             "type": "constant",
                             "value": "0xA6e54eA1C67396Bde9e92cA462197bE59Af3E875"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
-                        },
-                        {
-                            "name": "token_out_address",
-                            "label": "Token Out Address",
-                            "type": "input",
-                            "options": [
-                                {
-                                    "value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-                                    "label": "WETH"
-                                },
-                                {
-                                    "value": "0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB",
-                                    "label": "COW"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_3",
-                    "label": "Unstake + Withdraw (Proportional - Recovery Mode)",
-                    "test": false,
-                    "description": "Unstake BPT from Aura gauge and withdraw all tokens in amounts proportional to the pool balances by redeeming the BPT for a pool in Recovery Mode",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xA6e54eA1C67396Bde9e92cA462197bE59Af3E875"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "protocol": "Balancer",
-            "position_id": "172",
-            "position_id_tech": "FillMeWithBptAddressAndStakedOrNot",
-            "position_id_human_readable": "AddressGivesError: execution reverted",
-            "exec_config": [
-                {
-                    "function_name": "exit_1_1",
-                    "label": "Withdraw (proportional)",
-                    "test": true,
-                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "bpt_address",
-                            "type": "constant",
-                            "value": "0xC128a9954e6c874eA3d62ce62B468bA073093F25"
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_1_2",
-                    "label": "Withdraw (single token)",
-                    "test": true,
-                    "description": "Exit pool on Balancer with single token exit",
-                    "parameters": [
-                        {
-                            "name": "bpt_address",
-                            "type": "constant",
-                            "value": "0xC128a9954e6c874eA3d62ce62B468bA073093F25"
                         },
                         {
                             "name": "max_slippage",
@@ -347,324 +269,10 @@
                             "name": "token_out_address",
                             "label": "Token out",
                             "type": "input",
-                            "options": []
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_1_3",
-                    "label": "Withdraw (proportional) (Recovery mode)",
-                    "test": false,
-                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
-                    "parameters": [
-                        {
-                            "name": "bpt_address",
-                            "type": "constant",
-                            "value": "0xC128a9954e6c874eA3d62ce62B468bA073093F25"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "position_id": "29",
-            "position_id_tech": null,
-            "position_id_human_readable": "AddressGivesError: execution reverted",
-            "protocol": "Aura",
-            "exec_config": [
-                {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
-                    "test": true,
-                    "description": "Unstake BPT from Aura gauge",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": null
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_1",
-                    "label": "Unstake + withdraw (proportional)",
-                    "test": true,
-                    "description": "Unstake the BPT from Aura  and exit pool on Balancer with proportional exit (Not for recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": null
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_2",
-                    "label": "Unstake + withdraw (single token)",
-                    "test": true,
-                    "description": "Unstake BPT from Aura and exit pool on Balancer with single token exit",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": null
-                        },
-                        {
-                            "name": "max_slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 10
-                            }
-                        },
-                        {
-                            "name": "token_out_address",
-                            "label": "Token Out Address",
-                            "type": "input",
-                            "options": []
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_3",
-                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
-                    "test": false,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": null
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "position_id": "33",
-            "position_id_tech": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
-            "position_id_human_readable": "ethereum_Aura_rETH_WETH",
-            "protocol": "Aura",
-            "exec_config": [
-                {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
-                    "test": true,
-                    "description": "Unstake BPT from Aura gauge",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_1",
-                    "label": "Unstake + withdraw (proportional)",
-                    "test": true,
-                    "description": "Unstake the BPT from Aura  and exit pool on Balancer with proportional exit (Not for recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_2",
-                    "label": "Unstake + withdraw (single token)",
-                    "test": true,
-                    "description": "Unstake BPT from Aura and exit pool on Balancer with single token exit",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 10
-                            }
-                        },
-                        {
-                            "name": "token_out_address",
-                            "label": "Token Out Address",
-                            "type": "input",
                             "options": [
-                                {
-                                    "value": "0xae78736Cd615f374D3085123A210448E74Fc6393",
-                                    "label": "rETH"
-                                },
                                 {
                                     "value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
                                     "label": "WETH"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_3",
-                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
-                    "test": false,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "position_id": "35",
-            "position_id_tech": "0x89D3D732da8bf0f88659Cf3738E5E44e553f9ED7",
-            "position_id_human_readable": "ethereum_Aura_B-80BAL-20WETH_auraBAL",
-            "protocol": "Aura",
-            "exec_config": [
-                {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
-                    "test": true,
-                    "description": "Unstake BPT from Aura gauge",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x89D3D732da8bf0f88659Cf3738E5E44e553f9ED7"
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_1",
-                    "label": "Unstake + withdraw (proportional)",
-                    "test": true,
-                    "description": "Unstake the BPT from Aura  and exit pool on Balancer with proportional exit (Not for recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x89D3D732da8bf0f88659Cf3738E5E44e553f9ED7"
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_2",
-                    "label": "Unstake + withdraw (single token)",
-                    "test": true,
-                    "description": "Unstake BPT from Aura and exit pool on Balancer with single token exit",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x89D3D732da8bf0f88659Cf3738E5E44e553f9ED7"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 10
-                            }
-                        },
-                        {
-                            "name": "token_out_address",
-                            "label": "Token Out Address",
-                            "type": "input",
-                            "options": [
-                                {
-                                    "value": "0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56",
-                                    "label": "B-80BAL-20WETH"
-                                },
-                                {
-                                    "value": "0x616e8BfA43F920657B3497DBf40D6b1A02D4608d",
-                                    "label": "auraBAL"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_3",
-                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
-                    "test": false,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x89D3D732da8bf0f88659Cf3738E5E44e553f9ED7"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "position_id": "38",
-            "position_id_tech": "0x82FeB430d9D14eE5E635C41807e03fD8F5FfFDeC",
-            "position_id_human_readable": "ethereum_Aura_GNO_COW",
-            "protocol": "Aura",
-            "exec_config": [
-                {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
-                    "test": true,
-                    "description": "Unstake BPT from Aura gauge",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x82FeB430d9D14eE5E635C41807e03fD8F5FfFDeC"
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_1",
-                    "label": "Unstake + withdraw (proportional)",
-                    "test": true,
-                    "description": "Unstake the BPT from Aura  and exit pool on Balancer with proportional exit (Not for recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x82FeB430d9D14eE5E635C41807e03fD8F5FfFDeC"
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_2",
-                    "label": "Unstake + withdraw (single token)",
-                    "test": true,
-                    "description": "Unstake BPT from Aura and exit pool on Balancer with single token exit",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x82FeB430d9D14eE5E635C41807e03fD8F5FfFDeC"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 10
-                            }
-                        },
-                        {
-                            "name": "token_out_address",
-                            "label": "Token Out Address",
-                            "type": "input",
-                            "options": [
-                                {
-                                    "value": "0x6810e776880C02933D47DB1b9fc05908e5386b96",
-                                    "label": "GNO"
                                 },
                                 {
                                     "value": "0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB",
@@ -683,7 +291,16 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0x82FeB430d9D14eE5E635C41807e03fD8F5FfFDeC"
+                            "value": "0xA6e54eA1C67396Bde9e92cA462197bE59Af3E875"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
                         }
                     ]
                 }
