@@ -1,5 +1,5 @@
 from roles_royce.applications.panic_button_app.utils import ENV
-from tests.utils import assign_role, local_node_eth, accounts
+from tests.utils import assign_role, local_node_eth, accounts, web3_eth, local_node_gc, web3_gnosis
 import os
 import json
 import pytest
@@ -71,9 +71,15 @@ test_parameters = [(dao, exec_config) for dao, sublist in zip(daos, daos_exec_co
 # -----------------------------------------------------------------------------------------------------------------------
 
 
-def set_up_roles(local_node_eth, accounts, dao: DAO):
-    block = 18421437
-    local_node_eth.set_block(block)
+def set_up_roles(local_node_eth, local_node_gc, web3_eth, web3_gc, accounts, dao: DAO):
+    if dao.blockchain == 'ETHEREUM':
+        block = web3_eth.eth.block_number
+        local_node_eth.set_block(block)
+    elif dao.blockchain == 'GNOSIS':
+        block = web3_gc.eth.block_number
+        local_node_gc.set_block(block)
+    else:
+        raise ValueError(f'Blockchain {dao.blockchain} not supported')
 
     disassembler_address = accounts[0].address
     private_key = accounts[0].key.hex()
@@ -97,8 +103,8 @@ def set_env(monkeypatch, private_key: str, dao: DAO) -> ENV:
 @pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False),
                     reason="Long position integration test not running by default.")
 @pytest.mark.parametrize("dao, exec_config", test_parameters)
-def test_stresstest(local_node_eth, accounts, monkeypatch, dao, exec_config):
-    private_key = set_up_roles(local_node_eth, accounts, dao)
+def test_stresstest(local_node_eth, local_node_gc, web3_eth, web3_gnosis,  accounts, monkeypatch, dao, exec_config):
+    private_key = set_up_roles(local_node_eth, local_node_gc, web3_eth, web3_gnosis, accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
     arguments_build = [
@@ -149,10 +155,10 @@ def test_stresstest(local_node_eth, accounts, monkeypatch, dao, exec_config):
 # The following test is meant to test individual exit strategies by specifying the index. If left empty ([]) the test
 # will be skipped, if [3] is set, test_parameters[3] will be tested.
 @pytest.mark.parametrize("index", [])
-def test_stresstest_single(local_node_eth, accounts, monkeypatch, index):
+def test_stresstest_single(local_node_eth, local_node_gc, web3_eth, web3_gnosis,accounts, monkeypatch, index):
     dao = test_parameters[index][0]
     exec_config = test_parameters[index][1]
-    private_key = set_up_roles(local_node_eth, accounts, dao)
+    private_key = set_up_roles(local_node_eth, local_node_gc, web3_eth, web3_gnosis,accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
     arguments_build = [
