@@ -14,6 +14,15 @@
           "name": "rewards_address",
           "type": "constant",
           "value": "FillMeWithRewardsAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max Slippage",
+          "type": "input",
+          "rules": {
+            "min": 0,
+            "max": 100
+          }
         }
       ]
     },
@@ -27,6 +36,15 @@
           "name": "rewards_address",
           "type": "constant",
           "value": "FillMeWithRewardsAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max Slippage",
+          "type": "input",
+          "rules": {
+            "min": 0,
+            "max": 100
+          }
         }
       ]
     },
@@ -45,7 +63,10 @@
           "name": "max_slippage",
           "label": "Max slippage",
           "type": "input",
-          "rules": { "min": 0, "max": 10 }
+          "rules": {
+            "min": 0,
+            "max": 100
+          }
         },
         {
           "name": "token_out_address",
@@ -70,6 +91,15 @@
           "name": "rewards_address",
           "type": "constant",
           "value": "FillMeWithRewardsAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max Slippage",
+          "type": "input",
+          "rules": {
+            "min": 0,
+            "max": 100
+          }
         }
       ]
     }
