@@ -43,12 +43,13 @@
         },
         {
           "name": "max_slippage",
+          "label": "Max slippage",
           "type": "input",
           "rules": { "min": 0, "max": 10 }
         },
         {
           "name": "token_out_address",
-          "label": "Token Out Address",
+          "label": "Token out",
           "type": "input",
           "options": [
             {
