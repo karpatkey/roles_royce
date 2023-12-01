@@ -100,3 +100,44 @@ jobs:
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           file: ./docker/Dockerfile.eur
+
+  docker-keeper:
+    needs: Test
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Docker meta
+        id: docker_meta
+        uses: docker/metadata-action@v3
+        with:
+          images: registry.digitalocean.com/karpatkey/bridge-keeper-bot
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+
+
+      - name: Login to Docker
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.DOCKER_URL }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/docker
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/docker/Dockerfile*') }}
+
+      - name: build and Push image
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          file: ./docker/Dockerfile.keeper

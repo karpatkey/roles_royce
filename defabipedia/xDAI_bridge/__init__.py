@@ -10,7 +10,7 @@ class EthereumContractSpecs:
 
 class GnosisContractSpecs:
     BridgeInterestReceiver = ContractSpec(address='0x670daeaF0F1a5e336090504C68179670B5059088',
-                                          abi=load_abi('BRIDGE_INTEREST_RECEIVER.json'),
+                                          abi=load_abi('bridge_interest_receiver.json'),
                                           name='bridge_interest_receiver')
 
 
