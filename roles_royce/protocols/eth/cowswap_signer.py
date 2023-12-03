@@ -3,7 +3,7 @@ from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, B
 from defabipedia.cowswap_signer import ContractSpecs
 from defabipedia.types import Blockchain, Chains
 from web3 import Web3
-
+import math
 import requests
 import json
 
@@ -50,7 +50,8 @@ class SignOrder(ContractMethod):
                        "app_data": Web3.keccak(text=json.dumps({"appCode":"santi_the_best"})),
                        "partially_fillable": False,
                        "sell_token_balance": Web3.keccak(text="erc20"),
-                       "buy_token_balance": Web3.keccak(text="erc20")}
+                       "buy_token_balance": Web3.keccak(text="erc20"),
+                       "valid_duration": 60}
 
     def __init__(self, 
                  blockchain: Blockchain,
@@ -59,10 +60,7 @@ class SignOrder(ContractMethod):
                  buy_token: Address,
                  sell_amount: int,
                  valid_to: int,
-                 kind: str,
-                 valid_duration: int,
-                 fee_amount_bp: int):
-
+                 kind: str):
 
         self.target_address = ContractSpecs[blockchain].CowswapSigner.address
         super().__init__(avatar=avatar)
@@ -78,7 +76,7 @@ class SignOrder(ContractMethod):
                         "priceQuality": "verified",
                         "signingScheme": "eip712",
                         "onchainOrder": False,
-                        "kind": "sell",
+                        "kind": kind,
                         "sellAmountBeforeFee": str(sell_amount)}
         if blockchain == Chains.Ethereum:   
             self.response = requests.post('https://api.cow.fi/mainnet/api/v1/quote', data=json.dumps(self.quote_order)).json()
@@ -104,8 +102,8 @@ class SignOrder(ContractMethod):
                             self.fixed_arguments['partially_fillable'],
                             self.fixed_arguments['sell_token_balance'],
                             self.fixed_arguments['buy_token_balance']]
-        self.args.valid_duration = valid_duration
-        self.args.fee_amount_bp = fee_amount_bp
+        self.args.valid_duration = self.fixed_arguments['valid_duration']
+        self.args.fee_amount_bp = math.ceil((self.args.fee_amount / self.args.sell_amount) * 10000)
 
 
         

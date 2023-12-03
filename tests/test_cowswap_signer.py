@@ -9,41 +9,37 @@ from time import time
 import pytest
 from unittest import mock
 
+  
 def test_cowswap_signer_v1():
-   mock_response = mock.Mock()
-   mock_response.json.return_value = {
-       'quote': {
-           'buyAmount': 1000,
-           'feeAmount': 100
-       }
-   }
+    mock_response = mock.Mock()
+    mock_response.json.return_value = {
+        'quote': {
+            'buyAmount': 1000000000000000000,
+            'feeAmount': 10000000000
+        }
+    }
 
    # Mock the requests.post function
-   with mock.patch('requests.post', return_value=mock_response) as mock_post:
-       # Now you can call the function you want to test
+    with mock.patch('requests.post', return_value=mock_response) as mock1:
+
      
-    avatar_safe = "0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f"
+        avatar_safe = "0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f"
 
-    sell_token = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
-    buy_token = "0x6810e776880C02933D47DB1b9fc05908e5386b96"
-    sell_amount = 999749122606373987000
-    kind = "sell"
-    valid_to = int(30*60)
-    valid_duration = 1700372412
-    fee_amount_bp = 250877393626013  
+        sell_token = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+        buy_token = "0x6810e776880C02933D47DB1b9fc05908e5386b96"
+        sell_amount = 999749122606373987000
+        kind = "sell" 
+        valid_to = 1707000000
 
-    signer_tx = cowswap_signer.SignOrder(blockchain=Chains.Ethereum,
-                                         avatar=avatar_safe,
-                                         sell_token=sell_token,
-                                         buy_token=buy_token,
-                                         sell_amount=sell_amount,
-                                         valid_to=valid_to,
-                                         kind=kind,
-                                         valid_duration=valid_duration,
-                                         fee_amount_bp=fee_amount_bp)
-    
-    assert signer_tx.data == "0x569d34890000000000000000000000006b175474e89094c44da98b954eedeac495271d0f0000000000000000000000006810e776880c02933d47db1b9fc05908e5386b96000000000000000000000000458cd345b4c05e8df39d0a07220feb4ec19f5e6f000000000000000000000000000000000000000000000036324e621cd55ee2b800000000000000000000000000000000000000000000000000000000000003e80000000000000000000000000000000000000000000000000000000000000708970eb15ab11f171c843c2d1fa326b7f8f6bf06ac7f84bb1affcc86511c783f120000000000000000000000000000000000000000000000000000000000000064f3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee34677500000000000000000000000000000000000000000000000000000000000000005a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc95a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc90000000000000000000000000000000000000000000000000000000065599fbc0000000000000000000000000000000000000000000000000000e42bf1ede39d"
-
+        signer_tx = cowswap_signer.SignOrder(blockchain=Chains.Ethereum,
+                                            avatar=avatar_safe,
+                                            sell_token=sell_token,
+                                            buy_token=buy_token,
+                                            sell_amount=sell_amount,
+                                            valid_to=valid_to,
+                                            kind=kind)
+        
+        assert signer_tx.data == "0x569d34890000000000000000000000006b175474e89094c44da98b954eedeac495271d0f0000000000000000000000006810e776880c02933d47db1b9fc05908e5386b96000000000000000000000000458cd345b4c05e8df39d0a07220feb4ec19f5e6f000000000000000000000000000000000000000000000036324e621cd55ee2b80000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000000000065bec0c0970eb15ab11f171c843c2d1fa326b7f8f6bf06ac7f84bb1affcc86511c783f1200000000000000000000000000000000000000000000000000000002540be400f3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee34677500000000000000000000000000000000000000000000000000000000000000005a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc95a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9000000000000000000000000000000000000000000000000000000000000003c0000000000000000000000000000000000000000000000000000000000000001"
 
 def test_cowswap_signer(local_node_eth, accounts):
     w3 = local_node_eth.w3
@@ -88,9 +84,7 @@ def test_cowswap_signer(local_node_eth, accounts):
     buy_token = "0x6810e776880C02933D47DB1b9fc05908e5386b96"
     sell_amount = 999749122606373987000
     kind = "sell"
-    valid_to = int(30*60)
-    valid_duration = 1700372412
-    fee_amount_bp = 250877393626013 
+    valid_to = 1700372412 
 
     signer_tx = cowswap_signer.SignOrder(blockchain=blockchain,
                                          avatar=avatar_safe_address,
@@ -98,9 +92,7 @@ def test_cowswap_signer(local_node_eth, accounts):
                                          buy_token=buy_token,
                                          sell_amount=sell_amount,
                                          valid_to=valid_to,
-                                         kind=kind,
-                                         valid_duration=valid_duration,
-                                         fee_amount_bp=fee_amount_bp)
+                                         kind=kind)
     
     
     checking = roles.send([signer_tx], 
