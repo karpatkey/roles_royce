@@ -7,16 +7,26 @@ from tests.roles import setup_common_roles, deploy_roles, apply_presets
 from defabipedia.types import Chains
 from time import time
 import pytest
+from unittest import mock
 
 def test_cowswap_signer_v1():
+   mock_response = mock.Mock()
+   mock_response.json.return_value = {
+       'quote': {
+           'buyAmount': 1000,
+           'feeAmount': 100
+       }
+   }
 
+   # Mock the requests.post function
+   with mock.patch('requests.post', return_value=mock_response) as mock_post:
+       # Now you can call the function you want to test
+     
     avatar_safe = "0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f"
 
-    sell_token = "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"
-    buy_token = "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb"
-    sell_amount = 999749122606373987
-    buy_amount = 5537011879839777
-    fee_amount = 250877393626013
+    sell_token = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    buy_token = "0x6810e776880C02933D47DB1b9fc05908e5386b96"
+    sell_amount = 999749122606373987000
     kind = "sell"
     valid_to = int(30*60)
     valid_duration = 1700372412
@@ -27,14 +37,12 @@ def test_cowswap_signer_v1():
                                          sell_token=sell_token,
                                          buy_token=buy_token,
                                          sell_amount=sell_amount,
-                                         buy_amount=buy_amount,
-                                         fee_amount=fee_amount,
                                          valid_to=valid_to,
                                          kind=kind,
                                          valid_duration=valid_duration,
                                          fee_amount_bp=fee_amount_bp)
     
-    assert signer_tx.data == "0x569d3489000000000000000000000000e91d153e0b41518a2ce8dd3d7944fa863463a97d0000000000000000000000009c58bacc331c9aa871afd802db6379a98e80cedb000000000000000000000000458cd345b4c05e8df39d0a07220feb4ec19f5e6f0000000000000000000000000000000000000000000000000ddfd287b5761c630000000000000000000000000000000000000000000000000013abe20a3708210000000000000000000000000000000000000000000000000000000000000708e09e64f0458093a33addd5c6c3e089b0acfdd59b92edd5be4a762a32131b49a40000000000000000000000000000000000000000000000000000e42bf1ede39df3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee34677500000000000000000000000000000000000000000000000000000000000000005a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc95a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc90000000000000000000000000000000000000000000000000000000065599fbc0000000000000000000000000000000000000000000000000000e42bf1ede39d"
+    assert signer_tx.data == "0x569d34890000000000000000000000006b175474e89094c44da98b954eedeac495271d0f0000000000000000000000006810e776880c02933d47db1b9fc05908e5386b96000000000000000000000000458cd345b4c05e8df39d0a07220feb4ec19f5e6f000000000000000000000000000000000000000000000036324e621cd55ee2b800000000000000000000000000000000000000000000000000000000000003e80000000000000000000000000000000000000000000000000000000000000708970eb15ab11f171c843c2d1fa326b7f8f6bf06ac7f84bb1affcc86511c783f120000000000000000000000000000000000000000000000000000000000000064f3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee34677500000000000000000000000000000000000000000000000000000000000000005a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc95a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc90000000000000000000000000000000000000000000000000000000065599fbc0000000000000000000000000000000000000000000000000000e42bf1ede39d"
 
 
 def test_cowswap_signer(local_node_eth, accounts):
@@ -76,11 +84,9 @@ def test_cowswap_signer(local_node_eth, accounts):
     private_key = accounts[4].key
     role = 4
 
-    sell_token = "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"
-    buy_token = "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb"
-    sell_amount = 999749122606373987
-    buy_amount = 5537011879839777
-    fee_amount = 250877393626013
+    sell_token = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    buy_token = "0x6810e776880C02933D47DB1b9fc05908e5386b96"
+    sell_amount = 999749122606373987000
     kind = "sell"
     valid_to = int(30*60)
     valid_duration = 1700372412
@@ -91,12 +97,11 @@ def test_cowswap_signer(local_node_eth, accounts):
                                          sell_token=sell_token,
                                          buy_token=buy_token,
                                          sell_amount=sell_amount,
-                                         buy_amount=buy_amount,
-                                         fee_amount=fee_amount,
                                          valid_to=valid_to,
                                          kind=kind,
                                          valid_duration=valid_duration,
                                          fee_amount_bp=fee_amount_bp)
+    
     
     checking = roles.send([signer_tx], 
                            role=role, 
