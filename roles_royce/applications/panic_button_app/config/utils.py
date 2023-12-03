@@ -3,40 +3,28 @@ from web3 import Web3
 from defabipedia import balancer, aura
 from defabipedia.types import Chains
 from roles_royce.protocols.balancer.utils import Pool, PoolKind
+import os
+import json
 
 
-def get_bpt_from_aura(w3: Web3) -> list[dict]:
+def get_aura_gauge_from_bpt(w3: Web3, bpt_address: Address) -> Address:
     """
-    Fetches all the Aura gauge token addresses with their corresponding BPT addresses
+    Fetches the Aura gauge address from the BPT address from the data in the aura_db_{blockchain}.json file in the
+    db directory
 
     Args:
         w3: Web3 instance
+        bpt_address: BPT address of the pool
 
     Returns:
-        List of dictionaries with the BPT address and the Aura gauge address for each pool
-         e.g. [{
-                    "blockchain": "ethereum",
-                    "aura_address": "0xAura_gauge_token_address",
-                    "bpt_address": "0xBpt_address"
-              }]
+        Address of the Aura gauge token
     """
-    blockchain = Chains.get_blockchain_from_web3(w3)
-    booster_ctr = aura.ContractSpecs[blockchain].Booster.contract(w3)
-    pool_length = booster_ctr.functions.poolLength().call()
-    result = []
-    for i in range(0, pool_length, 1):
-        info = booster_ctr.functions.poolInfo(i).call()
-        info_dict = {"blockchain": blockchain, "bpt_address": info[0], "aura_address": info[3]}
-        if len(result) == 0:
-            result.append(info_dict)
-        if any(d['bpt_address'] == info_dict['bpt_address'] for d in result):
-            for d in result:
-                if d['bpt_address'] == info_dict['bpt_address']:
-                    d['aura_address'] = info_dict['aura_address']
-                    break
-        else:
-            result.append(info_dict)
-    return result
+    with open(os.path.join(os.path.dirname(__file__), 'db', f'aura_db_{Chains.get_blockchain_from_web3(w3)}.json'), 'r') as f:
+        aura_db = json.load(f)
+    for item in aura_db:
+        if Web3.to_checksum_address(item.get('bpt_address')) == bpt_address:
+            aura_address = item.get('aura_address')
+            return aura_address
 
 
 def get_tokens_from_bpt(w3: Web3, bpt_address: Address) -> list[dict]:
@@ -72,3 +60,20 @@ def get_tokens_from_bpt(w3: Web3, bpt_address: Address) -> list[dict]:
             "symbol": token_symbol
         })
     return result
+
+
+def get_gauge_address_from_bpt(w3: Web3, bpt_address: Address) -> Address:
+    """get the gauge address from a bpt
+
+    Args:
+        w3 (Web3): Web3 instance
+        bpt_address (Address): BPT address of the pool
+
+    Returns:
+        Address: The gauge address
+    """
+
+    blockchain = Chains.get_blockchain_from_web3(w3)
+    get_gauge_contract = balancer.ContractSpecs[blockchain].LiquidityGaugeFactory.contract(w3)
+    gauge_address = get_gauge_contract.functions.getPoolGauge(bpt_address).call()
+    return gauge_address

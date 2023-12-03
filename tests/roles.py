@@ -53,4 +53,4 @@ def apply_presets(safe: SimpleSafe, roles_ctract, json_data, replaces=None):
         data: str = tx['data']
         for replacer in replaces:
             data = data.replace(replacer[0], replacer[1])
-            safe.send(txs=[TxData(contract_address=roles_ctract.address, data=data)])
+        safe.send(txs=[TxData(contract_address=roles_ctract.address, data=data)])
