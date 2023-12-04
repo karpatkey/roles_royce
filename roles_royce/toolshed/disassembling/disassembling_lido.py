@@ -68,7 +68,7 @@ class LidoDisassembler(Disassembler):
             amount_to_redeem = self.get_amount_to_redeem(address, fraction)
 
         set_allowance = lido.ApproveWithdrawalWstETH(amount = amount_to_redeem)
-        request_withdrawal = lido.RequestWithdrawalsWstETH(amounts = amount_to_redeem)
+        request_withdrawal = lido.RequestWithdrawalsWstETH(amounts=[amount_to_redeem],avatar=self.avatar_safe_address)
 
         txns.append(set_allowance)
         txns.append(request_withdrawal)

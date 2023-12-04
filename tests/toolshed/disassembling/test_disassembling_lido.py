@@ -110,16 +110,18 @@ def test_integration_exit_1_1(local_node_eth, accounts):
 
 def test_integration_exit_1_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = 18421437
+    block = 18710862
     local_node_eth.set_block(block)
-
+    
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
+
     apply_presets(avatar_safe, roles_contract, json_data=presets,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
+    
 
-    steal_token(w3=w3, token=ETHAddr.wstETH, holder="0x5e28B5858DA2C6fb4E449D69EEb5B82e271c45Ce",
+    steal_token(w3=w3, token=ETHAddr.wstETH, holder="0x4dCbB1fE5983ad5b44DC661273a4f11CA812f8B8",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     
     blockchain = Chains.get_blockchain_from_web3(w3)
@@ -137,7 +139,7 @@ def test_integration_exit_1_2(local_node_eth, accounts):
     
     wsteth_contract = ContractSpecs[blockchain].wstETH.contract(w3)
     wsteth_balance = wsteth_contract.functions.balanceOf(avatar_safe_address).call()
-    assert wsteth_balance == 8999999999998999998
+    assert wsteth_balance == 8999999999999000000
 
     txn_transactable = lido_disassembler.exit_2(percentage=50)
     lido_disassembler.send(txn_transactable, private_key=private_key)
