@@ -31,5 +31,5 @@ dependencies = [
 Homepage = "https://github.com/KarpatkeyDAO/rolling-roles"
 
 [tool.setuptools.packages.find]
-include = ["roles_royce*", "defabipedia*"]
+include = ["roles_royce*", ]
 namespaces = false
