@@ -7,6 +7,7 @@ import os
 from dataclasses import dataclass
 from defabipedia.types import Blockchain, Chains
 import copy
+from defabipedia.lido import ContractSpecs
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -127,13 +128,22 @@ class AuraPosition:
         for token in pool_tokens:
             result = result + f"_{token['symbol']}"
         return result
+    
+@dataclass
+class LidoPosition:
+    position_id: str
+    lido_address: Address
 
-
-# -----------------------------------------------------------------------------------------------------------------------
-
-def add_lido_positions(protocol, template, position_id):
-    template['position_id'] = f"{protocol}_{position_id}"
-    return template
+    def position_id_tech(self) -> Address:
+        """Returns either stETH or wstETH address"""
+        return self.lido_address
+    
+    def position_id_human_readable(self, w3: Web3) -> str:
+        blockchain = Chains.get_blockchain_from_web3(w3)
+        if self.lido_address == ContractSpecs[blockchain].stETH.address:
+            return f'{blockchain}_Lido_stETH'
+        else:
+            return f'{blockchain}_Lido_wstETH'
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -155,7 +165,9 @@ class DAOStrategiesBuilder:
         print(f'    Adding Aura positions')
         if self.aura:
             self.add_to_json(self.build_aura_positions(w3, self.aura))
-        # TODO: add_lido_position
+        print(f'    Adding Lido positions')
+        if self.aura:
+            self.add_to_json(self.build_lido_positions(w3, self.aura))
 
     def add_to_json(self, positions: list[dict]):
         file = os.path.join(os.path.dirname(__file__), 'strategies', f"{self.dao}-{self.blockchain}.json")
@@ -259,4 +271,20 @@ class DAOStrategiesBuilder:
 
         return result
 
-        # TODO: add_lido_position
+    @staticmethod
+    def build_lido_positions(positions: list[LidoPosition]) -> list[dict]:
+
+
+        with open(os.path.join(os.path.dirname(__file__), 'templates', 'lido_template.json'), 'r') as f:
+            lido_template = json.load(f)
+
+        result = []
+        for lido_position in positions:
+
+            print("        Adding: ", lido_position)
+            position = copy.deepcopy(lido_template)
+
+            result.append(position)
+        return result
+
+
