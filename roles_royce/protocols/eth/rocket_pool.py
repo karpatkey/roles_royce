@@ -1,12 +1,12 @@
 from roles_royce.protocols.base import ContractMethod, BaseApprove, Address
-from defabipedia import Chains
+from defabipedia import Chain
 from defabipedia.rocket_pool import ContractSpecs
 
 
 class ApproveForSwapRouter(BaseApprove):
     """Approve rETH with Swap Router as spender"""
-    fixed_arguments = {"spender": ContractSpecs[Chains.Ethereum].SwapRouter.address}
-    token = ContractSpecs[Chains.Ethereum].rETH.address
+    fixed_arguments = {"spender": ContractSpecs[Chain.Ethereum].SwapRouter.address}
+    token = ContractSpecs[Chain.Ethereum].rETH.address
 
 
 class Deposit(ContractMethod):
@@ -21,7 +21,7 @@ class Deposit(ContractMethod):
 class Burn(ContractMethod):
     """Burns rETH in exchange for ETH"""
     name = "burn"
-    target_address = ContractSpecs[Chains.Ethereum].rETH.address
+    target_address = ContractSpecs[Chain.Ethereum].rETH.address
     in_signature = [("_rethAmount", "uint256")]
 
     def __init__(self, amount: int):
@@ -35,7 +35,7 @@ class SwapTo(ContractMethod):
     the ETH you are depositing, the SWAP_ROUTER swaps the ETH for rETH 
     in secondary markets (Balancer and Uniswap)"""
     name = "swapTo"
-    target_address = ContractSpecs[Chains.Ethereum].SwapRouter.address
+    target_address = ContractSpecs[Chain.Ethereum].SwapRouter.address
     in_signature = [("_uniswapPortion", "uint256"), ("_balancerPortion", "uint256"), ("_minTokensOut", "uint256"),
                     ("_idealTokensOut", "uint256")]
 
@@ -53,7 +53,7 @@ class SwapFrom(ContractMethod):
     the rETH you are withdrawing, the SWAP_ROUTER swaps the rETH for 
     ETH in secondary markets (Balancer and Uniswap)"""
     name = "swapFrom"
-    target_address = ContractSpecs[Chains.Ethereum].SwapRouter.address
+    target_address = ContractSpecs[Chain.Ethereum].SwapRouter.address
     in_signature = [("_uniswapPortion", "uint256"), ("_balancerPortion", "uint256"), ("_minTokensOut", "uint256"),
                     ("_idealTokensOut", "uint256"), ("_tokensIn", "uint256")]
 

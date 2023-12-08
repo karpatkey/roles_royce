@@ -4,7 +4,7 @@ from eth_abi import abi
 from web3 import Web3
 from gnosis.safe.multi_send import MultiSend, MultiSendOperation, MultiSendTx
 from .roles_modifier import Operation
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
 from .generic_method import Transactable, TxData
 
 TENDERLY_API_URL = "https://api.tenderly.co/api/v1/"
@@ -24,8 +24,8 @@ def to_data_input(name, signature, args):
 
 
 MULTISENDS = {
-    Chains.Ethereum: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
-    Chains.Gnosis: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
+    Chain.Ethereum: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761',
+    Chain.Gnosis: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
 }
 
 

@@ -1,6 +1,6 @@
 from decimal import Decimal
 from defabipedia.spark import ContractSpecs, Abis
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
 from roles_royce.protocols.eth.spark import RateModel
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 from roles_royce.protocols.eth import spark
@@ -72,7 +72,7 @@ class SparkCDPManager:
         if not self.owner_address:
             raise ValueError("'owner_address' must be filled.")
         self.owner_address = Web3.to_checksum_address(self.owner_address)
-        self.blockchain = Chains.get_blockchain_from_web3(self.w3)
+        self.blockchain = Chain.get_blockchain_from_web3(self.w3)
         if self.token_addresses_block == 'latest':
             self.token_addresses_block = self.w3.eth.block_number
         self.token_addresses = SparkUtils.get_spark_token_addresses(self.w3, block=self.token_addresses_block)

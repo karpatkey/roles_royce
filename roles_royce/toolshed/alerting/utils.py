@@ -1,7 +1,7 @@
 from roles_royce.evm_utils import erc20_abi
 from dataclasses import dataclass
 from typing import Any, Dict, cast, Union
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
 from web3.types import Address, ChecksumAddress
 from web3._utils.abi import get_abi_input_names, get_abi_input_types, map_abi_data
 from web3._utils.normalizers import BASE_RETURN_NORMALIZERS
@@ -93,8 +93,8 @@ def get_token_amounts_from_transfer_events(tx_receipt: object, target_address: s
 
 
 ExplorerTxUrls = {
-    Chains.Ethereum: 'https://etherscan.io/tx/',
-    Chains.Gnosis: 'https://gnosisscan.io/tx/'
+    Chain.Ethereum: 'https://etherscan.io/tx/',
+    Chain.Gnosis: 'https://gnosisscan.io/tx/'
 }
 
 
@@ -116,7 +116,7 @@ def get_tx_executed_msg(tx_receipt: TxReceipt, chain: Blockchain) -> (str, str):
 
 def get_tx_receipt_message_with_transfers(tx_receipt: object, target_address: str | ChecksumAddress | Address,
                                           w3: Web3) -> (str, str):
-    chain = Chains.get_blockchain_from_web3(w3)
+    chain = Chain.get_blockchain_from_web3(w3)
     tx_executed_message, tx_executed_message_slack = get_tx_executed_msg(tx_receipt, chain)
     transfers, transfers_message = get_token_amounts_from_transfer_events(tx_receipt, target_address, w3)
 

@@ -1,4 +1,4 @@
-from defabipedia.types import Chains, load_local_abi, ContractSpec, ContractAbi, ContractAddress
+from defabipedia.types import Chain, load_local_abi, ContractSpec, ContractAbi, ContractAddress
 
 
 class GnosisChainAddressesAndAbis:
@@ -17,5 +17,5 @@ class GnosisChainAddressesAndAbis:
 
 
 AddressesAndAbis = {
-    Chains.Gnosis: GnosisChainAddressesAndAbis
+    Chain.Gnosis: GnosisChainAddressesAndAbis
 }

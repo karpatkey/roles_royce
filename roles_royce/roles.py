@@ -3,7 +3,7 @@ from typing import List
 from web3 import Web3
 from web3.types import TxReceipt
 from .roles_modifier import RolesMod
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 from .generic_method import Transactable
 from .utils import multi_or_one
 
@@ -31,7 +31,7 @@ def build(txs: List[Transactable],
     Returns:
         Transaction dict.
     """
-    tx_data = multi_or_one(txs, Chains.get_blockchain_from_web3(web3))
+    tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(
         role=role,
         contract_address=roles_mod_address,
@@ -66,7 +66,7 @@ def check(txs: List[Transactable],
     Returns:
         Status.
     """
-    tx_data = multi_or_one(txs, Chains.get_blockchain_from_web3(web3))
+    tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(
         role=role,
         contract_address=roles_mod_address,
@@ -98,7 +98,7 @@ def send(txs: List[Transactable],
     Returns:
         Tx receipt.
     """
-    tx_data = multi_or_one(txs, Chains.get_blockchain_from_web3(web3))
+    tx_data = multi_or_one(txs, Chain.get_blockchain_from_web3(web3))
     roles_mod = RolesMod(
         role=role,
         contract_address=roles_mod_address,

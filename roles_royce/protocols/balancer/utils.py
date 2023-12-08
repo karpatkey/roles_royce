@@ -1,5 +1,5 @@
 from web3 import Web3
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 from defabipedia.balancer import ContractSpecs, Abis
 from web3.exceptions import ContractLogicError
 from .types_and_enums import PoolKind
@@ -9,7 +9,7 @@ class Pool:
     def __init__(self, w3: Web3, pool_id: str):
         self.w3 = w3
         self.pool_id = pool_id
-        blockchain = Chains.get_blockchain_from_web3(self.w3)
+        blockchain = Chain.get_blockchain_from_web3(self.w3)
         self.vault_contract = ContractSpecs[blockchain].Vault.contract(self.w3)
         bpt_address = self.vault_contract.functions.getPool(self.pool_id).call()[0]
         self.bpt_contract = self.w3.eth.contract(address=bpt_address, abi=Abis[blockchain].UniversalBPT.abi)

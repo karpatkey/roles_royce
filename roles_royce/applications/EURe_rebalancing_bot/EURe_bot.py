@@ -1,5 +1,5 @@
 from web3 import Web3
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
 from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel, web3_connection_check
 from prometheus_client import start_http_server as prometheus_start_http_server
@@ -65,8 +65,8 @@ def bot_do(w3):
 
     # -----------------------------------------------------------------------------------------------------------------------
 
-    WXDAI_contract = w3.eth.contract(address=AddressesAndAbis[Chains.Gnosis].WXDAI.address,
-                                     abi=AddressesAndAbis[Chains.Gnosis].ERC20.abi)
+    WXDAI_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Gnosis].WXDAI.address,
+                                     abi=AddressesAndAbis[Chain.Gnosis].ERC20.abi)
     balance_WXDAI = WXDAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
     if 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance_WXDAI and amount_WXDAI < ENV.AMOUNT:
         while 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance_WXDAI and 10 * amount_WXDAI <= ENV.AMOUNT:
@@ -87,8 +87,8 @@ def bot_do(w3):
 
     # -----------------------------------------------------------------------------------------------------------------------
 
-    EURe_contract = w3.eth.contract(address=AddressesAndAbis[Chains.Gnosis].EURe.address,
-                                    abi=AddressesAndAbis[Chains.Gnosis].ERC20.abi)
+    EURe_contract = w3.eth.contract(address=AddressesAndAbis[Chain.Gnosis].EURe.address,
+                                    abi=AddressesAndAbis[Chain.Gnosis].ERC20.abi)
     balance_EURe = EURe_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
     if 10 * amount_EURe * (10 ** decimalsEURe) < balance_EURe and amount_EURe < ENV.AMOUNT:
         while 10 * amount_EURe * (10 ** decimalsEURe) < balance_EURe and 10 * amount_EURe <= ENV.AMOUNT:

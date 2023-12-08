@@ -3,7 +3,7 @@ from decouple import config
 from web3.types import Address
 from web3 import Web3
 from roles_royce.protocols.base import Address
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 from eth_account import Account
 from roles_royce.constants import StrEnum
 from web3.exceptions import ContractLogicError
@@ -208,14 +208,14 @@ def fork_unlock_account(w3, address):
 
 # These accounts are not guaranteed to hold tokens forever...
 Holders = {
-    Chains.Ethereum: '0x00000000219ab540356cBB839Cbe05303d7705Fa',  # BINANCE_ACCOUNT_WITH_LOTS_OF_ETH =
-    Chains.Gnosis: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'  # WXDAI_CONTRACT_WITH_LOTS_OF_XDAI =
+    Chain.Ethereum: '0x00000000219ab540356cBB839Cbe05303d7705Fa',  # BINANCE_ACCOUNT_WITH_LOTS_OF_ETH =
+    Chain.Gnosis: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'  # WXDAI_CONTRACT_WITH_LOTS_OF_XDAI =
 }
 
 
 def top_up_address(w3: Web3, address: str, amount: int) -> None:
     """Top up an address with ETH"""
-    holder = Holders[Chains.get_blockchain_from_web3(w3)]
+    holder = Holders[Chain.get_blockchain_from_web3(w3)]
     if amount > (w3.eth.get_balance(holder) * 1e18) * 0.99:
         raise ValueError("Not enough ETH in the faucet account")
     fork_unlock_account(w3, holder)
