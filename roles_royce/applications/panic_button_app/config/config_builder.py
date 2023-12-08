@@ -175,7 +175,10 @@ class DAOStrategiesBuilder:
             json.dump(strategies, f, indent=4)
 
     @staticmethod
-    def build_balancer_positions(w3: Web3, positions: list[BalancerPosition]) -> list[dict]:            
+    def build_balancer_positions(w3: Web3, positions: list[BalancerPosition]) -> list[dict]: 
+        with open(os.path.join(os.path.dirname(__file__), 'templates', 'balancer_template.json'), 'r') as f:
+            balancer_template = json.load(f)
+           
         result = []
         for balancer_position in positions:
 

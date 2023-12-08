@@ -7,22 +7,11 @@ import math
 import requests
 import json
 
-from json import JSONEncoder
-
 from eth_utils.conversions import to_hex
-
-
-# class to encode hexbytes into string. For example: appData cant be encoded into JSON
-# because its hexbytes, this class encodes it into hex (normal string)
-class BytesJSONEncoder(JSONEncoder):
-    def default(self, o):
-        if isinstance(o, bytes):
-            return to_hex(o)
-        else:
-            return super(BytesJSONEncoder, self).default(o)
 
 class SignOrder(ContractMethod):
     """sign an order with the cowswap signer contract"""
+
     target_address = None
     name = "signOrder"
     in_signature = (
@@ -74,14 +63,11 @@ class SignOrder(ContractMethod):
                         "buyTokenBalance": "erc20",
                         "from": avatar,
                         "priceQuality": "verified",
-                        "signingScheme": "eip712",
+                        "signingScheme": "presign",
                         "onchainOrder": False,
                         "kind": kind,
                         "sellAmountBeforeFee": str(sell_amount)}
-        if blockchain == Chains.Ethereum:   
-            self.response = requests.post('https://api.cow.fi/mainnet/api/v1/quote', data=json.dumps(self.quote_order)).json()
-        else:
-            self.response = requests.post('https://api.cow.fi/xdai/api/v1/quote', data=json.dumps(self.quote_order)).json()
+
         self.args.sell_token = sell_token
         self.args.buy_token = buy_token
         self.args.receiver = avatar

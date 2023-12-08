@@ -8,7 +8,8 @@ from web3 import Web3
 from web3.exceptions import ContractLogicError
 from roles_royce.protocols.base import Address
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.eth import cowswap_signer
+from roles_royce.protocols.cowswap.contract_methods import SignOrder
+from roles_royce.protocols.cowswap.utils import QuoteOrderCowSwap
 from time import time
 
 
@@ -16,7 +17,7 @@ from time import time
 class LidoDisassembler(Disassembler):
 
     def get_amount_to_redeem(self, address: Address, fraction: float | Decimal) -> int:
-        if address == ETHAddr.stETH:
+        if address == ContractSpecs[self.blockchain].stETH.address:
             contract = ContractSpecs[self.blockchain].stETH.contract(self.w3)
         else:
             contract = ContractSpecs[self.blockchain].wstETH.contract(self.w3)
@@ -36,7 +37,7 @@ class LidoDisassembler(Disassembler):
         fraction = validate_percentage(percentage)
 
         txns = []
-        address = ETHAddr.stETH
+        address = ContractSpecs[self.blockchain].stETH.address
 
         if amount_to_redeem is None: 
             amount_to_redeem = self.get_amount_to_redeem(address, fraction)
@@ -62,7 +63,7 @@ class LidoDisassembler(Disassembler):
         fraction = validate_percentage(percentage)
 
         txns = []
-        address = ETHAddr.wstETH
+        address = ContractSpecs[self.blockchain].wstETH.address
 
         if amount_to_redeem is None: 
             amount_to_redeem = self.get_amount_to_redeem(address, fraction)
@@ -94,17 +95,31 @@ class LidoDisassembler(Disassembler):
             fraction = validate_percentage(percentage)
 
             txns = []
-            address = ETHAddr.stETH
+            address = ContractSpecs[self.blockchain].stETH.address
 
             if amount_to_redeem is None: 
                 amount_to_redeem = self.get_amount_to_redeem(address, fraction)
 
-            moooooo = cowswap_signer.SignOrder(blockchain=self.blockchain,
+            quote = QuoteOrderCowSwap(blockchain=self.blockchain,
+                                        sell_token=address,
+                                        buy_token=ETHAddr.ETH,
+                                        receiver=self.avatar_safe_address,
+                                        kind="sell",
+                                        sell_amount=amount_to_redeem)
+            
+            buy_amount = quote.buy_amount
+            fee_amount = quote.fee_amount
+
+            buy_amount_min_slippage = int(Decimal(buy_amount) * Decimal(1 - max_slippage))
+
+            moooooo = SignOrder(blockchain=self.blockchain,
                                                 avatar=self.avatar_safe_address,
                                                 sell_token=address,
                                                 buy_token=ETHAddr.ETH,
                                                 sell_amount=amount_to_redeem,
-                                                valid_to=int(int(time())+60),
+                                                buy_amount=buy_amount_min_slippage,
+                                                fee_amount=fee_amount,
+                                                valid_to=int(int(time())+240),
                                                 kind="sell")
             
             txns.append(moooooo)
@@ -125,23 +140,37 @@ class LidoDisassembler(Disassembler):
         Returns:
             list[ Transactable]: List of transactions to execute.
         """
-
+        
         for element in exit_arguments:
             max_slippage = element["max_slippage"]
             fraction = validate_percentage(percentage)
 
             txns = []
-            address = ETHAddr.wstETH
+            address = ContractSpecs[self.blockchain].wstETH.address
 
             if amount_to_redeem is None: 
                 amount_to_redeem = self.get_amount_to_redeem(address, fraction)
 
-            moooooo = cowswap_signer.SignOrder(blockchain=self.blockchain,
+            quote = QuoteOrderCowSwap(blockchain=self.blockchain,
+                                        sell_token=address,
+                                        buy_token=ETHAddr.ETH,
+                                        receiver=self.avatar_safe_address,
+                                        kind="sell",
+                                        sell_amount=amount_to_redeem)
+            
+            buy_amount = quote.buy_amount
+            fee_amount = quote.fee_amount
+
+            buy_amount_min_slippage = int(Decimal(buy_amount) * Decimal(1 - max_slippage))
+
+            moooooo = SignOrder(blockchain=self.blockchain,
                                                 avatar=self.avatar_safe_address,
                                                 sell_token=address,
                                                 buy_token=ETHAddr.ETH,
                                                 sell_amount=amount_to_redeem,
-                                                valid_to=int(int(time())+60),
+                                                buy_amount=buy_amount_min_slippage,
+                                                fee_amount=fee_amount,
+                                                valid_to=int(int(time())+240),
                                                 kind="sell")
             
             txns.append(moooooo)

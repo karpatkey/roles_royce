@@ -10,6 +10,9 @@ from roles_royce.roles_modifier import set_gas_strategy, GasStrategies
 from defabipedia.lido import ContractSpecs
 from roles_royce.protocols.eth import lido
 import pytest
+import json
+import requests
+from time import time
 
 presets = """{
   "version": "1.0",
@@ -69,6 +72,8 @@ presets = """{
   ]
 }"""
 
+
+
 def test_integration_exit_1_1(local_node_eth, accounts):
     w3 = local_node_eth.w3
     block = 18421437
@@ -79,11 +84,12 @@ def test_integration_exit_1_1(local_node_eth, accounts):
     setup_common_roles(avatar_safe, roles_contract)
     apply_presets(avatar_safe, roles_contract, json_data=presets,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
-
-    steal_token(w3=w3, token=ETHAddr.stETH, holder="0xE53FFF67f9f384d20Ebea36F43b93DC49Ed22753",
-                to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     
     blockchain = Chains.get_blockchain_from_web3(w3)
+    steal_token(w3=w3, token=ContractSpecs[blockchain].stETH.address, holder="0xE53FFF67f9f384d20Ebea36F43b93DC49Ed22753",
+                to=avatar_safe.address, amount=8_999_999_999_999_000_000)
+    
+
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address
@@ -120,11 +126,10 @@ def test_integration_exit_1_2(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=presets,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
     
-
-    steal_token(w3=w3, token=ETHAddr.wstETH, holder="0x4dCbB1fE5983ad5b44DC661273a4f11CA812f8B8",
+    blockchain = Chains.get_blockchain_from_web3(w3)
+    steal_token(w3=w3, token=ContractSpecs[blockchain].wstETH.address, holder="0x4dCbB1fE5983ad5b44DC661273a4f11CA812f8B8",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     
-    blockchain = Chains.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address
@@ -186,22 +191,43 @@ preset_cowswap = """{
     }
   ]
 }"""
-@pytest.mark.skip(reason="This test is not working")
+
+preset_cowswap_easy ="""{
+            "version": "1.0",
+            "chainId": "1",
+            "meta": {
+                "description": "",
+                "txBuilderVersion": "1.8.0"
+            },
+            "createdAt": 1700857590822,
+            "transactions": [
+                {
+                "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+                "data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000E522f854b978650Dc838Ade0e39FbC1417A2FfB0",
+                "value": "0"
+                },
+                {
+                "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+                "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000E522f854b978650Dc838Ade0e39FbC1417A2FfB0569d3489000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002",
+                "value": "0"
+                }
+            ]
+            }"""
+
+
 def test_integration_exit_1_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = 18708512
-    local_node_eth.set_block(block)
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(avatar_safe, roles_contract, json_data=preset_cowswap,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
+    apply_presets(avatar_safe, roles_contract, json_data=preset_cowswap_easy,
+                  replaces=[("E522f854b978650Dc838Ade0e39FbC1417A2FfB0", "23dA9AdE38E4477b23770DeD512fD37b12381FAB")])
 
-    steal_token(w3=w3, token=ETHAddr.stETH, holder="0xE53FFF67f9f384d20Ebea36F43b93DC49Ed22753",
+    blockchain = Chains.get_blockchain_from_web3(w3)
+    steal_token(w3=w3, token=ContractSpecs[blockchain].stETH.address, holder="0xE53FFF67f9f384d20Ebea36F43b93DC49Ed22753",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     
-    blockchain = Chains.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address
@@ -213,34 +239,51 @@ def test_integration_exit_1_3(local_node_eth, accounts):
                                         roles_mod_address=roles_contract.address,
                                         role=role,
                                         signer_address=disassembler_address)
-    
-    steth_contract = ContractSpecs[blockchain].stETH.contract(w3)
-    steth_balance = steth_contract.functions.balanceOf(avatar_safe_address).call()
-    assert steth_balance == 8999999999998999999
 
     txn_transactable = lido_disassembler.exit_3(percentage=50,exit_arguments=[{"max_slippage": 0.01}])
     send_it = lido_disassembler.send(txn_transactable, private_key=private_key)
     assert send_it
 
-    steth_balance = steth_contract.functions.balanceOf(avatar_safe_address).call()
-    assert steth_balance == 4499999999999500000
 
-@pytest.mark.skip(reason="This test is not working")
+    cow_api_address = "https://api.cow.fi/mainnet/api/v1/orders"
+    send_order_api = {"sellToken": txn_transactable[0].args_list[0][0],
+                        "buyToken": txn_transactable[0].args_list[0][1],
+                        "receiver": txn_transactable[0].args_list[0][2],
+                        "sellAmount": str(txn_transactable[0].args_list[0][3]),
+                        "buyAmount": str(txn_transactable[0].args_list[0][4]),
+                        "validTo": txn_transactable[0].args_list[0][5],
+                        "feeAmount": str(txn_transactable[0].args_list[0][7]),
+                        "kind": "sell",
+                        "partiallyFillable": False,
+                        "sellTokenBalance": "erc20",
+                        "buyTokenBalance": "erc20",
+                        "signingScheme": "presign",
+                        "signature": "0x",
+                        "from": txn_transactable[0].args_list[0][2],
+                        "appData": json.dumps({"appCode":"santi_the_best"}),
+                        "appDataHash": "0x970eb15ab11f171c843c2d1fa326b7f8f6bf06ac7f84bb1affcc86511c783f12"
+                        }
+    
+    send_order = requests.post(cow_api_address, json=send_order_api)
+    assert send_order.status_code == 201
+
+    
 def test_integration_exit_1_4(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = 18708512
-    local_node_eth.set_block(block)
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(avatar_safe, roles_contract, json_data=preset_cowswap,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
+    apply_presets(avatar_safe, roles_contract, json_data=preset_cowswap_easy,
+                  replaces=[("E522f854b978650Dc838Ade0e39FbC1417A2FfB0", "23dA9AdE38E4477b23770DeD512fD37b12381FAB")])
 
-    steal_token(w3=w3, token=ETHAddr.wstETH, holder="0x5e28B5858DA2C6fb4E449D69EEb5B82e271c45Ce",
+    blockchain = Chains.get_blockchain_from_web3(w3)
+    steal_token(w3=w3, token=ContractSpecs[blockchain].wstETH.address, holder="0xB0850a7589C195A6545Ed8A6a932B25B47003f2A",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    wsteth_contract = ContractSpecs[blockchain].wstETH.contract(w3)
+    wsteth_balance = wsteth_contract.functions.balanceOf(avatar_safe.address).call()
+    assert wsteth_balance == 8999999999999000000
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address
@@ -252,17 +295,35 @@ def test_integration_exit_1_4(local_node_eth, accounts):
                                         roles_mod_address=roles_contract.address,
                                         role=role,
                                         signer_address=disassembler_address)
-    
-    wsteth_contract = ContractSpecs[blockchain].wstETH.contract(w3)
-    wsteth_balance = wsteth_contract.functions.balanceOf(avatar_safe_address).call()
-    assert wsteth_balance == 8999999999998999998
 
-    txn_transactable = lido_disassembler.exit_3(percentage=50,exit_arguments=[{"max_slippage": 0.01}])
+    txn_transactable = lido_disassembler.exit_4(percentage=50,exit_arguments=[{"max_slippage": 0.01}])
     send_it = lido_disassembler.send(txn_transactable, private_key=private_key)
     assert send_it
 
-    wsteth_balance = wsteth_contract.functions.balanceOf(avatar_safe_address).call()
-    assert wsteth_balance == 4499999999999500000
+    cow_api_address = "https://api.cow.fi/mainnet/api/v1/orders"
+    send_order_api = {"sellToken": txn_transactable[0].args_list[0][0],
+                        "buyToken": txn_transactable[0].args_list[0][1],
+                        "receiver": txn_transactable[0].args_list[0][2],
+                        "sellAmount": str(txn_transactable[0].args_list[0][3]),
+                        "buyAmount": str(txn_transactable[0].args_list[0][4]),
+                        "validTo": txn_transactable[0].args_list[0][5],
+                        "feeAmount": str(txn_transactable[0].args_list[0][7]),
+                        "kind": "sell",
+                        "partiallyFillable": False,
+                        "sellTokenBalance": "erc20",
+                        "buyTokenBalance": "erc20",
+                        "signingScheme": "presign",
+                        "signature": "0x",
+                        "from": txn_transactable[0].args_list[0][2],
+                        "appData": json.dumps({"appCode":"santi_the_best"}),
+                        "appDataHash": "0x970eb15ab11f171c843c2d1fa326b7f8f6bf06ac7f84bb1affcc86511c783f12"
+                        }
+    
+    send_order = requests.post(cow_api_address, json=send_order_api)
+    assert send_order.status_code == 201
+
+
+
 
 
 
