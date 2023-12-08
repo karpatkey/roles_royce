@@ -155,7 +155,7 @@ class DAOStrategiesBuilder:
     blockchain: Blockchain
     balancer: list[BalancerPosition] | None = None
     aura: list[AuraPosition] | None = None
-    lido: bool = False  # We either have funds in Lido or we don't
+    lido: list[LidoPosition] | None = None
 
     def build_json(self, w3: Web3):
         print(f'Building json for {self.dao}-{self.blockchain}')
@@ -166,8 +166,8 @@ class DAOStrategiesBuilder:
         if self.aura:
             self.add_to_json(self.build_aura_positions(w3, self.aura))
         print(f'    Adding Lido positions')
-        if self.aura:
-            self.add_to_json(self.build_lido_positions(w3, self.aura))
+        if self.lido:
+            self.add_to_json(self.build_lido_positions(self.lido))
 
     def add_to_json(self, positions: list[dict]):
         file = os.path.join(os.path.dirname(__file__), 'strategies', f"{self.dao}-{self.blockchain}.json")
