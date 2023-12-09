@@ -109,6 +109,8 @@ def test_process_expired_locks():
 
 def test_approve_method_with_roles(local_node_eth):
     w3 = local_node_eth.w3
+    block = 18000000
+    local_node_eth.set_block(block)
     method = aura.ApproveForBooster(token=LP80GNO20WETH, amount=1000)
     ROLE = 1
     roles_mod = RolesMod(role=ROLE, contract_address=ROLES_MOD, account=REVOKER_ROLE, web3=w3)

@@ -74,7 +74,7 @@ presets = """{
 
 
 
-def test_integration_exit_1_1(local_node_eth, accounts):
+def test_integration_exit_1(local_node_eth, accounts):
     w3 = local_node_eth.w3
     block = 18421437
     local_node_eth.set_block(block)
@@ -114,7 +114,7 @@ def test_integration_exit_1_1(local_node_eth, accounts):
     steth_balance = steth_contract.functions.balanceOf(avatar_safe_address).call()
     assert steth_balance == 4499999999999500000
 
-def test_integration_exit_1_2(local_node_eth, accounts):
+def test_integration_exit_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
     block = 18710862
     local_node_eth.set_block(block)
@@ -215,7 +215,7 @@ preset_cowswap_easy ="""{
             }"""
 
 
-def test_integration_exit_1_3(local_node_eth, accounts):
+def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
@@ -268,7 +268,7 @@ def test_integration_exit_1_3(local_node_eth, accounts):
     assert send_order.status_code == 201
 
     
-def test_integration_exit_1_4(local_node_eth, accounts):
+def test_integration_exit_4(local_node_eth, accounts):
     w3 = local_node_eth.w3
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])

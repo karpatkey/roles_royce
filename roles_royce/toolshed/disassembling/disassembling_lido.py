@@ -119,7 +119,7 @@ class LidoDisassembler(Disassembler):
                                                 sell_amount=amount_to_redeem,
                                                 buy_amount=buy_amount_min_slippage,
                                                 fee_amount=fee_amount,
-                                                valid_to=int(int(time())+240),
+                                                valid_to=int(int(time())+600),
                                                 kind="sell")
             
             txns.append(moooooo)
@@ -170,7 +170,7 @@ class LidoDisassembler(Disassembler):
                                                 sell_amount=amount_to_redeem,
                                                 buy_amount=buy_amount_min_slippage,
                                                 fee_amount=fee_amount,
-                                                valid_to=int(int(time())+240),
+                                                valid_to=int(int(time())+600),
                                                 kind="sell")
             
             txns.append(moooooo)

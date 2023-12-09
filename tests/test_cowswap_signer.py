@@ -94,7 +94,7 @@ def test_cowswap_signer(local_node_eth, accounts):
     buy_token = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
     sell_amount = 4499999999999499999
     kind = "sell"
-    valid_to = int(int(time())+240)
+    valid_to = int(int(time())+600)
 
     quote_tx = QuoteOrderCowSwap(blockchain=blockchain,
                                         sell_token=sell_token,
