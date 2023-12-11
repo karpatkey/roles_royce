@@ -296,6 +296,38 @@
                     ]
                 }
             ]
+        },
+        {
+            "protocol": "Lido",
+            "position_id": "164",
+            "position_id_tech": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+            "position_id_human_readable": "ethereum_Lido_stETH",
+            "exec_config": [
+                {
+                    "function_name": "exit_1",
+                    "label": "Unstake stETH",
+                    "test": false,
+                    "description": "Unstake stETH for ETH",
+                    "parameters": []
+                },
+                {
+                    "function_name": "exit_3",
+                    "label": "Swap stETH",
+                    "test": false,
+                    "description": "Swap stETH for ETH",
+                    "parameters": [
+                        {
+                            "name": "max_slippage",
+                            "type": "input",
+                            "label": "Max slippage",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
