@@ -134,16 +134,19 @@ class LidoPosition:
     position_id: str
     lido_address: Address
 
+    def __post_init__(self):
+        self.lido_address = Web3.to_checksum_address(self.lido_address)
+
     def position_id_tech(self) -> Address:
         """Returns either stETH or wstETH address"""
         return self.lido_address
     
     def position_id_human_readable(self, w3: Web3) -> str:
         blockchain = Chains.get_blockchain_from_web3(w3)
-        if self.lido_address == ContractSpecs[blockchain].stETH.address:
-            return f'{blockchain}_Lido_stETH'
-        else:
+        if self.lido_address == ContractSpecs[blockchain].wstETH.address:
             return f'{blockchain}_Lido_wstETH'
+        else:
+            return f'{blockchain}_Lido_stETH'
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -167,7 +170,7 @@ class DAOStrategiesBuilder:
             self.add_to_json(self.build_aura_positions(w3, self.aura))
         print(f'    Adding Lido positions')
         if self.lido:
-            self.add_to_json(self.build_lido_positions(self.lido))
+            self.add_to_json(self.build_lido_positions(w3, self.lido))
 
     def add_to_json(self, positions: list[dict]):
         file = os.path.join(os.path.dirname(__file__), 'strategies', f"{self.dao}-{self.blockchain}.json")
@@ -280,12 +283,17 @@ class DAOStrategiesBuilder:
 
         result = []
         for lido_position in positions:
-            position["position_id"] = lido_position.position_id
-            position["position_id_tech"] = lido_position.lido_address
-            position["position_id_human_readable"] = lido_position.position_id_human_readable(w3)
 
             print("        Adding: ", lido_position)
             position = copy.deepcopy(lido_template)
+            blockchain = Chains.get_blockchain_from_web3(w3)
+            if lido_position.lido_address == ContractSpecs[blockchain].wstETH.address:
+                position['exec_config'] = list(filter(lambda x: x['function_name'] not in ['exit_1', 'exit_3'], position['exec_config']))
+            else:
+                position['exec_config'] = list(filter(lambda x: x['function_name'] not in ['exit_2', 'exit_4'], position['exec_config']))
+            position["position_id"] = lido_position.position_id
+            position["position_id_tech"] = lido_position.position_id_tech()
+            position["position_id_human_readable"] = lido_position.position_id_human_readable(w3)
 
             result.append(position)
         return result
