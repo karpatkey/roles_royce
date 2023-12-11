@@ -6,7 +6,7 @@ from roles_royce.constants import ETHAddr
 from decimal import Decimal
 from pytest import approx
 from defabipedia.maker import ContractSpecs, Abis
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 
 JOIN_WSTETH_A = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH-A
 JOIN_ETH_A = "0x2F0b23f53734252Bda2277357e97e1517d6B042A"  # ETHJoin ETH-A
@@ -29,7 +29,7 @@ def test_approve_dai():
     method = maker.ApproveDAI(spender=DS_PROXY_TEST, amount=123)
     assert method.data == '0x095ea7b3000000000000000000000000d758500ddec05172aaa035911387c8e0e789cf6a000000000000000000000000000000000000000000000000000000000000007b'
 
-    method = maker.ApproveDAI(spender=ContractSpecs[Chains.Ethereum].DaiJoin.address, amount=123)
+    method = maker.ApproveDAI(spender=ContractSpecs[Chain.ETHEREUM].DaiJoin.address, amount=123)
     assert method.data == '0x095ea7b30000000000000000000000009759a6ac90977b93b58547b4a71c78317f391a28000000000000000000000000000000000000000000000000000000000000007b'
 
 def test_build():
@@ -174,7 +174,7 @@ def test_integration_maker_cdp_module_proxy(local_node_eth, accounts):
             proxy_address = w3.to_checksum_address('0x' + log["data"].hex()[26:66])
             break
 
-    gem_join_contract = w3.eth.contract(address=JOIN_WSTETH_A, abi=Abis[Chains.Ethereum].GemJoin.abi)
+    gem_join_contract = w3.eth.contract(address=JOIN_WSTETH_A, abi=Abis[Chain.ETHEREUM].GemJoin.abi)
     gem = gem_join_contract.functions.gem().call()
     ilk = gem_join_contract.functions.ilk().call()
 
@@ -200,7 +200,7 @@ def test_integration_maker_cdp_module_proxy(local_node_eth, accounts):
                roles_mod_address=roles_ctract.address,
                web3=w3)
 
-    gem_contract = w3.eth.contract(address=gem, abi=Abis[Chains.Ethereum].ERC20.abi)
+    gem_contract = w3.eth.contract(address=gem, abi=Abis[Chain.ETHEREUM].ERC20.abi)
     gem_allowance = gem_contract.functions.allowance(safe.address, proxy_address).call()
     assert gem_allowance == 1000_000_000_000_000_000_000
 
@@ -226,9 +226,9 @@ def test_integration_maker_cdp_module_proxy(local_node_eth, accounts):
                roles_mod_address=roles_ctract.address,
                web3=w3)
 
-    cdp_manager_contract = ContractSpecs[Chains.Ethereum].CdpManager.contract(w3)
+    cdp_manager_contract = ContractSpecs[Chain.ETHEREUM].CdpManager.contract(w3)
     urn_handler = cdp_manager_contract.functions.urns(cdp_id).call()
-    vat_contract = ContractSpecs[Chains.Ethereum].Vat.contract(w3)
+    vat_contract = ContractSpecs[Chain.ETHEREUM].Vat.contract(w3)
     locked_gem = vat_contract.functions.urns(ilk, urn_handler).call()[0]
     assert locked_gem == 1000_000_000_000_000_000_000
 
@@ -245,7 +245,7 @@ def test_integration_maker_cdp_module_proxy(local_node_eth, accounts):
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chains.Ethereum].ERC20.abi)
+    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chain.ETHEREUM].ERC20.abi)
     dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
 
@@ -280,7 +280,7 @@ def test_integration_maker_cdp_module_proxy_bulk(local_node_eth, accounts):
             proxy_address = w3.to_checksum_address('0x' + log["data"].hex()[26:66])
             break
 
-    eth_join_contract = w3.eth.contract(address=JOIN_ETH_A, abi=Abis[Chains.Ethereum].GemJoin.abi)
+    eth_join_contract = w3.eth.contract(address=JOIN_ETH_A, abi=Abis[Chain.ETHEREUM].GemJoin.abi)
     ilk = eth_join_contract.functions.ilk().call()
 
     presets = """{"version": "1.0","chainId": "1","meta":{ "description": "","txBuilderVersion": "1.8.0"},"createdAt": 1695904723785,"transactions": [
@@ -332,7 +332,7 @@ def test_integration_maker_cdp_module_proxy_bulk(local_node_eth, accounts):
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                 roles_mod_address=roles_ctract.address,
                 web3=w3)
-    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chains.Ethereum].ERC20.abi)
+    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chain.ETHEREUM].ERC20.abi)
     dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
     assert dai_allowance == wad_d
     wipe_and_free_eth = maker.ProxyActionWipeAndFreeETH(proxy=proxy_address, eth_join=JOIN_ETH_A, cdp_id=cdp_id, wad_c=wad_c, wad_d=wad_d)
@@ -348,9 +348,9 @@ def test_integration_maker_cdp_module_proxy_bulk(local_node_eth, accounts):
     dai_balance = get_balance(w3=w3, token=ETHAddr.DAI, address=safe.address)
     # Logic to get the amount of DAI to wipe
     RAY = 10 ** 27
-    cdp_manager_contract = w3.eth.contract(address=ContractSpecs[Chains.Ethereum].CdpManager.address, abi=ContractSpecs[Chains.Ethereum].CdpManager.abi)
+    cdp_manager_contract = w3.eth.contract(address=ContractSpecs[Chain.ETHEREUM].CdpManager.address, abi=ContractSpecs[Chain.ETHEREUM].CdpManager.abi)
     urn_handler = cdp_manager_contract.functions.urns(cdp_id).call()
-    vat_contract = w3.eth.contract(address=ContractSpecs[Chains.Ethereum].Vat.address, abi=ContractSpecs[Chains.Ethereum].Vat.abi)
+    vat_contract = w3.eth.contract(address=ContractSpecs[Chain.ETHEREUM].Vat.address, abi=ContractSpecs[Chain.ETHEREUM].Vat.abi)
     rate = vat_contract.functions.ilks(ilk).call()[1]
     art = vat_contract.functions.urns(ilk, urn_handler).call()[1]
     urn_dai = vat_contract.functions.dai(urn_handler).call()
@@ -382,7 +382,7 @@ def test_integration_maker_cdp_module_no_proxy(local_node_eth, accounts):
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
 
-    gem_join_contract = w3.eth.contract(address=JOIN_WSTETH_A, abi=Abis[Chains.Ethereum].GemJoin.abi)
+    gem_join_contract = w3.eth.contract(address=JOIN_WSTETH_A, abi=Abis[Chain.ETHEREUM].GemJoin.abi)
     gem = gem_join_contract.functions.gem().call()
     ilk = gem_join_contract.functions.ilk().call()
 
@@ -421,7 +421,7 @@ def test_integration_maker_cdp_module_no_proxy(local_node_eth, accounts):
                roles_mod_address=roles_ctract.address,
                web3=w3)
 
-    gem_contract = w3.eth.contract(address=gem, abi=Abis[Chains.Ethereum].ERC20.abi)
+    gem_contract = w3.eth.contract(address=gem, abi=Abis[Chain.ETHEREUM].ERC20.abi)
     gem_allowance = gem_contract.functions.allowance(safe.address, gem_join_contract.address).call()
     assert gem_allowance == 1000_000_000_000_000_000_000
 
@@ -442,7 +442,7 @@ def test_integration_maker_cdp_module_no_proxy(local_node_eth, accounts):
 
     # lockGem
     wad_gem = 1000_000_000_000_000_000_000
-    cdp_manager_contract = ContractSpecs[Chains.Ethereum].CdpManager.contract(w3)
+    cdp_manager_contract = ContractSpecs[Chain.ETHEREUM].CdpManager.contract(w3)
     urn_handler = cdp_manager_contract.functions.urns(cdp_id).call()
     join_lock_gem = maker.Join(assetJoin=gem_join_contract.address, usr=urn_handler, wad=wad_gem)
     roles.send([join_lock_gem], role=1, private_key=accounts[1].key,
@@ -452,14 +452,14 @@ def test_integration_maker_cdp_module_no_proxy(local_node_eth, accounts):
     roles.send([frob_lock_gem], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    vat_contract = ContractSpecs[Chains.Ethereum].Vat.contract(w3)
+    vat_contract = ContractSpecs[Chain.ETHEREUM].Vat.contract(w3)
     locked_gem = vat_contract.functions.urns(ilk, urn_handler).call()[0]
     assert locked_gem == wad_gem
 
     # draw DAI
     RAY = 10 ** 27
     wad_dai = 100_000_000_000_000_000_000_000
-    jug_contract = ContractSpecs[Chains.Ethereum].Jug.contract(w3)
+    jug_contract = ContractSpecs[Chain.ETHEREUM].Jug.contract(w3)
     drip = maker.Drip(ilk=ilk)
     roles.send([drip], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
@@ -489,7 +489,7 @@ def test_integration_maker_cdp_module_no_proxy(local_node_eth, accounts):
     roles.send([hope], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    exit_draw = maker.Exit(assetJoin=ContractSpecs[Chains.Ethereum].DaiJoin.address, avatar=safe.address, wad=wad_dai)
+    exit_draw = maker.Exit(assetJoin=ContractSpecs[Chain.ETHEREUM].DaiJoin.address, avatar=safe.address, wad=wad_dai)
     roles.send([exit_draw], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
@@ -498,11 +498,11 @@ def test_integration_maker_cdp_module_no_proxy(local_node_eth, accounts):
 
     # wipeDAI / repayDAI
     wad_dai = 50_000_000_000_000_000_000_000
-    approve_dai = maker.ApproveDAI(spender=ContractSpecs[Chains.Ethereum].DaiJoin.address, amount=wad_dai)
+    approve_dai = maker.ApproveDAI(spender=ContractSpecs[Chain.ETHEREUM].DaiJoin.address, amount=wad_dai)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    join_wipe = maker.Join(assetJoin=ContractSpecs[Chains.Ethereum].DaiJoin.address, usr=urn_handler, wad=wad_dai)
+    join_wipe = maker.Join(assetJoin=ContractSpecs[Chain.ETHEREUM].DaiJoin.address, usr=urn_handler, wad=wad_dai)
     roles.send([join_wipe], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
@@ -533,11 +533,11 @@ def test_integration_maker_cdp_module_no_proxy(local_node_eth, accounts):
     if (wad_dai * RAY) < rad:
         wad_dai += 1
 
-    approve_dai = maker.ApproveDAI(spender=ContractSpecs[Chains.Ethereum].DaiJoin.address, amount=wad_dai)
+    approve_dai = maker.ApproveDAI(spender=ContractSpecs[Chain.ETHEREUM].DaiJoin.address, amount=wad_dai)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    join_wipe_all = maker.Join(assetJoin=ContractSpecs[Chains.Ethereum].DaiJoin.address, usr=urn_handler, wad=wad_dai)
+    join_wipe_all = maker.Join(assetJoin=ContractSpecs[Chain.ETHEREUM].DaiJoin.address, usr=urn_handler, wad=wad_dai)
     roles.send([join_wipe_all], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
@@ -596,14 +596,14 @@ def test_integration_maker_dsr_module_proxy(local_node_eth, accounts):
     steal_token(w3, token=ETHAddr.DAI, holder="0x60FaAe176336dAb62e284Fe19B885B095d29fB7F",
                 to=safe.address, amount=100_000_000_000_000_000_000_000)
 
-    pot_contract = ContractSpecs[Chains.Ethereum].Pot.contract(w3)
+    pot_contract = ContractSpecs[Chain.ETHEREUM].Pot.contract(w3)
 
     # approve DAI
     approve_dai = maker.ApproveDAI(spender=proxy_address, amount=100_000_000_000_000_000_000_000)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chains.Ethereum].ERC20.abi)
+    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chain.ETHEREUM].ERC20.abi)
     dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
 
@@ -661,16 +661,16 @@ def test_integration_maker_dsr_module_no_proxy(local_node_eth, accounts):
     steal_token(w3, token=ETHAddr.DAI, holder="0x60FaAe176336dAb62e284Fe19B885B095d29fB7F",
                 to=safe.address, amount=100_000_000_000_000_000_000_000)
 
-    dsr_manager_contract = ContractSpecs[Chains.Ethereum].DsrManager.contract(w3)
-    pot_contract = ContractSpecs[Chains.Ethereum].Pot.contract(w3)
+    dsr_manager_contract = ContractSpecs[Chain.ETHEREUM].DsrManager.contract(w3)
+    pot_contract = ContractSpecs[Chain.ETHEREUM].Pot.contract(w3)
 
     # approve DAI
-    approve_dai = maker.ApproveDAI(spender=ContractSpecs[Chains.Ethereum].DsrManager.address, amount=100_000_000_000_000_000_000_000)
+    approve_dai = maker.ApproveDAI(spender=ContractSpecs[Chain.ETHEREUM].DsrManager.address, amount=100_000_000_000_000_000_000_000)
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chains.Ethereum].ERC20.abi)
-    dai_allowance = dai_contract.functions.allowance(safe.address, ContractSpecs[Chains.Ethereum].DsrManager.address).call()
+    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chain.ETHEREUM].ERC20.abi)
+    dai_allowance = dai_contract.functions.allowance(safe.address, ContractSpecs[Chain.ETHEREUM].DsrManager.address).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
 
     # join DAI

@@ -2,7 +2,7 @@ from roles_royce.constants import ETHAddr
 from tests.utils import (local_node_eth, accounts, fork_unlock_account, create_simple_safe, steal_token, top_up_address)
 from roles_royce.toolshed.disassembling import BalancerDisassembler
 from defabipedia.balancer import Abis
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 from decimal import Decimal
 from roles_royce.evm_utils import erc20_abi
 from tests.roles import setup_common_roles, deploy_roles, apply_presets

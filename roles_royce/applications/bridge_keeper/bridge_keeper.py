@@ -9,7 +9,7 @@ from utils import ENV, Gauges, refill_bridge, invest_DAI, pay_interest, decimals
 import time
 import sys
 from datetime import datetime
-from defabipedia.xDAI_bridge import ContractSpecs
+from defabipedia.xdai_bridge import ContractSpecs
 from defabipedia.tokens import EthereumContractSpecs as Tokens
 from defabipedia.types import Chain
 from decimal import Decimal
@@ -67,11 +67,11 @@ def bot_do(w3_eth, w3_gnosis):
 
     # Contracts
     DAI_contract = Tokens.DAI.contract(w3_eth)
-    bridge_contract = ContractSpecs[Chain.Ethereum].xDaiBridge.contract(w3_eth)
-    interest_receiver_contract = ContractSpecs[Chain.Gnosis].BridgeInterestReceiver.contract(w3_gnosis)
+    bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3_eth)
+    interest_receiver_contract = ContractSpecs[Chain.GNOSIS].BridgeInterestReceiver.contract(w3_gnosis)
 
     # Data
-    bridge_DAI_balance = DAI_contract.functions.balanceOf(ContractSpecs[Chain.Ethereum].xDaiBridge.address).call()
+    bridge_DAI_balance = DAI_contract.functions.balanceOf(ContractSpecs[Chain.ETHEREUM].xDaiBridge.address).call()
     min_cash_threshold = bridge_contract.functions.minCashThreshold(Tokens.DAI.address).call()
     next_claim_epoch = interest_receiver_contract.functions.nextClaimEpoch().call()
     bot_ETH_balance = w3_eth.eth.get_balance(ENV.BOT_ADDRESS)
@@ -101,7 +101,7 @@ def bot_do(w3_eth, w3_gnosis):
         flags.tx_executed.set()
 
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt, ContractSpecs[
-            Chain.Ethereum].xDaiBridge.address, w3_eth)
+            Chain.ETHEREUM].xDaiBridge.address, w3_eth)
         messenger.log_and_alert(LoggingLevel.Info, f'Bridge refilled', message,
                                 slack_msg=message_slack)
 
@@ -113,7 +113,7 @@ def bot_do(w3_eth, w3_gnosis):
         tx_receipt = invest_DAI(w3_eth, ENV)
         flags.tx_executed.set()
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt, ContractSpecs[
-            Chain.Ethereum].xDaiBridge.address, w3_eth)
+            Chain.ETHEREUM].xDaiBridge.address, w3_eth)
         messenger.log_and_alert(LoggingLevel.Info, f'DAI invested', message,
                                 slack_msg=message_slack)
 
@@ -126,7 +126,7 @@ def bot_do(w3_eth, w3_gnosis):
         tx_receipt = pay_interest(w3_eth, ENV, int(Decimal(ENV.AMOUNT_OF_INTEREST_TO_PAY) * Decimal(10 ** decimals_DAI)))
         flags.tx_executed.set()
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt, ContractSpecs[
-            Chain.Ethereum].xDaiBridge.address, w3_eth)
+            Chain.ETHEREUM].xDaiBridge.address, w3_eth)
         messenger.log_and_alert(LoggingLevel.Info, f'Interest payed', message,
                                 slack_msg=message_slack)
         flags.interest_payed.set()
@@ -135,7 +135,7 @@ def bot_do(w3_eth, w3_gnosis):
 
     if flags.tx_executed.is_set():
         # Update dataData
-        bridge_DAI_balance = DAI_contract.functions.balanceOf(ContractSpecs[Chain.Ethereum].xDaiBridge.address).call()
+        bridge_DAI_balance = DAI_contract.functions.balanceOf(ContractSpecs[Chain.ETHEREUM].xDaiBridge.address).call()
         min_cash_threshold = bridge_contract.functions.minCashThreshold(Tokens.DAI.address).call()
         next_claim_epoch = interest_receiver_contract.functions.nextClaimEpoch().call()
         bot_ETH_balance = w3_eth.eth.get_balance(ENV.BOT_ADDRESS)

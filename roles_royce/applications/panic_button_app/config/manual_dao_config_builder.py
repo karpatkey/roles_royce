@@ -16,7 +16,7 @@ def main():
                                                   PUBLIC_GC_NODE_URL)))  # Will use the endpoint stored as github secret if possible
 
     strategies_gnosis_dao_ethereum = DAOStrategiesBuilder(DAO.GnosisDAO,
-                                                          Chain.Ethereum,
+                                                          Chain.ETHEREUM,
 
                                                           aura=[AuraPosition(position_id="33",
                                                                              bpt_address='0x1e19cf2d73a72ef1332c882f20534b6519be0276'),
@@ -80,17 +80,17 @@ def main():
     strategies_gnosis_dao_gnosis_chain.build_json(w3_gc)
 
     strategies_gnosis_ltd_ethereum = DAOStrategiesBuilder(DAO.GnosisLTD,
-                                                          Chain.Ethereum,
+                                                          Chain.ETHEREUM,
                                                           balancer=[BalancerPosition(position_id="123",
                                                                                      bpt_address=BalancerContractSpecs[
-                                                                                         Chain.Ethereum].BPT_COW_WETH.address,
+                                                                                         Chain.ETHEREUM].BPT_COW_WETH.address,
                                                                                      staked=False),
                                                                     BalancerPosition(position_id="174",
                                                                                      bpt_address='0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2',
                                                                                      staked=False)],
                                                           aura=[AuraPosition(position_id="19",
                                                                              bpt_address=BalancerContractSpecs[
-                                                                                 Chain.Ethereum].BPT_COW_WETH.address)])
+                                                                                 Chain.ETHEREUM].BPT_COW_WETH.address)])
     strategies_gnosis_ltd_ethereum.build_json(w3_eth)
 
     strategies_gnosis_ltd_gnosis_chain = DAOStrategiesBuilder(DAO.GnosisLTD,

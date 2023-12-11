@@ -8,7 +8,7 @@ from hexbytes import HexBytes
 
 from roles_royce.generic_method import Transactable
 from roles_royce.constants import ETHAddr
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 from roles_royce.utils import multi_or_one
 
 

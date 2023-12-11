@@ -14,7 +14,7 @@ def main(dao: DAO, blockchain: Blockchain, balancer: list[BalancerPosition], aur
 
     if blockchain == Chain.Gnosis:
         w3 = w3_gc
-    elif blockchain == Chain.Ethereum:
+    elif blockchain == Chain.ETHEREUM:
         w3 = w3_eth
 
     jsons = DAOStrategiesBuilder(dao, blockchain, balancer=balancer, aura=aura)

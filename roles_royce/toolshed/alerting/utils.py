@@ -93,7 +93,7 @@ def get_token_amounts_from_transfer_events(tx_receipt: object, target_address: s
 
 
 ExplorerTxUrls = {
-    Chain.Ethereum: 'https://etherscan.io/tx/',
+    Chain.ETHEREUM: 'https://etherscan.io/tx/',
     Chain.Gnosis: 'https://gnosisscan.io/tx/'
 }
 
