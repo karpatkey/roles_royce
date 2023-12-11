@@ -7,7 +7,8 @@ from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_tran
 from decimal import Decimal
 from roles_royce import roles
 from roles_royce.evm_utils import erc20_abi
-from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
+from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel, \
+    web3_connection_check
 from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
 from utils import ENV, log_initial_data, send_status, SchedulerThread, Gauges
@@ -26,8 +27,6 @@ if test_mode:
 
     w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
     top_up_address(w3, ENV.BOT_ADDRESS, 1)
-else:
-    w3 = Web3(Web3.HTTPProvider(ENV.RPC_ENDPOINT))
 
 # Alert flags
 send_status_flag = Event()
@@ -52,9 +51,6 @@ messenger = Messenger(slack_messenger, telegram_messenger)
 prometheus_start_http_server(ENV.PROMETHEUS_PORT)
 gauges = Gauges()
 
-# FIXME: there's already an event for this
-lack_of_gas_warning = False
-
 # Exception and RPC endpoint failure counters
 exception_counter = 0
 rpc_endpoint_failure_counter = 0
@@ -66,9 +62,7 @@ gauges.health_factor_threshold.set(ENV.THRESHOLD_HEALTH_FACTOR)
 
 # -----------------------------------------------------------------------------------------------------------------------
 
-def bot_do():
-    global w3
-    global lack_of_gas_warning
+def bot_do(w3: Web3):
     global gauges
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -78,11 +72,11 @@ def bot_do():
     if bot_ETH_balance < 0.1:
         title = 'Lack of ETH for gas'
         message = 'Im running outta ETH for gas! Only %.5f ETH left.' % (bot_ETH_balance / (10 ** 18))
-        messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=lack_of_gas_warning)
-        lack_of_gas_warning = True
+        messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=lack_of_gas_warning_flag.is_set())
+        lack_of_gas_warning_flag.set()
 
-    if bot_ETH_balance >= 0.1 and lack_of_gas_warning:
-        lack_of_gas_warning = False
+    if bot_ETH_balance >= 0.1 and lack_of_gas_warning_flag.is_set():
+        lack_of_gas_warning_flag.clear()
 
     # -----------------------------------------------------------------------------------------------------------------------
 
@@ -243,36 +237,13 @@ while True:
 
     try:
         if not test_mode:
-            w3 = Web3(Web3.HTTPProvider(ENV.RPC_ENDPOINT))
-            if not w3.is_connected(show_traceback=True):
-                time.sleep(5)
-                if not w3.is_connected(show_traceback=True):
-                    if ENV.FALLBACK_RPC_ENDPOINT != '':
-                        messenger.log_and_alert(LoggingLevel.Warning, title='Warning',
-                                                message=f'  RPC endpoint {ENV.RPC_ENDPOINT} is not working.')
-                        w3 = Web3(Web3.HTTPProvider(ENV.FALLBACK_RPC_ENDPOINT))
-                        if not w3.is_connected(show_traceback=True):
-                            time.sleep(5)
-                            if not w3.is_connected(show_traceback=True):
-                                messenger.log_and_alert(LoggingLevel.Error, title='Error',
-                                                        message=f'  RPC endpoint {ENV.RPC_ENDPOINT} and fallback RPC '
-                                                                f'endpoint {ENV.FALLBACK_RPC_ENDPOINT} are both not '
-                                                                f'working.')
-                                rpc_endpoint_failure_counter += 1
-                                continue
-                    else:
-                        messenger.log_and_alert(LoggingLevel.Error, title='Error',
-                                                message=f'  RPC endpoint {ENV.RPC_ENDPOINT} is not working.')
-                        rpc_endpoint_failure_counter += 1
-                        continue
-
-            if rpc_endpoint_failure_counter == 5:  # TODO: this can be added as an environment variable
-                messenger.log_and_alert(LoggingLevel.Error, title='Too many RPC endpoint failures, exiting...',
-                                        message='')
-                time.sleep(5)  # Cooldown time for the messenger system to send messages in queue
-                sys.exit(1)
-
-        bot_do()
+            w3, connection_check = web3_connection_check(ENV.RPC_ENDPOINT, messenger, rpc_endpoint_failure_counter,
+                                                         ENV.FALLBACK_RPC_ENDPOINT)
+            if not connection_check:
+                continue
+        else:
+            w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
+        bot_do(w3)
 
     except Exception as e:
         messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e.args[0]))
@@ -282,3 +253,6 @@ while True:
             time.sleep(5)  # Cooldown time for the messenger system to send messages in queue
             sys.exit(1)
     time.sleep(ENV.COOLDOWN_MINUTES * 60)
+
+
+

@@ -1,5 +1,5 @@
 from roles_royce.constants import StrEnum
-from defabipedia.types import Chains, load_abi, ContractAbi
+from defabipedia.types import Chains, load_abi, ContractAbi, ContractSpec
 
 
 class Abis:
@@ -32,3 +32,15 @@ Addresses = {
     Chains.Ethereum: EthereumAddresses,
 }
 
+
+# Before adding tokens to the EthereumContractSpecs, make sure there's no other functions needed other than the ones
+# in the ERC20 abi
+class EthereumContractSpecs:
+    DAI = ContractSpec(address='0x6B175474E89094C44Da98b954EedeAC495271d0F',
+                       abi=load_abi('erc20.json'),
+                       name='DAI')
+
+
+ContractSpecs = {
+    Chains.Ethereum: EthereumContractSpecs,
+}

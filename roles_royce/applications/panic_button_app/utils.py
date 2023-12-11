@@ -7,6 +7,10 @@ from defabipedia.types import Chains
 from eth_account import Account
 from roles_royce.constants import StrEnum
 from web3.exceptions import ContractLogicError
+import time
+import json
+from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler
+from roles_royce.generic_method import Transactable
 
 
 class Modes(StrEnum):
@@ -47,7 +51,6 @@ class ENV:
 
     SLACK_WEBHOOK_URL: str = field(init=False)
 
-
     def __post_init__(self):
         # Tenderly credentials
         self.TENDERLY_ACCOUNT_ID: str = config('TENDERLY_ACCOUNT_ID', default='')
@@ -67,7 +70,6 @@ class ENV:
         self.RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT', default='')
         self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_FALLBACK', default='')
         self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_MEV', default='')
-
 
         # Configuration addresses and key
         self.AVATAR_SAFE_ADDRESS: Address = config(
@@ -98,7 +100,7 @@ class ENV:
                 self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_GNOSIS', cast=int, default=8547)
         else:
             self.LOCAL_FORK_PORT = None
-        self.LOCAL_FORK_HOST: str = custom_config('LOCAL_FORK_HOST', default='localhost', cast=str)
+        self.LOCAL_FORK_HOST: str = custom_config('LOCAL_FORK_HOST' + '_' + self.BLOCKCHAIN.upper(), default='localhost', cast=str)
 
         self.SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
 
@@ -109,7 +111,6 @@ class ENV:
 @dataclass
 class ExecConfig:
     percentage: float
-    simulate: bool
     dao: str
     blockchain: str
     protocol: str
@@ -119,15 +120,96 @@ class ExecConfig:
 
 # -----------------------------------------------------------------------------------------------------------------------
 
+def start_the_engine(env: ENV) -> (Web3, Web3):
+    if env.MODE == Modes.DEVELOPMENT:
+        w3 = Web3(Web3.HTTPProvider(f'http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}'))
+        fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
+        top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)  # Topping up disassembler address for testing
+        w3_MEV = w3
+    else:
+        w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+        if not w3.is_connected():
+            w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
+            if not w3.is_connected():
+                time.sleep(2)
+                w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+                if not w3.is_connected():
+                    w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
+                    if not w3.is_connected():
+                        raise Exception("No connection to RPC endpoint")
+                    w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_MEV))
+                    if not w3_MEV.is_connected():
+                        w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+                        if not w3_MEV.is_connected():
+                            w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
+                            if not w3_MEV.is_connected():
+                                raise Exception("No connection to RPC endpoint")
+
+    return w3, w3_MEV
+
+
+def bytes_to_hex_in_iterable(data):
+    """Converts all atomic elements in nested lists or tuples from bytes to hex if they are bytes."""
+    if isinstance(data, list):
+        return [bytes_to_hex_in_iterable(element) for element in data]
+    if isinstance(data, tuple):
+        return tuple(bytes_to_hex_in_iterable(element) for element in data)
+    elif isinstance(data, bytes):
+        return '0x' + data.hex()
+    else:
+        return data
+
+
+def decode_transaction(txns: list[Transactable], env: ENV) -> list[dict]:
+    result = []
+    for transactable in txns:
+        tx = json.loads(transactable.abi)[0]
+        for item, arg in zip(tx["inputs"], transactable.args_list):
+            item["value"] = bytes_to_hex_in_iterable(arg)
+        tx["to_address"] = transactable.contract_address
+        tx["value"] = transactable.value
+        tx["data"] = transactable.data
+        tx["from_address"] = env.DISASSEMBLER_ADDRESS
+        result.append(tx)
+    return result
+
+
+def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[Transactable]):
+    if exec_config.protocol == "Aura":
+        disassembler = AuraDisassembler(w3=w3,
+                                        avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
+                                        roles_mod_address=env.ROLES_MOD_ADDRESS,
+                                        role=env.ROLE,
+                                        signer_address=env.DISASSEMBLER_ADDRESS)
+
+    elif exec_config.protocol == "Balancer":
+        disassembler = BalancerDisassembler(w3=w3,
+                                            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
+                                            roles_mod_address=env.ROLES_MOD_ADDRESS,
+                                            role=env.ROLE,
+                                            signer_address=env.DISASSEMBLER_ADDRESS)
+    else:
+        raise Exception("Invalid protocol")
+
+    exit_strategy = getattr(disassembler, exec_config.exit_strategy)
+
+    txn_transactables = exit_strategy(percentage=exec_config.percentage, exit_arguments=exec_config.exit_arguments)
+
+    return disassembler, txn_transactables
+
+
+# -----------------------------------------------------------------------------------------------------------------------
+
 # TODO: all tools for dev environment should be in roles_royce
 def fork_unlock_account(w3, address):
     """Unlock the given address on the forked node."""
     return w3.provider.make_request("anvil_impersonateAccount", [address])
 
-# This accounts are not guaranteed to hold tokens forever...
+
+# These accounts are not guaranteed to hold tokens forever...
 Holders = {
     Chains.Ethereum: '0x00000000219ab540356cBB839Cbe05303d7705Fa',  # BINANCE_ACCOUNT_WITH_LOTS_OF_ETH =
-    Chains.Gnosis: '0xe91d153e0b41518a2ce8dd3d7944fa863463a97d'  # WXDAI_CONTRACT_WITH_LOTS_OF_XDAI =
+    Chains.Gnosis: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'  # WXDAI_CONTRACT_WITH_LOTS_OF_XDAI =
 }
 
 

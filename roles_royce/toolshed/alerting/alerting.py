@@ -122,7 +122,8 @@ class Messenger:
         self.slack_messenger = slack_messenger
         self.telegram_messenger = telegram_messenger
 
-    def log_and_alert(self, logging_level: LoggingLevel, title: str, message: str, slack_msg: str | None = None, alert_flag: bool = False):
+    def log_and_alert(self, logging_level: LoggingLevel, title: str, message: str, slack_msg: str | None = None,
+                      alert_flag: bool = False):
         if logging_level == LoggingLevel.Info:
             logger.info(title + '.\n' + message)
             if not alert_flag:
@@ -148,3 +149,40 @@ class Messenger:
                     self.slack_messenger.send_msg(SlackMessageIcon.ErrorRotatingLight, title, message)
                 self.telegram_messenger.send_msg('Error: ' + title + '\n' + message)
 
+
+def web3_connection_check(rpc_endpoint_url: str, messenger: Messenger, rpc_endpoint_failure_counter: int,
+                          fallback_rpc_endpoint_url: str = '', max_rpc_endpoint_failures: int = 5) -> (object, bool):
+    w3 = Web3(Web3.HTTPProvider(rpc_endpoint_url))
+    if not w3.is_connected(show_traceback=True):
+        time.sleep(5)
+        if not w3.is_connected(show_traceback=True):
+            if fallback_rpc_endpoint_url != '':
+                messenger.log_and_alert(LoggingLevel.Warning, title='Warning',
+                                        message=f'  RPC endpoint {rpc_endpoint_url} is not working.')
+                w3 = Web3(Web3.HTTPProvider(fallback_rpc_endpoint_url))
+                if not w3.is_connected(show_traceback=True):
+                    time.sleep(5)
+                    if not w3.is_connected(show_traceback=True):
+                        messenger.log_and_alert(LoggingLevel.Error, title='Error',
+                                                message=f'  RPC endpoint {rpc_endpoint_url} and fallback RPC '
+                                                        f'endpoint {fallback_rpc_endpoint_url} are both not '
+                                                        f'working.')
+                        rpc_endpoint_failure_counter += 1
+                        return w3, False
+                    else:
+                        return w3, True
+            else:
+                messenger.log_and_alert(LoggingLevel.Error, title='Error',
+                                        message=f'  RPC endpoint {rpc_endpoint_url} is not working.')
+                rpc_endpoint_failure_counter += 1
+                return w3, False
+        else:
+            return w3, True
+    else:
+        return w3, True
+
+    if rpc_endpoint_failure_counter == max_rpc_endpoint_failures:
+        messenger.log_and_alert(LoggingLevel.Error, title='Too many RPC endpoint failures, exiting...',
+                                message='')
+        time.sleep(5)  # Cooldown time for the messenger system to send messages in queue
+        sys.exit(1)

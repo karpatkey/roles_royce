@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from web3.types import Address, ChecksumAddress, TxReceipt, TxParams
 from web3 import Web3
 from defabipedia.types import Blockchain, Chains
-from roles_royce.utils import TenderlyCredentials, tenderly_share_simulation, simulate_tx
 from roles_royce import roles
 from roles_royce.generic_method import Transactable
 
@@ -14,7 +13,6 @@ class Disassembler:
     roles_mod_address: Address | ChecksumAddress | str
     role: int
     blockchain: Blockchain = field(init=False)
-    tenderly_credentials: TenderlyCredentials = None
     signer_address: Address | ChecksumAddress | str | None = None
 
     def __post_init__(self):
@@ -23,44 +21,8 @@ class Disassembler:
         self.roles_mod_address = Web3.to_checksum_address(self.roles_mod_address)
         self.blockchain = Chains.get_blockchain_from_web3(self.w3)
 
-    def simulate(self, txns: list[Transactable], from_address: Address | ChecksumAddress | str | None = None) -> (object,str):
-        """Simulate the multisend batched transactions with Tenderly.
-
-        Args:
-            txns (list[Transactable]): List of transactions to simulate
-            from_address (Address | ChecksumAddress | str, optional): Address to simulate the transactions from.
-            Defaults to None. If None, self.signer_address must be provided.
-
-        Returns:
-            str: Tenderly simulation link
-        """
-        if from_address:
-            account = from_address
-        elif self.signer_address:
-            account = self.signer_address
-        else:
-            raise ValueError("Either from_address or self.signer_address must be provided.")
-
-        tx = roles.build(txns,
-                         role=self.role,
-                         account=account,
-                         roles_mod_address=self.roles_mod_address,
-                         web3=self.w3)
-        block = self.w3.eth.block_number
-        sim_data = simulate_tx(tx,
-                               block=block,
-                               account_id=self.tenderly_credentials.account_id,
-                               project=self.tenderly_credentials.project,
-                               api_token=self.tenderly_credentials.api_token,
-                               sim_type='quick')
-        simulate_link = tenderly_share_simulation(account_id=self.tenderly_credentials.account_id,
-                                                  project=self.tenderly_credentials.project,
-                                                  api_token=self.tenderly_credentials.api_token,
-                                                  simulation_id=sim_data['simulation']['id'])
-        return sim_data, simulate_link
-
     def send(self, txns: list[Transactable], private_key: str, w3: Web3 = None) -> TxReceipt:
-        """Execute the multisend batched transactions.
+        """Executes the multisend batched transaction built from the transactables.
 
         Args:
             txns (list[Transactable]): List of transactions to execute
@@ -69,7 +31,7 @@ class Disassembler:
                 not None. Useful for nodes with MEV protection to be used only for eth_sendTransaction. Defaults to None
 
         Returns:
-            TxReceipt: Transaction receipt
+            Transaction receipt as a TxReceipt object
         """
         if w3 is None:
             w3 = self.w3
@@ -79,15 +41,15 @@ class Disassembler:
                           roles_mod_address=self.roles_mod_address,
                           web3=w3)
 
-    def check(self, txns: list[Transactable], block: int | str = 'latest', from_address: Address | ChecksumAddress | str | None = None) -> TxParams:
-        """Checks the multisend batched transactions with static call.
+    def check(self, txns: list[Transactable], block: int | str = 'latest', from_address: Address | ChecksumAddress | str | None = None) -> bool:
+        """Checks whether the multisend batched transaction built from the transactables is successfully executed with static call.
 
         Args:
             txns (list[Transactable]): List of transactions to execute
-            block: int | str = 'latest': block number to check the tx
-            from_address (Address | ChecksumAddress | str, optional): from address to build the transaction.
+            block: int | str = 'latest': block number to check the transaction at
+            from_address (Address | ChecksumAddress | str, optional): from address that overrides the ones in txns.
         Returns:
-            TxReceipt: Transaction receipt
+            True if the transaction was successfully executed, False if it reverted.
         """
         if from_address:
             account = from_address
@@ -103,13 +65,13 @@ class Disassembler:
                            block=block)
 
     def build(self, txns: list[Transactable], from_address: Address | ChecksumAddress | str | None = None) -> TxParams:
-        """Execute the multisend batched transactions.
+        """Builds a multisend batched transaction from the transactables.
 
         Args:
             txns (list[Transactable]): List of transactions to execute
-            from_address (Address | ChecksumAddress | str, optional): from address to build the transaction.
+            from_address (Address | ChecksumAddress | str, optional): from address that overrides the ones in txns.
         Returns:
-            TxReceipt: Transaction receipt
+            Transaction dictionary as a TxParams object.
         """
         if from_address is not None:
             account = from_address
