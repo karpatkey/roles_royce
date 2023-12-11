@@ -136,7 +136,7 @@ class LidoDisassembler(Disassembler):
                         "max_slippage": 0.01
                     }
                 ]
-            amount_to_redeem (int, optional): Amount of wstETH to redeem. Defaults to None. If None, the 'percentage' of the balance of stETH will be redeemed.
+            amount_to_redeem (int, optional): Amount of wstETH to redeem. Defaults to None. If None, the 'percentage' of the balance of wstETH will be redeemed.
         Returns:
             list[ Transactable]: List of transactions to execute.
         """
