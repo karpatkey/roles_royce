@@ -42,7 +42,7 @@ jobs:
 
       - name: RUN Tests
         run: |
-          RR_ETH_FORK_URL=${{ secrets.NODE_ETH }} RR_GC_FORK_URL=${{ secrets.NODE_XDAI }} RR_RUN_LOCAL_NODE=False pytest -vv --cov tests/applications/panic_button_app/test_stresstest.py::test_stresstest
+          RR_ETH_FORK_URL=${{ secrets.NODE_ETH }} RR_GC_FORK_URL=${{ secrets.NODE_XDAI }} RUN_LOCAL_NODE=False RR_RUN_LOCAL_NODE=False pytest -vv --cov tests/applications/panic_button_app/test_stresstest.py::test_stresstest
         env:
           RR_RUN_STRESSTEST: True
 
