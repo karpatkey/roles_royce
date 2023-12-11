@@ -272,7 +272,7 @@ class DAOStrategiesBuilder:
         return result
 
     @staticmethod
-    def build_lido_positions(positions: list[LidoPosition]) -> list[dict]:
+    def build_lido_positions(w3: Web3, positions: list[LidoPosition]) -> list[dict]:
 
 
         with open(os.path.join(os.path.dirname(__file__), 'templates', 'lido_template.json'), 'r') as f:
@@ -280,6 +280,9 @@ class DAOStrategiesBuilder:
 
         result = []
         for lido_position in positions:
+            position["position_id"] = lido_position.position_id
+            position["position_id_tech"] = lido_position.lido_address
+            position["position_id_human_readable"] = lido_position.position_id_human_readable(w3)
 
             print("        Adding: ", lido_position)
             position = copy.deepcopy(lido_template)
