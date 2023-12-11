@@ -500,12 +500,12 @@ def test_integration_1inch_swap(local_node_eth):
     # BASE_URL = "https://api.1inch.dev/swap/v5.2/1/swap?src=%s&dst=%s&amount=%d&from=%s&slippage=%d&allowPartialFill=%s&disableEstimate=%s"
     # headers = {'accept': 'application/json', 'Authorization': f'Bearer {API_KEY}'}
 
-    src_token = ETHAddr.E_ADDRESS
+    src_token = ETHAddr.ETH
     dst_token = ETHAddr.WETH
     amount = 1000000000000000000
 
     value = 0
-    if src_token == ETHAddr.E_ADDRESS:
+    if src_token == ETHAddr.ETH:
         value = amount
 
     local_node_eth.unlock_account(GNOSIS_DAO)
@@ -525,24 +525,24 @@ def test_integration_1inch_swap(local_node_eth):
     # https://github.com/1inch/1inchProtocol/blob/811f7b69b67d1d9657e3e9c18a2e97f3e2b2b33a/README.md#flags-description
     flags = 0
 
-    if src_token == ETHAddr.E_ADDRESS:
+    if src_token == ETHAddr.ETH:
         src_token_balance_before = w3.eth.get_balance(GNOSIS_DAO)
     else:
         src_token_balance_before = get_balance(w3, src_token, GNOSIS_DAO)
     
-    if dst_token == ETHAddr.E_ADDRESS:
+    if dst_token == ETHAddr.ETH:
         dst_token_balance_before = w3.eth.get_balance(GNOSIS_DAO)
     else:  
         dst_token_balance_before = get_balance(w3, dst_token, GNOSIS_DAO)
 
     swap = func_obj(**func_params).transact({"from": GNOSIS_DAO, "value": value})
     
-    if src_token == ETHAddr.E_ADDRESS:
+    if src_token == ETHAddr.ETH:
         src_token_balance_after = w3.eth.get_balance(GNOSIS_DAO)
     else:
         src_token_balance_after = get_balance(w3, src_token, GNOSIS_DAO)
     
-    if dst_token == ETHAddr.E_ADDRESS:
+    if dst_token == ETHAddr.ETH:
         dst_token_balance_after = w3.eth.get_balance(GNOSIS_DAO)
     else:  
         dst_token_balance_after = get_balance(w3, dst_token, GNOSIS_DAO)
