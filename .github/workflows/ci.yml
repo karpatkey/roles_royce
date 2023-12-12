@@ -29,9 +29,6 @@ jobs:
         run: RR_ETH_FORK_URL=${{ secrets.NODE_ETH }} RR_GC_FORK_URL=${{ secrets.NODE_XDAI }} RR_RUN_LOCAL_NODE=1 pytest -v --cov
       - name: Coverage report
         run: coverage report
-      - name:  Anvil log
-        if: ${{ failure() }}
-        run: cat /tmp/rr_fork_node_log.txt
 
   docker-spark:
     needs: Test

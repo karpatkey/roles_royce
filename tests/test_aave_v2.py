@@ -60,7 +60,7 @@ def test_deposit_eth():
 
 
 def test_borrow():
-    method = aave.Borrow(asset=GCAddr.USDT, amount=123, interest_rate_model=aave.InterestRateModel.STABLE,
+    method = aave.Borrow(asset=GCAddr.USDT, amount=123, interest_rate_mode=aave.InterestRateMode.STABLE,
                          avatar=AVATAR)
     referral_code = 0
     assert method.args_list == [GCAddr.USDT, 123, 1, referral_code, AVATAR]
@@ -68,7 +68,7 @@ def test_borrow():
 
 
 def test_borrow_with_bad_interest_rate():
-    method = aave.Borrow(asset=GCAddr.USDT, amount=123, interest_rate_model=aave.InterestRateModel.STABLE,
+    method = aave.Borrow(asset=GCAddr.USDT, amount=123, interest_rate_mode=aave.InterestRateMode.STABLE,
                          avatar=AVATAR)
     referral_code = 0
     assert method.args_list == [GCAddr.USDT, 123, 1, referral_code, AVATAR]
@@ -76,19 +76,19 @@ def test_borrow_with_bad_interest_rate():
 
 
 def test_borrow_eth():
-    method = aave.BorrowETH(amount=123, interest_rate_model=aave.InterestRateModel.VARIABLE)
+    method = aave.BorrowETH(amount=123, interest_rate_mode=aave.InterestRateMode.VARIABLE)
     referral_code = 0
     assert method.args_list == [ETHAddr.AAVE_V2_LendingPool, 123, 2, referral_code]
     assert method.target_address == ETHAddr.AAVE_V2_WrappedTokenGateway
 
 
 def test_swap_borrow_rate_mode():
-    method = aave.SwapBorrowRateMode(asset=ETHAddr.DAI, interest_rate_model=aave.InterestRateModel.STABLE)
+    method = aave.SwapBorrowRateMode(asset=ETHAddr.DAI, interest_rate_mode=aave.InterestRateMode.STABLE)
     assert method.data == "0x94ba89a20000000000000000000000006b175474e89094c44da98b954eedeac495271d0f0000000000000000000000000000000000000000000000000000000000000001"
 
 
 def test_repay_eth():
-    method = aave.RepayETH(eth_amount=10, interest_rate_model=aave.InterestRateModel.VARIABLE, avatar=AVATAR)
+    method = aave.RepayETH(eth_amount=10, interest_rate_mode=aave.InterestRateMode.VARIABLE, avatar=AVATAR)
     assert method.args.amount == 10
     assert method.value == 10
 

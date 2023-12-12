@@ -20,7 +20,7 @@ class EthereumContractSpecs:
                        name='Jug')
     DaiJoin = ContractSpec(address='0x9759A6Ac90977b93B58547b4A71c78317f391A28',
                            abi=load_abi('dai_join.json'),
-                           name='Daioin')
+                           name='DaiJoin')
     DsrManager = ContractSpec(address='0x373238337Bfe1146fb49989fc222523f83081dDb',
                               abi=load_abi('dsr_manager.json'),
                               name='DsrManager')
