@@ -3,7 +3,7 @@ requires = ["setuptools>=65.5.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "RolesRoyce"
+name = "rolesroyce"
 version = "0.0.1"
 description = "Create and execute DeFi transactions through the Roles Modifier contracts"
 readme = "README.md"
@@ -28,7 +28,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/KarpatkeyDAO/rolling-roles"
+Homepage = "https://github.com/karpatkey/roles_royce"
 
 [tool.setuptools.packages.find]
 include = ["roles_royce*", ]
