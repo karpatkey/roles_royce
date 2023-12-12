@@ -2,6 +2,7 @@ from web3.types import Address
 from web3 import Web3
 from defabipedia import balancer, aura
 from defabipedia.types import Chain
+from defabipedia.tokens import erc20_contract
 from roles_royce.protocols.balancer.utils import Pool, PoolKind
 import os
 import json
@@ -52,8 +53,7 @@ def get_tokens_from_bpt(w3: Web3, bpt_address: Address) -> list[dict]:
         del pool_tokens[pool.bpt_index_from_composable()]  # Remove the BPT if it is a composable stable
     result = []
     for token_address in pool_tokens:
-        token_contract = w3.eth.contract(address=token_address,
-                                         abi=balancer.Abis[Chain.get_blockchain_from_web3(w3)].ERC20.abi)
+        token_contract = erc20_contract(w3, token_address)
         token_symbol = token_contract.functions.symbol().call()
         result.append({
             "address": token_address,

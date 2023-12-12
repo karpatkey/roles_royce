@@ -6,6 +6,7 @@ from roles_royce.constants import ETHAddr
 from decimal import Decimal
 from pytest import approx
 from defabipedia.maker import ContractSpecs, Abis
+from defabipedia.tokens import erc20_contract
 from defabipedia.types import Chain
 
 JOIN_WSTETH_A = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH-A
@@ -200,7 +201,7 @@ def test_integration_maker_cdp_module_proxy(local_node_eth, accounts):
                roles_mod_address=roles_ctract.address,
                web3=w3)
 
-    gem_contract = w3.eth.contract(address=gem, abi=Abis[Chain.ETHEREUM].ERC20.abi)
+    gem_contract = erc20_contract(w3, gem)
     gem_allowance = gem_contract.functions.allowance(safe.address, proxy_address).call()
     assert gem_allowance == 1000_000_000_000_000_000_000
 
@@ -245,7 +246,8 @@ def test_integration_maker_cdp_module_proxy(local_node_eth, accounts):
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chain.ETHEREUM].ERC20.abi)
+    dai_contract = erc20_contract(w3, ETHAddr.DAI)
+
     dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
 
@@ -332,7 +334,7 @@ def test_integration_maker_cdp_module_proxy_bulk(local_node_eth, accounts):
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                 roles_mod_address=roles_ctract.address,
                 web3=w3)
-    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chain.ETHEREUM].ERC20.abi)
+    dai_contract = erc20_contract(w3, ETHAddr.DAI)
     dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
     assert dai_allowance == wad_d
     wipe_and_free_eth = maker.ProxyActionWipeAndFreeETH(proxy=proxy_address, eth_join=JOIN_ETH_A, cdp_id=cdp_id, wad_c=wad_c, wad_d=wad_d)
@@ -421,7 +423,7 @@ def test_integration_maker_cdp_module_no_proxy(local_node_eth, accounts):
                roles_mod_address=roles_ctract.address,
                web3=w3)
 
-    gem_contract = w3.eth.contract(address=gem, abi=Abis[Chain.ETHEREUM].ERC20.abi)
+    gem_contract = erc20_contract(w3, gem)
     gem_allowance = gem_contract.functions.allowance(safe.address, gem_join_contract.address).call()
     assert gem_allowance == 1000_000_000_000_000_000_000
 
@@ -603,7 +605,7 @@ def test_integration_maker_dsr_module_proxy(local_node_eth, accounts):
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chain.ETHEREUM].ERC20.abi)
+    dai_contract = erc20_contract(w3, ETHAddr.DAI)
     dai_allowance = dai_contract.functions.allowance(safe.address, proxy_address).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
 
@@ -669,7 +671,7 @@ def test_integration_maker_dsr_module_no_proxy(local_node_eth, accounts):
     roles.send([approve_dai], role=1, private_key=accounts[1].key,
                roles_mod_address=roles_ctract.address,
                web3=w3)
-    dai_contract = w3.eth.contract(address=ETHAddr.DAI, abi=Abis[Chain.ETHEREUM].ERC20.abi)
+    dai_contract = erc20_contract(w3, ETHAddr.DAI)
     dai_allowance = dai_contract.functions.allowance(safe.address, ContractSpecs[Chain.ETHEREUM].DsrManager.address).call()
     assert dai_allowance == 100_000_000_000_000_000_000_000
 
