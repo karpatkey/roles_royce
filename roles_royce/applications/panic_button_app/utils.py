@@ -1,16 +1,19 @@
-from dataclasses import dataclass, field
-from decouple import config
-from web3.types import Address
-from web3 import Web3
-from roles_royce.protocols.base import Address
-from defabipedia.types import Chain
-from eth_account import Account
-from roles_royce.constants import StrEnum
-from web3.exceptions import ContractLogicError
-import time
 import json
-from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler
+import time
+from dataclasses import dataclass, field
+
+from decouple import config
+from eth_account import Account
+from web3 import Web3
+from web3.exceptions import ContractLogicError
+from web3.types import Address
+
+from defabipedia.types import Chain
+from roles_royce.constants import StrEnum
 from roles_royce.generic_method import Transactable
+from roles_royce.protocols.base import Address
+from roles_royce.protocols.base import ContractMethod
+from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler
 
 
 class Modes(StrEnum):
@@ -160,7 +163,7 @@ def bytes_to_hex_in_iterable(data):
         return data
 
 
-def decode_transaction(txns: list[Transactable], env: ENV) -> list[dict]:
+def decode_transaction(txns: list[ContractMethod], env: ENV) -> list[dict]:
     result = []
     for transactable in txns:
         tx = json.loads(transactable.abi)[0]
@@ -209,7 +212,7 @@ def fork_unlock_account(w3, address):
 # These accounts are not guaranteed to hold tokens forever...
 Holders = {
     Chain.ETHEREUM: '0x00000000219ab540356cBB839Cbe05303d7705Fa',  # BINANCE_ACCOUNT_WITH_LOTS_OF_ETH =
-    Chain.Gnosis: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'  # WXDAI_CONTRACT_WITH_LOTS_OF_XDAI =
+    Chain.GNOSIS: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'  # WXDAI_CONTRACT_WITH_LOTS_OF_XDAI =
 }
 
 

@@ -5,7 +5,7 @@ from .roles import setup_common_roles, deploy_roles, apply_presets
 from pytest import approx
 from decimal import Decimal
 from defabipedia.rocket_pool import Abis, ContractSpecs
-from defabipedia import Chains
+from defabipedia import Chain
 
 rETH = ContractSpecs[Chain.ETHEREUM].rETH.address
 

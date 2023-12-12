@@ -32,7 +32,7 @@ class SimpleSafe(Safe):
 
     def send(self, txs: list[Transactable]) -> TxResult:
 
-        tx = multi_or_one(txs, Chains.get_blockchain_from_web3(self.w3))
+        tx = multi_or_one(txs, Chain.get_blockchain_from_web3(self.w3))
         safe_tx = self.build_multisig_tx(to=tx.contract_address, value=tx.value,
                                          data=tx.data, operation=tx.operation,
                                          safe_tx_gas=14_000_000,

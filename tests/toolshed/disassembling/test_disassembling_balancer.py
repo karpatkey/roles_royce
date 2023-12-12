@@ -28,7 +28,7 @@ def test_integration_exit_1_1(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=preset,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
 
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[1].address
@@ -162,7 +162,7 @@ def test_integration_exit_1_2(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=preset,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
 
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[1].address
@@ -336,7 +336,7 @@ def test_integration_exit_1_3(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=preset,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
 
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[1].address
@@ -495,7 +495,7 @@ def test_integration_exit_2_1(local_node_eth, accounts):
                              "1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112",
                             )])
 
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address
@@ -561,7 +561,7 @@ def test_integration_exit_2_2(local_node_eth, accounts):
                              "1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112",
                             )])
 
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address

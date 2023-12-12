@@ -30,7 +30,7 @@ def main():
     strategies_gnosis_dao_ethereum.build_json(w3_eth)
 
     strategies_gnosis_dao_gnosis_chain = DAOStrategiesBuilder(DAO.GnosisDAO,
-                                                              Chain.Gnosis,
+                                                              Chain.GNOSIS,
                                                               balancer=[BalancerPosition(position_id="107",
                                                                                          bpt_address='0xa99fd9950b5d5dceeaf4939e221dca8ca9b938ab',
                                                                                          staked=False),
@@ -94,7 +94,7 @@ def main():
     strategies_gnosis_ltd_ethereum.build_json(w3_eth)
 
     strategies_gnosis_ltd_gnosis_chain = DAOStrategiesBuilder(DAO.GnosisLTD,
-                                                              Chain.Gnosis,
+                                                              Chain.GNOSIS,
                                                               balancer=[BalancerPosition(position_id="271",
                                                                                          bpt_address='0x7644fa5d0ea14fcf3e813fdf93ca9544f8567655',
                                                                                          staked=False)],

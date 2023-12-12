@@ -12,7 +12,7 @@ def main(dao: DAO, blockchain: Blockchain, balancer: list[BalancerPosition], aur
     w3_eth = Web3(Web3.HTTPProvider(os.environ.get("RR_ETH_FORK_URL", PUBLIC_ETH_NODE_URL)))
     w3_gc = Web3(Web3.HTTPProvider(os.environ.get("RR_GC_FORK_URL", PUBLIC_GC_NODE_URL)))
 
-    if blockchain == Chain.Gnosis:
+    if blockchain == Chain.GNOSIS:
         w3 = w3_gc
     elif blockchain == Chain.ETHEREUM:
         w3 = w3_eth

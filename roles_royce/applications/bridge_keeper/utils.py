@@ -1,15 +1,13 @@
 from dataclasses import dataclass, field
 import threading
 from prometheus_client import Gauge
-import schedule
-import time
 from decouple import config
 from web3.types import Address, ChecksumAddress, TxReceipt
 from web3 import Web3
 from roles_royce.toolshed.alerting.alerting import Messenger, LoggingLevel
 from roles_royce.toolshed.anti_liquidation.spark import SparkCDP
 import logging
-from defabipedia.xDAI_bridge import ContractSpecs
+from defabipedia.xdai_bridge import ContractSpecs
 from defabipedia.types import Chain
 from defabipedia.tokens import EthereumContractSpecs as Tokens
 from datetime import datetime
