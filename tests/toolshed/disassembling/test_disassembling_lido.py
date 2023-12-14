@@ -218,6 +218,8 @@ preset_cowswap_easy ="""{
 def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
 
+    block = 18421437
+    local_node_eth.set_block(block)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
@@ -228,7 +230,6 @@ def test_integration_exit_3(local_node_eth, accounts):
     steal_token(w3=w3, token=ContractSpecs[blockchain].stETH.address, holder="0xE53FFF67f9f384d20Ebea36F43b93DC49Ed22753",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     
-
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address
     private_key = accounts[4].key
@@ -271,6 +272,8 @@ def test_integration_exit_3(local_node_eth, accounts):
 def test_integration_exit_4(local_node_eth, accounts):
     w3 = local_node_eth.w3
 
+    block = 18421437
+    local_node_eth.set_block(block)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
