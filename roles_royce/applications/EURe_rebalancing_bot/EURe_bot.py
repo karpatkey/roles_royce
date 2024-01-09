@@ -221,14 +221,18 @@ while True:
 
     try:
         if not test_mode:
-            w3, connection_check = web3_connection_check(ENV.RPC_ENDPOINT, messenger, rpc_endpoint_failure_counter,
-                                                         ENV.FALLBACK_RPC_ENDPOINT)
-            if not connection_check:
+            w3, rpc_endpoint_failure_counter = web3_connection_check(ENV.RPC_ENDPOINT, messenger,
+                                                                     rpc_endpoint_failure_counter,
+                                                                     ENV.FALLBACK_RPC_ENDPOINT)
+            if rpc_endpoint_failure_counter != 0:
                 continue
         else:
             w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
-
-        bot_do(w3)
+        try:
+            bot_do(w3)
+        except:
+            time.sleep(5)
+            bot_do(w3)  # Second attempt
 
     except Exception as e:
         messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e.args[0]))
