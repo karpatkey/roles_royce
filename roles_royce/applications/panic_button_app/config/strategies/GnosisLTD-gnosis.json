@@ -55,47 +55,6 @@
                     ]
                 },
                 {
-                    "function_name": "exit_2_2",
-                    "label": "Unstake + withdraw (single token)",
-                    "test": true,
-                    "description": "Unstake BPT from Aura and exit pool on Balancer with single token exit",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
-                        },
-                        {
-                            "name": "token_out_address",
-                            "label": "Token out",
-                            "type": "input",
-                            "options": [
-                                {
-                                    "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                                    "label": "USDT"
-                                },
-                                {
-                                    "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                                    "label": "USDC"
-                                },
-                                {
-                                    "value": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                                    "label": "WXDAI"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
                     "function_name": "exit_2_3",
                     "label": "Unstake + withdraw (proportional) (Recovery mode)",
                     "test": false,
@@ -161,47 +120,6 @@
                     ]
                 },
                 {
-                    "function_name": "exit_2_2",
-                    "label": "Unstake + withdraw (single token)",
-                    "test": true,
-                    "description": "Unstake BPT from Aura and exit pool on Balancer with single token exit",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
-                        },
-                        {
-                            "name": "token_out_address",
-                            "label": "Token out",
-                            "type": "input",
-                            "options": [
-                                {
-                                    "value": "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",
-                                    "label": "USDT"
-                                },
-                                {
-                                    "value": "0xaf204776c7245bF4147c2612BF6e5972Ee483701",
-                                    "label": "sDAI"
-                                },
-                                {
-                                    "value": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-                                    "label": "USDC"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
                     "function_name": "exit_2_3",
                     "label": "Unstake + withdraw (proportional) (Recovery mode)",
                     "test": false,
@@ -215,6 +133,96 @@
                         {
                             "name": "max_slippage",
                             "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "position_id": "376",
+            "position_id_tech": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62",
+            "position_id_human_readable": "gnosis_Aura_COW_wstETH",
+            "protocol": "Aura",
+            "exec_config": [
+                {
+                    "function_name": "exit_1",
+                    "label": "Unstake",
+                    "test": true,
+                    "description": "Unstake BPT from Aura gauge",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62"
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_2_1",
+                    "label": "Unstake + withdraw (proportional)",
+                    "test": true,
+                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_2_3",
+                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
+                    "test": false,
+                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "protocol": "Lido",
+            "position_id": "203",
+            "position_id_tech": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
+            "position_id_human_readable": "gnosis_Lido_wstETH",
+            "exec_config": [
+                {
+                    "function_name": "exit_4",
+                    "label": "Swap wstETH",
+                    "test": false,
+                    "description": "Swap wstETH for ETH",
+                    "parameters": [
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
                             "type": "input",
                             "rules": {
                                 "min": 0,

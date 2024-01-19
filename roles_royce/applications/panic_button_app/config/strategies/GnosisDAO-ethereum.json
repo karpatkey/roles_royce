@@ -55,43 +55,6 @@
                     ]
                 },
                 {
-                    "function_name": "exit_2_2",
-                    "label": "Unstake + withdraw (single token)",
-                    "test": true,
-                    "description": "Unstake BPT from Aura and exit pool on Balancer with single token exit",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
-                        },
-                        {
-                            "name": "token_out_address",
-                            "label": "Token out",
-                            "type": "input",
-                            "options": [
-                                {
-                                    "value": "0xae78736Cd615f374D3085123A210448E74Fc6393",
-                                    "label": "rETH"
-                                },
-                                {
-                                    "value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-                                    "label": "WETH"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
                     "function_name": "exit_2_3",
                     "label": "Unstake + withdraw (proportional) (Recovery mode)",
                     "test": false,
@@ -153,43 +116,6 @@
                                 "min": 0,
                                 "max": 100
                             }
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_2",
-                    "label": "Unstake + withdraw (single token)",
-                    "test": true,
-                    "description": "Unstake BPT from Aura and exit pool on Balancer with single token exit",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x89D3D732da8bf0f88659Cf3738E5E44e553f9ED7"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
-                        },
-                        {
-                            "name": "token_out_address",
-                            "label": "Token out",
-                            "type": "input",
-                            "options": [
-                                {
-                                    "value": "0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56",
-                                    "label": "B-80BAL-20WETH"
-                                },
-                                {
-                                    "value": "0x616e8BfA43F920657B3497DBf40D6b1A02D4608d",
-                                    "label": "auraBAL"
-                                }
-                            ]
                         }
                     ]
                 },
@@ -259,43 +185,6 @@
                     ]
                 },
                 {
-                    "function_name": "exit_2_2",
-                    "label": "Unstake + withdraw (single token)",
-                    "test": true,
-                    "description": "Unstake BPT from Aura and exit pool on Balancer with single token exit",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x82FeB430d9D14eE5E635C41807e03fD8F5FfFDeC"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
-                        },
-                        {
-                            "name": "token_out_address",
-                            "label": "Token out",
-                            "type": "input",
-                            "options": [
-                                {
-                                    "value": "0x6810e776880C02933D47DB1b9fc05908e5386b96",
-                                    "label": "GNO"
-                                },
-                                {
-                                    "value": "0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB",
-                                    "label": "COW"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
                     "function_name": "exit_2_3",
                     "label": "Unstake + withdraw (proportional) (Recovery mode)",
                     "test": false,
@@ -357,43 +246,6 @@
                                 "min": 0,
                                 "max": 100
                             }
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_2",
-                    "label": "Unstake + withdraw (single token)",
-                    "test": true,
-                    "description": "Unstake BPT from Aura and exit pool on Balancer with single token exit",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xA6e54eA1C67396Bde9e92cA462197bE59Af3E875"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
-                        },
-                        {
-                            "name": "token_out_address",
-                            "label": "Token out",
-                            "type": "input",
-                            "options": [
-                                {
-                                    "value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-                                    "label": "WETH"
-                                },
-                                {
-                                    "value": "0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB",
-                                    "label": "COW"
-                                }
-                            ]
                         }
                     ]
                 },

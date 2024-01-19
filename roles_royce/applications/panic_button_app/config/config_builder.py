@@ -17,6 +17,7 @@ from defabipedia.lido import ContractSpecs
 class DAO(StrEnum):
     GnosisDAO = "GnosisDAO"
     GnosisLTD = "GnosisLTD"
+    Karpatkey = "karpatkey"
 
     def __str__(self):
         return self.name
@@ -205,18 +206,16 @@ class DAOStrategiesBuilder:
             position = copy.deepcopy(balancer_template)
 
             if balancer_position.staked:
-                for item in range(3):
+                for item in range(2):
                     position['exec_config'].pop(0)
                     gauge_address = balancer_position.position_id_tech(w3)
-                for i in range(3):
+                for i in range(2):
                     position["exec_config"][i]["parameters"][0]["value"] = gauge_address
             else:
-                for item in range(3):
+                for item in range(2):
                     position['exec_config'].pop(-1)
-                for i in range(3):
+                for i in range(2):
                     position["exec_config"][i]["parameters"][0]["value"] = bpt_address
-
-            del position["exec_config"][1]["parameters"][2]["options"][0]  # Remove the dummy element in template
 
             position["position_id"] = balancer_position.position_id
 
@@ -224,11 +223,6 @@ class DAOStrategiesBuilder:
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
                 position["position_id_tech"] = gauge_address if balancer_position.staked else bpt_address
                 position["position_id_human_readable"] = balancer_position.position_id_human_readable(w3, pool_tokens=pool_tokens)
-                for token in pool_tokens:
-                    position["exec_config"][1]["parameters"][2]["options"].append({
-                        "value": token['address'],
-                        "label": token['symbol']
-                    })
 
             except Exception as e:
                 position["position_id_human_readable"] = f"AddressGivesError: {e}"
@@ -253,19 +247,12 @@ class DAOStrategiesBuilder:
             try:
                 aura_address = aura_position.position_id_tech(w3)
 
-                del position["exec_config"][2]["parameters"][2]["options"][0]  # Remove the dummy element in template
-
                 position["position_id"] = aura_position.position_id
                 position["position_id_tech"] = aura_address
-                for i in range(4):
+                for i in range(3):
                     position["exec_config"][i]["parameters"][0]["value"] = aura_address
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
                 position["position_id_human_readable"] = aura_position.position_id_human_readable(w3, pool_tokens=pool_tokens)
-                for token in pool_tokens:
-                    position["exec_config"][2]["parameters"][2]["options"].append({
-                        "value": token['address'],
-                        "label": token['symbol']
-                    })
 
             except Exception as e:
                 position["position_id_human_readable"] = f"AddressGivesError: {e}"
@@ -288,7 +275,10 @@ class DAOStrategiesBuilder:
             position = copy.deepcopy(lido_template)
             blockchain = Chains.get_blockchain_from_web3(w3)
             if lido_position.lido_address == ContractSpecs[blockchain].wstETH.address:
-                position['exec_config'] = list(filter(lambda x: x['function_name'] not in ['exit_1', 'exit_3'], position['exec_config']))
+                if blockchain == Chains.Gnosis:
+                    position['exec_config'] = list(filter(lambda x: x['function_name'] not in ['exit_1', 'exit_2', 'exit_3'], position['exec_config']))
+                else:
+                    position['exec_config'] = list(filter(lambda x: x['function_name'] not in ['exit_1', 'exit_3'], position['exec_config']))
             else:
                 position['exec_config'] = list(filter(lambda x: x['function_name'] not in ['exit_2', 'exit_4'], position['exec_config']))
             position["position_id"] = lido_position.position_id

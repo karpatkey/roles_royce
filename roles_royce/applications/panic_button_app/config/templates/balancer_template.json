@@ -27,39 +27,6 @@
       ]
     },
     {
-      "function_name": "exit_1_2",
-      "label": "Withdraw (single token)",
-      "test": true,
-      "description": "Exit pool on Balancer with single token exit",
-      "parameters": [
-        {
-          "name": "bpt_address",
-          "type": "constant",
-          "value": "FillMeWithBptAddress"
-        },
-        {
-          "name": "max_slippage",
-          "label": "Max slippage",
-          "type": "input",
-          "rules": {
-            "min": 0,
-            "max": 100
-          }
-        },
-        {
-          "name": "token_out_address",
-          "label": "Token out",
-          "type": "input",
-          "options": [
-            {
-              "value": "FillMewithTokenAddress",
-              "label": "FillMeWithTokenSymbol"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "function_name": "exit_1_3",
       "label": "Withdraw (proportional) (Recovery mode)",
       "test": false,
@@ -100,39 +67,6 @@
             "min": 0,
             "max": 100
           }
-        }
-      ]
-    },
-    {
-      "function_name": "exit_2_2",
-      "label": "Unstake + withdraw (single token)",
-      "test": true,
-      "description": "Unstake the BPT from the Balancer gauge and exit pool with single token exit",
-      "parameters": [
-        {
-          "name": "gauge_address",
-          "type": "constant",
-          "value": "FillMeWithGaugeAddress"
-        },
-        {
-          "name": "max_slippage",
-          "label": "Max slippage",
-          "type": "input",
-          "rules": {
-            "min": 0,
-            "max": 100
-          }
-        },
-        {
-          "name": "token_out_address",
-          "label": "Token out",
-          "type": "input",
-          "options": [
-            {
-              "value": "FillMewithTokenAddress",
-              "label": "FillMeWithTokenSymbol"
-            }
-          ]
         }
       ]
     },
