@@ -1,0 +1,237 @@
+{
+    "dao": "GnosisDAO",
+    "blockchain": "gnosis",
+    "general_parameters": [
+        {
+            "name": "percentage",
+            "label": "Percentage",
+            "type": "input",
+            "rules": {
+                "min": 0,
+                "max": 100
+            }
+        }
+    ],
+    "positions": [
+        {
+            "position_id": "225",
+            "position_id_tech": "0x8B59F9d4F24A266630756131fE62C3476886e496",
+            "position_id_human_readable": "gnosis_Aura_COW_GNO",
+            "protocol": "Aura",
+            "exec_config": [
+                {
+                    "function_name": "exit_1",
+                    "label": "Unstake",
+                    "test": true,
+                    "description": "Unstake BPT from Aura gauge",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0x8B59F9d4F24A266630756131fE62C3476886e496"
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_2_1",
+                    "label": "Unstake + withdraw (proportional)",
+                    "test": true,
+                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0x8B59F9d4F24A266630756131fE62C3476886e496"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_2_3",
+                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
+                    "test": false,
+                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0x8B59F9d4F24A266630756131fE62C3476886e496"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "position_id": "231",
+            "position_id_tech": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526",
+            "position_id_human_readable": "gnosis_Aura_WETH_wstETH",
+            "protocol": "Aura",
+            "exec_config": [
+                {
+                    "function_name": "exit_1",
+                    "label": "Unstake",
+                    "test": true,
+                    "description": "Unstake BPT from Aura gauge",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_2_1",
+                    "label": "Unstake + withdraw (proportional)",
+                    "test": true,
+                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_2_3",
+                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
+                    "test": false,
+                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "position_id": "275",
+            "position_id_tech": "0xDE151980d461696543aa07A19BbE2603B20ECbAE",
+            "position_id_human_readable": "gnosis_Aura_sDAI_EURe",
+            "protocol": "Aura",
+            "exec_config": [
+                {
+                    "function_name": "exit_1",
+                    "label": "Unstake",
+                    "test": true,
+                    "description": "Unstake BPT from Aura gauge",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0xDE151980d461696543aa07A19BbE2603B20ECbAE"
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_2_1",
+                    "label": "Unstake + withdraw (proportional)",
+                    "test": true,
+                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0xDE151980d461696543aa07A19BbE2603B20ECbAE"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_2_3",
+                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
+                    "test": false,
+                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "rewards_address",
+                            "type": "constant",
+                            "value": "0xDE151980d461696543aa07A19BbE2603B20ECbAE"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "protocol": "Lido",
+            "position_id": "200",
+            "position_id_tech": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
+            "position_id_human_readable": "gnosis_Lido_wstETH",
+            "exec_config": [
+                {
+                    "function_name": "exit_4",
+                    "label": "Swap wstETH",
+                    "test": false,
+                    "description": "Swap wstETH for ETH",
+                    "parameters": [
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
