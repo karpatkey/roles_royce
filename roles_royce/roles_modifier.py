@@ -21,6 +21,16 @@ ROLES_ABI = (
     '"outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]'
 )
 
+ROLES_ERRORS = (
+    "NoMembership()", "ArraysDifferentLength()", "FunctionSignatureTooShort()", "DelegateCallNotAllowed()", "TargetAddressNotAllowed()",
+    "FunctionNotAllowed()", "SendNotAllowed()", "ParameterNotAllowed()", "ParameterNotOneOfAllowed()", "ParameterLessThanAllowed()",
+    "ParameterGreaterThanAllowed()", "UnacceptableMultiSendOffset()", "UnsuitableOneOfComparison()", "UnsuitableRelativeComparison()",
+    "UnsuitableStaticCompValueSize()", "UnsuitableDynamic32CompValueSize()", "ScopeMaxParametersExceeded()", "NotEnoughCompValuesForOneOf()",
+    "CalldataOutOfBounds()"
+)
+
+ROLES_ERRORS_SELECTORS = {Web3.keccak(text=error).hex()[:10]: error for error in ROLES_ERRORS}
+
 
 class TransactionWouldBeReverted(Exception):
     """It is used to indicate that if a transaction is executed, it will be reverted."""
@@ -111,8 +121,12 @@ class RolesMod:
         try:
             self._build_exec_transaction(contract_address, data).call({"from": self.account}, block_identifier=block)
             return True
-        except exceptions.ContractLogicError:
-            return False
+        except exceptions.ContractCustomError as e:
+            custom_roles_error = ROLES_ERRORS_SELECTORS.get(e.data, None)
+            if custom_roles_error:
+                raise TransactionWouldBeReverted(ROLES_ERRORS_SELECTORS.get(e.data))
+            else:
+                raise TransactionWouldBeReverted(e)
 
     def estimate_gas(self, contract_address: str, data: str, block='latest') -> int:
         """Estimate the gas that would be needed."""
@@ -128,8 +142,8 @@ class RolesMod:
                 ) -> str:
         """Execute a role-based transaction. Returns the transaction hash as a str."""
 
-        if check and not self.check(contract_address, data):
-            raise TransactionWouldBeReverted()
+        if check:
+            self.check(contract_address, data)
 
         tx = self.build(contract_address, data, max_priority_fee, max_fee_per_gas)
         logger.debug(f"Executing tx: {tx}")
