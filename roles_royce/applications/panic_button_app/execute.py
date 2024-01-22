@@ -26,6 +26,7 @@ def main():
             tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
         else:  # In development environment, send the transaction to the local fork with the unlocked account
             tx_hash = w3.eth.send_transaction(tx)
+            w3.wait_for_transaction_receipt(tx)
             fork_reset_state(w3, w3.manager.provider.endpoint_uri, w3.get_block())
         response_message = {"status": 200, "tx_hash": tx_hash.hex()}
     except Exception as e:
