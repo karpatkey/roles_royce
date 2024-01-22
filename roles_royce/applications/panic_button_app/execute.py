@@ -1,5 +1,5 @@
 import argparse
-from roles_royce.applications.panic_button_app.utils import ENV, start_the_engine
+from roles_royce.applications.panic_button_app.utils import ENV, start_the_engine, fork_reset_state
 import json
 from roles_royce.roles_modifier import update_gas_fees_parameters_and_nonce, set_gas_strategy, GasStrategies
 
@@ -26,6 +26,8 @@ def main():
             tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
         else:  # In development environment, send the transaction to the local fork with the unlocked account
             tx_hash = w3.eth.send_transaction(tx)
+            w3.eth.wait_for_transaction_receipt(tx_hash)
+            fork_reset_state(w3, w3.manager.provider.endpoint_uri, w3.get_block())
         response_message = {"status": 200, "tx_hash": tx_hash.hex()}
     except Exception as e:
         response_message = {"status": 500, "message": f"Error: {e}"}
