@@ -224,5 +224,9 @@ def top_up_address(w3: Web3, address: str, amount: int) -> None:
             {"to": address, "value": Web3.to_wei(amount, "ether"), "from": holder})
     except ContractLogicError:
         raise Exception("Address is a smart contract address with no payable function.")
+    
+def fork_reset_state(w3, url, block):
+    """Reset the state of the forked node to the state of the mainnet node at the given block."""
+    return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
 
 # -----------------------------------------------------------------------------------------------------------------------
