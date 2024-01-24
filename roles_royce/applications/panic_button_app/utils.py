@@ -58,7 +58,7 @@ class ENV:
         self.TENDERLY_API_TOKEN: str = config('TENDERLY_API_TOKEN', default='')
 
         # DAO and blockchain
-        if self.DAO not in ['GnosisDAO', 'GnosisLTD', 'karpatkey']:
+        if self.DAO not in ['GnosisDAO', 'GnosisLtd', 'karpatkey']:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
         if self.BLOCKCHAIN.lower() not in ['mainnet', 'ethereum', 'gnosis']:
             raise ValueError(f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}. Options are either 'ethereum' or 'gnosis'.")
