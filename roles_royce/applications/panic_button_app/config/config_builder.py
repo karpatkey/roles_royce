@@ -216,6 +216,8 @@ class DAOStrategiesBuilder:
                     position['exec_config'].pop(-1)
                 for i in range(2):
                     position["exec_config"][i]["parameters"][0]["value"] = bpt_address
+                    print("                Adding: ", position["exec_config"][i]["function_name"], 
+                                position["exec_config"][i]["label"])
 
             position["position_id"] = balancer_position.position_id
 
@@ -223,6 +225,7 @@ class DAOStrategiesBuilder:
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
                 position["position_id_tech"] = gauge_address if balancer_position.staked else bpt_address
                 position["position_id_human_readable"] = balancer_position.position_id_human_readable(w3, pool_tokens=pool_tokens)
+                print(f"        Done adding: Balancer position", position["position_id"], position["position_id_human_readable"])
 
             except Exception as e:
                 position["position_id_human_readable"] = f"AddressGivesError: {e}"
@@ -251,8 +254,11 @@ class DAOStrategiesBuilder:
                 position["position_id_tech"] = aura_address
                 for i in range(3):
                     position["exec_config"][i]["parameters"][0]["value"] = aura_address
+                    print("                Adding: ", position["exec_config"][i]["function_name"], 
+                                position["exec_config"][i]["label"])
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
                 position["position_id_human_readable"] = aura_position.position_id_human_readable(w3, pool_tokens=pool_tokens)
+                print(f"        Done adding: Aura position", position["position_id"], position["position_id_human_readable"])
 
             except Exception as e:
                 position["position_id_human_readable"] = f"AddressGivesError: {e}"
@@ -284,6 +290,11 @@ class DAOStrategiesBuilder:
             position["position_id"] = lido_position.position_id
             position["position_id_tech"] = lido_position.position_id_tech()
             position["position_id_human_readable"] = lido_position.position_id_human_readable(w3)
+            for i in range(len(position['exec_config'])):
+                print("                Adding: ", position["exec_config"][i]["function_name"], 
+                                position["exec_config"][i]["label"])
+                
+            print(f"        Done adding: Lido position", position["position_id"], position["position_id_human_readable"])
 
             result.append(position)
         return result
