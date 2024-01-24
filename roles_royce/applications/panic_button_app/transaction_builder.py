@@ -4,6 +4,7 @@ from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, sta
 from roles_royce.generic_method import Transactable
 from roles_royce.applications.panic_button_app.utils import decode_transaction
 import json
+from roles_royce.roles_modifier import ROLES_ERRORS
 
 
 def main():
@@ -56,8 +57,12 @@ def main():
                                 "message": "Error: Transaction reverted when simulated with local eth_call"}
 
     except Exception as e:
-       
-        response_message = {"status": 500, 
+        if str(e) in ROLES_ERRORS:
+         response_message = {"status": 422, 
+                            "tx_data": {"decoded_transaction": decoded_transaction},
+                            "message": f"Role permissions error: {e}"}
+        else:
+            response_message = {"status": 500, 
                             "tx_data": {"decoded_transaction": decoded_transaction},
                             "message": f"Error: {e}"}
 
