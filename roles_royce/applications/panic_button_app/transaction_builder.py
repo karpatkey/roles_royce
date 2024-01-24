@@ -4,6 +4,7 @@ from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, sta
 from roles_royce.generic_method import Transactable
 from roles_royce.applications.panic_button_app.utils import decode_transaction
 import json
+from roles_royce.roles_modifier import ROLES_ERRORS
 
 
 def main():
@@ -18,7 +19,7 @@ def main():
 
     parser.add_argument("--protocol", type=str, help="Protocol where the funds are deposited.")
     parser.add_argument("-s", "--exit-strategy", type=str, help="Exit strategy to execute, e.g. exit_2_1, exit_3")
-    parser.add_argument("-a", "--exit-arguments", type=str,
+    parser.add_argument("-a", "--exit-arguments", type=str, default="[]",
                         help='List of jsons with the custom exit arguments for each '
                                 'position and exit strategy, e.g. [{ "bpt_address": "0xsOmEAddResS", "max_slippage": '
                                 '0.01}]')
@@ -56,8 +57,12 @@ def main():
                                 "message": "Error: Transaction reverted when simulated with local eth_call"}
 
     except Exception as e:
-       
-        response_message = {"status": 500, 
+        if str(e) in ROLES_ERRORS:
+         response_message = {"status": 422, 
+                            "tx_data": {"decoded_transaction": decoded_transaction},
+                            "message": f"Role permissions error: {e}"}
+        else:
+            response_message = {"status": 500, 
                             "tx_data": {"decoded_transaction": decoded_transaction},
                             "message": f"Error: {e}"}
 

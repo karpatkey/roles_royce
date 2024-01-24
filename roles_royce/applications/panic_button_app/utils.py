@@ -9,7 +9,7 @@ from roles_royce.constants import StrEnum
 from web3.exceptions import ContractLogicError
 import time
 import json
-from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler
+from roles_royce.toolshed.disassembling import LidoDisassembler, AuraDisassembler, BalancerDisassembler, Disassembler
 from roles_royce.generic_method import Transactable
 
 
@@ -58,7 +58,7 @@ class ENV:
         self.TENDERLY_API_TOKEN: str = config('TENDERLY_API_TOKEN', default='')
 
         # DAO and blockchain
-        if self.DAO not in ['GnosisDAO', 'GnosisLTD']:
+        if self.DAO not in ['GnosisDAO', 'GnosisLTD', 'karpatkey']:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
         if self.BLOCKCHAIN.lower() not in ['mainnet', 'ethereum', 'gnosis']:
             raise ValueError(f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}. Options are either 'ethereum' or 'gnosis'.")
@@ -188,6 +188,12 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
                                             roles_mod_address=env.ROLES_MOD_ADDRESS,
                                             role=env.ROLE,
                                             signer_address=env.DISASSEMBLER_ADDRESS)
+    elif exec_config.protocol == "Lido":
+        disassembler = LidoDisassembler(w3=w3,
+                                        avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
+                                        roles_mod_address=env.ROLES_MOD_ADDRESS,
+                                        role=env.ROLE,
+                                        signer_address=env.DISASSEMBLER_ADDRESS)
     else:
         raise Exception("Invalid protocol")
 
@@ -225,8 +231,8 @@ def top_up_address(w3: Web3, address: str, amount: int) -> None:
     except ContractLogicError:
         raise Exception("Address is a smart contract address with no payable function.")
     
-def fork_reset_state(w3, url, block):
+def fork_reset(w3, url):
     """Reset the state of the forked node to the state of the mainnet node at the given block."""
-    return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
+    return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url}}])
 
 # -----------------------------------------------------------------------------------------------------------------------
