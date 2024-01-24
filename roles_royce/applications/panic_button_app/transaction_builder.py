@@ -18,7 +18,7 @@ def main():
 
     parser.add_argument("--protocol", type=str, help="Protocol where the funds are deposited.")
     parser.add_argument("-s", "--exit-strategy", type=str, help="Exit strategy to execute, e.g. exit_2_1, exit_3")
-    parser.add_argument("-a", "--exit-arguments", type=str,
+    parser.add_argument("-a", "--exit-arguments", type=str, default="[]",
                         help='List of jsons with the custom exit arguments for each '
                                 'position and exit strategy, e.g. [{ "bpt_address": "0xsOmEAddResS", "max_slippage": '
                                 '0.01}]')
