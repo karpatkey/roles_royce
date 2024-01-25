@@ -174,8 +174,6 @@ def test_transaction_builder_kpk(local_node_eth, accounts, monkeypatch, args, ex
     del response['transaction']['maxFeePerGas']  # Gas fees change even in the fork
     del response['transaction']['maxPriorityFeePerGas']  # Gas fees change even in the fork
     w3 = local_node_eth.w3
-    print(expected_outputs)
-    print(response)
     # In the CI tests we get differences in the nonce, so we need to "hardcode" the nonce from the node
     expected['transaction']['nonce'] = w3.eth.get_transaction_count(w3.eth.account.from_key(private_key).address)
     assert response == expected
