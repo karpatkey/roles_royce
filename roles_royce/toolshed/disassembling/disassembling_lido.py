@@ -41,14 +41,26 @@ class LidoDisassembler(Disassembler):
 
         if amount_to_redeem is None: 
             amount_to_redeem = self.get_amount_to_redeem(address, fraction)
+        
+        chunk_amount = amount_to_redeem
+        if chunk_amount > 1000_000_000_000_000_000_000:
+            chunks = []
+            while chunk_amount >= 1000_000_000_000_000_000_000:
+                chunks.append(1000_000_000_000_000_000_000)
+                chunk_amount -= 1000_000_000_000_000_000_000
+            if chunk_amount > 0:
+                chunks.append(chunk_amount)
 
-        set_allowance = lido.ApproveWithdrawalStETHWithUnstETH(amount=amount_to_redeem)
-        request_withdrawal = lido.RequestWithdrawalsStETH(amounts=[amount_to_redeem], avatar=self.avatar_safe_address)
+            set_allowance = lido.ApproveWithdrawalStETHWithUnstETH(amount=amount_to_redeem)
+            request_withdrawal = lido.RequestWithdrawalsStETH(amounts=chunks, avatar=self.avatar_safe_address)
+
+        else:
+            set_allowance = lido.ApproveWithdrawalStETHWithUnstETH(amount=amount_to_redeem)
+            request_withdrawal = lido.RequestWithdrawalsStETH(amounts=[amount_to_redeem], avatar=self.avatar_safe_address)
 
         txns.append(set_allowance)
         txns.append(request_withdrawal)
         return txns
-
 
     def exit_2(self, percentage: float, exit_arguments: list[dict]= None, amount_to_redeem: int = None) -> list[
         Transactable]:
@@ -68,8 +80,21 @@ class LidoDisassembler(Disassembler):
         if amount_to_redeem is None: 
             amount_to_redeem = self.get_amount_to_redeem(address, fraction)
 
-        set_allowance = lido.ApproveWithdrawalWstETH(amount = amount_to_redeem)
-        request_withdrawal = lido.RequestWithdrawalsWstETH(amounts=[amount_to_redeem],avatar=self.avatar_safe_address)
+        chunk_amount = amount_to_redeem
+        if chunk_amount > 1000_000_000_000_000_000_000:
+            chunks = []
+            while chunk_amount >= 1000_000_000_000_000_000_000:
+                chunks.append(1000_000_000_000_000_000_000)
+                chunk_amount -= 1000_000_000_000_000_000_000
+            if chunk_amount > 0:
+                chunks.append(chunk_amount)
+            
+            set_allowance = lido.ApproveWithdrawalWstETH(amount = amount_to_redeem)
+            request_withdrawal = lido.RequestWithdrawalsWstETH(amounts=chunks,avatar=self.avatar_safe_address)
+
+        else:
+            set_allowance = lido.ApproveWithdrawalWstETH(amount = amount_to_redeem)
+            request_withdrawal = lido.RequestWithdrawalsWstETH(amounts=[amount_to_redeem],avatar=self.avatar_safe_address)
 
         txns.append(set_allowance)
         txns.append(request_withdrawal)
