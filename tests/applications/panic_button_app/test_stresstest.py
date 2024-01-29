@@ -45,7 +45,7 @@ daos = [DAO(name="GnosisDAO",
             avatar_safe_address="0x10E4597fF93cbee194F4879f8f1d54a370DB6969",
             roles_mod_address="0x494ec5194123487E8A6ba0b6bc96D57e340025e7",
             role=4),
-        DAO(name="Karpatkey",
+        DAO(name="karpatkey",
             blockchain="ETHEREUM",
             avatar_safe_address="0x58e6c7ab55Aa9012eAccA16d1ED4c15795669E1C",
             roles_mod_address="0x8C33ee6E439C874713a9912f3D3debfF1Efb90Da",
@@ -81,26 +81,32 @@ test_parameters = [(dao, exec_config) for dao, sublist in zip(daos, daos_exec_co
 # -----------------------------------------------------------------------------------------------------------------------
 
 
-def set_up_roles(local_node_eth, local_node_gc, web3_eth, web3_gnosis, accounts, dao: DAO):
+def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
     if dao.blockchain == 'ETHEREUM':
-        block = web3_eth.eth.block_number
-        logging.info(f'Block number: {block}')
+        block = 19114000
         local_node_eth.set_block(block)
-    elif dao.blockchain == 'GNOSIS':
-        block = web3_gnosis.eth.block_number
         logging.info(f'Block number: {block}')
+        disassembler_address = accounts[0].address
+        private_key = accounts[0].key.hex()
+        assign_role(local_node=local_node_eth,
+                    avatar_safe_address=dao.avatar_safe_address,
+                    roles_mod_address=dao.roles_mod_address,
+                    role=dao.role,
+                    asignee=disassembler_address)
+    elif dao.blockchain == 'GNOSIS':
+        block = 32191409
         local_node_gc.set_block(block)
+        logging.info(f'Block number: {block}')
+        disassembler_address = accounts[0].address
+        private_key = accounts[0].key.hex()
+        assign_role(local_node=local_node_gc,
+                    avatar_safe_address=dao.avatar_safe_address,
+                    roles_mod_address=dao.roles_mod_address,
+                    role=dao.role,
+                    asignee=disassembler_address)
     else:
         raise ValueError(f'Blockchain {dao.blockchain} not supported')
 
-    disassembler_address = accounts[0].address
-    private_key = accounts[0].key.hex()
-
-    assign_role(local_node=local_node_eth,
-                avatar_safe_address=dao.avatar_safe_address,
-                roles_mod_address=dao.roles_mod_address,
-                role=dao.role,
-                asignee=disassembler_address)
     return private_key
 
 
@@ -115,8 +121,8 @@ def set_env(monkeypatch, private_key: str, dao: DAO) -> ENV:
 @pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False),
                     reason="Long position integration test not running by default.")
 @pytest.mark.parametrize("dao, exec_config", test_parameters)
-def test_stresstest(local_node_eth, local_node_gc, web3_eth, web3_gnosis,  accounts, monkeypatch, dao, exec_config):
-    private_key = set_up_roles(local_node_eth, local_node_gc, web3_eth, web3_gnosis, accounts, dao)
+def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch, dao, exec_config):
+    private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
     logging.info(f'Running stresstest on DAO: {dao.name}, Blockchain: {dao.blockchain}, Position: {exec_config["function_name"]}')
@@ -129,7 +135,6 @@ def test_stresstest(local_node_eth, local_node_gc, web3_eth, web3_gnosis,  accou
         '--protocol', exec_config['protocol'],
         '--exit-strategy', exec_config['function_name'],
     ]
-
 
     exit_arguments_dict = {}
     for item in exec_config['parameters']:
@@ -186,10 +191,10 @@ def test_stresstest(local_node_eth, local_node_gc, web3_eth, web3_gnosis,  accou
 # The following test is meant to test individual exit strategies by specifying the index. If left empty ([]) the test
 # will be skipped, if [3] is set, test_parameters[3] will be tested.
 @pytest.mark.parametrize("index", [])
-def test_stresstest_single(local_node_eth, local_node_gc, web3_eth, web3_gnosis,accounts, monkeypatch, index):
+def test_stresstest_single(local_node_eth, local_node_gc, accounts, monkeypatch, index):
     dao = test_parameters[index][0]
     exec_config = test_parameters[index][1]
-    private_key = set_up_roles(local_node_eth, local_node_gc, web3_eth, web3_gnosis, accounts, dao)
+    private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
     logging.info(f'Running stresstest on DAO: {dao.name}, Blockchain: {dao.blockchain}, Position: {exec_config["function_name"]}')
