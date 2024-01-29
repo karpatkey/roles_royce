@@ -185,7 +185,7 @@ def test_stresstest(local_node_eth, local_node_gc, web3_eth, web3_gnosis,  accou
 
 # The following test is meant to test individual exit strategies by specifying the index. If left empty ([]) the test
 # will be skipped, if [3] is set, test_parameters[3] will be tested.
-@pytest.mark.parametrize("index", [8])
+@pytest.mark.parametrize("index", [])
 def test_stresstest_single(local_node_eth, local_node_gc, web3_eth, web3_gnosis,accounts, monkeypatch, index):
     dao = test_parameters[index][0]
     exec_config = test_parameters[index][1]
