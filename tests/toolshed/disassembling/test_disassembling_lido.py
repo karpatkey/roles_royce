@@ -219,6 +219,11 @@ def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
 
     block = 18421437
+    #block = 18630000
+    #block = 18800000
+    #block = 18900000
+    #block = 19000000
+    #block = 19115000
     local_node_eth.set_block(block)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)

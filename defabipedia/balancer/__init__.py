@@ -28,6 +28,9 @@ class EthereumContractSpecs:
     BPT_COW_GNO = ContractSpec(address="0x92762B42A06dCDDDc5B7362Cfb01E631c4D44B40",
                                abi=load_abi('weighted_pool.json'),
                                name='bpt_COW_GNO')
+    LiquidityGaugeFactory = ContractSpec(address="0x4E7bBd911cf1EFa442BC1b2e9Ea01ffE785412EC",
+                                            abi=load_abi('liquidity_gauge_factory.json'),
+                                            name='liquidity_gauge_factory')
 
 
 class GnosisContractSpecs:
