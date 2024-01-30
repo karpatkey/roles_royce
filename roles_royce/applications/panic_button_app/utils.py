@@ -137,13 +137,13 @@ def start_the_engine(env: ENV) -> (Web3, Web3):
                     w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
                     if not w3.is_connected():
                         raise Exception("No connection to RPC endpoint")
-                    w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_MEV))
-                    if not w3_MEV.is_connected():
-                        w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
-                        if not w3_MEV.is_connected():
-                            w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
-                            if not w3_MEV.is_connected():
-                                raise Exception("No connection to RPC endpoint")
+        w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_MEV))
+        if not w3_MEV.is_connected():
+            w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+            if not w3_MEV.is_connected():
+                w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
+                if not w3_MEV.is_connected():
+                    raise Exception("No connection to RPC endpoint")
 
     return w3, w3_MEV
 

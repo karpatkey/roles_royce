@@ -11,7 +11,7 @@ def main():
 
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("-p", "--percentage", type=int, default=100,
+    parser.add_argument("-p", "--percentage", type=float, default=100,
                         help="Percentage of liquidity to be removed, defaults to 100.")
 
     parser.add_argument("-d", "--dao", type=str, help="DAO whose funds are to be removed.")
