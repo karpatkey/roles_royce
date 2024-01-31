@@ -69,7 +69,7 @@ class ENV:
         # RPC endpoints
         self.RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT', default='')
         self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_FALLBACK', default='')
-        self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_MEV', default='')
+        self.RPC_ENDPOINT_MEV: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_MEV', default='')
 
         # Configuration addresses and key
         self.AVATAR_SAFE_ADDRESS: Address = config(
