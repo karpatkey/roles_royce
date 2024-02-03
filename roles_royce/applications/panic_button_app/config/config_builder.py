@@ -5,7 +5,7 @@ from roles_royce.constants import StrEnum
 from .utils import get_tokens_from_bpt, get_gauge_address_from_bpt, get_aura_gauge_from_bpt
 import os
 from dataclasses import dataclass
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
 import copy
 from defabipedia.lido import ContractSpecs
 
@@ -102,7 +102,7 @@ class BalancerPosition:
         """
         if pool_tokens is None:
             pool_tokens = get_tokens_from_bpt(w3, self.bpt_address)
-        result = f'{Chains.get_blockchain_from_web3(w3)}_Balancer'
+        result = f'{Chain.get_blockchain_from_web3(w3)}_Balancer'
         for token in pool_tokens:
             result= result + f"_{token['symbol']}"
         if self.staked:
@@ -125,7 +125,7 @@ class AuraPosition:
     def position_id_human_readable(self, w3: Web3, pool_tokens: list[dict] = None) -> str:
         if pool_tokens is None:
             pool_tokens = get_tokens_from_bpt(w3, self.bpt_address)
-        result = f'{Chains.get_blockchain_from_web3(w3)}_Aura'
+        result = f'{Chain.get_blockchain_from_web3(w3)}_Aura'
         for token in pool_tokens:
             result = result + f"_{token['symbol']}"
         return result
@@ -143,7 +143,7 @@ class LidoPosition:
         return self.lido_address
     
     def position_id_human_readable(self, w3: Web3) -> str:
-        blockchain = Chains.get_blockchain_from_web3(w3)
+        blockchain = Chain.get_blockchain_from_web3(w3)
         if self.lido_address == ContractSpecs[blockchain].wstETH.address:
             return f'{blockchain}_Lido_wstETH'
         else:
@@ -279,9 +279,9 @@ class DAOStrategiesBuilder:
 
             print("        Adding: ", lido_position)
             position = copy.deepcopy(lido_template)
-            blockchain = Chains.get_blockchain_from_web3(w3)
+            blockchain = Chain.get_blockchain_from_web3(w3)
             if lido_position.lido_address == ContractSpecs[blockchain].wstETH.address:
-                if blockchain == Chains.Gnosis:
+                if blockchain == Chain.GNOSIS:
                     position['exec_config'] = list(filter(lambda x: x['function_name'] not in ['exit_1', 'exit_2', 'exit_3'], position['exec_config']))
                 else:
                     position['exec_config'] = list(filter(lambda x: x['function_name'] not in ['exit_1', 'exit_3'], position['exec_config']))

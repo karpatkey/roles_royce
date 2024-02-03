@@ -1,7 +1,7 @@
 from web3.types import Address
 from web3 import Web3
 from defabipedia import balancer, aura
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 import json
 import os
 
@@ -22,7 +22,7 @@ def update_aura_db(w3: Web3) -> list[dict]:
                     "bpt_address": "0xBpt_address"
               }]
     """
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
     booster_ctr = aura.ContractSpecs[blockchain].Booster.contract(w3)
     pool_length = booster_ctr.functions.poolLength().call()
     result = []

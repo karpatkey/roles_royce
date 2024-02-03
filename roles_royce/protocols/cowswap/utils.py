@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 import json
 import requests
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
 
 @dataclass
-class QuoteOrderCowSwap():
-    blockchain: str
+class QuoteOrderCowSwap:
+    blockchain: Blockchain
     sell_token: str
     buy_token: str
     receiver: str
@@ -28,10 +28,13 @@ class QuoteOrderCowSwap():
                         "kind": self.kind,
                         "sellAmountBeforeFee": str(self.sell_amount)}
 
-        if self.blockchain == Chains.Ethereum:   
+        if self.blockchain == Chain.ETHEREUM:
             self.response = requests.post('https://api.cow.fi/mainnet/api/v1/quote', data=json.dumps(self.quote_order)).json()
-        else:
+        elif self.blockchain == Chain.GNOSIS:
             self.response = requests.post('https://api.cow.fi/xdai/api/v1/quote', data=json.dumps(self.quote_order)).json()
+        else:
+            raise ValueError("Unsupported blockchain %s" % self.blockchain)
+
         self.buy_amount = int(self.response['quote']['buyAmount'])
         self.fee_amount = int(self.response['quote']['feeAmount'])
         

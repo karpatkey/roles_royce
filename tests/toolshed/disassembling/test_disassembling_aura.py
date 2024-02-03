@@ -2,7 +2,7 @@ from roles_royce.constants import ETHAddr
 from tests.utils import local_node_eth, get_balance, top_up_address, fork_unlock_account
 from roles_royce.toolshed.disassembling import AuraDisassembler
 from defabipedia.aura import Abis
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 from decimal import Decimal
 
 
@@ -13,7 +13,7 @@ def test_integration_exit_1(local_node_eth):
     block = 18193307
     local_node_eth.set_block(block)
 
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
 
     avatar_safe_address = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
     roles_mod_address = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"

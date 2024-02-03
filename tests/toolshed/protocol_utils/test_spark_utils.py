@@ -1,7 +1,6 @@
-import pytest
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 
-from tests.utils import web3_gnosis, web3_eth, local_node_eth
+from tests.utils import local_node_eth
 
 
 def test_chi(local_node_eth):

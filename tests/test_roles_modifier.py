@@ -2,8 +2,8 @@ from unittest.mock import patch
 from roles_royce.roles_modifier import (RolesMod, NORMAL_FEE_MULTIPLER, AGGRESIVE_FEE_MULTIPLER,
                                         NORMAL_GAS_LIMIT_MULTIPLIER, AGGRESIVE_GAS_LIMIT_MULTIPLIER,
                                         set_gas_strategy, GasStrategies)
-from .utils import web3_gnosis, local_node_gc
-import pytest
+from .utils import local_node_gc
+
 
 ROLE = 2
 ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"

@@ -1,5 +1,5 @@
 from roles_royce.constants import ZERO, MAX_UINT256
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
 from roles_royce.protocols.base import Address
 from web3 import Web3
 from decimal import Decimal
@@ -57,7 +57,7 @@ class ExactBptSingleTokenExit(_ExactBptSingleTokenExit):
         min_amounts_out = [0] * exit_token_index + [min_amount_out] + [0] * (
                 len(assets) - exit_token_index - 1)
 
-        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_kind=pool_kind,
                          pool_id=pool_id,
                          avatar=avatar,
@@ -110,7 +110,7 @@ class ExactBptProportionalExit(_ExactBptProportionalExit):
             assets = Pool(w3, pool_id).assets()
         pool_kind = Pool(w3, pool_id).pool_kind()
 
-        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_kind=pool_kind,
                          pool_id=pool_id,
                          avatar=avatar,
@@ -165,7 +165,7 @@ class ExactTokensExit(_ExactTokensExit):
             assets = Pool(w3, pool_id).assets()
         pool_kind = Pool(w3, pool_id).pool_kind()
 
-        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_kind=pool_kind,
                          pool_id=pool_id,
                          avatar=avatar,
@@ -232,7 +232,7 @@ class ExactBptRecoveryModeExit(_ExactBptRecoveryModeExit):
 
         min_amounts_out = [0] * len(assets)
 
-        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,

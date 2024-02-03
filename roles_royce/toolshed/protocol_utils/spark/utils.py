@@ -2,7 +2,7 @@ from web3 import Web3
 import defabipedia
 from dataclasses import dataclass
 from enum import Enum
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 
 
 class SparkToken(Enum):
@@ -20,7 +20,7 @@ class SparkUtils:
 
     @staticmethod
     def get_chi(w3: Web3, block: int | str = 'latest') -> int:
-        blockchain = Chains.get_blockchain_from_web3(w3)
+        blockchain = Chain.get_blockchain_from_web3(w3)
         maker_pot_contract = defabipedia.maker.ContractSpecs[blockchain].Pot.contract(w3)
         ts = w3.eth.get_block(block)['timestamp']
         rho = maker_pot_contract.functions.rho().call(block_identifier=block)
@@ -32,7 +32,7 @@ class SparkUtils:
 
     @staticmethod
     def get_spark_token_addresses(w3: Web3, block: int | str = 'latest') -> list[dict]:
-        blockchain = Chains.get_blockchain_from_web3(w3)
+        blockchain = Chain.get_blockchain_from_web3(w3)
         protocol_data_provider_contract = defabipedia.spark.ContractSpecs[blockchain].ProtocolDataProvider.contract(w3)
         reserve_tokens = protocol_data_provider_contract.functions.getAllReservesTokens().call(block_identifier=block)
         spark_tokens = []

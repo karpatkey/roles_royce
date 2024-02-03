@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 
 from web3.types import TxReceipt, TxParams
-from gnosis.safe import addresses, Safe, SafeOperation
+from gnosis.safe import addresses, Safe
 from gnosis.eth import EthereumNetwork, EthereumClient
 from eth_account.signers.local import LocalAccount
 from hexbytes import HexBytes
 
 from roles_royce.generic_method import Transactable
 from roles_royce.constants import ETHAddr
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 from roles_royce.utils import multi_or_one
 
 
@@ -32,7 +32,7 @@ class SimpleSafe(Safe):
 
     def send(self, txs: list[Transactable]) -> TxResult:
 
-        tx = multi_or_one(txs, Chains.get_blockchain_from_web3(self.w3))
+        tx = multi_or_one(txs, Chain.get_blockchain_from_web3(self.w3))
         safe_tx = self.build_multisig_tx(to=tx.contract_address, value=tx.value,
                                          data=tx.data, operation=tx.operation,
                                          safe_tx_gas=14_000_000,

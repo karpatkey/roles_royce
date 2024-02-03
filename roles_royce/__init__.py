@@ -1,7 +1,7 @@
 import logging
 from .generic_method import GenericMethodTransaction, Transactable
 from .roles_modifier import Operation
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 

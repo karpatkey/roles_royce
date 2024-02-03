@@ -5,9 +5,9 @@ from .roles import setup_common_roles, deploy_roles, apply_presets
 from pytest import approx
 from decimal import Decimal
 from defabipedia.rocket_pool import Abis, ContractSpecs
-from defabipedia import Chains
+from defabipedia import Chain
 
-rETH = ContractSpecs[Chains.Ethereum].rETH.address
+rETH = ContractSpecs[Chain.ETHEREUM].rETH.address
 
 # -----------------------------------------------------#
 """Unit Tests"""
@@ -23,7 +23,7 @@ def test_deposit(local_node_eth):
     w3 = local_node_eth.w3
     local_node_eth.set_block(18443122)
 
-    storage_contract = ContractSpecs[Chains.Ethereum].Storage.contract(w3)
+    storage_contract = ContractSpecs[Chain.ETHEREUM].Storage.contract(w3)
     deposit_pool_hash = w3.solidity_keccak(["string", "string"], ["contract.address", "rocketDepositPool"]).hex()
 
     deposit_pool_address = storage_contract.functions.getAddress(deposit_pool_hash).call()
@@ -75,19 +75,19 @@ def test_integration_rocket_pool_deposit_pool(local_node_eth, accounts):
     local_node_eth.set_block(18443122)
     safe, roles_ctract = setup_safe(w3, accounts)
 
-    storage_contract = ContractSpecs[Chains.Ethereum].Storage.contract(w3)
+    storage_contract = ContractSpecs[Chain.ETHEREUM].Storage.contract(w3)
     deposit_pool_hash = w3.solidity_keccak(["string", "string"], ["contract.address", "rocketDepositPool"]).hex()
     protocol_settings_deposit_hash = w3.solidity_keccak(["string", "string"],
                                                         ["contract.address", "rocketDAOProtocolSettingsDeposit"]).hex()
 
     deposit_pool_address = storage_contract.functions.getAddress(deposit_pool_hash).call()
-    deposit_pool_contract = w3.eth.contract(address=deposit_pool_address, abi=Abis[Chains.Ethereum].DepositPool.abi)
+    deposit_pool_contract = w3.eth.contract(address=deposit_pool_address, abi=Abis[Chain.ETHEREUM].DepositPool.abi)
     protocol_settings_deposit_address = storage_contract.functions.getAddress(protocol_settings_deposit_hash).call()
     protocol_settings_deposit_contract = w3.eth.contract(address=protocol_settings_deposit_address,
-                                                         abi=Abis[Chains.Ethereum].ProtocolSettingsDeposit.abi)
-    rETH_contract = ContractSpecs[Chains.Ethereum].rETH.contract(w3)
+                                                         abi=Abis[Chain.ETHEREUM].ProtocolSettingsDeposit.abi)
+    rETH_contract = ContractSpecs[Chain.ETHEREUM].rETH.contract(w3)
     exchange_rate = rETH_contract.functions.getExchangeRate().call()
-    swap_router_contract = ContractSpecs[Chains.Ethereum].SwapRouter.contract(w3)
+    swap_router_contract = ContractSpecs[Chain.ETHEREUM].SwapRouter.contract(w3)
 
     eth_amount = 1000000000000000000
 
@@ -143,19 +143,19 @@ def test_integration_rocket_pool_secondary_markets(local_node_eth, accounts):
     local_node_eth.set_block(18463312)
     safe, roles_ctract = setup_safe(w3, accounts)
 
-    storage_contract = ContractSpecs[Chains.Ethereum].Storage.contract(w3)
+    storage_contract = ContractSpecs[Chain.ETHEREUM].Storage.contract(w3)
     deposit_pool_hash = w3.solidity_keccak(["string", "string"], ["contract.address", "rocketDepositPool"]).hex()
     protocol_settings_deposit_hash = w3.solidity_keccak(["string", "string"],
                                                         ["contract.address", "rocketDAOProtocolSettingsDeposit"]).hex()
 
     deposit_pool_address = storage_contract.functions.getAddress(deposit_pool_hash).call()
-    deposit_pool_contract = w3.eth.contract(address=deposit_pool_address, abi=Abis[Chains.Ethereum].DepositPool.abi)
+    deposit_pool_contract = w3.eth.contract(address=deposit_pool_address, abi=Abis[Chain.ETHEREUM].DepositPool.abi)
     protocol_settings_deposit_address = storage_contract.functions.getAddress(protocol_settings_deposit_hash).call()
     protocol_settings_deposit_contract = w3.eth.contract(address=protocol_settings_deposit_address,
-                                                         abi=Abis[Chains.Ethereum].ProtocolSettingsDeposit.abi)
-    rETH_contract = ContractSpecs[Chains.Ethereum].rETH.contract(w3)
+                                                         abi=Abis[Chain.ETHEREUM].ProtocolSettingsDeposit.abi)
+    rETH_contract = ContractSpecs[Chain.ETHEREUM].rETH.contract(w3)
     exchange_rate = rETH_contract.functions.getExchangeRate().call()
-    swap_router_contract = ContractSpecs[Chains.Ethereum].SwapRouter.contract(w3)
+    swap_router_contract = ContractSpecs[Chain.ETHEREUM].SwapRouter.contract(w3)
 
     eth_amount = 1000000000000000000
 

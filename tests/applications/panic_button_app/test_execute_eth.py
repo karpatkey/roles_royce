@@ -1,4 +1,3 @@
-from web3.exceptions import TimeExhausted
 from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
 from tests.utils import assign_role, local_node_eth, accounts
 import os
@@ -6,7 +5,7 @@ import json
 import pytest
 import subprocess
 from pathlib import Path
-import time
+
 
 dao = 'GnosisDAO'
 blockchain = 'ETHEREUM'
