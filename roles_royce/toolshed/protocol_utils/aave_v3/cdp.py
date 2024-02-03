@@ -288,19 +288,19 @@ class AaveV3CDPManager:
 
         if token_in_amount > allowance:
             tx_receipt = roles.send([aave_v3.ApproveToken(token=token_in_address, amount=token_in_amount),
-                                     aave_v3.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
-                                                 avatar=self.owner_address)], role=role, private_key=private_key,
+                                     aave_v3.Repay(asset=token_in_address, amount=token_in_amount, interest_rate_mode=rate_model,
+                                                   avatar=self.owner_address)], role=role, private_key=private_key,
                                     roles_mod_address=roles_mod_address,
                                     web3=self.w3)
         elif token_in_amount == allowance:
-            tx_receipt = roles.send([aave_v3.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
-                                                 avatar=self.owner_address), ], role=role,
+            tx_receipt = roles.send([aave_v3.Repay(asset=token_in_address, amount=token_in_amount, interest_rate_mode=rate_model,
+                                                   avatar=self.owner_address), ], role=role,
                                     private_key=private_key,
                                     roles_mod_address=roles_mod_address,
                                     web3=self.w3)
         else:
-            tx_receipt = roles.send([aave_v3.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
-                                                 avatar=self.owner_address),
+            tx_receipt = roles.send([aave_v3.Repay(asset=token_in_address, amount=token_in_amount, interest_rate_mode=rate_model,
+                                                   avatar=self.owner_address),
                                      aave_v3.ApproveToken(token=token_in_address, amount=0)], role=role,
                                     private_key=private_key,
                                     roles_mod_address=roles_mod_address,
