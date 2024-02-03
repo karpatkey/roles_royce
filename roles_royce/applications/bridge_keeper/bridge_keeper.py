@@ -10,7 +10,7 @@ import time
 import sys
 from datetime import datetime
 from defabipedia.xdai_bridge import ContractSpecs
-from defabipedia.tokens import EthereumTokenAddr
+from defabipedia.tokens import EthereumContractSpecs as Tokens
 from defabipedia.types import Chain
 from decimal import Decimal
 
@@ -74,7 +74,7 @@ def bot_do(w3_eth, w3_gnosis):
 
     # Data
     bridge_DAI_balance = DAI_contract.functions.balanceOf(ContractSpecs[Chain.ETHEREUM].xDaiBridge.address).call()
-    min_cash_threshold = bridge_contract.functions.minCashThreshold(EthereumTokenAddr.DAI).call()
+    min_cash_threshold = bridge_contract.functions.minCashThreshold(Tokens.DAI.address).call()
     next_claim_epoch = interest_receiver_contract.functions.nextClaimEpoch().call()
     bot_ETH_balance = w3_eth.eth.get_balance(ENV.BOT_ADDRESS)
 

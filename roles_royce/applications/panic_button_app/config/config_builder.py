@@ -281,7 +281,7 @@ class DAOStrategiesBuilder:
             position = copy.deepcopy(lido_template)
             blockchain = Chain.get_blockchain_from_web3(w3)
             if lido_position.lido_address == ContractSpecs[blockchain].wstETH.address:
-                if blockchain == Chains.Gnosis:
+                if blockchain == Chain.GNOSIS:
                     position['exec_config'] = list(filter(lambda x: x['function_name'] not in ['exit_1', 'exit_2', 'exit_3'], position['exec_config']))
                 else:
                     position['exec_config'] = list(filter(lambda x: x['function_name'] not in ['exit_1', 'exit_3'], position['exec_config']))
