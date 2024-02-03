@@ -5,11 +5,10 @@ from decouple import config
 from web3.types import Address, ChecksumAddress, TxReceipt
 from web3 import Web3
 from roles_royce.toolshed.alerting.alerting import Messenger, LoggingLevel
-from roles_royce.toolshed.anti_liquidation.spark import SparkCDP
 import logging
 from defabipedia.xdai_bridge import ContractSpecs
 from defabipedia.types import Chain
-from defabipedia.tokens import EthereumContractSpecs as Tokens
+from defabipedia.tokens import EthereumTokenAddr
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -118,7 +117,7 @@ def invest_DAI(w3: Web3, env: ENV) -> TxReceipt:
 
 def pay_interest(w3: Web3, env: ENV, amount: int) -> TxReceipt:
     bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3)
-    unsigned_tx = bridge_contract.functions.payInterest(Tokens.DAI.address, amount).build_transaction({
+    unsigned_tx = bridge_contract.functions.payInterest(EthereumTokenAddr.DAI, amount).build_transaction({
         "from": env.BOT_ADDRESS,
         "nonce": w3.eth.get_transaction_count(env.BOT_ADDRESS),
     })
