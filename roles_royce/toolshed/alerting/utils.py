@@ -57,7 +57,7 @@ class EventLogDecoder:
 erc20_event_log_decoder = EventLogDecoder(Web3().eth.contract(abi=erc20_abi))
 
 
-def get_token_amounts_from_transfer_events(tx_receipt: object, target_address: str | ChecksumAddress | Address,
+def get_token_amounts_from_transfer_events(tx_receipt: TxReceipt, target_address: str | ChecksumAddress | Address,
                                            w3: Web3) -> (list[dict], str):
     transfers = []
     message = ''
