@@ -1,5 +1,5 @@
 from roles_royce.protocols.eth import aave_v3
-from .utils import (local_node_eth, accounts, get_balance)
+from .utils import local_node_eth, get_balance
 from eth_abi import encode
 from roles_royce.constants import ETHAddr
 from decimal import Decimal
@@ -10,7 +10,7 @@ from defabipedia.spark import ContractSpecs as SparkContractSpecs
 from defabipedia.tokens import Abis as TokenAbis
 from roles_royce.toolshed.protocol_utils.aave_v3.cdp import AaveV3CDPManager, CDPData
 from pytest import approx
-import requests
+
 
 USER = "0xDf3A7a27704196Af5149CD67D881279e32AF2C21"
 USER2 = "0x7420fA58bA44E1141d5E9ADB6903BE549f7cE0b5"

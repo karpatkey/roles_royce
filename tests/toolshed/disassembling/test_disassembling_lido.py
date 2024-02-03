@@ -1,18 +1,14 @@
-from roles_royce.constants import ETHAddr
-from tests.utils import (local_node_eth, accounts, fork_unlock_account, create_simple_safe, steal_token, top_up_address)
-from roles_royce.toolshed.disassembling import LidoDisassembler
-from defabipedia.types import Chain, ContractSpec
-from decimal import Decimal
-from roles_royce.evm_utils import erc20_abi
-from tests.roles import setup_common_roles, deploy_roles, apply_presets
-from pytest import approx
-from roles_royce.roles_modifier import set_gas_strategy, GasStrategies
-from defabipedia.lido import ContractSpecs
-from roles_royce.protocols.eth import lido
-import pytest
 import json
 import requests
-from time import time
+
+from defabipedia.lido import ContractSpecs
+from defabipedia.types import Chain
+from roles_royce.protocols.eth import lido
+from roles_royce.toolshed.disassembling import LidoDisassembler
+
+from tests.utils import (local_node_eth, accounts, create_simple_safe, steal_token)
+from tests.roles import setup_common_roles, deploy_roles, apply_presets
+
 
 presets = """{
   "version": "1.0",

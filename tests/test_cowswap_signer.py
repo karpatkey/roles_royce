@@ -1,14 +1,11 @@
-from web3 import Web3
 from roles_royce import roles
 from roles_royce.protocols.cowswap.contract_methods import SignOrder
 from roles_royce.protocols.cowswap.utils import QuoteOrderCowSwap
-from roles_royce.constants import GCAddr
-from tests.utils import (local_node_eth, accounts, fork_unlock_account, create_simple_safe, steal_token, top_up_address)
+from tests.utils import (local_node_eth, accounts, create_simple_safe)
 from tests.roles import setup_common_roles, deploy_roles, apply_presets
 from defabipedia.types import Chain
 from time import time
-import pytest
-from unittest import mock
+
 import json
 import requests
 

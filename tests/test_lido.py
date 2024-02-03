@@ -1,7 +1,7 @@
 from roles_royce import roles
 from roles_royce.protocols.eth import lido
 from roles_royce.constants import ETHAddr
-from .utils import web3_eth, local_node_eth, accounts, get_balance, create_simple_safe
+from .utils import local_node_eth, accounts, get_balance, create_simple_safe
 
 # Test safe
 AVATAR = "0xC01318baB7ee1f5ba734172bF7718b5DC6Ec90E1"

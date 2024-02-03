@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from web3.types import TxReceipt, TxParams
-from gnosis.safe import addresses, Safe, SafeOperation
+from gnosis.safe import addresses, Safe
 from gnosis.eth import EthereumNetwork, EthereumClient
 from eth_account.signers.local import LocalAccount
 from hexbytes import HexBytes

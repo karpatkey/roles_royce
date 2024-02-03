@@ -2,7 +2,6 @@ from roles_royce.applications.EURe_rebalancing_bot.swaps import SwapsData, Swapp
 from tests.utils import local_node_gc, accounts, assign_role
 from roles_royce.evm_utils import erc20_abi
 from decimal import Decimal
-import pytest
 
 
 def test_swaps_data():
