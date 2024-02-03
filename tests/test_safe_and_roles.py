@@ -13,7 +13,8 @@ from roles_royce.generic_method import TxData
 from .utils import (local_node_eth, accounts, ETH_LOCAL_NODE_URL, create_simple_safe, get_balance,
                     steal_token, SimpleSafe)
 from .roles import setup_common_roles, deploy_roles, apply_presets
-
+import pytest
+from roles_royce.roles_modifier import TransactionWouldBeReverted
 
 def test_safe_and_roles(local_node_eth):
     w3 = local_node_eth.w3
@@ -305,3 +306,20 @@ def test_build_operation(local_node_eth, accounts):
     #  or sign it first with web3.eth.account.sign_transaction(tx, private_key)
     #  and then use w3.eth.send_raw_transaction()
     w3.eth.send_transaction(approves)
+
+def test_roles_errors(local_node_eth, accounts):
+    w3 = local_node_eth.w3
+    local_node_eth.reset_state()
+    safe = create_simple_safe(w3=w3, owner=accounts[0])
+    roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
+    setup_common_roles(safe, roles_ctract)
+
+    approve_vault = balancer.ApproveForVault(token="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", amount=1_000_000_000_000_000_000)
+
+    with pytest.raises(TransactionWouldBeReverted) as e:
+        roles.send([approve_vault], role=2, private_key=accounts[2].key, roles_mod_address=roles_ctract.address, web3=w3)
+    assert e.value.args[0] == 'TargetAddressNotAllowed()'
+
+    with pytest.raises(TransactionWouldBeReverted) as e:
+        roles.send([approve_vault], role=8, private_key=accounts[2].key, roles_mod_address=roles_ctract.address, web3=w3)
+    assert e.value.args[0] == 'NoMembership()'

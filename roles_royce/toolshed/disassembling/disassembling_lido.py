@@ -24,7 +24,7 @@ class LidoDisassembler(Disassembler):
 
         return int(Decimal(contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
 
-    def exit_1(self, percentage: float, amount_to_redeem: int = None) -> list[
+    def exit_1(self, percentage: float, exit_arguments: list[dict]=None, amount_to_redeem: int = None) -> list[
         Transactable]:
         """Unstake stETH from Lido
         Args:
@@ -50,7 +50,7 @@ class LidoDisassembler(Disassembler):
         return txns
 
 
-    def exit_2(self, percentage: float, amount_to_redeem: int = None) -> list[
+    def exit_2(self, percentage: float, exit_arguments: list[dict]= None, amount_to_redeem: int = None) -> list[
         Transactable]:
         """Unwrap wstETH and unstake for ETH on Lido
         Args:

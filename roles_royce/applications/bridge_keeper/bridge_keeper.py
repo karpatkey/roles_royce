@@ -10,7 +10,7 @@ import time
 import sys
 from datetime import datetime
 from defabipedia.xdai_bridge import ContractSpecs
-from defabipedia.tokens import EthereumContractSpecs as Tokens
+from defabipedia.tokens import EthereumTokenAddr
 from defabipedia.types import Chain
 from decimal import Decimal
 
@@ -52,11 +52,13 @@ gauges = Gauges()
 
 # Exception and RPC endpoint failure counters
 exception_counter = 0
-rpc_endpoint_failure_counter = 0
+rpc_endpoint_failure_counter_eth = 0
+rpc_endpoint_failure_counter_gnosis = 0
 
 # -----------------------------------------------------------------------------------------------------------------------
 
 log_initial_data(ENV, messenger)
+
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -72,7 +74,7 @@ def bot_do(w3_eth, w3_gnosis):
 
     # Data
     bridge_DAI_balance = DAI_contract.functions.balanceOf(ContractSpecs[Chain.ETHEREUM].xDaiBridge.address).call()
-    min_cash_threshold = bridge_contract.functions.minCashThreshold(Tokens.DAI.address).call()
+    min_cash_threshold = bridge_contract.functions.minCashThreshold(EthereumTokenAddr.DAI).call()
     next_claim_epoch = interest_receiver_contract.functions.nextClaimEpoch().call()
     bot_ETH_balance = w3_eth.eth.get_balance(ENV.BOT_ADDRESS)
 
@@ -123,7 +125,8 @@ def bot_do(w3_eth, w3_gnosis):
         title = 'Paying interest to interest receiver contract on Gnosis Chain...'
         message = f'  The next claim epoch {datetime.utcfromtimestamp(next_claim_epoch)} is in less than {ENV.MINUTES_BEFORE_CLAIM_EPOCH} minutes.'
         logger.info(title + '\n' + message)
-        tx_receipt = pay_interest(w3_eth, ENV, int(Decimal(ENV.AMOUNT_OF_INTEREST_TO_PAY) * Decimal(10 ** decimals_DAI)))
+        tx_receipt = pay_interest(w3_eth, ENV,
+                                  int(Decimal(ENV.AMOUNT_OF_INTEREST_TO_PAY) * Decimal(10 ** decimals_DAI)))
         flags.tx_executed.set()
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt, ContractSpecs[
             Chain.ETHEREUM].xDaiBridge.address, w3_eth)
@@ -134,7 +137,7 @@ def bot_do(w3_eth, w3_gnosis):
         flags.interest_payed.clear()
 
     if flags.tx_executed.is_set():
-        # Update dataData
+        # Update data
         bridge_DAI_balance = DAI_contract.functions.balanceOf(ContractSpecs[Chain.ETHEREUM].xDaiBridge.address).call()
         min_cash_threshold = bridge_contract.functions.minCashThreshold(Tokens.DAI.address).call()
         next_claim_epoch = interest_receiver_contract.functions.nextClaimEpoch().call()
@@ -153,19 +156,23 @@ while True:
 
     try:
         if not test_mode:
-            w3_eth, connection_check_eth = web3_connection_check(ENV.RPC_ENDPOINT_ETHEREUM, messenger,
-                                                                 rpc_endpoint_failure_counter,
-                                                                 ENV.RPC_ENDPOINT_ETHEREUM_FALLBACK)
-            w3_gnosis, connection_check_gnosis = web3_connection_check(ENV.RPC_ENDPOINT_GNOSIS, messenger,
-                                                                       rpc_endpoint_failure_counter,
-                                                                       ENV.RPC_ENDPOINT_GNOSIS_FALLBACK)
-            if not connection_check_eth or not connection_check_gnosis:
+            w3_eth, rpc_endpoint_failure_counter_eth = web3_connection_check(ENV.RPC_ENDPOINT_ETHEREUM, messenger,
+                                                                             rpc_endpoint_failure_counter_eth,
+                                                                             ENV.RPC_ENDPOINT_ETHEREUM_FALLBACK)
+            w3_gnosis, rpc_endpoint_failure_counter_gnosis = web3_connection_check(ENV.RPC_ENDPOINT_GNOSIS, messenger,
+                                                                                   rpc_endpoint_failure_counter_gnosis,
+                                                                                   ENV.RPC_ENDPOINT_GNOSIS_FALLBACK)
+            if rpc_endpoint_failure_counter_eth != 0 or rpc_endpoint_failure_counter_gnosis != 0:
                 continue
         else:
             w3_eth = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT_ETHEREUM}'))
             w3_gnosis = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT_GNOSIS}'))
 
-        bot_do(w3_eth, w3_gnosis)
+        try:
+            bot_do(w3_eth, w3_gnosis)
+        except:
+            time.sleep(5)
+            bot_do(w3_eth, w3_gnosis)
 
     except Exception as e:
         messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e.args[0]))

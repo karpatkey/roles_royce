@@ -13,7 +13,7 @@ from roles_royce.constants import StrEnum
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address
 from roles_royce.protocols.base import ContractMethod
-from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler
+from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler, LidoDisassembler
 
 
 class Modes(StrEnum):
@@ -61,7 +61,7 @@ class ENV:
         self.TENDERLY_API_TOKEN: str = config('TENDERLY_API_TOKEN', default='')
 
         # DAO and blockchain
-        if self.DAO not in ['GnosisDAO', 'GnosisLTD']:
+        if self.DAO not in ['GnosisDAO', 'GnosisLtd', 'karpatkey']:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
         if self.BLOCKCHAIN.lower() not in ['mainnet', 'ethereum', 'gnosis']:
             raise ValueError(f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}. Options are either 'ethereum' or 'gnosis'.")
@@ -72,7 +72,7 @@ class ENV:
         # RPC endpoints
         self.RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT', default='')
         self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_FALLBACK', default='')
-        self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_MEV', default='')
+        self.RPC_ENDPOINT_MEV: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_MEV', default='')
 
         # Configuration addresses and key
         self.AVATAR_SAFE_ADDRESS: Address = config(
@@ -140,13 +140,13 @@ def start_the_engine(env: ENV) -> (Web3, Web3):
                     w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
                     if not w3.is_connected():
                         raise Exception("No connection to RPC endpoint")
-                    w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_MEV))
-                    if not w3_MEV.is_connected():
-                        w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
-                        if not w3_MEV.is_connected():
-                            w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
-                            if not w3_MEV.is_connected():
-                                raise Exception("No connection to RPC endpoint")
+        w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_MEV))
+        if not w3_MEV.is_connected():
+            w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+            if not w3_MEV.is_connected():
+                w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
+                if not w3_MEV.is_connected():
+                    raise Exception("No connection to RPC endpoint")
 
     return w3, w3_MEV
 
@@ -191,6 +191,12 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
                                             roles_mod_address=env.ROLES_MOD_ADDRESS,
                                             role=env.ROLE,
                                             signer_address=env.DISASSEMBLER_ADDRESS)
+    elif exec_config.protocol == "Lido":
+        disassembler = LidoDisassembler(w3=w3,
+                                        avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
+                                        roles_mod_address=env.ROLES_MOD_ADDRESS,
+                                        role=env.ROLE,
+                                        signer_address=env.DISASSEMBLER_ADDRESS)
     else:
         raise Exception("Invalid protocol")
 
@@ -227,5 +233,9 @@ def top_up_address(w3: Web3, address: str, amount: int) -> None:
             {"to": address, "value": Web3.to_wei(amount, "ether"), "from": holder})
     except ContractLogicError:
         raise Exception("Address is a smart contract address with no payable function.")
+    
+def fork_reset(w3, url):
+    """Reset the state of the forked node to the state of the mainnet node at the given block."""
+    return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url}}])
 
 # -----------------------------------------------------------------------------------------------------------------------
