@@ -210,6 +210,16 @@ preset_cowswap_easy ="""{
                 "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
                 "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000E522f854b978650Dc838Ade0e39FbC1417A2FfB0569d3489000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002",
                 "value": "0"
+                },
+                {
+                "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+                "data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000ae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+                "value": "0"
+                },
+                {
+                "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+                "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000ae7ab96520DE3A18E5e111B5EaAb095312D7fE84095ea7b3000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002",
+                "value": "0"
                 }
             ]
             }"""
@@ -217,14 +227,9 @@ preset_cowswap_easy ="""{
 
 def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
-
-    block = 18421437
-    #block = 18630000
-    #block = 18800000
-    #block = 18900000
-    #block = 19000000
-    #block = 19115000
+    block = w3.eth.default_block
     local_node_eth.set_block(block)
+    set_gas_strategy(GasStrategies.AGGRESIVE)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
@@ -246,7 +251,7 @@ def test_integration_exit_3(local_node_eth, accounts):
                                         role=role,
                                         signer_address=disassembler_address)
 
-    txn_transactable = lido_disassembler.exit_3(percentage=50,exit_arguments=[{"max_slippage": 0.01}])
+    txn_transactable = lido_disassembler.exit_3(percentage=50,exit_arguments=[{"max_slippage": 1}])
     send_it = lido_disassembler.send(txn_transactable, private_key=private_key)
     assert send_it
 
@@ -276,9 +281,9 @@ def test_integration_exit_3(local_node_eth, accounts):
     
 def test_integration_exit_4(local_node_eth, accounts):
     w3 = local_node_eth.w3
-
-    block = 18421437
+    block = w3.eth.default_block
     local_node_eth.set_block(block)
+    set_gas_strategy(GasStrategies.AGGRESIVE)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)

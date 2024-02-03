@@ -5,6 +5,7 @@ from roles_royce.protocols.cowswap.utils import QuoteOrderCowSwap
 from roles_royce.constants import GCAddr
 from tests.utils import (local_node_eth, accounts, fork_unlock_account, create_simple_safe, steal_token, top_up_address)
 from tests.roles import setup_common_roles, deploy_roles, apply_presets
+from roles_royce.roles_modifier import set_gas_strategy, GasStrategies
 from defabipedia.types import Chains
 from time import time
 import pytest
@@ -53,7 +54,9 @@ def test_cowswap_signer_v1():
 
 def test_cowswap_signer(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    
+    block = w3.eth.default_block
+    local_node_eth.set_block(block)
+    set_gas_strategy(GasStrategies.AGGRESIVE)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     #steal_token(w3,"0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6", "0x4D8027E6e6e3E1Caa9AC23267D10Fb7d20f85A37", avatar_safe.address, 100)
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -76,6 +79,16 @@ def test_cowswap_signer(local_node_eth, accounts):
                 "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
                 "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000E522f854b978650Dc838Ade0e39FbC1417A2FfB0569d3489000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002",
                 "value": "0"
+                },
+                {
+                "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+                "data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000ae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+                "value": "0"
+                },
+                {
+                "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+                "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000ae7ab96520DE3A18E5e111B5EaAb095312D7fE84095ea7b3000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002",
+                "value": "0"
                 }
             ]
             }"""
@@ -90,7 +103,7 @@ def test_cowswap_signer(local_node_eth, accounts):
     private_key = accounts[4].key
     role = 4
 
-    sell_token = "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+    sell_token = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
     buy_token = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
     sell_amount = 4499999999999499999
     kind = "sell"

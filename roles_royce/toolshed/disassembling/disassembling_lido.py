@@ -116,7 +116,7 @@ class LidoDisassembler(Disassembler):
             list[ Transactable]: List of transactions to execute.
         """
         for element in exit_arguments:
-            max_slippage = element["max_slippage"]
+            max_slippage = element["max_slippage"] / 100
             fraction = validate_percentage(percentage)
 
             txns = []
@@ -136,7 +136,7 @@ class LidoDisassembler(Disassembler):
             fee_amount = quote.fee_amount
 
             buy_amount_min_slippage = int(Decimal(buy_amount) * Decimal(1 - max_slippage))
-
+            set_allowance = lido.ApproveRelayerStETH(amount = amount_to_redeem)
             moooooo = SignOrder(blockchain=self.blockchain,
                                                 avatar=self.avatar_safe_address,
                                                 sell_token=address,
@@ -147,6 +147,7 @@ class LidoDisassembler(Disassembler):
                                                 valid_to=int(int(time())+600),
                                                 kind="sell")
             
+            #txns.append(set_allowance)
             txns.append(moooooo)
         return txns
 
@@ -167,7 +168,7 @@ class LidoDisassembler(Disassembler):
         """
         
         for element in exit_arguments:
-            max_slippage = element["max_slippage"]
+            max_slippage = element["max_slippage"] / 100
             fraction = validate_percentage(percentage)
 
             txns = []
@@ -187,7 +188,7 @@ class LidoDisassembler(Disassembler):
             fee_amount = quote.fee_amount
 
             buy_amount_min_slippage = int(Decimal(buy_amount) * Decimal(1 - max_slippage))
-
+            set_allowance = lido.ApproveRelayerWstETH(amount = amount_to_redeem)
             moooooo = SignOrder(blockchain=self.blockchain,
                                                 avatar=self.avatar_safe_address,
                                                 sell_token=address,
@@ -198,5 +199,6 @@ class LidoDisassembler(Disassembler):
                                                 valid_to=int(int(time())+600),
                                                 kind="sell")
             
+            #txns.append(set_allowance)
             txns.append(moooooo)
         return txns

@@ -14,6 +14,110 @@
     ],
     "positions": [
         {
+            "protocol": "Balancer",
+            "position_id": "383",
+            "position_id_tech": "0x0000000000000000000000000000000000000000",
+            "position_id_human_readable": "ethereum_Balancer_LDO_wstETH_staked",
+            "exec_config": [
+                {
+                    "function_name": "exit_2_1",
+                    "label": "Unstake + withdraw (proportional)",
+                    "test": true,
+                    "description": "Unstake the BPT from the Balancer gauge and exit pool with proportional exit. (Not for recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "gauge_address",
+                            "type": "constant",
+                            "value": "0x0000000000000000000000000000000000000000"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_2_3",
+                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
+                    "test": false,
+                    "description": "Unstake the BPT from the Balancer gauge and exit pool with proportional exit. (Recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "gauge_address",
+                            "type": "constant",
+                            "value": "0x0000000000000000000000000000000000000000"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "protocol": "Balancer",
+            "position_id": "383",
+            "position_id_tech": "0x5f1f4E50ba51D723F12385a8a9606afc3A0555f5",
+            "position_id_human_readable": "ethereum_Balancer_LDO_wstETH",
+            "exec_config": [
+                {
+                    "function_name": "exit_1_1",
+                    "label": "Withdraw (proportional)",
+                    "test": true,
+                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "bpt_address",
+                            "type": "constant",
+                            "value": "0x5f1f4E50ba51D723F12385a8a9606afc3A0555f5"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_1_3",
+                    "label": "Withdraw (proportional) (Recovery mode)",
+                    "test": false,
+                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
+                    "parameters": [
+                        {
+                            "name": "bpt_address",
+                            "type": "constant",
+                            "value": "0x5f1f4E50ba51D723F12385a8a9606afc3A0555f5"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "position_id": "268",
             "position_id_tech": "0x2a14dB8D09dB0542f6A371c0cB308A768227D67D",
             "position_id_human_readable": "ethereum_Aura_wstETH_WETH",
@@ -87,14 +191,14 @@
                 {
                     "function_name": "exit_1",
                     "label": "Unstake stETH",
-                    "test": false,
+                    "test": true,
                     "description": "Unstake stETH for ETH",
                     "parameters": []
                 },
                 {
                     "function_name": "exit_3",
                     "label": "Swap stETH",
-                    "test": false,
+                    "test": true,
                     "description": "Swap stETH for ETH",
                     "parameters": [
                         {

@@ -7,6 +7,7 @@ import subprocess
 from pathlib import Path
 from dataclasses import dataclass
 import logging
+from time import sleep
 
 logging.basicConfig(filename='stresstest.log', level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -35,12 +36,12 @@ daos = [DAO(name="GnosisDAO",
             avatar_safe_address="0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f",
             roles_mod_address="0x10785356E66b93432e9E8D6F9e532Fa55e4fc058",
             role=4),
-        DAO(name="GnosisLTD",
+        DAO(name="GnosisLtd",
             blockchain="ETHEREUM",
             avatar_safe_address="0x4971DD016127F390a3EF6b956Ff944d0E2e1e462",
             roles_mod_address="0xEF4A73A20e2c6C6771C334e18a417A19Abb29c09",
             role=4),
-        DAO(name="GnosisLTD",
+        DAO(name="GnosisLtd",
             blockchain="GNOSIS",
             avatar_safe_address="0x10E4597fF93cbee194F4879f8f1d54a370DB6969",
             roles_mod_address="0x494ec5194123487E8A6ba0b6bc96D57e340025e7",
@@ -83,9 +84,9 @@ test_parameters = [(dao, exec_config) for dao, sublist in zip(daos, daos_exec_co
 
 def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
     if dao.blockchain == 'ETHEREUM':
-        block = 19114000
+        block = local_node_eth.w3.eth.default_block
         local_node_eth.set_block(block)
-        logging.info(f'Block number: {block}')
+        logging.info(f'Block number: {local_node_eth.w3.eth.block_number}')
         disassembler_address = accounts[0].address
         private_key = accounts[0].key.hex()
         assign_role(local_node=local_node_eth,
@@ -94,9 +95,9 @@ def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
                     role=dao.role,
                     asignee=disassembler_address)
     elif dao.blockchain == 'GNOSIS':
-        block = 32191409
+        block = local_node_gc.w3.eth.default_block
         local_node_gc.set_block(block)
-        logging.info(f'Block number: {block}')
+        logging.info(f'Block number: {local_node_gc.w3.eth.block_number}')
         disassembler_address = accounts[0].address
         private_key = accounts[0].key.hex()
         assign_role(local_node=local_node_gc,
@@ -125,7 +126,8 @@ def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch, dao, e
     private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
-    logging.info(f'Running stresstest on DAO: {dao.name}, Blockchain: {dao.blockchain}, Position: {exec_config["function_name"]}')
+    logging.info(f'Running stresstest on DAO: {dao.name}, Blockchain: {dao.blockchain}, Protocol: {exec_config["protocol"]}')
+    logging.info(f'Position: {exec_config["function_name"]}, description: {exec_config["description"]}')
 
     arguments_build = [
         'python', file_path_transaction_builder,
@@ -187,17 +189,18 @@ def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch, dao, e
     dict_message_stdout = json.loads(main.stdout[:-1])
     assert dict_message_stdout['status'] == 200
     #  If we don't wait for the transaction to be validated, the next test will fail when trying to reset Anvil
-
+    sleep(10)
 # The following test is meant to test individual exit strategies by specifying the index. If left empty ([]) the test
 # will be skipped, if [3] is set, test_parameters[3] will be tested.
-@pytest.mark.parametrize("index", [])
+@pytest.mark.parametrize("index", [3])
 def test_stresstest_single(local_node_eth, local_node_gc, accounts, monkeypatch, index):
     dao = test_parameters[index][0]
     exec_config = test_parameters[index][1]
     private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
-    logging.info(f'Running stresstest on DAO: {dao.name}, Blockchain: {dao.blockchain}, Position: {exec_config["function_name"]}')
+    logging.info(f'Running stresstest on DAO: {dao.name}, Blockchain: {dao.blockchain}, Protocol: {exec_config["protocol"]}')
+    logging.info(f'Position: {exec_config["function_name"]}, description: {exec_config["description"]}')
 
     arguments_build = [
         'python', file_path_transaction_builder,

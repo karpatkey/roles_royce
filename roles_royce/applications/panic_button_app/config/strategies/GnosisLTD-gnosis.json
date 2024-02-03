@@ -14,6 +14,110 @@
     ],
     "positions": [
         {
+            "protocol": "Balancer",
+            "position_id": "386",
+            "position_id_tech": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f",
+            "position_id_human_readable": "gnosis_Balancer_GBPe_WXDAI",
+            "exec_config": [
+                {
+                    "function_name": "exit_1_1",
+                    "label": "Withdraw (proportional)",
+                    "test": true,
+                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "bpt_address",
+                            "type": "constant",
+                            "value": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_1_3",
+                    "label": "Withdraw (proportional) (Recovery mode)",
+                    "test": false,
+                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
+                    "parameters": [
+                        {
+                            "name": "bpt_address",
+                            "type": "constant",
+                            "value": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "protocol": "Balancer",
+            "position_id": "387",
+            "position_id_tech": "0xC5Df11757F4A8DFACcC731d13b9577f67055c6c6",
+            "position_id_human_readable": "gnosis_Balancer_GBPe_EURe",
+            "exec_config": [
+                {
+                    "function_name": "exit_1_1",
+                    "label": "Withdraw (proportional)",
+                    "test": true,
+                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "bpt_address",
+                            "type": "constant",
+                            "value": "0xC5Df11757F4A8DFACcC731d13b9577f67055c6c6"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_1_3",
+                    "label": "Withdraw (proportional) (Recovery mode)",
+                    "test": false,
+                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
+                    "parameters": [
+                        {
+                            "name": "bpt_address",
+                            "type": "constant",
+                            "value": "0xC5Df11757F4A8DFACcC731d13b9577f67055c6c6"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "position_id": "244",
             "position_id_tech": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A",
             "position_id_human_readable": "gnosis_Aura_USDT_USDC_WXDAI",
@@ -217,7 +321,7 @@
                 {
                     "function_name": "exit_4",
                     "label": "Swap wstETH",
-                    "test": false,
+                    "test": true,
                     "description": "Swap wstETH for ETH",
                     "parameters": [
                         {
