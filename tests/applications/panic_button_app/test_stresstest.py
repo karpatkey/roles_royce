@@ -188,11 +188,10 @@ def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch, dao, e
     assert main.returncode == 0
     dict_message_stdout = json.loads(main.stdout[:-1])
     assert dict_message_stdout['status'] == 200
-    #  If we don't wait for the transaction to be validated, the next test will fail when trying to reset Anvil
-    sleep(10)
+
 # The following test is meant to test individual exit strategies by specifying the index. If left empty ([]) the test
 # will be skipped, if [3] is set, test_parameters[3] will be tested.
-@pytest.mark.parametrize("index", [3])
+@pytest.mark.parametrize("index", [])
 def test_stresstest_single(local_node_eth, local_node_gc, accounts, monkeypatch, index):
     dao = test_parameters[index][0]
     exec_config = test_parameters[index][1]

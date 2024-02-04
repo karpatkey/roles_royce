@@ -17,10 +17,10 @@ from time import time
 class LidoDisassembler(Disassembler):
 
     def get_amount_to_redeem(self, address: Address, fraction: float | Decimal) -> int:
-        if address == ContractSpecs[self.blockchain].stETH.address:
-            contract = ContractSpecs[self.blockchain].stETH.contract(self.w3)
-        else:
+        if address == ContractSpecs[self.blockchain].wstETH.address:
             contract = ContractSpecs[self.blockchain].wstETH.contract(self.w3)
+        else:
+            contract = ContractSpecs[self.blockchain].stETH.contract(self.w3)
 
         return int(Decimal(contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
 
