@@ -3,7 +3,7 @@ from unittest.mock import patch, mock_open
 from roles_royce.applications.panic_button_app.config.config_builder import DAO, AuraPosition, \
     DAOStrategiesBuilder, BalancerPosition
 import json
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 import os
 
 # Load the contents of your test JSON file
@@ -22,7 +22,7 @@ def test_build_aura_positions(local_node_gc):
             patch(
                 'roles_royce.applications.panic_button_app.config.config_builder.get_tokens_from_bpt') as mock_get_tokens_from_bpt:
         dao = DAO.GnosisDAO
-        blockchain = Chains.Gnosis
+        blockchain = Chain.GNOSIS
         aura_position = AuraPosition(position_id='226', bpt_address='0xf48f01dcb2cbb3ee1f6aab0e742c2d3941039d56')
         w3 = local_node_gc.w3
         block = 32101684
@@ -68,7 +68,7 @@ def test_build_balancer_positions(local_node_gc):
     with patch(
             'roles_royce.applications.panic_button_app.config.config_builder.get_tokens_from_bpt') as mock_get_tokens_from_bpt:
         dao = DAO.GnosisDAO
-        blockchain = Chains.Gnosis
+        blockchain = Chain.GNOSIS
         balancer_position = BalancerPosition(position_id='226',
                                              bpt_address='0xf48f01dcb2cbb3ee1f6aab0e742c2d3941039d56',
                                              staked=False)

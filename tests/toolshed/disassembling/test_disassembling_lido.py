@@ -1,18 +1,14 @@
-from roles_royce.constants import ETHAddr
-from tests.utils import (local_node_eth, accounts, fork_unlock_account, create_simple_safe, steal_token, top_up_address)
-from roles_royce.toolshed.disassembling import LidoDisassembler
-from defabipedia.types import Chains, ContractSpec
-from decimal import Decimal
-from roles_royce.evm_utils import erc20_abi
-from tests.roles import setup_common_roles, deploy_roles, apply_presets
-from pytest import approx
-from roles_royce.roles_modifier import set_gas_strategy, GasStrategies
-from defabipedia.lido import ContractSpecs
-from roles_royce.protocols.eth import lido
-import pytest
 import json
 import requests
-from time import time
+
+from defabipedia.lido import ContractSpecs
+from defabipedia.types import Chain
+from roles_royce.protocols.eth import lido
+from roles_royce.toolshed.disassembling import LidoDisassembler
+
+from tests.utils import (local_node_eth, accounts, create_simple_safe, steal_token)
+from tests.roles import setup_common_roles, deploy_roles, apply_presets
+
 
 presets = """{
   "version": "1.0",
@@ -85,7 +81,7 @@ def test_integration_exit_1(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=presets,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
     
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
     steal_token(w3=w3, token=ContractSpecs[blockchain].stETH.address, holder="0xE53FFF67f9f384d20Ebea36F43b93DC49Ed22753",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     
@@ -126,7 +122,7 @@ def test_integration_exit_2(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=presets,
                   replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
     
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
     steal_token(w3=w3, token=ContractSpecs[blockchain].wstETH.address, holder="0x4dCbB1fE5983ad5b44DC661273a4f11CA812f8B8",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     
@@ -236,7 +232,7 @@ def test_integration_exit_3(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=preset_cowswap_easy,
                   replaces=[("E522f854b978650Dc838Ade0e39FbC1417A2FfB0", "23dA9AdE38E4477b23770DeD512fD37b12381FAB")])
 
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
     steal_token(w3=w3, token=ContractSpecs[blockchain].stETH.address, holder="0xE53FFF67f9f384d20Ebea36F43b93DC49Ed22753",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     
@@ -290,7 +286,7 @@ def test_integration_exit_4(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=preset_cowswap_easy,
                   replaces=[("E522f854b978650Dc838Ade0e39FbC1417A2FfB0", "23dA9AdE38E4477b23770DeD512fD37b12381FAB")])
 
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
     steal_token(w3=w3, token=ContractSpecs[blockchain].wstETH.address, holder="0xB0850a7589C195A6545Ed8A6a932B25B47003f2A",
                 to=avatar_safe.address, amount=8_999_999_999_999_000_000)
     

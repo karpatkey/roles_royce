@@ -1,14 +1,15 @@
+from dataclasses import dataclass, field
 from decimal import Decimal
+from enum import Enum
+from web3 import Web3
+from web3.types import Address, ChecksumAddress
 from defabipedia.spark import ContractSpecs, Abis
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
+from defabipedia.tokens import erc20_contract
 from roles_royce.protocols.eth.spark import RateModel
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils, SparkToken
 from roles_royce.protocols.eth import spark
 from roles_royce import roles
-from dataclasses import dataclass, field
-from enum import Enum
-from web3 import Web3
-from web3.types import Address, ChecksumAddress
 
 
 class CDPData(Enum):
@@ -72,7 +73,7 @@ class SparkCDPManager:
         if not self.owner_address:
             raise ValueError("'owner_address' must be filled.")
         self.owner_address = Web3.to_checksum_address(self.owner_address)
-        self.blockchain = Chains.get_blockchain_from_web3(self.w3)
+        self.blockchain = Chain.get_blockchain_from_web3(self.w3)
         if self.token_addresses_block == 'latest':
             self.token_addresses_block = self.w3.eth.block_number
         self.token_addresses = SparkUtils.get_spark_token_addresses(self.w3, block=self.token_addresses_block)
@@ -101,8 +102,8 @@ class SparkCDPManager:
 
         for element in spark_tokens:
             # Decimals
-            token_contract = self.w3.eth.contract(address=element[SparkToken.UNDERLYING],
-                                                  abi=Abis[self.blockchain].ERC20.abi)
+
+            token_contract = erc20_contract(self.w3, element[SparkToken.UNDERLYING])
             decimals = token_contract.functions.decimals().call(block_identifier=block)
 
             # Wallet balances
@@ -201,8 +202,8 @@ class SparkCDPManager:
 
         if block == 'latest':
             block = self.w3.eth.block_number
-        token_in_decimals = self.w3.eth.contract(address=token_in_address, abi=Abis[
-            self.blockchain].ERC20.abi).functions.decimals().call(block_identifier=block)
+
+        token_in_decimals = erc20_contract(self.w3, token_in_address).functions.decimals().call(block_identifier=block)
 
         health_factor = spark_cdp.health_factor
         balances_data = spark_cdp.balances_data
@@ -271,8 +272,7 @@ class SparkCDPManager:
         elif token_in_borrowed_status[rate_model] is False and rate_model == RateModel.VARIABLE:
             raise ValueError('There is no variable borrowed amount of token %s.' % token_in_address)
 
-        token_in_contract = self.w3.eth.contract(address=token_in_address,
-                                                 abi=Abis[self.blockchain].ERC20.abi)
+        token_in_contract = erc20_contract(self.w3, token_in_address)
         pool_addresses_provider_contract = ContractSpecs[self.blockchain].PoolAddressesProvider.contract(self.w3)
         lending_pool_address = pool_addresses_provider_contract.functions.getPool().call()
         allowance = token_in_contract.functions.allowance(self.owner_address, lending_pool_address).call()

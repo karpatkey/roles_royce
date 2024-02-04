@@ -1,7 +1,7 @@
 from time import time
 from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApprove
 from defabipedia.cowswap_signer import ContractSpecs
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
 from web3 import Web3
 import math
 import requests

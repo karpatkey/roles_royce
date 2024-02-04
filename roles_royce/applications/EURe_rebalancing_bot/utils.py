@@ -1,14 +1,14 @@
 from dataclasses import dataclass, field
 from decouple import config
-from web3.types import Address, ChecksumAddress
+from web3.types import ChecksumAddress
 from web3 import Web3
 from roles_royce.toolshed.alerting.alerting import Messenger, LoggingLevel
 import logging
-from roles_royce.protocols.base import ContractMethod, InvalidArgument, AvatarAddress, Address
+from roles_royce.protocols.base import Address
 import threading
 import schedule
 import time
-from prometheus_client import start_http_server as prometheus_start_http_server, Gauge
+from prometheus_client import Gauge
 from swaps import decimalsWXDAI, decimalsEURe
 
 

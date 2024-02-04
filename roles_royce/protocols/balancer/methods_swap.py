@@ -1,5 +1,5 @@
 from roles_royce.constants import MAX_UINT256
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
 from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
 from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from web3 import Web3
@@ -69,7 +69,7 @@ class ExactTokenInSingleSwap(SingleSwap):
                  amount_in: int,
                  min_amount_out: int):
         swap_kind = SwapKind.OutGivenExactIn
-        super().__init__(blockchain=Chains.get_blockchain_by_chain_id(w3),
+        super().__init__(blockchain=Chain.get_blockchain_by_chain_id(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          swap_kind=swap_kind,
@@ -89,7 +89,7 @@ class ExactTokenOutSingleSwap(SingleSwap):
                  amount_out: int,
                  max_amount_in: int):
         swap_kind = SwapKind.InGivenExactOut
-        super().__init__(blockchain=Chains.get_blockchain_by_chain_id(w3),
+        super().__init__(blockchain=Chain.get_blockchain_by_chain_id(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          swap_kind=swap_kind,

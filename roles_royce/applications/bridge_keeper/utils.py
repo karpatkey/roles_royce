@@ -1,17 +1,14 @@
 from dataclasses import dataclass, field
 import threading
 from prometheus_client import Gauge
-import schedule
-import time
 from decouple import config
 from web3.types import Address, ChecksumAddress, TxReceipt
 from web3 import Web3
 from roles_royce.toolshed.alerting.alerting import Messenger, LoggingLevel
-from roles_royce.toolshed.anti_liquidation.spark import SparkCDP
 import logging
-from defabipedia.xDAI_bridge import ContractSpecs
-from defabipedia.types import Chains
-from defabipedia.tokens import EthereumContractSpecs as Tokens
+from defabipedia.xdai_bridge import ContractSpecs
+from defabipedia.types import Chain
+from defabipedia.tokens import EthereumTokenAddr
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -95,7 +92,7 @@ class Flags:
 
 
 def refill_bridge(w3: Web3, env: ENV) -> TxReceipt:
-    bridge_contract = ContractSpecs[Chains.Ethereum].xDaiBridge.contract(w3)
+    bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3)
     unsigned_tx = bridge_contract.functions.refillBridge().build_transaction({
         "from": env.BOT_ADDRESS,
         "nonce": w3.eth.get_transaction_count(env.BOT_ADDRESS),
@@ -107,7 +104,7 @@ def refill_bridge(w3: Web3, env: ENV) -> TxReceipt:
 
 
 def invest_DAI(w3: Web3, env: ENV) -> TxReceipt:
-    bridge_contract = ContractSpecs[Chains.Ethereum].xDaiBridge.contract(w3)
+    bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3)
     unsigned_tx = bridge_contract.functions.investDai().build_transaction({
         "from": env.BOT_ADDRESS,
         "nonce": w3.eth.get_transaction_count(env.BOT_ADDRESS),
@@ -119,8 +116,8 @@ def invest_DAI(w3: Web3, env: ENV) -> TxReceipt:
 
 
 def pay_interest(w3: Web3, env: ENV, amount: int) -> TxReceipt:
-    bridge_contract = ContractSpecs[Chains.Ethereum].xDaiBridge.contract(w3)
-    unsigned_tx = bridge_contract.functions.payInterest(Tokens.DAI.address, amount).build_transaction({
+    bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3)
+    unsigned_tx = bridge_contract.functions.payInterest(EthereumTokenAddr.DAI, amount).build_transaction({
         "from": env.BOT_ADDRESS,
         "nonce": w3.eth.get_transaction_count(env.BOT_ADDRESS),
     })
@@ -136,7 +133,7 @@ decimals_DAI = 18
 
 def log_initial_data(env: ENV, messenger: Messenger):
     title = "Bridge Keeper started"
-    message = (f"  xDAI bridge address: {ContractSpecs[Chains.Ethereum].xDaiBridge.address}\n"
+    message = (f"  xDAI bridge address: {ContractSpecs[Chain.ETHEREUM].xDaiBridge.address}\n"
                f"  Bot address: {env.BOT_ADDRESS}\n"
                f"  Refill threshold: {env.REFILL_THRESHOLD} DAI\n"
                f"  Invest threshold: {env.INVEST_THRESHOLD} DAI\n"

@@ -1,15 +1,11 @@
-from web3 import Web3
 from roles_royce import roles
 from roles_royce.protocols.cowswap.contract_methods import SignOrder
 from roles_royce.protocols.cowswap.utils import QuoteOrderCowSwap
-from roles_royce.constants import GCAddr
-from tests.utils import (local_node_eth, accounts, fork_unlock_account, create_simple_safe, steal_token, top_up_address)
+from tests.utils import (local_node_eth, accounts, create_simple_safe)
 from tests.roles import setup_common_roles, deploy_roles, apply_presets
-from roles_royce.roles_modifier import set_gas_strategy, GasStrategies
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 from time import time
-import pytest
-from unittest import mock
+
 import json
 import requests
 
@@ -20,7 +16,7 @@ def test_quote_order_cowswap():
     sell_amount = 999749122606373987000
     kind = "sell" 
 
-    signer_tx = QuoteOrderCowSwap(blockchain=Chains.Ethereum,
+    signer_tx = QuoteOrderCowSwap(blockchain=Chain.ETHEREUM,
                                         sell_token=sell_token,
                                         buy_token=buy_token,
                                         receiver=avatar_safe,
@@ -41,7 +37,7 @@ def test_cowswap_signer_v1():
         kind = "sell" 
         valid_to = 1707000000
 
-        signer_tx = SignOrder(blockchain=Chains.Ethereum,
+        signer_tx = SignOrder(blockchain=Chain.ETHEREUM,
                                             avatar=avatar_safe,
                                             sell_token=sell_token,
                                             buy_token=buy_token,
@@ -57,7 +53,6 @@ def test_cowswap_signer(local_node_eth, accounts):
     w3 = local_node_eth.w3
     block = w3.eth.default_block
     local_node_eth.set_block(block)
-    set_gas_strategy(GasStrategies.AGGRESIVE)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     #steal_token(w3,"0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6", "0x4D8027E6e6e3E1Caa9AC23267D10Fb7d20f85A37", avatar_safe.address, 100)
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -97,7 +92,7 @@ def test_cowswap_signer(local_node_eth, accounts):
     apply_presets(avatar_safe, roles_contract, json_data=presets,
                   replaces=[("E522f854b978650Dc838Ade0e39FbC1417A2FfB0", "23dA9AdE38E4477b23770DeD512fD37b12381FAB")])
 
-    blockchain = Chains.get_blockchain_from_web3(w3)
+    blockchain = Chain.get_blockchain_from_web3(w3)
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address

@@ -1,16 +1,16 @@
 from roles_royce.protocols.eth import aave_v3
-from .utils import (local_node_eth, accounts, get_balance)
+from .utils import local_node_eth, get_balance
 from eth_abi import encode
 from roles_royce.constants import ETHAddr
 from decimal import Decimal
 from defabipedia.aave_v3 import ContractSpecs
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 from defabipedia._1inch import ContractSpecs as _1inchContractSpecs
 from defabipedia.spark import ContractSpecs as SparkContractSpecs
 from defabipedia.tokens import Abis as TokenAbis
 from roles_royce.toolshed.protocol_utils.aave_v3.cdp import AaveV3CDPManager, CDPData
 from pytest import approx
-import requests
+
 
 USER = "0xDf3A7a27704196Af5149CD67D881279e32AF2C21"
 USER2 = "0x7420fA58bA44E1141d5E9ADB6903BE549f7cE0b5"
@@ -26,20 +26,20 @@ def test_approve_token():
 def test_approve_AEthWETH():
     method = aave_v3.ApproveAEthWETH(amount=123)
     assert method.data == '0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2000000000000000000000000000000000000000000000000000000000000007b'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].aEthWETH.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].aEthWETH.address
 
 def test_approve_stkAAVE():
     method = aave_v3.ApproveForStkAAVE(amount=123)
     assert method.data == '0x095ea7b30000000000000000000000004da27a545c0c5b758a6ba100e3a049001de870f5000000000000000000000000000000000000000000000000000000000000007b'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].AAVE.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].AAVE.address
 
 def test_approve_stkABPT():
     method = aave_v3.ApproveForStkABPT(amount=123)
     assert method.data == '0x095ea7b3000000000000000000000000a1116930326d21fb917d5a27f1e9943a9595fb47000000000000000000000000000000000000000000000000000000000000007b'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].ABPT.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].ABPT.address
 
 def test_approve_delegation():
-    method = aave_v3.ApproveDelegation(target= ContractSpecs[Chains.Ethereum].variableDebtWETH.address, amount=123)
+    method = aave_v3.ApproveDelegation(target= ContractSpecs[Chain.ETHEREUM].variableDebtWETH.address, amount=123)
     assert method.data == '0xc04a8a10000000000000000000000000d322a49006fc828f9b5b37ab215f99b4e5cab19c000000000000000000000000000000000000000000000000000000000000007b'
     assert method.contract_address == '0xeA51d7853EEFb32b6ee06b1C12E6dcCA88Be0fFE'
 
@@ -86,12 +86,12 @@ def test_swap_borrow_rate_mode():
 def test_stake_AAVE():
     method = aave_v3.StakeAAVE(avatar=GNOSIS_DAO, amount=123)
     assert method.data == '0xadc9772e000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].stkAAVE.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkAAVE.address
 
 def test_stake_ABPT():
     method = aave_v3.StakeABPT(avatar=GNOSIS_DAO, amount=123)
     assert method.data == '0xadc9772e000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].stkABPT.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkABPT.address
 
 def test_claim_rewards_and_stake():
     method = aave_v3.ClaimRewardsAndStake(avatar=GNOSIS_DAO, amount=123)
@@ -100,32 +100,32 @@ def test_claim_rewards_and_stake():
 def test_unstake_AAVE():
     method = aave_v3.UnstakeAAVE(avatar=GNOSIS_DAO, amount=123)
     assert method.data == '0x1e9a6950000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].stkAAVE.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkAAVE.address
 
 def test_unstake_ABPT():
     method = aave_v3.UnstakeABPT(avatar=GNOSIS_DAO, amount=123)
     assert method.data == '0x1e9a6950000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].stkABPT.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkABPT.address
 
 def test_cooldown_stkAAVE():
     method = aave_v3.CooldownStkAAVE(value=123, avatar=GNOSIS_DAO)
     assert method.data == '0x787a08a6'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].stkAAVE.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkAAVE.address
 
 def test_cooldown_stkABPT():
     method = aave_v3.CooldownStkABPT(value=123, avatar=GNOSIS_DAO)
     assert method.data == '0x787a08a6'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].stkABPT.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkABPT.address
 
 def test_claim_AAVE_rewards():
     method = aave_v3.ClaimAAVERewards(avatar=GNOSIS_DAO, amount=123)
     assert method.data == '0x9a99b4f0000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].stkAAVE.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkAAVE.address
 
 def test_claim_ABPT_rewards():
     method = aave_v3.ClaimABPTRewards(avatar=GNOSIS_DAO, amount=123)
     assert method.data == '0x9a99b4f0000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].stkABPT.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkABPT.address
 
 def test_swap_and_repay():
     method = aave_v3.SwapAndRepay(collateral_asset=ETHAddr.USDC, 
@@ -141,7 +141,7 @@ def test_swap_and_repay():
                                   permit_r='0xf63fe2ddf43a364fb088ca5fbabc1928b6bbf11b35aec8502907902baf240935', 
                                   permit_s='0x3e452b86b67a5c5ce46fdc83c1e23db730f7e2b9aa1d12ab25faf581be38140b') 
     assert method.data == '0x4db9dc97000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000000000000000007b000000000000000000000000000000000000000000000000000000000000007b000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000180000000000000000000000000000000000000000000000000000000000000007b000000000000000000000000000000000000000000000000000000006526fc58000000000000000000000000000000000000000000000000000000000000001bf63fe2ddf43a364fb088ca5fbabc1928b6bbf11b35aec8502907902baf2409353e452b86b67a5c5ce46fdc83c1e23db730f7e2b9aa1d12ab25faf581be38140b00000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000def171fe48cf0115b1d80b88dc8eab59176fee5700000000000000000000000000000000000000000000000000000000000004842298207a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000007f39c581f595b53c5cb19bd0b3f8da6c935e2ca0000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000000000000000000000000000562c9b4164b58103000000000000000000000000000000000000000000000000000000028fa6ae0000000000000000000000000000000000000000000000000056169161cebe049800000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000022000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009abf798f5314bfd793a9e57a654bed35af4a1d600100000000000000000000000000000000000000000000000000000000031388000000000000000000000000000000000000000000000000000000000000044000000000000000000000000000000000000000000000000000000000652742c577e189f1a03f43afae287d193069d849000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000e592427a0aece92de3edee1f18e0157c058615640000000000000000000000000000000000000000000000000000000000000144f28c0498000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000def171fe48cf0115b1d80b88dc8eab59176fee5700000000000000000000000000000000000000000000000000000000653028e4000000000000000000000000000000000000000000000000000000028fa6ae00000000000000000000000000000000000000000000000000562c9b4164b581010000000000000000000000000000000000000000000000000000000000000042a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480001f4c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000647f39c581f595b53c5cb19bd0b3f8da6c935e2ca00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014400000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].ParaSwapRepayAdapter.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].ParaSwapRepayAdapter.address
 
 def test_swap_and_deposit():
     method = aave_v3.SwapAndDeposit(from_asset=ETHAddr.USDC, 
@@ -157,37 +157,37 @@ def test_swap_and_deposit():
                                   permit_r='0xf63fe2ddf43a364fb088ca5fbabc1928b6bbf11b35aec8502907902baf240935', 
                                   permit_s='0x3e452b86b67a5c5ce46fdc83c1e23db730f7e2b9aa1d12ab25faf581be38140b') 
     assert method.data == '0xd3454a35000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000000000000000007b000000000000000000000000000000000000000000000000000000000000007b00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000180000000000000000000000000def171fe48cf0115b1d80b88dc8eab59176fee57000000000000000000000000000000000000000000000000000000000000007b000000000000000000000000000000000000000000000000000000006526fc58000000000000000000000000000000000000000000000000000000000000001bf63fe2ddf43a364fb088ca5fbabc1928b6bbf11b35aec8502907902baf2409353e452b86b67a5c5ce46fdc83c1e23db730f7e2b9aa1d12ab25faf581be38140b00000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000def171fe48cf0115b1d80b88dc8eab59176fee5700000000000000000000000000000000000000000000000000000000000004842298207a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000007f39c581f595b53c5cb19bd0b3f8da6c935e2ca0000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000000000000000000000000000562c9b4164b58103000000000000000000000000000000000000000000000000000000028fa6ae0000000000000000000000000000000000000000000000000056169161cebe049800000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000022000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009abf798f5314bfd793a9e57a654bed35af4a1d600100000000000000000000000000000000000000000000000000000000031388000000000000000000000000000000000000000000000000000000000000044000000000000000000000000000000000000000000000000000000000652742c577e189f1a03f43afae287d193069d849000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000e592427a0aece92de3edee1f18e0157c058615640000000000000000000000000000000000000000000000000000000000000144f28c0498000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000def171fe48cf0115b1d80b88dc8eab59176fee5700000000000000000000000000000000000000000000000000000000653028e4000000000000000000000000000000000000000000000000000000028fa6ae00000000000000000000000000000000000000000000000000562c9b4164b581010000000000000000000000000000000000000000000000000000000000000042a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480001f4c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000647f39c581f595b53c5cb19bd0b3f8da6c935e2ca00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014400000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].ParaSwapLiquidityAdapter.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].ParaSwapLiquidityAdapter.address
 
 def test_delegate_AAVE():
     method = aave_v3.DelegateAAVE(delegatee=USER)
     assert method.data == '0x5c19a95c000000000000000000000000df3a7a27704196af5149cd67d881279e32af2c21'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].AAVE.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].AAVE.address
 
 def test_delegate_AAVE_by_type():
     method = aave_v3.DelegateAAVEByType(delegatee=USER, delegation_type=aave_v3.DelegationType.VOTING)
     assert method.data == '0xdc937e1c000000000000000000000000df3a7a27704196af5149cd67d881279e32af2c210000000000000000000000000000000000000000000000000000000000000000'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].AAVE.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].AAVE.address
 
 def test_delegate_stkAAVE():
     method = aave_v3.DelegatestkAAVE(delegatee=USER)
     assert method.data == '0x5c19a95c000000000000000000000000df3a7a27704196af5149cd67d881279e32af2c21'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].stkAAVE.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkAAVE.address
 
 def test_delegate_stkAAVE_by_type():
     method = aave_v3.DelegatestkAAVEByType(delegatee=USER, delegation_type=aave_v3.DelegationType.VOTING)
     assert method.data == '0xdc937e1c000000000000000000000000df3a7a27704196af5149cd67d881279e32af2c210000000000000000000000000000000000000000000000000000000000000000'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].stkAAVE.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkAAVE.address
 
 def test_submit_vote():
     method = aave_v3.SubmitVote(proposal_id=123, support=True)
     assert method.data == '0x612c56fa000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000001'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].GovernanceV2.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].GovernanceV2.address
 
 def test_liquidation_call():
     method = aave_v3.LiquidationCall(collateral_asset=ETHAddr.WETH, debt_asset=ETHAddr.USDC, user=USER, debt_to_cover=123, receive_a_token=False)
     assert method.data == '0x00a718a9000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000df3a7a27704196af5149cd67d881279e32af2c21000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000000'
-    assert method.contract_address == ContractSpecs[Chains.Ethereum].LendingPoolV3.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address
 
 
 CLOSE_FACTOR_HF_THRESHOLD = 0.95
@@ -214,7 +214,7 @@ def test_integration_liquidation_call(local_node_eth):
     asset_to_pay_debt = ETHAddr.wstETH
     asset_to_pay_debt_contract = w3.eth.contract(address=asset_to_pay_debt, abi=TokenAbis.ERC20.abi)
 
-    pdp = w3.eth.contract(address=ContractSpecs[Chains.Ethereum].ProtocolDataProvider.address, abi=ContractSpecs[Chains.Ethereum].ProtocolDataProvider.abi)
+    pdp = w3.eth.contract(address=ContractSpecs[Chain.ETHEREUM].ProtocolDataProvider.address, abi=ContractSpecs[Chain.ETHEREUM].ProtocolDataProvider.abi)
     liquidation_bonus = Decimal(pdp.functions.getReserveConfigurationData(asset_to_liquidate).call(block_identifier=block)[3] / 10000)
     assert liquidation_bonus == approx(1.045)
     liquidation_protocol_fee = Decimal(pdp.functions.getLiquidationProtocolFee(asset_to_liquidate).call(block_identifier=block) / 10000)
@@ -259,8 +259,8 @@ def test_integration_liquidation_call(local_node_eth):
     max_amount_collateral_to_liquidate_final = max_amount_collateral_to_liquidate - protocol_fee
     assert max_amount_collateral_to_liquidate_final == Decimal("511.1161690787816474664908425")
 
-    asset_to_pay_debt_contract.functions.approve(ContractSpecs[Chains.Ethereum].LendingPoolV3.address, 115792089237316195423570985008687907853269984665640564039457584007913129639935).transact({"from": wallet})
-    lending_pool_v3 = w3.eth.contract(address=ContractSpecs[Chains.Ethereum].LendingPoolV3.address, abi=ContractSpecs[Chains.Ethereum].LendingPoolV3.abi)
+    asset_to_pay_debt_contract.functions.approve(ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address, 115792089237316195423570985008687907853269984665640564039457584007913129639935).transact({"from": wallet})
+    lending_pool_v3 = w3.eth.contract(address=ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address, abi=ContractSpecs[Chain.ETHEREUM].LendingPoolV3.abi)
 
     asset_to_liquidate_before_liquidation = get_balance(w3, asset_to_liquidate, wallet)
     asset_to_pay_debt_before_liquidation = get_balance(w3, asset_to_pay_debt, wallet)
@@ -302,7 +302,7 @@ def test_integration_liquidation_call2(local_node_eth):
     asset_to_pay_debt = ETHAddr.LINK
     asset_to_pay_debt_contract = w3.eth.contract(address=asset_to_pay_debt, abi=TokenAbis.ERC20.abi)
 
-    pdp = w3.eth.contract(address=ContractSpecs[Chains.Ethereum].ProtocolDataProvider.address, abi=ContractSpecs[Chains.Ethereum].ProtocolDataProvider.abi)
+    pdp = w3.eth.contract(address=ContractSpecs[Chain.ETHEREUM].ProtocolDataProvider.address, abi=ContractSpecs[Chain.ETHEREUM].ProtocolDataProvider.abi)
     liquidation_bonus = Decimal(pdp.functions.getReserveConfigurationData(asset_to_liquidate).call(block_identifier=block)[3] / 10000)
     liquidation_protocol_fee = Decimal(pdp.functions.getLiquidationProtocolFee(asset_to_liquidate).call(block_identifier=block) / 10000)
 
@@ -340,8 +340,8 @@ def test_integration_liquidation_call2(local_node_eth):
     protocol_fee = bonus * liquidation_protocol_fee
     max_amount_collateral_to_liquidate_final = max_amount_collateral_to_liquidate - protocol_fee
     
-    asset_to_pay_debt_contract.functions.approve(ContractSpecs[Chains.Ethereum].LendingPoolV3.address, 115792089237316195423570985008687907853269984665640564039457584007913129639935).transact({"from": wallet})
-    lending_pool_v3 = w3.eth.contract(address=ContractSpecs[Chains.Ethereum].LendingPoolV3.address, abi=ContractSpecs[Chains.Ethereum].LendingPoolV3.abi)
+    asset_to_pay_debt_contract.functions.approve(ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address, 115792089237316195423570985008687907853269984665640564039457584007913129639935).transact({"from": wallet})
+    lending_pool_v3 = w3.eth.contract(address=ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address, abi=ContractSpecs[Chain.ETHEREUM].LendingPoolV3.abi)
 
     asset_to_liquidate_before_liquidation = get_balance(w3, asset_to_liquidate, wallet)
     asset_to_pay_debt_before_liquidation = get_balance(w3, asset_to_pay_debt, wallet)
@@ -372,7 +372,7 @@ def test_integration_liquidation_call2(local_node_eth):
     asset_to_pay_debt = ETHAddr.USDC
     asset_to_pay_debt_contract = w3.eth.contract(address=asset_to_pay_debt, abi=TokenAbis.ERC20.abi)
 
-    pdp = w3.eth.contract(address=ContractSpecs[Chains.Ethereum].ProtocolDataProvider.address, abi=ContractSpecs[Chains.Ethereum].ProtocolDataProvider.abi)
+    pdp = w3.eth.contract(address=ContractSpecs[Chain.ETHEREUM].ProtocolDataProvider.address, abi=ContractSpecs[Chain.ETHEREUM].ProtocolDataProvider.abi)
     liquidation_bonus = Decimal(pdp.functions.getReserveConfigurationData(asset_to_liquidate).call()[3] / 10000)
     liquidation_protocol_fee = Decimal(pdp.functions.getLiquidationProtocolFee(asset_to_liquidate).call() / 10000)
 
@@ -409,8 +409,8 @@ def test_integration_liquidation_call2(local_node_eth):
     protocol_fee = bonus * liquidation_protocol_fee
     max_amount_collateral_to_liquidate_final = max_amount_collateral_to_liquidate - protocol_fee
     
-    asset_to_pay_debt_contract.functions.approve(ContractSpecs[Chains.Ethereum].LendingPoolV3.address, 115792089237316195423570985008687907853269984665640564039457584007913129639935).transact({"from": wallet})
-    lending_pool_v3 = w3.eth.contract(address=ContractSpecs[Chains.Ethereum].LendingPoolV3.address, abi=ContractSpecs[Chains.Ethereum].LendingPoolV3.abi)
+    asset_to_pay_debt_contract.functions.approve(ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address, 115792089237316195423570985008687907853269984665640564039457584007913129639935).transact({"from": wallet})
+    lending_pool_v3 = w3.eth.contract(address=ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address, abi=ContractSpecs[Chain.ETHEREUM].LendingPoolV3.abi)
 
     asset_to_liquidate_before_liquidation = get_balance(w3, asset_to_liquidate, wallet)
     asset_to_pay_debt_before_liquidation = get_balance(w3, asset_to_pay_debt, wallet)
@@ -448,7 +448,7 @@ def test_bonus_matrix(local_node_eth, owner_address=USER2):
     balances = cdp.get_cdp_balances_data(block=block)
     health_factor = cdp.get_health_factor(block=block)
 
-    pdp = w3.eth.contract(address=ContractSpecs[Chains.Ethereum].ProtocolDataProvider.address, abi=ContractSpecs[Chains.Ethereum].ProtocolDataProvider.abi)
+    pdp = w3.eth.contract(address=ContractSpecs[Chain.ETHEREUM].ProtocolDataProvider.address, abi=ContractSpecs[Chain.ETHEREUM].ProtocolDataProvider.abi)
 
     if health_factor < 1 and health_factor > CLOSE_FACTOR_HF_THRESHOLD:
         close_factor = DEFAULT_LIQUIDATION_CLOSE_FACTOR
@@ -513,12 +513,12 @@ def test_integration_1inch_swap(local_node_eth):
     src_token_contract = w3.eth.contract(address=src_token, abi=TokenAbis.ERC20.abi)
 
     # Approve src_token with 1inch Aggregation Router as spender
-    src_token_contract.functions.approve(_1inchContractSpecs[Chains.Ethereum].AggregationRouterV5.address, 115792089237316195423570985008687907853269984665640564039457584007913129639935).transact({"from": GNOSIS_DAO})
+    src_token_contract.functions.approve(_1inchContractSpecs[Chain.ETHEREUM].AggregationRouterV5.address, 115792089237316195423570985008687907853269984665640564039457584007913129639935).transact({"from": GNOSIS_DAO})
 
     # api_response = requests.get(BASE_URL % (src_token.lower(), dst_token.lower(), amount, GNOSIS_DAO, 2, False, True), headers=headers).json()
     # mock api response
     api_response = {'toAmount': '1000000000000000000', 'tx': {'from': '0x849d52316331967b6ff1198e5e32a0eb168d039d', 'to': '0x1111111254eeb25477b68fb85ed929f73a960582', 'data': '0x12aa3caf000000000000000000000000e37e799d5077682fa0a244d46e5649f71457bd09000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000e37e799d5077682fa0a244d46e5649f71457bd09000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d0000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000d99a8cec7e200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000001600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008600000000000000000000000000000000000000000000000000006800001a4061c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2d0e30db080206c4eca27c02aaa39b223fe8d0a0e5c4f27ead9083c756cc21111111254eeb25477b68fb85ed929f73a9605820000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000008b1ccac8', 'value': '1000000000000000000', 'gas': 0, 'gasPrice': '43220576181'}}
-    router_contract = w3.eth.contract(address=_1inchContractSpecs[Chains.Ethereum].AggregationRouterV5.address, abi=_1inchContractSpecs[Chains.Ethereum].AggregationRouterV5.abi)
+    router_contract = w3.eth.contract(address=_1inchContractSpecs[Chain.ETHEREUM].AggregationRouterV5.address, abi=_1inchContractSpecs[Chain.ETHEREUM].AggregationRouterV5.abi)
 
     func_obj, func_params = router_contract.decode_function_input(api_response['tx']['data'])
 
@@ -552,6 +552,6 @@ def test_integration_1inch_swap(local_node_eth):
     # https://github.com/phoenixlabsresearch/sparklend-liquidator/blob/7f999858bb2570ea68db4ac2d3fb095431bb7a7b/contracts/LiquidateLoan.sol#L145C8-L145C9
     # api_response['tx']['data'] contains the _swapPath that should be sent to the executeFlashLoans function
     # The executeFlashLoans function calls the ILendingPool(_lendingPool).flashLoan() function which takes the params parameter with the following encoding:
-    flash_loan_params = encode(['address', 'address', 'address', 'address', 'address', 'bytes'], [GNOSIS_DAO, SparkContractSpecs[Chains.Ethereum].LendingPoolV3.address, collateral, USER, _1inchContractSpecs[Chains.Ethereum].AggregationRouterV5.address, bytes.fromhex(api_response['tx']['data'][2:])])
+    flash_loan_params = encode(['address', 'address', 'address', 'address', 'address', 'bytes'], [GNOSIS_DAO, SparkContractSpecs[Chain.ETHEREUM].LendingPoolV3.address, collateral, USER, _1inchContractSpecs[Chain.ETHEREUM].AggregationRouterV5.address, bytes.fromhex(api_response['tx']['data'][2:])])
 
     assert flash_loan_params.hex() == "000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000c13e21b648a5ee794902342038ff3adab66be987000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000df3a7a27704196af5149cd67d881279e32af2c210000000000000000000000001111111254eeb25477b68fb85ed929f73a96058200000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000022812aa3caf000000000000000000000000e37e799d5077682fa0a244d46e5649f71457bd09000000000000000000000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000e37e799d5077682fa0a244d46e5649f71457bd09000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d0000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000d99a8cec7e200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000001600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008600000000000000000000000000000000000000000000000000006800001a4061c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2d0e30db080206c4eca27c02aaa39b223fe8d0a0e5c4f27ead9083c756cc21111111254eeb25477b68fb85ed929f73a9605820000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000008b1ccac8000000000000000000000000000000000000000000000000"

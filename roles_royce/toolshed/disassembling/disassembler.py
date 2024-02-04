@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from web3.types import Address, ChecksumAddress, TxReceipt, TxParams
 from web3 import Web3
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
 from roles_royce import roles
 from roles_royce.generic_method import Transactable
 
@@ -19,7 +19,7 @@ class Disassembler:
 
         self.avatar_safe_address = Web3.to_checksum_address(self.avatar_safe_address)
         self.roles_mod_address = Web3.to_checksum_address(self.roles_mod_address)
-        self.blockchain = Chains.get_blockchain_from_web3(self.w3)
+        self.blockchain = Chain.get_blockchain_from_web3(self.w3)
 
     def send(self, txns: list[Transactable], private_key: str, w3: Web3 = None) -> TxReceipt:
         """Executes the multisend batched transaction built from the transactables.

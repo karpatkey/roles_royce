@@ -1,5 +1,5 @@
 from roles_royce.constants import ZERO, MAX_UINT256
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
 from roles_royce.protocols.base import Address
 from web3 import Web3
 from decimal import Decimal
@@ -52,7 +52,7 @@ class ExactBptSingleTokenJoin(_ExactBptSingleTokenJoin):
         join_token_index = assets.index(token_in_address)
         max_amounts_in = [0] * join_token_index + [max_amount_in] + [0] * (len(assets) - join_token_index - 1)
 
-        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,
@@ -101,7 +101,7 @@ class ProportionalJoin(_ProportionalJoin):
         if assets is None:
             assets = Pool(w3, pool_id).assets()
 
-        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,
@@ -143,7 +143,7 @@ class ExactTokensJoin(_ExactTokensJoin):
         if assets is None:
             assets = Pool(w3, pool_id).assets()
 
-        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,
@@ -169,7 +169,7 @@ class ExactSingleTokenJoin(_ExactTokensJoin):
         join_token_index = assets.index(token_in_address)
         amounts_in = [0] * join_token_index + [amount_in] + [0] * (len(assets) - join_token_index - 1)
 
-        super().__init__(blockchain=Chains.get_blockchain_from_web3(w3),
+        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3),
                          pool_id=pool_id,
                          avatar=avatar,
                          assets=assets,

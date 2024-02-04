@@ -1,7 +1,7 @@
 from decimal import Decimal
 from defabipedia.aave_v3 import ContractSpecs, Abis
 from defabipedia.tokens import Abis as TokenAbis
-from defabipedia.types import Blockchain, Chains
+from defabipedia.types import Blockchain, Chain
 from roles_royce.protocols.eth.aave_v3 import InterestRateMode
 from roles_royce.toolshed.protocol_utils.aave_v3.utils import AaveV3Utils, AaveV3Token
 from roles_royce.protocols.eth import aave_v3
@@ -73,7 +73,7 @@ class AaveV3CDPManager:
         if not self.owner_address:
             raise ValueError("'owner_address' must be filled.")
         self.owner_address = Web3.to_checksum_address(self.owner_address)
-        self.blockchain = Chains.get_blockchain_from_web3(self.w3)
+        self.blockchain = Chain.get_blockchain_from_web3(self.w3)
         if self.token_addresses_block == 'latest':
             self.token_addresses_block = self.w3.eth.block_number
         self.token_addresses = AaveV3Utils.get_aave_v3_token_addresses(self.w3, block=self.token_addresses_block)
@@ -98,7 +98,7 @@ class AaveV3CDPManager:
             abi=ContractSpecs[self.blockchain].PoolAddressesProvider.abi)
         price_oracle_address = pool_addresses_provider_contract.functions.getPriceOracle().call(block_identifier=block)
         price_oracle_contract = self.w3.eth.contract(price_oracle_address,
-                                                     abi=Abis[Chains.Ethereum].PriceOracle.abi)
+                                                     abi=Abis[Chain.ETHEREUM].PriceOracle.abi)
         protocol_data_provider_contract = self.w3.eth.contract(
             address=ContractSpecs[self.blockchain].ProtocolDataProvider.address,
             abi=ContractSpecs[self.blockchain].ProtocolDataProvider.abi)
@@ -288,19 +288,19 @@ class AaveV3CDPManager:
 
         if token_in_amount > allowance:
             tx_receipt = roles.send([aave_v3.ApproveToken(token=token_in_address, amount=token_in_amount),
-                                     aave_v3.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
-                                                 avatar=self.owner_address)], role=role, private_key=private_key,
+                                     aave_v3.Repay(asset=token_in_address, amount=token_in_amount, interest_rate_mode=rate_model,
+                                                   avatar=self.owner_address)], role=role, private_key=private_key,
                                     roles_mod_address=roles_mod_address,
                                     web3=self.w3)
         elif token_in_amount == allowance:
-            tx_receipt = roles.send([aave_v3.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
-                                                 avatar=self.owner_address), ], role=role,
+            tx_receipt = roles.send([aave_v3.Repay(asset=token_in_address, amount=token_in_amount, interest_rate_mode=rate_model,
+                                                   avatar=self.owner_address), ], role=role,
                                     private_key=private_key,
                                     roles_mod_address=roles_mod_address,
                                     web3=self.w3)
         else:
-            tx_receipt = roles.send([aave_v3.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
-                                                 avatar=self.owner_address),
+            tx_receipt = roles.send([aave_v3.Repay(asset=token_in_address, amount=token_in_amount, interest_rate_mode=rate_model,
+                                                   avatar=self.owner_address),
                                      aave_v3.ApproveToken(token=token_in_address, amount=0)], role=role,
                                     private_key=private_key,
                                     roles_mod_address=roles_mod_address,

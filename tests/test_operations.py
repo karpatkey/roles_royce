@@ -1,5 +1,5 @@
 from roles_royce import roles, GenericMethodTransaction, Operation
-from defabipedia.types import Chains
+from defabipedia.types import Chain
 from roles_royce.constants import GCAddr
 from roles_royce.utils import multi_or_one, MULTISENDS
 from .utils import web3_gnosis
@@ -27,7 +27,7 @@ add_liquidity = GenericMethodTransaction(
 
 
 def test_multi_or_one_one():
-    tx = multi_or_one([approve], blockchain=Chains.Gnosis)
+    tx = multi_or_one([approve], blockchain=Chain.GNOSIS)
     assert tx.operation == Operation.CALL
     assert tx.contract_address == GCAddr.USDT
     assert tx.data == ("0x095ea7b30000000000000000000000007f90122bf0700f9e7e1f688fe926940e8839f353000000000000000000000000000000"
@@ -35,10 +35,10 @@ def test_multi_or_one_one():
 
 
 def test_multi_or_one_multi():
-    tx = multi_or_one([approve, add_liquidity], blockchain=Chains.Gnosis)
+    tx = multi_or_one([approve, add_liquidity], blockchain=Chain.GNOSIS)
     # when building more than one transaction the Multisend contract is used
     assert tx.operation == Operation.DELEGATE_CALL
-    assert tx.contract_address == MULTISENDS[Chains.Gnosis]
+    assert tx.contract_address == MULTISENDS[Chain.GNOSIS]
     assert tx.data == ('0x8d80ff0a000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000'
                        '00000000000000000000000000000000172004ecaba5870353805a9f068101a40e0f32ed605c600000000000000000000000000'
                        '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000440'
