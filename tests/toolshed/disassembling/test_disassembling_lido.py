@@ -5,6 +5,7 @@ from defabipedia.lido import ContractSpecs
 from defabipedia.types import Chain
 from roles_royce.protocols.eth import lido
 from roles_royce.toolshed.disassembling import LidoDisassembler
+from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
 
 from tests.utils import (local_node_eth, accounts, create_simple_safe, steal_token)
 from tests.roles import setup_common_roles, deploy_roles, apply_presets
