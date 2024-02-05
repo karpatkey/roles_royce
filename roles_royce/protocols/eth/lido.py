@@ -1,18 +1,17 @@
-from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApprove
 from defabipedia.cowswap_signer import ContractSpecs as CowswapSignerContractSpecs
-from defabipedia.lido import ContractSpecs as LidoContractSpecs
-from defabipedia.types import Blockchain, Chains
+from defabipedia.tokens import EthereumTokenAddr as ETHAddr
+from defabipedia.types import Chain
 
 class ApproveRelayerStETH(BaseApprove):
     """approve relayer to spend stETH"""
-    fixed_arguments = {"spender": CowswapSignerContractSpecs[Chains.Ethereum].CowswapRelayer.address}
-    token = LidoContractSpecs[Chains.Ethereum].stETH.address
+    fixed_arguments = {"spender": CowswapSignerContractSpecs[Chain.ETHEREUM].CowswapRelayer.address}
+    token = ETHAddr.stETH
 
 class ApproveRelayerWstETH(BaseApprove):
     """approve relayer to spend wstETH"""
-    fixed_arguments = {"spender": CowswapSignerContractSpecs[Chains.Ethereum].CowswapRelayer.address}
-    token = LidoContractSpecs[Chains.Ethereum].wstETH.address
+    fixed_arguments = {"spender": CowswapSignerContractSpecs[Chain.ETHEREUM].CowswapRelayer.address}
+    token = ETHAddr.wstETH
 
 class ApproveWithdrawalStETHwithWstETH(BaseApprove):
     """approve stETH withdrawal with wstETH as spender"""
