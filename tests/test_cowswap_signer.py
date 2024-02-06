@@ -23,7 +23,7 @@ def test_quote_order_cowswap():
                                         kind=kind,
                                         sell_amount=sell_amount)
     
-    assert len(signer_tx.response) == 4
+    assert len(signer_tx.response) == 5
   
 def test_cowswap_signer_v1():
         
