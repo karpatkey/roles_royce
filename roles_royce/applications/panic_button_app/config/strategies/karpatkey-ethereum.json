@@ -1,6 +1,6 @@
 {
-    "dao": "GnosisLTD",
-    "blockchain": "gnosis",
+    "dao": "karpatkey",
+    "blockchain": "ethereum",
     "general_parameters": [
         {
             "name": "percentage",
@@ -14,38 +14,25 @@
     ],
     "positions": [
         {
-            "position_id": "244",
-            "position_id_tech": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A",
-            "position_id_human_readable": "gnosis_Aura_USDT_USDC_WXDAI",
-            "protocol": "Aura",
+            "protocol": "Balancer",
+            "position_id": "383",
+            "position_id_tech": "0x0000000000000000000000000000000000000000",
+            "position_id_human_readable": "ethereum_Balancer_LDO_wstETH_staked",
             "exec_config": [
-                {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
-                    "test": true,
-                    "description": "Unstake BPT from Aura gauge",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A"
-                        }
-                    ]
-                },
                 {
                     "function_name": "exit_2_1",
                     "label": "Unstake + withdraw (proportional)",
                     "test": true,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
+                    "description": "Unstake the BPT from the Balancer gauge and exit pool with proportional exit. (Not for recovery mode)",
                     "parameters": [
                         {
-                            "name": "rewards_address",
+                            "name": "gauge_address",
                             "type": "constant",
-                            "value": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A"
+                            "value": "0x0000000000000000000000000000000000000000"
                         },
                         {
                             "name": "max_slippage",
-                            "label": "Max Slippage",
+                            "label": "Max slippage",
                             "type": "input",
                             "rules": {
                                 "min": 0,
@@ -58,16 +45,16 @@
                     "function_name": "exit_2_3",
                     "label": "Unstake + withdraw (proportional) (Recovery mode)",
                     "test": false,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
+                    "description": "Unstake the BPT from the Balancer gauge and exit pool with proportional exit. (Recovery mode)",
                     "parameters": [
                         {
-                            "name": "rewards_address",
+                            "name": "gauge_address",
                             "type": "constant",
-                            "value": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A"
+                            "value": "0x0000000000000000000000000000000000000000"
                         },
                         {
                             "name": "max_slippage",
-                            "label": "Max Slippage",
+                            "label": "Max slippage",
                             "type": "input",
                             "rules": {
                                 "min": 0,
@@ -79,38 +66,25 @@
             ]
         },
         {
-            "position_id": "272",
-            "position_id_tech": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA",
-            "position_id_human_readable": "gnosis_Aura_USDT_sDAI_USDC",
-            "protocol": "Aura",
+            "protocol": "Balancer",
+            "position_id": "383",
+            "position_id_tech": "0x5f1f4E50ba51D723F12385a8a9606afc3A0555f5",
+            "position_id_human_readable": "ethereum_Balancer_LDO_wstETH",
             "exec_config": [
                 {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
+                    "function_name": "exit_1_1",
+                    "label": "Withdraw (proportional)",
                     "test": true,
-                    "description": "Unstake BPT from Aura gauge",
+                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
                     "parameters": [
                         {
-                            "name": "rewards_address",
+                            "name": "bpt_address",
                             "type": "constant",
-                            "value": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA"
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_1",
-                    "label": "Unstake + withdraw (proportional)",
-                    "test": true,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA"
+                            "value": "0x5f1f4E50ba51D723F12385a8a9606afc3A0555f5"
                         },
                         {
                             "name": "max_slippage",
-                            "label": "Max Slippage",
+                            "label": "Max slippage",
                             "type": "input",
                             "rules": {
                                 "min": 0,
@@ -120,19 +94,19 @@
                     ]
                 },
                 {
-                    "function_name": "exit_2_3",
-                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
+                    "function_name": "exit_1_3",
+                    "label": "Withdraw (proportional) (Recovery mode)",
                     "test": false,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
+                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
                     "parameters": [
                         {
-                            "name": "rewards_address",
+                            "name": "bpt_address",
                             "type": "constant",
-                            "value": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA"
+                            "value": "0x5f1f4E50ba51D723F12385a8a9606afc3A0555f5"
                         },
                         {
                             "name": "max_slippage",
-                            "label": "Max Slippage",
+                            "label": "Max slippage",
                             "type": "input",
                             "rules": {
                                 "min": 0,
@@ -144,9 +118,9 @@
             ]
         },
         {
-            "position_id": "376",
-            "position_id_tech": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62",
-            "position_id_human_readable": "gnosis_Aura_COW_wstETH",
+            "position_id": "268",
+            "position_id_tech": "0x2a14dB8D09dB0542f6A371c0cB308A768227D67D",
+            "position_id_human_readable": "ethereum_Aura_wstETH_WETH",
             "protocol": "Aura",
             "exec_config": [
                 {
@@ -158,7 +132,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62"
+                            "value": "0x2a14dB8D09dB0542f6A371c0cB308A768227D67D"
                         }
                     ]
                 },
@@ -171,7 +145,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62"
+                            "value": "0x2a14dB8D09dB0542f6A371c0cB308A768227D67D"
                         },
                         {
                             "name": "max_slippage",
@@ -193,7 +167,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62"
+                            "value": "0x2a14dB8D09dB0542f6A371c0cB308A768227D67D"
                         },
                         {
                             "name": "max_slippage",
@@ -210,20 +184,27 @@
         },
         {
             "protocol": "Lido",
-            "position_id": "203",
-            "position_id_tech": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
-            "position_id_human_readable": "gnosis_Lido_wstETH",
+            "position_id": "163",
+            "position_id_tech": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+            "position_id_human_readable": "ethereum_Lido_stETH",
             "exec_config": [
                 {
-                    "function_name": "exit_4",
-                    "label": "Swap wstETH",
-                    "test": false,
-                    "description": "Swap wstETH for ETH",
+                    "function_name": "exit_1",
+                    "label": "Unstake stETH",
+                    "test": true,
+                    "description": "Unstake stETH for ETH",
+                    "parameters": []
+                },
+                {
+                    "function_name": "exit_3",
+                    "label": "Swap stETH",
+                    "test": true,
+                    "description": "Swap stETH for ETH",
                     "parameters": [
                         {
                             "name": "max_slippage",
-                            "label": "Max slippage",
                             "type": "input",
+                            "label": "Max slippage",
                             "rules": {
                                 "min": 0,
                                 "max": 100

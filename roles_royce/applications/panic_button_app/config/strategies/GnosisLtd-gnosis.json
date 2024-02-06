@@ -1,6 +1,6 @@
 {
-    "dao": "GnosisDAO",
-    "blockchain": "ethereum",
+    "dao": "GnosisLtd",
+    "blockchain": "gnosis",
     "general_parameters": [
         {
             "name": "percentage",
@@ -15,9 +15,9 @@
     "positions": [
         {
             "protocol": "Balancer",
-            "position_id": "206",
-            "position_id_tech": "0xfeBb0bbf162E64fb9D0dfe186E517d84C395f016",
-            "position_id_human_readable": "ethereum_Balancer_bb-a-DAI_bb-a-USDT_bb-a-USDC",
+            "position_id": "386",
+            "position_id_tech": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f",
+            "position_id_human_readable": "gnosis_Balancer_GBPe_WXDAI",
             "exec_config": [
                 {
                     "function_name": "exit_1_1",
@@ -28,7 +28,7 @@
                         {
                             "name": "bpt_address",
                             "type": "constant",
-                            "value": "0xfeBb0bbf162E64fb9D0dfe186E517d84C395f016"
+                            "value": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f"
                         },
                         {
                             "name": "max_slippage",
@@ -50,7 +50,7 @@
                         {
                             "name": "bpt_address",
                             "type": "constant",
-                            "value": "0xfeBb0bbf162E64fb9D0dfe186E517d84C395f016"
+                            "value": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f"
                         },
                         {
                             "name": "max_slippage",
@@ -66,9 +66,61 @@
             ]
         },
         {
-            "position_id": "33",
-            "position_id_tech": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
-            "position_id_human_readable": "ethereum_Aura_rETH_WETH",
+            "protocol": "Balancer",
+            "position_id": "387",
+            "position_id_tech": "0xC5Df11757F4A8DFACcC731d13b9577f67055c6c6",
+            "position_id_human_readable": "gnosis_Balancer_GBPe_EURe",
+            "exec_config": [
+                {
+                    "function_name": "exit_1_1",
+                    "label": "Withdraw (proportional)",
+                    "test": true,
+                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "bpt_address",
+                            "type": "constant",
+                            "value": "0xC5Df11757F4A8DFACcC731d13b9577f67055c6c6"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_1_3",
+                    "label": "Withdraw (proportional) (Recovery mode)",
+                    "test": false,
+                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
+                    "parameters": [
+                        {
+                            "name": "bpt_address",
+                            "type": "constant",
+                            "value": "0xC5Df11757F4A8DFACcC731d13b9577f67055c6c6"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "position_id": "244",
+            "position_id_tech": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A",
+            "position_id_human_readable": "gnosis_Aura_USDT_USDC_WXDAI",
             "protocol": "Aura",
             "exec_config": [
                 {
@@ -80,7 +132,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
+                            "value": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A"
                         }
                     ]
                 },
@@ -93,7 +145,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
+                            "value": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A"
                         },
                         {
                             "name": "max_slippage",
@@ -115,7 +167,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
+                            "value": "0x0821ed041620b83b306FfaC74Df3FA855cEDe51A"
                         },
                         {
                             "name": "max_slippage",
@@ -131,9 +183,9 @@
             ]
         },
         {
-            "position_id": "35",
-            "position_id_tech": "0x89D3D732da8bf0f88659Cf3738E5E44e553f9ED7",
-            "position_id_human_readable": "ethereum_Aura_B-80BAL-20WETH_auraBAL",
+            "position_id": "272",
+            "position_id_tech": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA",
+            "position_id_human_readable": "gnosis_Aura_USDT_sDAI_USDC",
             "protocol": "Aura",
             "exec_config": [
                 {
@@ -145,7 +197,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0x89D3D732da8bf0f88659Cf3738E5E44e553f9ED7"
+                            "value": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA"
                         }
                     ]
                 },
@@ -158,7 +210,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0x89D3D732da8bf0f88659Cf3738E5E44e553f9ED7"
+                            "value": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA"
                         },
                         {
                             "name": "max_slippage",
@@ -180,7 +232,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0x89D3D732da8bf0f88659Cf3738E5E44e553f9ED7"
+                            "value": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA"
                         },
                         {
                             "name": "max_slippage",
@@ -196,9 +248,9 @@
             ]
         },
         {
-            "position_id": "38",
-            "position_id_tech": "0x82FeB430d9D14eE5E635C41807e03fD8F5FfFDeC",
-            "position_id_human_readable": "ethereum_Aura_GNO_COW",
+            "position_id": "376",
+            "position_id_tech": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62",
+            "position_id_human_readable": "gnosis_Aura_COW_wstETH",
             "protocol": "Aura",
             "exec_config": [
                 {
@@ -210,7 +262,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0x82FeB430d9D14eE5E635C41807e03fD8F5FfFDeC"
+                            "value": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62"
                         }
                     ]
                 },
@@ -223,7 +275,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0x82FeB430d9D14eE5E635C41807e03fD8F5FfFDeC"
+                            "value": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62"
                         },
                         {
                             "name": "max_slippage",
@@ -245,72 +297,7 @@
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0x82FeB430d9D14eE5E635C41807e03fD8F5FfFDeC"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max Slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "position_id": "40",
-            "position_id_tech": "0xA6e54eA1C67396Bde9e92cA462197bE59Af3E875",
-            "position_id_human_readable": "ethereum_Aura_WETH_COW",
-            "protocol": "Aura",
-            "exec_config": [
-                {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
-                    "test": true,
-                    "description": "Unstake BPT from Aura gauge",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xA6e54eA1C67396Bde9e92cA462197bE59Af3E875"
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_1",
-                    "label": "Unstake + withdraw (proportional)",
-                    "test": true,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xA6e54eA1C67396Bde9e92cA462197bE59Af3E875"
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max Slippage",
-                            "type": "input",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_3",
-                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
-                    "test": false,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xA6e54eA1C67396Bde9e92cA462197bE59Af3E875"
+                            "value": "0x85298595D4F6F8Fa91f8658BA9c10f9A85B17f62"
                         },
                         {
                             "name": "max_slippage",
@@ -327,49 +314,10 @@
         },
         {
             "protocol": "Lido",
-            "position_id": "64",
-            "position_id_tech": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
-            "position_id_human_readable": "ethereum_Lido_stETH",
+            "position_id": "203",
+            "position_id_tech": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6",
+            "position_id_human_readable": "gnosis_Lido_wstETH",
             "exec_config": [
-                {
-                    "function_name": "exit_1",
-                    "label": "Unstake stETH",
-                    "test": true,
-                    "description": "Unstake stETH for ETH",
-                    "parameters": []
-                },
-                {
-                    "function_name": "exit_3",
-                    "label": "Swap stETH",
-                    "test": true,
-                    "description": "Swap stETH for ETH",
-                    "parameters": [
-                        {
-                            "name": "max_slippage",
-                            "type": "input",
-                            "label": "Max slippage",
-                            "rules": {
-                                "min": 0,
-                                "max": 100
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "protocol": "Lido",
-            "position_id": "195",
-            "position_id_tech": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
-            "position_id_human_readable": "ethereum_Lido_wstETH",
-            "exec_config": [
-                {
-                    "function_name": "exit_2",
-                    "label": "Unstake wstETH",
-                    "test": true,
-                    "description": "Unstake wstETH for ETH",
-                    "parameters": []
-                },
                 {
                     "function_name": "exit_4",
                     "label": "Swap wstETH",

@@ -1,5 +1,5 @@
 {
-    "dao": "karpatkey",
+    "dao": "GnosisLtd",
     "blockchain": "ethereum",
     "general_parameters": [
         {
@@ -14,38 +14,25 @@
     ],
     "positions": [
         {
-            "position_id": "268",
-            "position_id_tech": "0x2a14dB8D09dB0542f6A371c0cB308A768227D67D",
-            "position_id_human_readable": "ethereum_Aura_wstETH_WETH",
-            "protocol": "Aura",
+            "protocol": "Balancer",
+            "position_id": "174",
+            "position_id_tech": "0x7B50775383d3D6f0215A8F290f2C9e2eEBBEceb2",
+            "position_id_human_readable": "ethereum_Balancer_bb-a-USDT_bb-a-DAI_bb-a-USDC",
             "exec_config": [
                 {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
+                    "function_name": "exit_1_1",
+                    "label": "Withdraw (proportional)",
                     "test": true,
-                    "description": "Unstake BPT from Aura gauge",
+                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
                     "parameters": [
                         {
-                            "name": "rewards_address",
+                            "name": "bpt_address",
                             "type": "constant",
-                            "value": "0x2a14dB8D09dB0542f6A371c0cB308A768227D67D"
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_1",
-                    "label": "Unstake + withdraw (proportional)",
-                    "test": true,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x2a14dB8D09dB0542f6A371c0cB308A768227D67D"
+                            "value": "0x7B50775383d3D6f0215A8F290f2C9e2eEBBEceb2"
                         },
                         {
                             "name": "max_slippage",
-                            "label": "Max Slippage",
+                            "label": "Max slippage",
                             "type": "input",
                             "rules": {
                                 "min": 0,
@@ -55,19 +42,19 @@
                     ]
                 },
                 {
-                    "function_name": "exit_2_3",
-                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
+                    "function_name": "exit_1_3",
+                    "label": "Withdraw (proportional) (Recovery mode)",
                     "test": false,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
+                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
                     "parameters": [
                         {
-                            "name": "rewards_address",
+                            "name": "bpt_address",
                             "type": "constant",
-                            "value": "0x2a14dB8D09dB0542f6A371c0cB308A768227D67D"
+                            "value": "0x7B50775383d3D6f0215A8F290f2C9e2eEBBEceb2"
                         },
                         {
                             "name": "max_slippage",
-                            "label": "Max Slippage",
+                            "label": "Max slippage",
                             "type": "input",
                             "rules": {
                                 "min": 0,
@@ -80,21 +67,21 @@
         },
         {
             "protocol": "Lido",
-            "position_id": "163",
+            "position_id": "164",
             "position_id_tech": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
             "position_id_human_readable": "ethereum_Lido_stETH",
             "exec_config": [
                 {
                     "function_name": "exit_1",
                     "label": "Unstake stETH",
-                    "test": false,
+                    "test": true,
                     "description": "Unstake stETH for ETH",
                     "parameters": []
                 },
                 {
                     "function_name": "exit_3",
                     "label": "Swap stETH",
-                    "test": false,
+                    "test": true,
                     "description": "Swap stETH for ETH",
                     "parameters": [
                         {

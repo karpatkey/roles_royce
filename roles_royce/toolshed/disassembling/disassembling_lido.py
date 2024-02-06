@@ -17,10 +17,10 @@ from time import time
 class LidoDisassembler(Disassembler):
 
     def get_amount_to_redeem(self, address: Address, fraction: float | Decimal) -> int:
-        if address == ContractSpecs[self.blockchain].stETH.address:
-            contract = ContractSpecs[self.blockchain].stETH.contract(self.w3)
-        else:
+        if address == ContractSpecs[self.blockchain].wstETH.address:
             contract = ContractSpecs[self.blockchain].wstETH.contract(self.w3)
+        else:
+            contract = ContractSpecs[self.blockchain].stETH.contract(self.w3)
 
         return int(Decimal(contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
 
@@ -41,14 +41,26 @@ class LidoDisassembler(Disassembler):
 
         if amount_to_redeem is None: 
             amount_to_redeem = self.get_amount_to_redeem(address, fraction)
+        
+        chunk_amount = amount_to_redeem
+        if chunk_amount > 1000_000_000_000_000_000_000:
+            chunks = []
+            while chunk_amount >= 1000_000_000_000_000_000_000:
+                chunks.append(1000_000_000_000_000_000_000)
+                chunk_amount -= 1000_000_000_000_000_000_000
+            if chunk_amount > 0:
+                chunks.append(chunk_amount)
 
-        set_allowance = lido.ApproveWithdrawalStETHWithUnstETH(amount=amount_to_redeem)
-        request_withdrawal = lido.RequestWithdrawalsStETH(amounts=[amount_to_redeem], avatar=self.avatar_safe_address)
+            set_allowance = lido.ApproveWithdrawalStETHWithUnstETH(amount=amount_to_redeem)
+            request_withdrawal = lido.RequestWithdrawalsStETH(amounts=chunks, avatar=self.avatar_safe_address)
+
+        else:
+            set_allowance = lido.ApproveWithdrawalStETHWithUnstETH(amount=amount_to_redeem)
+            request_withdrawal = lido.RequestWithdrawalsStETH(amounts=[amount_to_redeem], avatar=self.avatar_safe_address)
 
         txns.append(set_allowance)
         txns.append(request_withdrawal)
         return txns
-
 
     def exit_2(self, percentage: float, exit_arguments: list[dict]= None, amount_to_redeem: int = None) -> list[
         Transactable]:
@@ -68,8 +80,21 @@ class LidoDisassembler(Disassembler):
         if amount_to_redeem is None: 
             amount_to_redeem = self.get_amount_to_redeem(address, fraction)
 
-        set_allowance = lido.ApproveWithdrawalWstETH(amount = amount_to_redeem)
-        request_withdrawal = lido.RequestWithdrawalsWstETH(amounts=[amount_to_redeem],avatar=self.avatar_safe_address)
+        chunk_amount = amount_to_redeem
+        if chunk_amount > 1000_000_000_000_000_000_000:
+            chunks = []
+            while chunk_amount >= 1000_000_000_000_000_000_000:
+                chunks.append(1000_000_000_000_000_000_000)
+                chunk_amount -= 1000_000_000_000_000_000_000
+            if chunk_amount > 0:
+                chunks.append(chunk_amount)
+            
+            set_allowance = lido.ApproveWithdrawalWstETH(amount = amount_to_redeem)
+            request_withdrawal = lido.RequestWithdrawalsWstETH(amounts=chunks,avatar=self.avatar_safe_address)
+
+        else:
+            set_allowance = lido.ApproveWithdrawalWstETH(amount = amount_to_redeem)
+            request_withdrawal = lido.RequestWithdrawalsWstETH(amounts=[amount_to_redeem],avatar=self.avatar_safe_address)
 
         txns.append(set_allowance)
         txns.append(request_withdrawal)
@@ -91,7 +116,7 @@ class LidoDisassembler(Disassembler):
             list[ Transactable]: List of transactions to execute.
         """
         for element in exit_arguments:
-            max_slippage = element["max_slippage"]
+            max_slippage = element["max_slippage"] / 100
             fraction = validate_percentage(percentage)
 
             txns = []
@@ -111,7 +136,7 @@ class LidoDisassembler(Disassembler):
             fee_amount = quote.fee_amount
 
             buy_amount_min_slippage = int(Decimal(buy_amount) * Decimal(1 - max_slippage))
-
+            set_allowance = lido.ApproveRelayerStETH(amount = amount_to_redeem)
             moooooo = SignOrder(blockchain=self.blockchain,
                                                 avatar=self.avatar_safe_address,
                                                 sell_token=address,
@@ -122,6 +147,7 @@ class LidoDisassembler(Disassembler):
                                                 valid_to=int(int(time())+600),
                                                 kind="sell")
             
+            #txns.append(set_allowance)
             txns.append(moooooo)
         return txns
 
@@ -142,7 +168,7 @@ class LidoDisassembler(Disassembler):
         """
         
         for element in exit_arguments:
-            max_slippage = element["max_slippage"]
+            max_slippage = element["max_slippage"] / 100
             fraction = validate_percentage(percentage)
 
             txns = []
@@ -162,7 +188,7 @@ class LidoDisassembler(Disassembler):
             fee_amount = quote.fee_amount
 
             buy_amount_min_slippage = int(Decimal(buy_amount) * Decimal(1 - max_slippage))
-
+            set_allowance = lido.ApproveRelayerWstETH(amount = amount_to_redeem)
             moooooo = SignOrder(blockchain=self.blockchain,
                                                 avatar=self.avatar_safe_address,
                                                 sell_token=address,
@@ -173,5 +199,6 @@ class LidoDisassembler(Disassembler):
                                                 valid_to=int(int(time())+600),
                                                 kind="sell")
             
+            #txns.append(set_allowance)
             txns.append(moooooo)
         return txns

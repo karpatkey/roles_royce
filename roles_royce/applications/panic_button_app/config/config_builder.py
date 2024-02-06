@@ -16,8 +16,8 @@ from defabipedia.lido import ContractSpecs
 
 class DAO(StrEnum):
     GnosisDAO = "GnosisDAO"
-    GnosisLTD = "GnosisLTD"
-    Karpatkey = "karpatkey"
+    GnosisLtd = "GnosisLtd"
+    karpatkey = "karpatkey"
 
     def __str__(self):
         return self.name

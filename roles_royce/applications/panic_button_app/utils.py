@@ -198,7 +198,7 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
                                         role=env.ROLE,
                                         signer_address=env.DISASSEMBLER_ADDRESS)
     else:
-        raise Exception("Invalid protocol")
+        raise Exception("Status 422: Invalid protocol")
 
     exit_strategy = getattr(disassembler, exec_config.exit_strategy)
 

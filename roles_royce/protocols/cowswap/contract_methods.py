@@ -6,7 +6,7 @@ from web3 import Web3
 import math
 import requests
 import json
-
+from roles_royce.roles_modifier import Operation
 from eth_utils.conversions import to_hex
 
 class SignOrder(ContractMethod):
@@ -45,7 +45,7 @@ class SignOrder(ContractMethod):
                        "partially_fillable": False,
                        "sell_token_balance": Web3.keccak(text="erc20"),
                        "buy_token_balance": Web3.keccak(text="erc20"),
-                       "valid_duration": 60}
+                       "valid_duration": 1800}
 
     def __init__(self, 
                  blockchain: Blockchain,
@@ -96,3 +96,4 @@ class SignOrder(ContractMethod):
                             self.fixed_arguments['buy_token_balance']]
         self.args.valid_duration = self.fixed_arguments['valid_duration']
         self.args.fee_amount_bp = math.ceil((self.args.fee_amount / self.args.sell_amount) * 10000)
+        self.operation = Operation.DELEGATE_CALL

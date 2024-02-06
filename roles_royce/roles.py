@@ -109,8 +109,6 @@ def send(txs: List[Transactable],
     )
     tx_kwargs = tx_kwargs or {}
     roles_mod_execute = roles_mod.execute(tx_data.contract_address, tx_data.data, **tx_kwargs)
-    logger.info('building receipt....')
     roles_mod_tx1 = roles_mod.get_tx_receipt(roles_mod_execute)
-    logger.info(roles_mod_tx1)
     return roles_mod_tx1
   
