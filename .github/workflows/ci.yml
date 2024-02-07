@@ -31,7 +31,6 @@ jobs:
         run: coverage report
 
   docker-spark:
-    needs: Test
     runs-on: self-hosted
 
     steps:
