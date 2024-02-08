@@ -35,7 +35,7 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Docker meta
         id: docker_meta
@@ -63,13 +63,15 @@ jobs:
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           file: ./docker/Dockerfile.spark
+          build-args: |
+            BUILDKIT_CONTEXT_KEEP_GIT_DIR=true
 
   docker-eur:
     needs: Test
     runs-on: self-hosted
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Docker meta
         id: docker_meta
@@ -97,13 +99,15 @@ jobs:
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           file: ./docker/Dockerfile.eur
+          build-args: |
+            BUILDKIT_CONTEXT_KEEP_GIT_DIR=true
 
   docker-keeper:
     needs: Test
     runs-on: self-hosted
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Docker meta
         id: docker_meta
@@ -133,8 +137,10 @@ jobs:
           key: ${{ runner.os }}-docker-${{ hashFiles('**/docker/Dockerfile*') }}
 
       - name: build and Push image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           file: ./docker/Dockerfile.keeper
+          build-args: |
+            BUILDKIT_CONTEXT_KEEP_GIT_DIR=true

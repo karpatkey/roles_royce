@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=65.5.1"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [project]
 name = "rolesroyce"
-version = "0.0.1"
+dynamic = ["version"]
 description = "Create and execute DeFi transactions through the Roles Modifier contracts"
 readme = "README.md"
 license = {text = "MIT License"}
@@ -31,6 +31,14 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/karpatkey/roles_royce"
 
-[tool.setuptools.packages.find]
-include = ["roles_royce*", ]
-namespaces = false
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "_version.py"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["roles_royce"]
