@@ -42,9 +42,47 @@ def update_aura_db(w3: Web3) -> list[dict]:
         json.dump(result, f, indent=4)
     return result
 
+#Only for eth 
+def update_gauge_db(w3: Web3) -> list[dict]:
+    """
+    Fetches all the Gauge token addresses with their corresponding BPT addresses and saves them in a json file
+    gauge_db_{blockchain}.json in the same directory the call is made
+
+    Args:
+        w3: Web3 instance
+
+    Returns:
+        List of dictionaries with the BPT address and the Gauge token address for each pool
+         e.g. [{
+                    "blockchain": "ethereum",
+                    "gauge_address": "0xGauge_token_address",
+                    "bpt_address": "0xBpt_address"
+              }]
+    """
+    blockchain = Chain.get_blockchain_from_web3(w3)
+    #lgf2_addr = balancer.ContractSpecs[blockchain].LiquidityGaugeFactory2.address
+    lgf2_addr = "0xf1665E19bc105BE4EDD3739F88315cC699cc5b65"
+    event_filter = w3.eth.filter({
+    "fromBlock": 15399251,
+    "toBlock": "latest",
+    "address": lgf2_addr,
+    "topics": [w3.keccak(text="GaugeCreated(address)").hex()]})
+
+
+    logs = event_filter.get_all_entries()
+    result = []
+    decoded_addresses = [Web3.to_checksum_address((f"0x{log['topics'][1].hex()[-40:]}")) for log in logs]
+
+    for address in decoded_addresses:
+        gauge_contr = w3.eth.contract(address=address, abi=balancer.Abis[blockchain].Gauge.abi)
+        bpt_address = gauge_contr.functions.lp_token().call()
+        result.append({"blockchain": blockchain, "gauge_address": address, "bpt_address": bpt_address})
+    with open(f'gauge_db_{blockchain}.json', "w") as g:
+        json.dump(result, g, indent=4)
+    return result
 
 def main():
-    PUBLIC_ETH_NODE_URL = 'https://eth-mainnet.g.alchemy.com/v2/xNrcWkb6vlhP1KD2oivsbhXVgpEu-Tw7'
+    PUBLIC_ETH_NODE_URL = 'https://rpc.mevblocker.io'
     PUBLIC_GC_NODE_URL = 'https://rpc.ankr.com/gnosis'
 
     w3_eth = Web3(Web3.HTTPProvider(os.environ.get("RR_ETH_FORK_URL",
@@ -54,7 +92,7 @@ def main():
 
     update_aura_db(w3_eth)
     update_aura_db(w3_gc)
-
+    update_gauge_db(w3_eth)
 
 if __name__ == "__main__":
     main()

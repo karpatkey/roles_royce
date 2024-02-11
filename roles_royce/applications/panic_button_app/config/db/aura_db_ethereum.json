@@ -82,7 +82,7 @@
     {
         "blockchain": "ethereum",
         "bpt_address": "0x99A14324Cfd525A34BBc93ac7e348929909D57fD",
-        "aura_address": "0x2c5b78610D69447Ded2A0B60a565c947f17A1668"
+        "aura_address": "0x6f804C713F5b8331c101Da4c732ebFe7cCA1Ea7f"
     },
     {
         "blockchain": "ethereum",
@@ -743,5 +743,100 @@
         "blockchain": "ethereum",
         "bpt_address": "0xf8C4CD95c7496cB7c8d97202Cf7e5b8DA2204C2b",
         "aura_address": "0x8355B93489437c6eb0590d7a8EE7b3caf1BA0652"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x35c5C8C7B77942f9D44B535Fa590D8b503B2b00C",
+        "aura_address": "0x9703aBC2665d2e3b1b1F105f546850052cB708Cf"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0xb9dEbDDF1d894c79D2B2d09f819FF9B856FCa552",
+        "aura_address": "0x5DbbE4998D5524BD2990241B2f43584ed0172c5a"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0xC2AA60465BfFa1A88f5bA471a59cA0435c3ec5c1",
+        "aura_address": "0xE9096FDB508C0160318c11425Ba75924ecFA1D82"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x1CCE5169bDe03f3d5aD0206f6BD057953539DAE6",
+        "aura_address": "0x2C0D60f986cDe7eE59489055aa22A8E49b6825aD"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0xfbfaD5fa9E99081da6461F36f229B5cC88A64c63",
+        "aura_address": "0x4313428170c09ca81117a95f0418aefE3446d935"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0xDACf5Fa19b1f720111609043ac67A9818262850c",
+        "aura_address": "0x5F032f15B4e910252EDaDdB899f7201E89C8cD6b"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0xee3959FD00a0B996d801fc34B7CE566bD037f5f5",
+        "aura_address": "0x098DCC73cd97C2BE5eAC5bD59c50cc034b60C06E"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920",
+        "aura_address": "0x0D00848440D2E2B3C6f288128c1a19C483e78F45"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x05ff47AFADa98a98982113758878F9A8B9FddA0a",
+        "aura_address": "0x07A319A023859BbD49CC9C38ee891c3EA9283Cc5"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x6Aa6d7542310cDC75D1179B8729E1E6ec8d42BF1",
+        "aura_address": "0xe771592D172a91fB30b9E80Cf0C2f17697CA60e0"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0xB06bFBD7b50F80c8d9dA57Fc4cF5CBD5B3E2f148",
+        "aura_address": "0xE557658e3D13d074961265756dC2eFB6c903A763"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x88794C65550DeB6b4087B7552eCf295113794410",
+        "aura_address": "0x570eA5C8A528E3495EE9883910012BeD598E8814"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x49cbD67651fbabCE12d1df18499896ec87BEf46f",
+        "aura_address": "0x9360F473A533D7f8855C768437dd0c8cAEcCB9e6"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x127ECc2318d002664cc4515C9f2B22B09b6aea85",
+        "aura_address": "0x52D97Fa3481BbFa95Cb48d8af4B1e31756EE1DB8"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x6228f64D5BA8376652Bfe7E36569D595347cF6Fb",
+        "aura_address": "0x8660F02Ca94970C45add17CEDdCC81DD4D90ffED"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x596192bB6e41802428Ac943D2f1476C1Af25CC0E",
+        "aura_address": "0x95eC73Baa0eCF8159b4EE897D973E41f51978E50"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x383e7859271B2D0589B013b6d944572a0a8bE3cB",
+        "aura_address": "0x34211820D0Ab85E051214e60fea88Ba944c9BA57"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0x7761b6E0Daa04E70637D81f1Da7d186C205C2aDE",
+        "aura_address": "0xf618102462Ff3cf7edbA4c067316F1C3AbdbA193"
+    },
+    {
+        "blockchain": "ethereum",
+        "bpt_address": "0xD3F8AB9C5928FDf53153e7757131aD7815fe3146",
+        "aura_address": "0x7633d0bBDe67553C582BF241BF8cb22895610B94"
     }
 ]

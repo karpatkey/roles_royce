@@ -132,23 +132,20 @@ def recovery_mode_balancer(w3, bpt_address: str, exit_strategy: str):
                                                 abi=BalancerAbis[blockchain].UniversalBPT.abi)
         bpt_pool_recovery_mode = bpt_contract.functions.inRecoveryMode().call()
     except ContractLogicError:
-        bpt_pool_recovery_mode = False
-    if blockchain == 'ethereum':
-        emergency = "0xA29F61256e948F3FB707b4b3B138C5cCb9EF9888"
-    elif blockchain == 'gnosis':
-        emergency = "0xd6110A7756080a4e3BCF4e7EBBCA8E8aDFBC9962"
-    top_up_address(w3, emergency, 100)
-    fork_unlock_account(w3, emergency)
-    
+        logging.info('Balancer pool has no recovery mode')
+        if (exit_strategy == 'exit_1_3' or exit_strategy == 'exit_2_3'):
+            logging.info('Test will not execute')
+            return True
+        else:
+            return False
     if bpt_pool_recovery_mode and (exit_strategy == 'exit_1_1' or exit_strategy == 'exit_2_1'):
-        logging.info('Balancer pool is in recovery mode. Getting it out of recovery mode to test exit strategy.')
-        bpt_contract.functions.disableRecoveryMode().transact({'from': emergency})
-        recover_mode = bpt_contract.functions.inRecoveryMode().call()
-        logging.info(f'Balancer recovery mode: {recover_mode}')
+        logging.info('Balancer pool is in recovery mode, not testing this exit_strategy')
+        return True
     elif not bpt_pool_recovery_mode and (exit_strategy == 'exit_1_3' or exit_strategy == 'exit_2_3'):
-        logging.info('Balancer pool is not in recovery mode. Getting it into recovery mode to test exit strategy.')
-        bpt_contract.functions.enableRecoveryMode().transact({'from': emergency})
-        logging.info('Balancer recovery mode: ', bpt_contract.functions.inRecoveryMode().call())
+        logging.info('Balancer pool is not in recovery mode, not testing this exit_strategy')
+        return True
+    else:
+        return False
         
 @pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", True),
                     reason="Long position integration test not running by default.")
@@ -180,21 +177,27 @@ def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch, dao, e
     exit_arguments = [exit_arguments_dict]
 
     blockchain = Chain.get_blockchain_from_web3(w3)
-    if exec_config['protocol'] == 'Balancer' and (exec_config['exit_strategy'] == 'exit_1_1' or exec_config['exit_strategy'] == 'exit_1_3'):
+    if exec_config['protocol'] == 'Balancer' and (exec_config['function_name'] == 'exit_1_1' or exec_config['function_name'] == 'exit_1_3'):
         bpt_address = exit_arguments_dict['bpt_address']
-        recovery_mode_balancer(w3, bpt_address, exec_config['exit_strategy'])
-    elif exec_config['protocol'] == 'Balancer' and (exec_config['exit_strategy'] == 'exit_2_1' or exec_config['exit_strategy'] == 'exit_2_3'):
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
+    elif exec_config['protocol'] == 'Balancer' and (exec_config['function_name'] == 'exit_2_1' or exec_config['function_name'] == 'exit_2_3'):
         gauge_address = exit_arguments_dict['gauge_address']
         gauge_contract = w3.eth.contract(address=gauge_address,
                                                 abi=BalancerAbis[blockchain].Gauge.abi)
         bpt_address = gauge_contract.functions.lp_token().call()  
-        recovery_mode_balancer(w3, bpt_address, exec_config['exit_strategy'])
-    elif exec_config['protocol'] == 'Aura' and (exec_config['exit_strategy'] == 'exit_2_1' or exec_config['exit_strategy'] == 'exit_2_3'):
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
+    elif exec_config['protocol'] == 'Aura' and (exec_config['function_name'] == 'exit_2_1' or exec_config['function_name'] == 'exit_2_3'):
         aura_rewards_address = exit_arguments_dict['rewards_address']
         aura_rewards_contract = w3.eth.contract(address=aura_rewards_address,
                                                      abi=AuraAbis[blockchain].BaseRewardPool.abi)
         bpt_address = aura_rewards_contract.functions.asset().call()
-        recovery_mode_balancer(w3, bpt_address, exec_config['exit_strategy'])
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
 
     logging.info(f'Exit arguments: {exit_arguments}')
 
@@ -271,19 +274,25 @@ def test_stresstest_single(local_node_eth, local_node_gc, accounts, monkeypatch,
     blockchain = Chain.get_blockchain_from_web3(w3)
     if exec_config['protocol'] == 'Balancer' and (exec_config['function_name'] == 'exit_1_1' or exec_config['function_name'] == 'exit_1_3'):
         bpt_address = exit_arguments_dict['bpt_address']
-        recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
     elif exec_config['protocol'] == 'Balancer' and (exec_config['function_name'] == 'exit_2_1' or exec_config['function_name'] == 'exit_2_3'):
         gauge_address = exit_arguments_dict['gauge_address']
         gauge_contract = w3.eth.contract(address=gauge_address,
                                                 abi=BalancerAbis[blockchain].Gauge.abi)
         bpt_address = gauge_contract.functions.lp_token().call()  
-        recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
     elif exec_config['protocol'] == 'Aura' and (exec_config['function_name'] == 'exit_2_1' or exec_config['function_name'] == 'exit_2_3'):
         aura_rewards_address = exit_arguments_dict['rewards_address']
         aura_rewards_contract = w3.eth.contract(address=aura_rewards_address,
                                                      abi=AuraAbis[blockchain].BaseRewardPool.abi)
         bpt_address = aura_rewards_contract.functions.asset().call()
-        recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
 
     logging.info(f'Exit arguments: {exit_arguments}')
 

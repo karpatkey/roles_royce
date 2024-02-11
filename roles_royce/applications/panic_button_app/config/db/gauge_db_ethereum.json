@@ -1,0 +1,1092 @@
+[
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xb0FB3e031224bd449974AB02cae369E81db58Fa6",
+        "bpt_address": "0x1b65fe4881800B91d4277ba738b567CbB200A60d"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x3F29e69955E5202759208DD0C5E0BA55ff934814",
+        "bpt_address": "0xb460DAa847c45f1C4a41cb05BFB3b51c92e41B36"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x96d7e549eA1d810725e4Cd1f51ed6b4AE8496338",
+        "bpt_address": "0x5f7FA48d765053F8dD85E052843e12D23e3D7BC5"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x27Fd581E9D0b2690C2f808cd40f7fe667714b575",
+        "bpt_address": "0x3F7C10701b14197E2695dEC6428a2Ca4Cf7FC3B8"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xf46FD013Acc2c6988BB2f773bd879101eB5d4573",
+        "bpt_address": "0x8f4205e1604133d1875a3E771AE7e4F2b0865639"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xAde9C0054f051f5051c4751563C7364765Bf52f5",
+        "bpt_address": "0x96bA9025311e2f47B840A1f68ED57A3DF1EA8747"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xc2D343E2C9498E905F53C818B88eB8064B42D036",
+        "bpt_address": "0x350196326AEAA9b98f1903fb5e8fc2686f85318C"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xE5f24cD43f77fadF4dB33Dab44EB25774159AC66",
+        "bpt_address": "0x8eB6c82C3081bBBd45DcAC5afA631aaC53478b7C"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x47c56A900295df5224EC5e6751dC31eb900321D5",
+        "bpt_address": "0xe8cc7E765647625B95F59C15848379D10B9AB4af"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x09AFEc27F5A6201617aAd014CeEa8deb572B0608",
+        "bpt_address": "0x5122E01D819E58BB2E22528c0D68D310f0AA6FD7"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x00Ab79a3bE3AacDD6f85C623f63222A07d3463DB",
+        "bpt_address": "0x17dDd9646a69C9445CD8A9f921d4cD93BF50D108"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xe2b680A8d02fbf48C7D9465398C4225d7b7A7f87",
+        "bpt_address": "0xA7Ff759DBeF9F3EFDD1d59Beee44b966AcAfe214"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x59E7DBfF74B2B76957E6a3f25cCEe40b2f3421D0",
+        "bpt_address": "0x2D344A84BaC123660b021EEbE4eB6F12ba25fe86"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x1249c510e066731FF14422500466A7102603da9e",
+        "bpt_address": "0x27C9f71cC31464B906E0006d4FcBC8900F48f15f"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x75cAceBb5b4a73a530EdcdFdE7cFfbfea44c026E",
+        "bpt_address": "0x48607651416A943bF5AC71C41BE1420538e78f87"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x0bFE50f798f981bE378A2ae0807Fab56e30513D1",
+        "bpt_address": "0x12769c1020A3e68946a4F1F0D18A737258772e04"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x46804462f147fF96e9CAFB20cA35A3B2600656DF",
+        "bpt_address": "0x441b8a1980f2F2E43A9397099d15CC2Fe6D36250"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x7C777eEA1dC264e71E567Fcc9B6DdaA9064Eff51",
+        "bpt_address": "0xde8C195Aa41C11a0c4787372deFBbDdAa31306D2"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x57AB3b673878C3fEaB7f8FF434C40Ab004408c4c",
+        "bpt_address": "0x92762B42A06dCDDDc5B7362Cfb01E631c4D44B40"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x777C45BD0a2AF1dA5fe4a532AD6B207D3CEd8b2d",
+        "bpt_address": "0xBaeEC99c90E3420Ec6c1e7A769d2A856d2898e4D"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xBB7b0a5ACefEE08B832daccf9245899490608f50",
+        "bpt_address": "0x5210287a2a440c06d7F3fcC4CC7B119BA8DE4339"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xb32Ae42524d38be7E7eD9E02b5F9330fCEf07f3F",
+        "bpt_address": "0xe340EBfcAA544da8bB1Ee9005F1a346D50Ec422e"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x39a9E78c3b9b5B47f1f6632BD74890E2430215Cf",
+        "bpt_address": "0xae7bFd6fA54259fC477879712Eebe34164d3A84F"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x973fb174Cdf9b1652e4213125a186f66684D899c",
+        "bpt_address": "0x173063A30E095313eEe39411f07E95A8a806014e"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xff7c044EEEE53092346A6661b476e4d8dEaf9E5e",
+        "bpt_address": "0x7152a37BBF363262bAD269EC4dE2269dD0E84Ca3"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x7Fc115BF013844D6eF988837F7ae6398af153532",
+        "bpt_address": "0x8167A1117691f39e05e9131cfA88F0e3A620E967"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x63E3951212cCCAFE3eDC7588FD4D20Ee5e7Ad73f",
+        "bpt_address": "0x5512A4bbe7B3051f92324bAcF25C02b9000c4a50"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xE7ec5216ff485abffd9d390B82A5D742155f3A6f",
+        "bpt_address": "0xC9C5Ff67bB2Fae526aE2467C359609D6BCb4c532"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xBC02eF87f4E15EF78A571f3B2aDcC726Fee70d8b",
+        "bpt_address": "0xFf4ce5AAAb5a627bf82f4A571AB1cE94Aa365eA6"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x66ce08e46a3cD4eB4f861645EE80322CeB0ff844",
+        "bpt_address": "0x51459cC1329392a6572AFe901BDd63d905716af6"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x01A9502C11f411b494c62746D37e89d6f7078657",
+        "bpt_address": "0x9c6d47Ff73e0F5E51BE5FD53236e3F595C5793F2"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xE629c43BCad1029E12ED51432B9dd3432b656cc9",
+        "bpt_address": "0xAd0e5e0778cAC28f1ff459602b31351871B5754a"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x37eCa8DaaB052E722e3bf8ca861aa4e1C047143b",
+        "bpt_address": "0xE4010EF5E37dc23154680f23c4A0d48BFca91687"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x4dC35eC8562596ddA6aEe8EceE59a76D4d72b83E",
+        "bpt_address": "0xDb0cBcF1b8282dedc90e8c2CEFe11041d6d1e9f0"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x190AE1f6EE5c0B7bc193fA9CD9bBe9b335F69C65",
+        "bpt_address": "0xFD1Cf6FD41F229Ca86ada0584c63C49C3d66BbC9"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x21D8dB8a46393FEdE4e91eAfBc0cCf092faCb469",
+        "bpt_address": "0x8A34b5ad76F528bfEc06c80D85EF3b53dA7FC300"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x10a361766e64D7983a97202ac3a0F4cee06Eb717",
+        "bpt_address": "0xB08885e6026bab4333A80024Ec25a1a3e1FF2b8A"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xFc4541437265945F13368F9F61c19dA427D41A02",
+        "bpt_address": "0x384F67aA430376efc4f8987eaBf7F3f84eB9EA5d"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xe9866B9dc2c1213433f614CbB22EdAA0FAFF9a66",
+        "bpt_address": "0x831261f44931B7dA8ba0DcC547223c60BB75B47F"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xA2a9Ebd6f4dEA4802083F2C8D08066A4e695e64B",
+        "bpt_address": "0x5aEe1e99fE86960377DE9f88689616916D5DcaBe"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x2C2179abce3413E27BDA6917f60ae37F96D01826",
+        "bpt_address": "0x9F9d900462492D4C21e9523ca95A7CD86142F298"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x87012b0C3257423fD74a5986F81a0f1954C17a1d",
+        "bpt_address": "0x1ee442b5326009Bb18F2F472d3e0061513d1A0fF"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x95201B61EF19C867dA0D093DF20021e1a559452c",
+        "bpt_address": "0x5f1f4E50ba51D723F12385a8a9606afc3A0555f5"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xf7B0751Fea697cf1A541A5f57D11058a8fB794ee",
+        "bpt_address": "0x36Be1E97eA98AB43b4dEBf92742517266F5731a3"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xf53f2fEE2A34f7f8d1BFe1B774A95Cc79C121B34",
+        "bpt_address": "0x50Cf90B954958480b8DF7958A9E965752F627124"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x2064dd25d709d6a00914dE17Ddf89Ba1cC967D7b",
+        "bpt_address": "0x3dbb8D974b82E82CE79c20C0F5995F4f1f533eDE"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x4532fBa326D853A03644758B8B7438374F6780dC",
+        "bpt_address": "0xa3C500969accb3D8DF08CBa313C120818fE0ed9D"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xD973e86547e810117Db131B94708F429A463535E",
+        "bpt_address": "0x959216BB492B2efa72b15B7AAcEa5B5C984c3ccA"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x623F3Dbc761B46F64aE7951700Dd7724cB7d6075",
+        "bpt_address": "0x4fD4687ec38220F805b6363C3c1E52D0dF3B5023"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x38727B907046818135c9a865D5C40BE6cd1c0514",
+        "bpt_address": "0xa718042E5622099E5F0aCe4E7122058ab39e1bbe"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xE96924D293b9e2961f9763cA058E389D27341D3d",
+        "bpt_address": "0xB5E3de837F869B0248825e0175DA73d4E8c3db6B"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x5FbEAa96c9D8d0e839780433aA0B3B4d35b049d8",
+        "bpt_address": "0x133d241F225750D2c92948E464A5a80111920331"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xD65979f15cfB52E9a6a4f8DEA34c69c1568EA4A8",
+        "bpt_address": "0x00C2A4be503869Fa751c2DbcB7156cc970b5a8dA"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xE879f17910E77c01952b97E4A098B0ED15B6295c",
+        "bpt_address": "0xd4f79CA0Ac83192693bce4699d0c10C66Aa6Cf0F"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xA9A63971c55c132aF0e6B39a081e604F07f4e234",
+        "bpt_address": "0x483006684f422a9448023b2382615C57c5ecF18f"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x33BcAa8A390e6DcF2f18AE5fDd9e38fD248219eB",
+        "bpt_address": "0x60683B05e9a39E3509D8fdb9C959f23170f8A0fa"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x36365dA262dB3965Ba2E1C4411409Bf22508e0A1",
+        "bpt_address": "0x15C1cDAcd3dA1E1C1304200b1bEb080D50BbBc0F"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xE5d4B82e1386163d179B2e2c5cEc2656ad87e780",
+        "bpt_address": "0xe03aF00faBe8401560c1FF7d242d622a5b601573"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x29C6361Af40fc1B6585ce0885319511dF4450a8E",
+        "bpt_address": "0x20b156776114E8a801e9767D90c6ccCCc8Adf398"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x19A13793af96f534F0027b4b6a3eB699647368e7",
+        "bpt_address": "0x99c88AD7dc566616548adde8ED3eFfa730eB6C34"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x45280c7FE46Bd875E23D3820e89daA4C70fA2C34",
+        "bpt_address": "0x961764651931941F23cea5bAB246607dC19ef224"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x4d997a27A64c0c04ef697033b1a3121C674Fa5f2",
+        "bpt_address": "0x961764651931941F23cea5bAB246607dC19ef224"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x183D73dA7adC5011EC3C46e33BB50271e59EC976",
+        "bpt_address": "0xf16aEe6a71aF1A9Bc8F56975A4c2705ca7A782Bc"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x7d890e2c7eECa435298880c083061A60DCa8A897",
+        "bpt_address": "0x3f7a7fd7F214bE45EC26820Fd01aC3bE4fC75aa7"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x32dF62dc3aEd2cD6224193052Ce665DC18165841",
+        "bpt_address": "0xdB3B48F27332c171869f2Ae4160BC93A8EED347c"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6AB026B3f9d7c55b871901B1a5c19Ea5e6c5fDB9",
+        "bpt_address": "0x779d01F939D78a918A3de18cC236ee89221dfd4E"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x2DE9cF1E8f823F0586b1e11664FC05144a02f059",
+        "bpt_address": "0x779d01F939D78a918A3de18cC236ee89221dfd4E"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x119990bc25598C4f14F98f6c45b06e75821FC48e",
+        "bpt_address": "0x779d01F939D78a918A3de18cC236ee89221dfd4E"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xFd29298041eA355cF7e15652689F2865443C3144",
+        "bpt_address": "0x779d01F939D78a918A3de18cC236ee89221dfd4E"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x497F222b01242F93A64ebF61c3fDfBE863628D1c",
+        "bpt_address": "0x9cE746Ded4D6031e4f2Da842936C57d0e50f8D0E"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x254f3a52Ba9e0cac4E32B648d129529622D1A46c",
+        "bpt_address": "0xCAa052584b462198A5a9356c28bcE0634D65f65C"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x5612876e6F6cA370d93873FE28c874e89E741fB9",
+        "bpt_address": "0x79c58f70905F734641735BC61e45c19dD9Ad60bC"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6661136537dfDCA26EEA05c8500502d7D5796E5E",
+        "bpt_address": "0x9CC64EE4CB672Bc04C54B00a37E1Ed75b2Cc19Dd"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xF17F1E67bc384E43b4acf69cc032AD086f15f262",
+        "bpt_address": "0x8Bd4A1E74A27182D23B98c10Fd21D4FbB0eD4BA0"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xD9cde95eFeD2d426F2741E2c44De9573116B8F07",
+        "bpt_address": "0x08775ccb6674d6bDCeB0797C364C2653ED84F384"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6B29de6b961F60A494416164B651eeeA71b7aED7",
+        "bpt_address": "0xD278166DAbaf26707362f7CfDd204b277FD2a460"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xCd8bB8cEBc794842967849255C234e7b7619A518",
+        "bpt_address": "0xD278166DAbaf26707362f7CfDd204b277FD2a460"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x0052688295413b32626D226a205b95cDB337DE86",
+        "bpt_address": "0xfeBb0bbf162E64fb9D0dfe186E517d84C395f016"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x5f838591A5A8048F0E4C4c7fCca8fD9A25BF0590",
+        "bpt_address": "0xE0fCBf4d98F0aD982DB260f86cf28b49845403C5"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x454eb2f12242397688DbfdA241487e67ed80507a",
+        "bpt_address": "0x639883476960a23b38579acfd7D71561A0f408Cf"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x70c6A653e273523FADfB4dF99558737906c230c6",
+        "bpt_address": "0x9001cBbD96F54a658FF4e6E65AB564DED76a5431"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xb61bEFF1243315562Af3deC2Ec94fC18D006c723",
+        "bpt_address": "0x04248AAbca09E9a1a3D5129a7ba05b7F17DE7684"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xC764B55852F8849Ae69923e45ce077A576bF9a8d",
+        "bpt_address": "0x04248AAbca09E9a1a3D5129a7ba05b7F17DE7684"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x2fC4506354166e8B9183FBB6A68cd9C5F3Fb9Bc5",
+        "bpt_address": "0x87a867f5D240a782d43D90b6B06DEa470F3f8F22"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x2D42910D826e5500579D121596E98A6eb33C0a1b",
+        "bpt_address": "0x68e3266C9C8bbD44ad9Dca5AFBfe629022AeE9fE"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xC4E72abE8A32Fd7D7BA787e1Ec860ecb8C0B333c",
+        "bpt_address": "0x0018C32D85D8AebEA2eFbE0b0F4a4Eb9e4F1C8C9"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xB5E2dcFBEb62AbEA603a0c585cA8f880eb709A9C",
+        "bpt_address": "0x42FBD9F666AaCC0026ca1B88C94259519e03dd67"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x11Ff498C7c2A29fc4638BF45D9fF995C3297fcA5",
+        "bpt_address": "0x02D928E68D8F10C0358566152677Db51E1e2Dc8C"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x5aF3B93Fb82ab8691b82a09CBBae7b8D3eB5Ac11",
+        "bpt_address": "0x7E9AfD25F5Ec0eb24d7d4b089Ae7EcB9651c8b1F"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x7Ef80D6C6B62e194AB3465F10d97F4c48E623025",
+        "bpt_address": "0xA13c5b866C204ce1F8E5F5C6Ca24317A11A44C30"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xEeDEd342aa2Cc1b48ECcAfeB663fdf2c1d166934",
+        "bpt_address": "0x3e953C6Bf97284F736c5F95b3c3BE8F4e48075f4"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x249034A0EA97E76c2b4AB7a1727CBC52548c531c",
+        "bpt_address": "0xB5E2dcFBEb62AbEA603a0c585cA8f880eb709A9C"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xc85d90dec1E12eDee418C445b381E7168EB380Ab",
+        "bpt_address": "0xd689ABc77B82803F22c49dE5C8A0049Cc74D11fD"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xd1566767047Dd97395f0Ec1d88Ec614d0A93ADF0",
+        "bpt_address": "0xbFCe47224B4A938865E3e2727DC34E0fAA5b1D82"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x8a88C1f44854C61a466aB55614F6A7778473418b",
+        "bpt_address": "0x793F2D5Cd52dfafe7a1a1B0B3988940Ba2d6a63D"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xB5bd58C733948e3d65d86BA9604e06e5dA276FD1",
+        "bpt_address": "0x6910C4e32D425a834Fb61e983C8083a84b0EBd01"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x78a54C8F4eAba82e45cBC20B9454a83CB296e09E",
+        "bpt_address": "0x42FBD9F666AaCC0026ca1B88C94259519e03dd67"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xd1c070eBc7Ec77f2134b3Ef75283b6C1fb31a157",
+        "bpt_address": "0x2E848426AEc6dbF2260535a5bEa048ed94d9FF3D"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x21cf9324D5B1AC739B7E6922B69500F1eEDB52e0",
+        "bpt_address": "0xeC3626fEe40EF95e7C0CBb1D495C8B67B34D3983"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xb3CA475746591878e8AAd9710b402eeb4470784a",
+        "bpt_address": "0xD61e198e139369a40818FE05F5d5e6e045Cd6eaF"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x69F1077AeCE23D5b0344330B5eB13f05d5e410a1",
+        "bpt_address": "0xDf2c03c12442c7A0895455A48569B889079cA52A"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xc43bF12A008d3Cc48AF7da1e8e87622A78dc64da",
+        "bpt_address": "0xEb567DDE03F3DA7FE185BDaCD5AB495AB220769d"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6E7B9A1746a7eD4b23edFf0975B726E5aA673E21",
+        "bpt_address": "0x380aAbE019ed2a9C2d632b51eDDD30fd804d0fAD"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6F3b31296FD2457eba6Dca3BED65ec79e06c1295",
+        "bpt_address": "0x20a61B948E33879ce7F23e535CC7BAA3BC66c5a9"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xFa58735ceEAa83a7c9c13CA771F12378D40D7b05",
+        "bpt_address": "0xFCF77141908Aa22bfEAc216123C5FEb2531f373e"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xD449Efa0A587f2cb6BE3AE577Bc167a774525810",
+        "bpt_address": "0x1A44E35d5451E0b78621A1B3e7a53DFaA306B1D0"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xbf65b3fA6c208762eD74e82d4AEfCDDfd0323648",
+        "bpt_address": "0xdfE6e7e18f6Cc65FA13C8D8966013d4FdA74b6ba"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x801baDb59BeA0165bA32151Bd759350F3b016E19",
+        "bpt_address": "0xf57c794F42DA72B38c8f610FF3B5e8502E48CbDE"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x7F244b47C63E9Ca33A58E6550bfd1D3dC806Ce55",
+        "bpt_address": "0x18FDf15ff782e44C1f9B6C5846ff6B0F0004F6a2"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xd8191A3496a1520c2B5C81D04B26F8556Fc62d7b",
+        "bpt_address": "0x18FDf15ff782e44C1f9B6C5846ff6B0F0004F6a2"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6AF7bCA454f3C8165225Ed46FD4d78cc90E81fAA",
+        "bpt_address": "0xbFCe47224B4A938865E3e2727DC34E0fAA5b1D82"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x9fB7D6dCAC7b6aa20108BaD226c35B85A9e31B63",
+        "bpt_address": "0x481C5fc05D63a58AA2f0F2aA417C021B5d419cB2"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xD3D5d45f4Edf82ba0dFaf061d230766032a10e07",
+        "bpt_address": "0x26c2B83FC8535DeEaD276f5Cc3ad9c1a2192E027"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x8eeB783A4A67f626c6E3952AAeD0D6b104AaC85f",
+        "bpt_address": "0xC5DC1316AB670a2eeD5716d7F19CeD321191F382"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x1d157Cf1F1339864A3C291D1Bbe786d6Ee682434",
+        "bpt_address": "0x156C02f3f7fEf64a3A9D80CCF7085f23ccE91D76"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x39dF6e857bdf7387273C43eBb373b9D74F467d35",
+        "bpt_address": "0x9d7f992c900FbeA0EC314Bdd71b7cC1becF76A33"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x5E23599eBE87A5A140f295C2fC6aAedb10955497",
+        "bpt_address": "0x616D4D131F1147aC3B3C3CC752BAB8613395B2bB"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x0021e01B9fAb840567a8291b864fF783894EabC6",
+        "bpt_address": "0x42ED016F826165C2e5976fe5bC3df540C5aD0Af7"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x882f961Def46deadAcf31798B295834a5b6d0c86",
+        "bpt_address": "0xbF2ef8bDC2fC0F3203B3a01778E3ec5009AEEf33"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x3eFd3E18504dC213188Ed2b694F886A305a6e5ed",
+        "bpt_address": "0xd7edb56F63b2a0191742aEa32DF1F98ca81ed9c6"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x21eC388000B5BA5D9e3DF3848EA0c1f58e054Af7",
+        "bpt_address": "0xc443C15033FCB6Cf72cC24f1BDA0Db070DdD9786"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x29488df9253171AcD0a0598FDdA92C5F6E767a38",
+        "bpt_address": "0x41503C9D499ddbd1dCdf818a1b05e9774203Bf46"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x9e3f4FB69058244066801404e50889592d33cA11",
+        "bpt_address": "0x4CbdE5C4B4B53EBE4aF4adB85404725985406163"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xe74795EC9251E2381f490a4a5b8BE1D3FA73DE82",
+        "bpt_address": "0xe0E8AC08De6708603cFd3D23B613d2f80e3b7afB"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x5Db1Fe5A1652f095eBc3f6065E9DB3f3d492bfC2",
+        "bpt_address": "0xc2B021133D1b0cF07dba696fd5DD89338428225B"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x70892E4355d0E04A3d19264E93c64C401520f3A4",
+        "bpt_address": "0x3FA8C89704e5d07565444009e5d9e624B40Be813"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x5c23661E747F84E0c71d782e5f1513126041734B",
+        "bpt_address": "0x9A172e1cb0E99f7E6DCc4c52e4655e8f337d5c00"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6EE63656BbF5BE3fdF9Be4982BF9466F6a921b83",
+        "bpt_address": "0x7D98f308Db99FDD04BbF4217a4be8809F38fAa64"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x73f49a29F91e016CC9BdE5cdF6f5DC049280e5A9",
+        "bpt_address": "0xB2B918f2d628b4c8ff237b0A1c6aC3Bea222FEDc"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xE35f0152f0d49fE8E386E5c42B656321ffB0d477",
+        "bpt_address": "0x9B692f571b256140a39a34676BffA30634c586e1"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xe77D45b5dE97aC7717E4EdE6bE16E3D805fF02A5",
+        "bpt_address": "0xdD59f89B5B07B7844d72996fC9d83D81acC82196"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x0A4825154bCFD493d15777184d01B93e8115215a",
+        "bpt_address": "0xB54E6AADBF1ac1a3EF2A56E358706F0f8E320a03"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x5669736FD1dF3572f9D519FcCf7536A750CFAc62",
+        "bpt_address": "0xaE8535c23afeDdA9304B03c68a3563B75fc8f92b"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x06d27c0FE5AbF6020bf56E47c72Ca002dD5d9f54",
+        "bpt_address": "0x1bd2F176a812e312077BcA87e37c08432Bb09F3e"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6d5AF3414a73E498039a3720aFb4A376aE9C5a07",
+        "bpt_address": "0x4C81255Cc9eD7062180ea99962fE05aC0D57350B"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xe9E6E9597123034Fa3fc73D482852e18EdF9c282",
+        "bpt_address": "0xE8C56405Bc405840154d9b572927F4197D110dE1"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xFfb4Df23959E46C5BacD4b40b4bC9DA13E6DcBb0",
+        "bpt_address": "0x064BcC35BFE023Fe717A87574faE9333f98AAE4D"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x639F4583E505e9E0A16C5D90E1AF61b47415A3A9",
+        "bpt_address": "0xE2D16b0A39F3FBb4389a0E8F1efCBecFB3d1E6E1"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x9aaAf6757BE9e115895429EF6B81e05dCB951646",
+        "bpt_address": "0x158e0fBC2271E1dCEbadD365a22E2B4dD173C0DB"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x44bc38d3aF025C0EA9a4729E79d6E44244d68Ac6",
+        "bpt_address": "0x759FABc513AccD292ADA967C4DD7Bb94Da39232e"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x521824093f7341A66E9284Cf9Af76F0bE0855f0d",
+        "bpt_address": "0x26Cc136e9b8FD65466F193a8e5710661Ed9A9827"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x2Dc55e84bAF47296c2cf87B4eC3eb66fD7665611",
+        "bpt_address": "0x26Cc136e9b8FD65466F193a8e5710661Ed9A9827"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6dFD91757D68312129Ac97c34C754Fc1aee3b182",
+        "bpt_address": "0xB841B062eA8CCf5C4cb78032e91dE4aE87556042"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x21c377cBB2bEdDd8534308E5CdfeBE35fDF817E8",
+        "bpt_address": "0xe4e72f872c4048925a78E1e6Fddac411C9ae348A"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x5C0F23A5c1be65Fa710d385814a7Fd1Bda480b1C",
+        "bpt_address": "0x93d199263632a4EF4Bb438F1feB99e57b4b5f0BD"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xee01c0d9c0439c94D314a6ecAE0490989750746C",
+        "bpt_address": "0xE7e2c68d3b13d905BBb636709cF4DfD21076b9D2"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x414Eae9a827f4174A63Fe4f10E975678Ca28C898",
+        "bpt_address": "0xbE19d87Ea6cd5b05bBC34B564291c371dAe96747"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x4f3F3501F376D93E4E5FD61d4168f871CBf67C97",
+        "bpt_address": "0xdB02F620a59F1B16146EDD0e8dBEb27D94e9C25c"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x274fDa0D445097DCcC55c7F7EF85bFd3877a132e",
+        "bpt_address": "0x37b18B10ce5635a84834b26095A0AE5639dCB752"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xd66aBAD5516f668D8Ea6157666B74862546E6e80",
+        "bpt_address": "0xd6AbbfD427398ea463b4f15F405624baB520db03"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x05266A0d5aC04E44D394B8A8A2d0935d8809692b",
+        "bpt_address": "0xD5D99B7e9697bA8bB1dA48f07BA81900c7572CeA"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xD5417ACb575c799cEB373f85AdF100C7cD84C8c8",
+        "bpt_address": "0x10f8EA49255e8a865ca4edA1630168C85cC8ee81"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x250db2E6eC145c745653802CE21354eA77057901",
+        "bpt_address": "0x0DA692Ac0611397027c91E559cFD482C4197e403"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x15C84754c7445D0DF6c613f1490cA07654347c1B",
+        "bpt_address": "0x3ff3a210e57cFe679D9AD1e9bA6453A716C56a2e"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x2efCc89a1D534a8ee0e8dD469fa05cb20ccF5C19",
+        "bpt_address": "0x8ED9e70BfA17A1E2C4F8e561c8d0c2d1acc092fA"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x3aD46eA897eD7078F38d24769e7B8E81a15dDf95",
+        "bpt_address": "0xdd378A2a1DD89A90Ee1dE05afF195a4F2E476C49"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xf720e9137baa9C7612e6CA59149a5057ab320cFa",
+        "bpt_address": "0x8353157092ED8Be69a9DF8F95af097bbF33Cb2aF"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x02ea1C2702eCD478082D4b3AE902B6d10d26b920",
+        "bpt_address": "0x6f0ed6f346007563D3266DE350d174a831bDE0ca"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x7bDAD6A4A61F1C1132466962877552F5DE1E720d",
+        "bpt_address": "0x623729861bc3837c503708f995B93D317c3c1d7c"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x276Df166BC23bC6A84Aac1EA48E1acC32264b652",
+        "bpt_address": "0x6Ae5a7857aAd26722cB02CC168e38c52E0e4e45d"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xdf54d2Dd06F8Be3B0c4FfC157bE54EC9cca91F3C",
+        "bpt_address": "0xf01b0684C98CD7aDA480BFDF6e43876422fa1Fc1"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x4D4264aebf65Bb1727bb5438E0b2Aaf86186DA50",
+        "bpt_address": "0xF7A826D47c8E02835D94fb0Aa40F0cC9505cb134"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x13Dd3Eaecfb09A1EA9cED4A21CA47Ca7852C9694",
+        "bpt_address": "0x034E2d995B39A88aB9a532A9BF0deDDac2c576eA"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xe6281Fc01607366794597d7fA6b32931fF986969",
+        "bpt_address": "0x70d5E3234F6329c1D5a26796dcf4e109d69A3488"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xbB14A4ADf47921A2E86FAF6b80D39FB6eB43e82e",
+        "bpt_address": "0x5eeEEF8Ccf2aa28f6D2314a0566658B7Cc8fE136"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xCc6A23446f6388D78F3037BD55f2eB820352d982",
+        "bpt_address": "0x6228f64D5BA8376652Bfe7E36569D595347cF6Fb"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xeE707Ae5500DD9072aC0daB1170DD16d9AddD68F",
+        "bpt_address": "0x47E1Cf97A0586367349A14306A65F54Ba0b8f1B6"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x3b861B81B086Ef0CfFA0B00Cd2dDB3d545ec9B98",
+        "bpt_address": "0x52b69d6b3eB0BD6b2b4A48a316Dfb0e1460E67E4"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6A58e7C904eCF991A3183d28FC73bE90732B7a30",
+        "bpt_address": "0x40C806394d03d350420d13CD7d1DE1C806f34956"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x91a3dA17Bd563A099E3213a1784c8A25a7DD9f69",
+        "bpt_address": "0x94D6cb35f06abB71B87Afe266b93b902b9aa2ED9"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x1450be69022E6a51026b0b1d19CA70E6848d542d",
+        "bpt_address": "0x94D6cb35f06abB71B87Afe266b93b902b9aa2ED9"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x3c8502E60eBD1e036E1d3906Fc34e9616218B6e5",
+        "bpt_address": "0x01536b22ea06e4A315E3DAAF05a12683Ed4dc14c"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xAdE872ab2df9Fe42eF737720Db81FC0e360C40BF",
+        "bpt_address": "0x1EcfAE11F6c502c4CdDf532e7cA3302c7dcCa197"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x17748Aa07A6a1Be2ACE8bCC546919C006B40De34",
+        "bpt_address": "0x127ECc2318d002664cc4515C9f2B22B09b6aea85"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x0f58a431A2B6023686c40559DdE19C0d1A9D0AeF",
+        "bpt_address": "0x127ECc2318d002664cc4515C9f2B22B09b6aea85"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xF6B8309021406cFed5010C110C00F76C98348cE2",
+        "bpt_address": "0x81E998523f02ADf4679ff57Fff8cA2b9D23a5747"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x7fA019de859ba39dE15aCb63e84B8b03A85Aa5A7",
+        "bpt_address": "0x317994cbA902be6633DE043A6Bf05F4f08F43702"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x08e179Cf6F2Ca5dff67E93CdfBE2a29B2d8A27F7",
+        "bpt_address": "0x35c5C8C7B77942f9D44B535Fa590D8b503B2b00C"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x70754AB20c63cc65Ea12206CF28342723d731aC6",
+        "bpt_address": "0xb3b675a9A3CB0DF8F66Caf08549371BfB76A9867"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x25C171d81FD17CB514160D423F55c4471819003B",
+        "bpt_address": "0xDD36FdA7329291db8666540186cB36FCF0E36Eac"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xd639e7fAe7a8d0233d416bfd5dA2ae4f917D2E77",
+        "bpt_address": "0x02CA8086498552C071451724D3A34cAA3922b65a"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xF22BbdAd6B3Dd9314BdF97724DF32b09Ff95C216",
+        "bpt_address": "0xcF7b51ce5755513d4bE016b0e28D6EDEffa1d52a"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xc5e66bB9fE27b7Cef4B64557Ad8398437730DD33",
+        "bpt_address": "0xC58150838855a5605C9030398c6D22afd5Bb09EE"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x53Fa0546f307317dAA82371e94E8Dcd5CAd3345F",
+        "bpt_address": "0xf8C4CD95c7496cB7c8d97202Cf7e5b8DA2204C2b"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x95a84B18d25Df16FdF304F1B110f0BD26E18C132",
+        "bpt_address": "0x54ca50EE86616379420Cc56718E12566aa75Abbe"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xC6C69b977329D93E34fDBD2c37Ab8e70b8decFCD",
+        "bpt_address": "0x58B645FA247B60f2cB896991Fd8956146c9FCB4A"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x835A597a030203f131988F523992B820d2c12206",
+        "bpt_address": "0x3dE1b8854Ec4F1a6E45Fc56b8008AbB14EB103FB"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xf04fB738Fb96d88Ca4Dfd427Ff6Fd3BAFDD0427e",
+        "bpt_address": "0x9CA0ffCbae87A66a8f4604BFec724DA04e2474AE"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x1c9E55ae29541F2D29cDf83a38F53e1143Db278E",
+        "bpt_address": "0x7056C8DFa8182859eD0d4Fb0eF0886fdf3d2edCF"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xc2dc7cCAfBb14a6709124A92ae62C6BfA12a7AB0",
+        "bpt_address": "0x7056C8DFa8182859eD0d4Fb0eF0886fdf3d2edCF"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xFc3f916C28f32DEBA1cc04b1F6011F28a691134c",
+        "bpt_address": "0x1CCE5169bDe03f3d5aD0206f6BD057953539DAE6"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xf21Fa4Fb30cA6eAFDF567A02aAD92E49D6d0752D",
+        "bpt_address": "0xC2AA60465BfFa1A88f5bA471a59cA0435c3ec5c1"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xfC7D964f1676831d8105506b1F0c3B3e2B55c467",
+        "bpt_address": "0xfbfaD5fa9E99081da6461F36f229B5cC88A64c63"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x5D7C0521DB5a6F37aD839d0eEfbaF8205389adD8",
+        "bpt_address": "0xb9dEbDDF1d894c79D2B2d09f819FF9B856FCa552"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xC31624bb62132D9a55A76128158d4Cb864eB0c46",
+        "bpt_address": "0x50359088f666a9E70DC00B565Ecd9F853a572c7c"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xc592c33e51A764B94DB0702D8BAf4035eD577aED",
+        "bpt_address": "0xDACf5Fa19b1f720111609043ac67A9818262850c"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x008EB79DBE2Efcf8A9586F8F697464BE65D39eFf",
+        "bpt_address": "0x5F8B11995D7F95faA59cA6fD5fFA1C0dbBe0EC7b"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x4a3d252d121c627F2450f06412Ca5c5A62e662f2",
+        "bpt_address": "0x73f8E7A9A19E284a9Ac85704Af58454cFe75f059"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xf593c50A3a3e1294b6E3c089cEC44021BdD43Fa7",
+        "bpt_address": "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x85d6840EaB7473b60F10d1a3E2452243eb702C97",
+        "bpt_address": "0x577A7f7EE659Aa14Dc16FD384B3F8078E23F1920"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6be156504Cda8ee38169BE96Bcf53AEAB4377c1a",
+        "bpt_address": "0xee3959FD00a0B996d801fc34B7CE566bD037f5f5"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xC859BF9d7B8C557bBd229565124c2C09269F3aEF",
+        "bpt_address": "0x05ff47AFADa98a98982113758878F9A8B9FddA0a"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xdee29b7b6dF3576280bFBbC088ee9eBAA767C0Bd",
+        "bpt_address": "0x88794C65550DeB6b4087B7552eCf295113794410"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xF6A7ad46b00300344C7d4739C0518db70e722DC4",
+        "bpt_address": "0x49cbD67651fbabCE12d1df18499896ec87BEf46f"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x94981eB72dB7EBcAE91ABd5A810f34B1DBf21108",
+        "bpt_address": "0x6Aa6d7542310cDC75D1179B8729E1E6ec8d42BF1"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xA1D5B81d0024809FAA278Ab72fe3D2FB467Dd28b",
+        "bpt_address": "0xB06bFBD7b50F80c8d9dA57Fc4cF5CBD5B3E2f148"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xFFcF147bF814f05460aca27123e2aD9d1e92eC11",
+        "bpt_address": "0x7056C8DFa8182859eD0d4Fb0eF0886fdf3d2edCF"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xc40F4ABc616Ab3136A002A667A7830F3F7dEC5FA",
+        "bpt_address": "0xA2E9242163d54b536583368a01b5D232C95aA884"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x6D560CbE3Cc25Eca8c930835Ec3d296a6C16B210",
+        "bpt_address": "0x383e7859271B2D0589B013b6d944572a0a8bE3cB"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xa8B309a75f0D64ED632d45A003c68A30e59A1D8b",
+        "bpt_address": "0x596192bB6e41802428Ac943D2f1476C1Af25CC0E"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x5b0ed1fa8850012Db8B075602253335cACD53aD4",
+        "bpt_address": "0x99e7b15df044e1b62e2e1774fD4469d54D9409aC"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x80AeF246F9926B52622f4e74cdc7Acb5C4344FfE",
+        "bpt_address": "0x99e7b15df044e1b62e2e1774fD4469d54D9409aC"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x3ca33F22893a51A80Ed4ed8afebc900Ae813cA02",
+        "bpt_address": "0xD3F8AB9C5928FDf53153e7757131aD7815fe3146"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x0BcDb6d9b27Bd62d3De605393902C7d1a2c71Aab",
+        "bpt_address": "0x7761b6E0Daa04E70637D81f1Da7d186C205C2aDE"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x4a7475D32CCD29edD65b2a1712b091aA741ba9BB",
+        "bpt_address": "0xaA7a70070E7495fe86c67225329DbD39BAa2F63b"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xa2F8bd6B95a0cB9094206075504CD0ED1Cc717Be",
+        "bpt_address": "0x3932b187f440cE7703653b3908EDc5bB7676C283"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0xD98ed0426D18B115d6388923803e33ad8aaF11F8",
+        "bpt_address": "0xdEdb11A6a23263469567C2881A9b9F8629eE0041"
+    },
+    {
+        "blockchain": "ethereum",
+        "gauge_address": "0x253ED65fff980AEE7E94a0dC57BE304426048b35",
+        "bpt_address": "0x848a5564158d84b8A8fb68ab5D004Fae11619A54"
+    }
+]
