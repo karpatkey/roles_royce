@@ -29,7 +29,7 @@
     {
       "function_name": "exit_1_3",
       "label": "Withdraw (proportional) (Recovery mode)",
-      "test": false,
+      "test": true,
       "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
       "parameters": [
         {
@@ -73,7 +73,7 @@
     {
       "function_name": "exit_2_3",
       "label": "Unstake + withdraw (proportional) (Recovery mode)",
-      "test": false,
+      "test": true,
       "description": "Unstake the BPT from the Balancer gauge and exit pool with proportional exit. (Recovery mode)",
       "parameters": [
         {

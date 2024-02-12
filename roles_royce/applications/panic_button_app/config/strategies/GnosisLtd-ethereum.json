@@ -44,7 +44,7 @@
                 {
                     "function_name": "exit_1_3",
                     "label": "Withdraw (proportional) (Recovery mode)",
-                    "test": false,
+                    "test": true,
                     "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
                     "parameters": [
                         {

@@ -76,4 +76,12 @@ def get_gauge_address_from_bpt(w3: Web3, bpt_address: Address) -> Address:
     blockchain = Chain.get_blockchain_from_web3(w3)
     get_gauge_contract = balancer.ContractSpecs[blockchain].LiquidityGaugeFactory.contract(w3)
     gauge_address = get_gauge_contract.functions.getPoolGauge(bpt_address).call()
+    if gauge_address == "0x0000000000000000000000000000000000000000":
+        with open(os.path.join(os.path.dirname(__file__), 'db', f'gauge_db_{Chain.get_blockchain_from_web3(w3)}.json'), 'r') as f:
+            gauge_db = json.load(f)
+        for item in gauge_db:
+            if Web3.to_checksum_address(item.get('bpt_address')) == bpt_address:
+                gauge_address = item.get('gauge_address')
+                return gauge_address
+
     return gauge_address

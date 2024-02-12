@@ -1,5 +1,6 @@
 from roles_royce.applications.panic_button_app.utils import ENV
 from tests.utils import assign_role, local_node_eth, accounts, web3_eth, local_node_gc, web3_gnosis
+from tests.utils import top_up_address, fork_unlock_account 
 import os
 import json
 import pytest
@@ -8,6 +9,10 @@ from pathlib import Path
 from dataclasses import dataclass
 import logging
 from time import sleep
+from web3.exceptions import ContractLogicError
+from defabipedia.balancer import Abis as BalancerAbis
+from defabipedia.aura import Abis as AuraAbis
+from defabipedia.types import Chain
 
 logging.basicConfig(filename='stresstest.log', level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -86,6 +91,7 @@ def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
     if dao.blockchain == 'ETHEREUM':
         block = local_node_eth.w3.eth.default_block
         local_node_eth.set_block(block)
+        w3 = local_node_eth.w3
         logging.info(f'Block number: {local_node_eth.w3.eth.block_number}')
         disassembler_address = accounts[0].address
         private_key = accounts[0].key.hex()
@@ -98,6 +104,7 @@ def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
         block = local_node_gc.w3.eth.default_block
         local_node_gc.set_block(block)
         logging.info(f'Block number: {local_node_gc.w3.eth.block_number}')
+        w3 = local_node_gc.w3
         disassembler_address = accounts[0].address
         private_key = accounts[0].key.hex()
         assign_role(local_node=local_node_gc,
@@ -108,7 +115,7 @@ def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
     else:
         raise ValueError(f'Blockchain {dao.blockchain} not supported')
 
-    return private_key
+    return w3, private_key
 
 
 def set_env(monkeypatch, private_key: str, dao: DAO) -> ENV:
@@ -118,12 +125,33 @@ def set_env(monkeypatch, private_key: str, dao: DAO) -> ENV:
     monkeypatch.setenv(f'{dao.name.upper()}_{dao.blockchain.upper()}_PRIVATE_KEY', private_key)
     return ENV(dao.name, dao.blockchain)
 
-
+def recovery_mode_balancer(w3, bpt_address: str, exit_strategy: str):
+    blockchain = Chain.get_blockchain_from_web3(w3)
+    try:
+        bpt_contract = w3.eth.contract(address=bpt_address,
+                                                abi=BalancerAbis[blockchain].UniversalBPT.abi)
+        bpt_pool_recovery_mode = bpt_contract.functions.inRecoveryMode().call()
+    except ContractLogicError:
+        logging.info('Balancer pool has no recovery mode')
+        if (exit_strategy == 'exit_1_3' or exit_strategy == 'exit_2_3'):
+            logging.info('Test will not execute')
+            return True
+        else:
+            return False
+    if bpt_pool_recovery_mode and (exit_strategy == 'exit_1_1' or exit_strategy == 'exit_2_1'):
+        logging.info('Balancer pool is in recovery mode, not testing this exit_strategy')
+        return True
+    elif not bpt_pool_recovery_mode and (exit_strategy == 'exit_1_3' or exit_strategy == 'exit_2_3'):
+        logging.info('Balancer pool is not in recovery mode, not testing this exit_strategy')
+        return True
+    else:
+        return False
+        
 @pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False),
                     reason="Long position integration test not running by default.")
 @pytest.mark.parametrize("dao, exec_config", test_parameters)
 def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch, dao, exec_config):
-    private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
+    w3, private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
     logging.info(f'Running stresstest on DAO: {dao.name}, Blockchain: {dao.blockchain}, Protocol: {exec_config["protocol"]}')
@@ -147,6 +175,29 @@ def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch, dao, e
         elif item['name'] == 'token_out_address':
             exit_arguments_dict[item['name']] = item['options'][0]['value']
     exit_arguments = [exit_arguments_dict]
+
+    blockchain = Chain.get_blockchain_from_web3(w3)
+    if exec_config['protocol'] == 'Balancer' and (exec_config['function_name'] == 'exit_1_1' or exec_config['function_name'] == 'exit_1_3'):
+        bpt_address = exit_arguments_dict['bpt_address']
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
+    elif exec_config['protocol'] == 'Balancer' and (exec_config['function_name'] == 'exit_2_1' or exec_config['function_name'] == 'exit_2_3'):
+        gauge_address = exit_arguments_dict['gauge_address']
+        gauge_contract = w3.eth.contract(address=gauge_address,
+                                                abi=BalancerAbis[blockchain].Gauge.abi)
+        bpt_address = gauge_contract.functions.lp_token().call()  
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
+    elif exec_config['protocol'] == 'Aura' and (exec_config['function_name'] == 'exit_2_1' or exec_config['function_name'] == 'exit_2_3'):
+        aura_rewards_address = exit_arguments_dict['rewards_address']
+        aura_rewards_contract = w3.eth.contract(address=aura_rewards_address,
+                                                     abi=AuraAbis[blockchain].BaseRewardPool.abi)
+        bpt_address = aura_rewards_contract.functions.asset().call()
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
 
     logging.info(f'Exit arguments: {exit_arguments}')
 
@@ -195,7 +246,7 @@ def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch, dao, e
 def test_stresstest_single(local_node_eth, local_node_gc, accounts, monkeypatch, index):
     dao = test_parameters[index][0]
     exec_config = test_parameters[index][1]
-    private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
+    w3, private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
     logging.info(f'Running stresstest on DAO: {dao.name}, Blockchain: {dao.blockchain}, Protocol: {exec_config["protocol"]}')
@@ -219,6 +270,29 @@ def test_stresstest_single(local_node_eth, local_node_gc, accounts, monkeypatch,
         elif item['name'] == 'token_out_address':
             exit_arguments_dict[item['name']] = item['options'][0]['value']
     exit_arguments = [exit_arguments_dict]
+
+    blockchain = Chain.get_blockchain_from_web3(w3)
+    if exec_config['protocol'] == 'Balancer' and (exec_config['function_name'] == 'exit_1_1' or exec_config['function_name'] == 'exit_1_3'):
+        bpt_address = exit_arguments_dict['bpt_address']
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
+    elif exec_config['protocol'] == 'Balancer' and (exec_config['function_name'] == 'exit_2_1' or exec_config['function_name'] == 'exit_2_3'):
+        gauge_address = exit_arguments_dict['gauge_address']
+        gauge_contract = w3.eth.contract(address=gauge_address,
+                                                abi=BalancerAbis[blockchain].Gauge.abi)
+        bpt_address = gauge_contract.functions.lp_token().call()  
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
+    elif exec_config['protocol'] == 'Aura' and (exec_config['function_name'] == 'exit_2_1' or exec_config['function_name'] == 'exit_2_3'):
+        aura_rewards_address = exit_arguments_dict['rewards_address']
+        aura_rewards_contract = w3.eth.contract(address=aura_rewards_address,
+                                                     abi=AuraAbis[blockchain].BaseRewardPool.abi)
+        bpt_address = aura_rewards_contract.functions.asset().call()
+        test = recovery_mode_balancer(w3, bpt_address, exec_config['function_name'])
+        if test:
+            return
 
     logging.info(f'Exit arguments: {exit_arguments}')
 
@@ -260,3 +334,4 @@ def test_stresstest_single(local_node_eth, local_node_gc, accounts, monkeypatch,
     assert main.returncode == 0
     dict_message_stdout = json.loads(main.stdout[:-1])
     assert dict_message_stdout['status'] == 200
+

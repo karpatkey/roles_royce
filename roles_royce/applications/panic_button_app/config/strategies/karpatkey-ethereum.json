@@ -16,7 +16,7 @@
         {
             "protocol": "Balancer",
             "position_id": "383",
-            "position_id_tech": "0x0000000000000000000000000000000000000000",
+            "position_id_tech": "0x95201B61EF19C867dA0D093DF20021e1a559452c",
             "position_id_human_readable": "ethereum_Balancer_LDO_wstETH_staked",
             "exec_config": [
                 {
@@ -28,7 +28,7 @@
                         {
                             "name": "gauge_address",
                             "type": "constant",
-                            "value": "0x0000000000000000000000000000000000000000"
+                            "value": "0x95201B61EF19C867dA0D093DF20021e1a559452c"
                         },
                         {
                             "name": "max_slippage",
@@ -44,13 +44,13 @@
                 {
                     "function_name": "exit_2_3",
                     "label": "Unstake + withdraw (proportional) (Recovery mode)",
-                    "test": false,
+                    "test": true,
                     "description": "Unstake the BPT from the Balancer gauge and exit pool with proportional exit. (Recovery mode)",
                     "parameters": [
                         {
                             "name": "gauge_address",
                             "type": "constant",
-                            "value": "0x0000000000000000000000000000000000000000"
+                            "value": "0x95201B61EF19C867dA0D093DF20021e1a559452c"
                         },
                         {
                             "name": "max_slippage",
@@ -96,7 +96,7 @@
                 {
                     "function_name": "exit_1_3",
                     "label": "Withdraw (proportional) (Recovery mode)",
-                    "test": false,
+                    "test": true,
                     "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
                     "parameters": [
                         {
@@ -161,7 +161,7 @@
                 {
                     "function_name": "exit_2_3",
                     "label": "Unstake + withdraw (proportional) (Recovery mode)",
-                    "test": false,
+                    "test": true,
                     "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
                     "parameters": [
                         {

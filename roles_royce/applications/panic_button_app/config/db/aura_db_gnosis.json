@@ -113,5 +113,10 @@
         "blockchain": "gnosis",
         "bpt_address": "0x06135A9Ae830476d3a941baE9010B63732a055F4",
         "aura_address": "0x408883E983695DeC78CF66480e6eFeF907a73c21"
+    },
+    {
+        "blockchain": "gnosis",
+        "bpt_address": "0xc9F00C3a713008DDf69b768d90d4978549bFDF94",
+        "aura_address": "0xFaD4505C5bF3D3654bA7C97A0Cea6e7B35882959"
     }
 ]
