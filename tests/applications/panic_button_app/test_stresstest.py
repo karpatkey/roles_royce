@@ -147,7 +147,7 @@ def recovery_mode_balancer(w3, bpt_address: str, exit_strategy: str):
     else:
         return False
         
-@pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", True),
+@pytest.mark.skipif(not os.environ.get("RR_RUN_STRESSTEST", False),
                     reason="Long position integration test not running by default.")
 @pytest.mark.parametrize("dao, exec_config", test_parameters)
 def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch, dao, exec_config):
