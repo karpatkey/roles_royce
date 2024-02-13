@@ -50,7 +50,18 @@ daos = [DAO(name="GnosisDAO",
             blockchain="ETHEREUM",
             avatar_safe_address="0x58e6c7ab55Aa9012eAccA16d1ED4c15795669E1C",
             roles_mod_address="0x8C33ee6E439C874713a9912f3D3debfF1Efb90Da",
+            role=1),
+        DAO(name="BalancerDAO",
+            blockchain="ETHEREUM",
+            avatar_safe_address="0x58e6c7ab55Aa9012eAccA16d1ED4c15795669E1C",
+            roles_mod_address="0x8C33ee6E439C874713a9912f3D3debfF1Efb90Da",
+            role=1),
+        DAO(name="ENSDAO",
+            blockchain="ETHEREUM",
+            avatar_safe_address="0x0EFcCBb9E2C09Ea29551879bd9Da32362b32fc89",
+            roles_mod_address="0xd8dd9164E765bEF903E429c9462E51F0Ea8514F9",
             role=1)
+
         ]
 
 file_path_transaction_builder = os.path.join(Path(os.path.dirname(__file__)).resolve().parent.parent.parent,

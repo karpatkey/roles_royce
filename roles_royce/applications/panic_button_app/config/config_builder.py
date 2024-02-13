@@ -18,6 +18,8 @@ class DAO(StrEnum):
     GnosisDAO = "GnosisDAO"
     GnosisLtd = "GnosisLtd"
     karpatkey = "karpatkey"
+    ENS = "ENS"
+    BalancerDAO = "BalancerDAO"
 
     def __str__(self):
         return self.name
@@ -48,7 +50,7 @@ def seed_file(dao: DAO, blockchain: Blockchain) -> None:
                     "label": "Percentage",
                     "type": "input",
                     "rules": {
-                        "min": 0,
+                        "min": 0.001,
                         "max": 100
                     }
                 }
