@@ -7,7 +7,7 @@
             "label": "Percentage",
             "type": "input",
             "rules": {
-                "min": 0,
+                "min": 0.001,
                 "max": 100
             }
         }
@@ -35,7 +35,7 @@
                             "label": "Max slippage",
                             "type": "input",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
@@ -57,7 +57,7 @@
                             "label": "Max slippage",
                             "type": "input",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
@@ -100,7 +100,7 @@
                             "label": "Max Slippage",
                             "type": "input",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
@@ -122,7 +122,7 @@
                             "label": "Max Slippage",
                             "type": "input",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
@@ -165,7 +165,7 @@
                             "label": "Max Slippage",
                             "type": "input",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
@@ -187,7 +187,7 @@
                             "label": "Max Slippage",
                             "type": "input",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
@@ -230,7 +230,7 @@
                             "label": "Max Slippage",
                             "type": "input",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
@@ -252,7 +252,7 @@
                             "label": "Max Slippage",
                             "type": "input",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
@@ -295,7 +295,7 @@
                             "label": "Max Slippage",
                             "type": "input",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
@@ -317,7 +317,7 @@
                             "label": "Max Slippage",
                             "type": "input",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
@@ -349,7 +349,7 @@
                             "type": "input",
                             "label": "Max slippage",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
@@ -381,7 +381,7 @@
                             "label": "Max slippage",
                             "type": "input",
                             "rules": {
-                                "min": 0,
+                                "min": 0.001,
                                 "max": 100
                             }
                         }
