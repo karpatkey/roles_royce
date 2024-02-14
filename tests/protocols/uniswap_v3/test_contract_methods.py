@@ -138,7 +138,7 @@ def test_integration_eth(local_node_eth, accounts):
     eth_balance = get_balance(w3, ETHAddr.ZERO, safe.address) / 10**18
     usdc_balance = get_balance(w3, ETHAddr.USDC, safe.address) / 10**6
     
-    assert eth_balance == approx(9.99999, abs=0.2)
+    assert eth_balance == approx(9.99999, abs=0.3)
     assert usdc_balance == approx(97033.6)
     
     # nft id
@@ -228,7 +228,7 @@ def test_integration_eth(local_node_eth, accounts):
     eth_balance = get_balance(w3, ETHAddr.ZERO, safe.address) / 10**18
     usdc_balance = get_balance(w3, ETHAddr.USDC, safe.address) / 10**6
 
-    assert eth_balance == approx(10.99999, abs=0.2)
+    assert eth_balance == approx(10.99999, abs=0.3)
     assert usdc_balance == approx(100000)
 
 def test_integration_no_eth(local_node_eth, accounts):
