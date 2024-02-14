@@ -31,7 +31,7 @@ jobs:
       - name: Build and push
         run: ./.github/scripts/build_and_push.sh
         env:
-          DOCKER_IMAGE_NAME: "registry.digitalocean.com/karpatkey/EURE-rebalancing-bot"
+          DOCKER_IMAGE_NAME: "registry.digitalocean.com/karpatkey/eure-rebalancing-bot"
           DOCKERFILE: "./docker/Dockerfile.eur"
 
   docker-keeper:
