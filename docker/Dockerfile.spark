@@ -1,9 +1,7 @@
-### Multi stage docker build
-
-ARG DEBIAN_FRONTEND=noninteractive
-
 # Build Stage
 FROM python:3.10-slim-buster AS builder
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /build
 
@@ -11,7 +9,7 @@ WORKDIR /build
 COPY . .
 
 # Install build dependencies and compile
-RUN apt-get update && apt-get upgrade -qq -y && \
+RUN apt-get update -q && apt-get upgrade -qq -y && \
     apt-get install -qq -y build-essential gcc git && \
     pip install . \
     pip install -r roles_royce/applications/spark_anti_liquidation_bot/requirements.txt
