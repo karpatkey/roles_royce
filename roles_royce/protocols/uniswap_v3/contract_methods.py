@@ -137,10 +137,9 @@ class DecreaseLiquidity(ContractMethod):
                  liquidity: int,
                  amount0_min: int,
                  amount1_min: int,
-                 deadline: int,
-                 value: int = 0):
+                 deadline: int):
         self.target_address = ContractSpecs[blockchain].PositionsNFT.address
-        super().__init__(value=value)
+        super().__init__()
         self.args.token_id = token_id
         self.args.liquidity = liquidity
         self.args.amount0_min = amount0_min
