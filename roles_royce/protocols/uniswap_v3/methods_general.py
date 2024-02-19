@@ -9,9 +9,9 @@ from karpatkit.constants import Address as GenAddr
 from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 from datetime import datetime
 import math
-from karpatkit.node import get_node
 
 COLLECT_AMOUNT_MAX = 340282366920938463463374607431768211455
+
 
 def mint_nft(w3: Web3,
              avatar: Address,
