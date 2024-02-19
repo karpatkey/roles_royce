@@ -2,6 +2,12 @@ name: Roles Royce tests
 
 on: [push]
 
+env:
+ GIT_REF: ${{ github.head_ref || github.ref_name }}
+ DOCKER_REGISTRY: ${{ secrets.DOCKER_URL }}
+ DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+ DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
 jobs:
   Test:
 
@@ -31,116 +37,37 @@ jobs:
         run: coverage report
 
   docker-spark:
-    needs: Test
     runs-on: self-hosted
-
+    needs: Test
     steps:
       - uses: actions/checkout@v4
 
-      - name: Docker meta
-        id: docker_meta
-        uses: docker/metadata-action@v3
-        with:
-          images: registry.digitalocean.com/karpatkey/spark-anti-liquidation-bot
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix={{branch}}-
-
-
-      - name: Login to Docker
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ secrets.DOCKER_URL }}
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: build and Push image
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          file: ./docker/Dockerfile.spark
-          build-args: |
-            BUILDKIT_CONTEXT_KEEP_GIT_DIR=true
+      - name: Build and push
+        run: ./.github/scripts/build_and_push.sh
+        env:
+          DOCKER_IMAGE_NAME: "registry.digitalocean.com/karpatkey/spark-anti-liquidation-bot"
+          DOCKERFILE: "./docker/Dockerfile.spark"
 
   docker-eur:
-    needs: Test
     runs-on: self-hosted
-
+    needs: Test
     steps:
       - uses: actions/checkout@v4
 
-      - name: Docker meta
-        id: docker_meta
-        uses: docker/metadata-action@v3
-        with:
-          images: registry.digitalocean.com/karpatkey/EURE-rebalancing-bot
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix={{branch}}-
-
-
-      - name: Login to Docker
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ secrets.DOCKER_URL }}
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: build and Push image
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          file: ./docker/Dockerfile.eur
-          build-args: |
-            BUILDKIT_CONTEXT_KEEP_GIT_DIR=true
+      - name: Build and push
+        run: ./.github/scripts/build_and_push.sh
+        env:
+          DOCKER_IMAGE_NAME: "registry.digitalocean.com/karpatkey/eure-rebalancing-bot"
+          DOCKERFILE: "./docker/Dockerfile.eur"
 
   docker-keeper:
-    needs: Test
     runs-on: self-hosted
-
+    needs: Test
     steps:
       - uses: actions/checkout@v4
 
-      - name: Docker meta
-        id: docker_meta
-        uses: docker/metadata-action@v3
-        with:
-          images: registry.digitalocean.com/karpatkey/bridge-keeper-bot
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix={{branch}}-
-
-
-      - name: Login to Docker
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ secrets.DOCKER_URL }}
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/docker
-          key: ${{ runner.os }}-docker-${{ hashFiles('**/docker/Dockerfile*') }}
-
-      - name: build and Push image
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          file: ./docker/Dockerfile.keeper
-          build-args: |
-            BUILDKIT_CONTEXT_KEEP_GIT_DIR=true
+      - name: Build and push
+        run: ./.github/scripts/build_and_push.sh
+        env:
+          DOCKER_IMAGE_NAME: "registry.digitalocean.com/karpatkey/bridge-keeper-bot"
+          DOCKERFILE: "./docker/Dockerfile.keeper"
