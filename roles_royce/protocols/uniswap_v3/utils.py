@@ -14,44 +14,62 @@ def validate_tokens(token0: Address, token1: Address):
         raise ValueError("token0 and token1 must be different")
 
 
-def validate_amounts(amount0_desired: float, amount1_desired: float):
-    if amount0_desired == 0 and amount1_desired == 0:
-        raise ValueError("amount0_desired and amount1_desired cannot both be 0")
+def validate_amounts(amount0_desired: float, amount1_desired: float) -> tuple:
+    if not amount0_desired and not amount1_desired:
+        raise ValueError("One of amount0_desired or amount1_desired must be provided")
 
-    if amount0_desired > 0:
-        if amount1_desired != 0:
-            raise ValueError(
-                "amount1_desired must be 0 if amount0_desired is greater than 0"
-            )
+    if amount0_desired:
+        if amount0_desired <= 0:
+            raise ValueError("amount0_desired must be greater than 0")
+        else:
+            if amount1_desired:
+                raise ValueError("Only one amount can be provided")
+            else:
+                amount1_desired = 0
+    else:
+        if amount1_desired <= 0:
+            raise ValueError("amount1_desired must be greater than 0")
+        else:
+            if amount0_desired:
+                raise ValueError("Only one amount can be provided")
+            else:
+                amount0_desired = 0
 
-    if amount1_desired > 0:
-        if amount0_desired != 0:
-            raise ValueError(
-                "amount0_desired must be 0 if amount1_desired is greater than 0"
-            )
+    return amount0_desired, amount1_desired
 
 
 def validate_price_percentage_deviation(
-    token_0_min_price_perc_dev: float, token_0_max_price_perc_dev: float
+    token0_min_price_perc_dev: float, token0_max_price_perc_dev: float
 ):
-    if not 0 <= token_0_min_price_perc_dev <= 100:
-        raise ValueError("token_0_min_percentage_deviation must be between 0 and 100")
+    if not 0 <= token0_min_price_perc_dev <= 100:
+        raise ValueError("token0_min_percentage_deviation must be between 0 and 100")
 
-    if not 0 <= token_0_max_price_perc_dev <= 100:
-        raise ValueError("token_0_max_percentage_deviation must be between 0 and 100")
+    if not 0 <= token0_max_price_perc_dev <= 100:
+        raise ValueError("token0_max_percentage_deviation must be between 0 and 100")
 
 
-def validate_slippage(amount_0_min_slippage: float, amount_1_min_slippage: float):
-    if not 0 <= amount_0_min_slippage <= 100:
-        raise ValueError("amount_0_min_slippage must be between 0 and 100")
+def validate_slippage(amount0_min_slippage: float, amount1_min_slippage: float):
+    if not 0 <= amount0_min_slippage <= 100:
+        raise ValueError("amount0_min_slippage must be between 0 and 100")
 
-    if not 0 <= amount_1_min_slippage <= 100:
-        raise ValueError("amount_1_min_slippage must be between 0 and 100")
+    if not 0 <= amount1_min_slippage <= 100:
+        raise ValueError("amount1_min_slippage must be between 0 and 100")
 
 
 def validate_removed_liquidity_percentage(removed_liquidity_percentage: float):
     if not 0 <= removed_liquidity_percentage <= 100:
         raise ValueError("removed_liquidity_percentage must be between 0 and 100")
+
+
+def check_allowance(
+    w3: Web3, owner: Address, spender: Address, token: Address, amount: Decimal
+) -> bool:
+    allowance = (
+        w3.eth.contract(address=token, abi=TokenAbis.ERC20.abi)
+        .functions.allowance(owner, spender)
+        .call()
+    )
+    return allowance >= amount
 
 
 class Pool:
@@ -158,7 +176,7 @@ def set_and_check_desired_amounts(
     tick_upper: int,
     send_eth: bool,
 ):
-    if amount0_desired > 0:
+    if amount0_desired:
         amount1_desired = Decimal(
             amount0_desired
             * pool.sqrt_price_x96
@@ -167,7 +185,7 @@ def set_and_check_desired_amounts(
         ) / Decimal(
             (2**96) * (1.0001 ** (tick_upper / 2) * (2**96) - pool.sqrt_price_x96)
         )
-    elif amount1_desired > 0:
+    elif amount1_desired:
         amount0_desired = Decimal(
             amount1_desired
             * (2**96)

@@ -1,6 +1,13 @@
 from roles_royce.protocols import uniswap_v3
 from defabipedia.types import Chain
-from tests.utils import (local_node_eth, accounts, get_balance, steal_token, create_simple_safe, top_up_address)
+from tests.utils import (
+    local_node_eth,
+    accounts,
+    get_balance,
+    steal_token,
+    create_simple_safe,
+    top_up_address,
+)
 from tests.roles import setup_common_roles, deploy_roles, apply_presets
 from roles_royce import roles
 from defabipedia.uniswap_v3 import ContractSpecs
@@ -9,9 +16,16 @@ from pytest import approx
 
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
 
+
 def test_approve_method():
-    method = uniswap_v3.ApproveForPositionsNFT(blockchain=Chain.ETHEREUM, token=ETHAddr.USDC, amount=123)
-    assert method.data == "0x095ea7b3000000000000000000000000c36442b4a4522e871399cd717abdd847ab11fe88000000000000000000000000000000000000000000000000000000000000007b"
+    method = uniswap_v3.ApproveForPositionsNFT(
+        blockchain=Chain.ETHEREUM, token=ETHAddr.USDC, amount=123
+    )
+    assert (
+        method.data
+        == "0x095ea7b3000000000000000000000000c36442b4a4522e871399cd717abdd847ab11fe88000000000000000000000000000000000000000000000000000000000000007b"
+    )
+
 
 def test_mint():
     method = uniswap_v3.Mint(
@@ -26,12 +40,18 @@ def test_mint():
         amount1_desired=999999999786827347,
         amount0_min=0,
         amount1_min=0,
-        deadline=1707313036)
-    assert method.data == "0x88316456000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000307c800000000000000000000000000000000000000000000000000000000000307dc00000000000000000000000000000000000000000000000000000001125fe26d0000000000000000000000000000000000000000000000000de0b6b39aaf3e5300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d0000000000000000000000000000000000000000000000000000000065c3878c"
+        deadline=1707313036,
+    )
+    assert (
+        method.data
+        == "0x88316456000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000307c800000000000000000000000000000000000000000000000000000000000307dc00000000000000000000000000000000000000000000000000000001125fe26d0000000000000000000000000000000000000000000000000de0b6b39aaf3e5300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d0000000000000000000000000000000000000000000000000000000065c3878c"
+    )
+
 
 def test_refund_eth():
     method = uniswap_v3.RefundETH(blockchain=Chain.ETHEREUM)
     assert method.data == "0x12210e8a"
+
 
 def test_increase_liquidity():
     method = uniswap_v3.IncreaseLiquidity(
@@ -41,8 +61,12 @@ def test_increase_liquidity():
         amount1_desired=999999999866768757,
         amount0_min=2911438948,
         amount1_min=971641762367882813,
-        deadline=1707320231)
-    assert method.data == "0x219f5d1700000000000000000000000000000000000000000000000000000000000a3cc000000000000000000000000000000000000000000000000000000000b1ba59180000000000000000000000000000000000000000000000000de0b6b39f730d7500000000000000000000000000000000000000000000000000000000ad8908640000000000000000000000000000000000000000000000000d7bf708eedf463d0000000000000000000000000000000000000000000000000000000065c3a3a7"
+        deadline=1707320231,
+    )
+    assert (
+        method.data
+        == "0x219f5d1700000000000000000000000000000000000000000000000000000000000a3cc000000000000000000000000000000000000000000000000000000000b1ba59180000000000000000000000000000000000000000000000000de0b6b39f730d7500000000000000000000000000000000000000000000000000000000ad8908640000000000000000000000000000000000000000000000000d7bf708eedf463d0000000000000000000000000000000000000000000000000000000065c3a3a7"
+    )
 
 
 def test_decrease_liquidity():
@@ -52,8 +76,13 @@ def test_decrease_liquidity():
         liquidity=44104265461504192,
         amount0_min=0,
         amount1_min=0,
-        deadline=1707320231)
-    assert method.data == "0x0c49ccbe00000000000000000000000000000000000000000000000000000000000a3cc0000000000000000000000000000000000000000000000000009cb09883e998c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065c3a3a7"
+        deadline=1707320231,
+    )
+    assert (
+        method.data
+        == "0x0c49ccbe00000000000000000000000000000000000000000000000000000000000a3cc0000000000000000000000000000000000000000000000000009cb09883e998c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000065c3a3a7"
+    )
+
 
 def test_collect():
     method = uniswap_v3.Collect(
@@ -61,20 +90,33 @@ def test_collect():
         recipient=AVATAR,
         token_id=670912,
         amount0_max=340282366920938463463374607431768211455,
-        amount1_max=340282366920938463463374607431768211455)
-    assert method.data == "0xfc6f786500000000000000000000000000000000000000000000000000000000000a3cc0000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d00000000000000000000000000000000ffffffffffffffffffffffffffffffff00000000000000000000000000000000ffffffffffffffffffffffffffffffff"
+        amount1_max=340282366920938463463374607431768211455,
+    )
+    assert (
+        method.data
+        == "0xfc6f786500000000000000000000000000000000000000000000000000000000000a3cc0000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d00000000000000000000000000000000ffffffffffffffffffffffffffffffff00000000000000000000000000000000ffffffffffffffffffffffffffffffff"
+    )
+
 
 def test_unwrap_weth9():
-    method = uniswap_v3.UnwrapWETH9(blockchain=Chain.ETHEREUM, avatar=AVATAR, amount_minimum=0)
-    assert method.data == "0x49404b7c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d"
+    method = uniswap_v3.UnwrapWETH9(
+        blockchain=Chain.ETHEREUM, avatar=AVATAR, amount_minimum=0
+    )
+    assert (
+        method.data
+        == "0x49404b7c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d"
+    )
+
 
 def test_sweep_token():
     method = uniswap_v3.SweepToken(
-        blockchain=Chain.ETHEREUM,
-        avatar=AVATAR,
-        amount_minimum=0,
-        token=ETHAddr.USDC)
-    assert method.data == "0xdf2ab5bb000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000000000000000000000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d"
+        blockchain=Chain.ETHEREUM, avatar=AVATAR, amount_minimum=0, token=ETHAddr.USDC
+    )
+    assert (
+        method.data
+        == "0xdf2ab5bb000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000000000000000000000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d"
+    )
+
 
 def test_integration_eth(local_node_eth, accounts):
     w3 = local_node_eth.w3
@@ -98,22 +140,36 @@ def test_integration_eth(local_node_eth, accounts):
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000c36442b4a4522e871399cd717abdd847ab11fe8849404b7c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000220000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value": "0"},
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000c36442b4a4522e871399cd717abdd847ab11fe88df2ab5bb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value": "0"}
     ]}"""
-    apply_presets(safe, roles_ctract, json_data=presets,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
-    
+    apply_presets(
+        safe,
+        roles_ctract,
+        json_data=presets,
+        replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])],
+    )
 
     # fund safe with eth
     top_up_address(w3, safe.address, 10)
 
     # steal USDC
-    steal_token(w3, token=ETHAddr.USDC, holder="0xD6153F5af5679a75cC85D8974463545181f48772",
-                to=safe.address, amount=100_000_000_000)
-    
+    steal_token(
+        w3,
+        token=ETHAddr.USDC,
+        holder="0xD6153F5af5679a75cC85D8974463545181f48772",
+        to=safe.address,
+        amount=100_000_000_000,
+    )
+
     # approve USDC
-    approve_usdc = uniswap_v3.ApproveForPositionsNFT(blockchain=Chain.ETHEREUM, token=ETHAddr.USDC, amount=100_000_000_000)
-    roles.send([approve_usdc], role=1, private_key=accounts[1].key,
-               roles_mod_address=roles_ctract.address,
-               web3=w3)
+    approve_usdc = uniswap_v3.ApproveForPositionsNFT(
+        blockchain=Chain.ETHEREUM, token=ETHAddr.USDC, amount=100_000_000_000
+    )
+    roles.send(
+        [approve_usdc],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
 
     # mint
     mint = uniswap_v3.Mint(
@@ -129,22 +185,30 @@ def test_integration_eth(local_node_eth, accounts):
         amount0_min=2896267889,
         amount1_min=971714435369867492,
         deadline=1707500064,
-        value=1000_000_000_000_000_000)
-    
-    send_mint = roles.send([mint], role=1, private_key=accounts[1].key,
-                  roles_mod_address=roles_ctract.address,
-                  web3=w3)
-    
+        value=1000_000_000_000_000_000,
+    )
+
+    send_mint = roles.send(
+        [mint],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
+
     eth_balance = get_balance(w3, ETHAddr.ZERO, safe.address) / 10**18
     usdc_balance = get_balance(w3, ETHAddr.USDC, safe.address) / 10**6
-    
+
     assert eth_balance == approx(9.99999, abs=0.3)
     assert usdc_balance == approx(97033.6)
-    
+
     # nft id
     nft_id = None
     for log in send_mint["logs"]:
-        if log["topics"][0].hex() == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f":  # IncreaseLiquidity
+        if (
+            log["topics"][0].hex()
+            == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f"
+        ):  # IncreaseLiquidity
             nft_id = int(log["topics"][1].hex(), 16)
             break
 
@@ -153,10 +217,14 @@ def test_integration_eth(local_node_eth, accounts):
     # refund eth
     refund_eth = uniswap_v3.RefundETH(blockchain=Chain.ETHEREUM)
 
-    send_refund = roles.send([refund_eth], role=1, private_key=accounts[1].key,
-                    roles_mod_address=roles_ctract.address,
-                    web3=w3)
-    
+    send_refund = roles.send(
+        [refund_eth],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
+
     # increase liquidity
     increase_liquidity = uniswap_v3.IncreaseLiquidity(
         blockchain=Chain.ETHEREUM,
@@ -166,21 +234,33 @@ def test_integration_eth(local_node_eth, accounts):
         amount0_min=2896267889,
         amount1_min=971714435369867492,
         deadline=1707500072,
-        value=1000_000_000_000_000_000)
-    
-    send_increase_liquidity = roles.send([increase_liquidity], role=1, private_key=accounts[1].key,
-                                roles_mod_address=roles_ctract.address,
-                                web3=w3)
-    
+        value=1000_000_000_000_000_000,
+    )
+
+    send_increase_liquidity = roles.send(
+        [increase_liquidity],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
+
     # refund eth
     refund_eth = uniswap_v3.RefundETH(blockchain=Chain.ETHEREUM)
 
-    send_refund = roles.send([refund_eth], role=1, private_key=accounts[1].key,
-                    roles_mod_address=roles_ctract.address,
-                    web3=w3)
-    
+    send_refund = roles.send(
+        [refund_eth],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
+
     # decrease liquidity
-    positions_nft = w3.eth.contract(address=ContractSpecs[Chain.ETHEREUM].PositionsNFT.address, abi=ContractSpecs[Chain.ETHEREUM].PositionsNFT.abi)
+    positions_nft = w3.eth.contract(
+        address=ContractSpecs[Chain.ETHEREUM].PositionsNFT.address,
+        abi=ContractSpecs[Chain.ETHEREUM].PositionsNFT.abi,
+    )
     liquidity = positions_nft.functions.positions(nft_id).call()[7]
 
     decrease_liquidity = uniswap_v3.DecreaseLiquidity(
@@ -189,47 +269,69 @@ def test_integration_eth(local_node_eth, accounts):
         liquidity=liquidity,
         amount0_min=5792535777,
         amount1_min=1943428870739734982,
-        deadline=1707500111)
-    
-    send_decrease_liquidity = roles.send([decrease_liquidity], role=1, private_key=accounts[1].key,
-                                roles_mod_address=roles_ctract.address,
-                                web3=w3)
-    
+        deadline=1707500111,
+    )
+
+    send_decrease_liquidity = roles.send(
+        [decrease_liquidity],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
+
     # collect
     collect = uniswap_v3.Collect(
         blockchain=Chain.ETHEREUM,
         recipient=ETHAddr.ZERO,
         token_id=nft_id,
         amount0_max=340282366920938463463374607431768211455,
-        amount1_max=340282366920938463463374607431768211455)
-    
-    send_collect = roles.send([collect], role=1, private_key=accounts[1].key,
-                    roles_mod_address=roles_ctract.address,
-                    web3=w3)
-    
-    # unwrap weth9
-    unwrap_weth9 = uniswap_v3.UnwrapWETH9(blockchain=Chain.ETHEREUM, avatar=safe.address, amount_minimum=0)
+        amount1_max=340282366920938463463374607431768211455,
+    )
 
-    send_unwrap_weth9 = roles.send([unwrap_weth9], role=1, private_key=accounts[1].key,
-                          roles_mod_address=roles_ctract.address,
-                          web3=w3)
+    send_collect = roles.send(
+        [collect],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
+
+    # unwrap weth9
+    unwrap_weth9 = uniswap_v3.UnwrapWETH9(
+        blockchain=Chain.ETHEREUM, avatar=safe.address, amount_minimum=0
+    )
+
+    send_unwrap_weth9 = roles.send(
+        [unwrap_weth9],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
 
     # sweep token
     sweep_token = uniswap_v3.SweepToken(
         blockchain=Chain.ETHEREUM,
         avatar=safe.address,
         amount_minimum=0,
-        token=ETHAddr.USDC)
-    
-    send_sweep_token = roles.send([sweep_token], role=1, private_key=accounts[1].key,
-                        roles_mod_address=roles_ctract.address,
-                        web3=w3)
+        token=ETHAddr.USDC,
+    )
+
+    send_sweep_token = roles.send(
+        [sweep_token],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
 
     eth_balance = get_balance(w3, ETHAddr.ZERO, safe.address) / 10**18
     usdc_balance = get_balance(w3, ETHAddr.USDC, safe.address) / 10**6
 
     assert eth_balance == approx(10.99999, abs=0.3)
     assert usdc_balance == approx(100000)
+
 
 def test_integration_no_eth(local_node_eth, accounts):
     w3 = local_node_eth.w3
@@ -253,29 +355,54 @@ def test_integration_no_eth(local_node_eth, accounts):
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000c36442b4a4522e871399cd717abdd847ab11fe8849404b7c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000220000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value": "0"},
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x33a0480c0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000c36442b4a4522e871399cd717abdd847ab11fe88df2ab5bb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value": "0"}
     ]}"""
-    apply_presets(safe, roles_ctract, json_data=presets,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
-    
+    apply_presets(
+        safe,
+        roles_ctract,
+        json_data=presets,
+        replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])],
+    )
 
     # steal WETH
-    steal_token(w3, token=ETHAddr.WETH, holder="0x57757E3D981446D585Af0D9Ae4d7DF6D64647806",
-                to=safe.address, amount=10_000_000_000_000_000_000)
+    steal_token(
+        w3,
+        token=ETHAddr.WETH,
+        holder="0x57757E3D981446D585Af0D9Ae4d7DF6D64647806",
+        to=safe.address,
+        amount=10_000_000_000_000_000_000,
+    )
 
     # steal USDC
-    steal_token(w3, token=ETHAddr.USDC, holder="0xD6153F5af5679a75cC85D8974463545181f48772",
-                to=safe.address, amount=100_000_000_000)
+    steal_token(
+        w3,
+        token=ETHAddr.USDC,
+        holder="0xD6153F5af5679a75cC85D8974463545181f48772",
+        to=safe.address,
+        amount=100_000_000_000,
+    )
 
     # approve WETH
-    approve_weth = uniswap_v3.ApproveForPositionsNFT(blockchain=Chain.ETHEREUM, token=ETHAddr.WETH, amount=10_000_000_000_000_000_000)
-    roles.send([approve_weth], role=1, private_key=accounts[1].key,
-               roles_mod_address=roles_ctract.address,
-               web3=w3)
-    
+    approve_weth = uniswap_v3.ApproveForPositionsNFT(
+        blockchain=Chain.ETHEREUM, token=ETHAddr.WETH, amount=10_000_000_000_000_000_000
+    )
+    roles.send(
+        [approve_weth],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
+
     # approve USDC
-    approve_usdc = uniswap_v3.ApproveForPositionsNFT(blockchain=Chain.ETHEREUM, token=ETHAddr.USDC, amount=100_000_000_000)
-    roles.send([approve_usdc], role=1, private_key=accounts[1].key,
-               roles_mod_address=roles_ctract.address,
-               web3=w3)
+    approve_usdc = uniswap_v3.ApproveForPositionsNFT(
+        blockchain=Chain.ETHEREUM, token=ETHAddr.USDC, amount=100_000_000_000
+    )
+    roles.send(
+        [approve_usdc],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
 
     # mint
     mint = uniswap_v3.Mint(
@@ -290,22 +417,30 @@ def test_integration_no_eth(local_node_eth, accounts):
         amount1_desired=999999999872895280,
         amount0_min=2907953596,
         amount1_min=971658456538248483,
-        deadline=1707501113)
-    
-    send_mint = roles.send([mint], role=1, private_key=accounts[1].key,
-                  roles_mod_address=roles_ctract.address,
-                  web3=w3)
-    
+        deadline=1707501113,
+    )
+
+    send_mint = roles.send(
+        [mint],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
+
     weth_balance = get_balance(w3, ETHAddr.WETH, safe.address) / 10**18
     usdc_balance = get_balance(w3, ETHAddr.USDC, safe.address) / 10**6
-    
+
     assert weth_balance == approx(9)
     assert usdc_balance == approx(97021.75)
-    
+
     # nft id
     nft_id = None
     for log in send_mint["logs"]:
-        if log["topics"][0].hex() == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f":  # IncreaseLiquidity
+        if (
+            log["topics"][0].hex()
+            == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f"
+        ):  # IncreaseLiquidity
             nft_id = int(log["topics"][1].hex(), 16)
             break
 
@@ -319,14 +454,22 @@ def test_integration_no_eth(local_node_eth, accounts):
         amount1_desired=999999999872895280,
         amount0_min=2907953596,
         amount1_min=971658456538248483,
-        deadline=1707501120)
+        deadline=1707501120,
+    )
 
-    send_increase_liquidity = roles.send([increase_liquidity], role=1, private_key=accounts[1].key,
-                                roles_mod_address=roles_ctract.address,
-                                web3=w3)
-    
+    send_increase_liquidity = roles.send(
+        [increase_liquidity],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
+
     # decrease liquidity
-    positions_nft = w3.eth.contract(address=ContractSpecs[Chain.ETHEREUM].PositionsNFT.address, abi=ContractSpecs[Chain.ETHEREUM].PositionsNFT.abi)
+    positions_nft = w3.eth.contract(
+        address=ContractSpecs[Chain.ETHEREUM].PositionsNFT.address,
+        abi=ContractSpecs[Chain.ETHEREUM].PositionsNFT.abi,
+    )
     liquidity = positions_nft.functions.positions(nft_id).call()[7]
 
     decrease_liquidity = uniswap_v3.DecreaseLiquidity(
@@ -335,23 +478,33 @@ def test_integration_no_eth(local_node_eth, accounts):
         liquidity=liquidity,
         amount0_min=5815907191,
         amount1_min=1943316913076496964,
-        deadline=1707501155)
-    
-    send_decrease_liquidity = roles.send([decrease_liquidity], role=1, private_key=accounts[1].key,
-                                roles_mod_address=roles_ctract.address,
-                                web3=w3)
-    
+        deadline=1707501155,
+    )
+
+    send_decrease_liquidity = roles.send(
+        [decrease_liquidity],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
+
     # collect
     collect = uniswap_v3.Collect(
         blockchain=Chain.ETHEREUM,
         recipient=safe.address,
         token_id=nft_id,
         amount0_max=340282366920938463463374607431768211455,
-        amount1_max=340282366920938463463374607431768211455)
-    
-    send_collect = roles.send([collect], role=1, private_key=accounts[1].key,
-                    roles_mod_address=roles_ctract.address,
-                    web3=w3)
+        amount1_max=340282366920938463463374607431768211455,
+    )
+
+    send_collect = roles.send(
+        [collect],
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
 
     weth_balance = get_balance(w3, ETHAddr.WETH, safe.address) / 10**18
     usdc_balance = get_balance(w3, ETHAddr.USDC, safe.address) / 10**6
