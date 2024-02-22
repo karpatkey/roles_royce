@@ -388,8 +388,8 @@ class MintNFT(Mint):
         if token1 == GenAddr.E or token1 == GenAddr.ZERO:
             send_eth = True
 
-        amount0_desired = amount0_desired * 10**pool.token0_decimals
-        amount1_desired = amount1_desired * 10**pool.token1_decimals
+        amount0_desired = Decimal(amount0_desired * 10**pool.token0_decimals)
+        amount1_desired = Decimal(amount1_desired * 10**pool.token1_decimals)
 
         token0_min_price = pool.price * (1 - Decimal(token0_min_price_perc_dev) / 100)
         token0_max_price = pool.price * (1 + Decimal(token0_max_price_perc_dev) / 100)
@@ -485,8 +485,12 @@ class IncreaseLiquidityNFT(IncreaseLiquidity):
 
         self.nft_position = NFTPosition(w3, nft_id)
 
-        amount0_desired = amount0_desired * 10**self.nft_position.pool.token0_decimals
-        amount1_desired = amount1_desired * 10**self.nft_position.pool.token1_decimals
+        amount0_desired = Decimal(
+            amount0_desired * 10**self.nft_position.pool.token0_decimals
+        )
+        amount1_desired = Decimal(
+            amount1_desired * 10**self.nft_position.pool.token1_decimals
+        )
 
         amount0_desired, amount1_desired = set_and_check_desired_amounts(
             w3,
@@ -556,19 +560,3 @@ class DecreaseLiquidityNFT(DecreaseLiquidity):
             amount1_min=int(amount1_min),
             deadline=math.floor(datetime.now().timestamp() + 1800),
         )
-
-
-# w3 = get_node(Chain.ETHEREUM)
-
-# print(
-#     mint_nft(
-#         w3,
-#         "0x849D52316331967b6fF1198e5E32A0eB168D039d",
-#         GenAddr.E,
-#         ETHAddr.USDC,
-#         FeeAmount.LOW,
-#         amount0_desired=1,
-#         token0_min_price_perc_dev=0.73,
-#         token0_max_price_perc_dev=0.67,
-#     )
-# )

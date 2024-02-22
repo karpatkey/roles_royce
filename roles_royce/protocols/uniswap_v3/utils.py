@@ -179,17 +179,20 @@ def set_and_check_desired_amounts(
     if amount0_desired:
         amount1_desired = Decimal(
             amount0_desired
-            * pool.sqrt_price_x96
-            * 1.0001 ** (tick_upper / 2)
-            * (pool.sqrt_price_x96 - 1.0001 ** (tick_lower / 2) * (2**96))
+            * Decimal(
+                pool.sqrt_price_x96
+                * 1.0001 ** (tick_upper / 2)
+                * (pool.sqrt_price_x96 - 1.0001 ** (tick_lower / 2) * (2**96))
+            )
         ) / Decimal(
             (2**96) * (1.0001 ** (tick_upper / 2) * (2**96) - pool.sqrt_price_x96)
         )
     elif amount1_desired:
         amount0_desired = Decimal(
             amount1_desired
-            * (2**96)
-            * (1.0001 ** (tick_upper / 2) * (2**96) - pool.sqrt_price_x96)
+            * Decimal(
+                (2**96) * (1.0001 ** (tick_upper / 2) * (2**96) - pool.sqrt_price_x96)
+            )
         ) / (
             Decimal(
                 pool.sqrt_price_x96
