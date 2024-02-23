@@ -1,6 +1,7 @@
 import json
 import time
 from dataclasses import dataclass, field
+import logging
 
 from decouple import config
 from eth_account import Account
@@ -8,13 +9,14 @@ from web3 import Web3
 from web3.exceptions import ContractLogicError
 from web3.types import Address
 
+from defabipedia.balancer import Abis as BalancerAbis
+from defabipedia.aura import Abis as AuraAbis
 from defabipedia.types import Chain
 from roles_royce.constants import StrEnum
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address
 from roles_royce.protocols.base import ContractMethod
 from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler, LidoDisassembler
-
 
 class Modes(StrEnum):
     DEVELOPMENT = 'development'
@@ -238,3 +240,25 @@ def fork_reset(w3, url):
     return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url}}])
 
 # -----------------------------------------------------------------------------------------------------------------------
+
+def recovery_mode_balancer(w3, bpt_address: str, exit_strategy: str):
+    blockchain = Chain.get_blockchain_from_web3(w3)
+    try:
+        bpt_contract = w3.eth.contract(address=bpt_address,
+                                                abi=BalancerAbis[blockchain].UniversalBPT.abi)
+        bpt_pool_recovery_mode = bpt_contract.functions.inRecoveryMode().call()
+    except ContractLogicError:
+        logging.info('Balancer pool has no recovery mode')
+        if (exit_strategy == 'exit_1_3' or exit_strategy == 'exit_2_3'):
+            logging.info('Test will not execute')
+            return True
+        else:
+            return False
+    if bpt_pool_recovery_mode and (exit_strategy == 'exit_1_1' or exit_strategy == 'exit_2_1'):
+        logging.info('Balancer pool is in recovery mode, not testing this exit_strategy')
+        return True
+    elif not bpt_pool_recovery_mode and (exit_strategy == 'exit_1_3' or exit_strategy == 'exit_2_3'):
+        logging.info('Balancer pool is not in recovery mode, not testing this exit_strategy')
+        return True
+    else:
+        return False
