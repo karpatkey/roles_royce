@@ -9,6 +9,10 @@ from defabipedia.types import Blockchain, Chain
 import copy
 from defabipedia.lido import ContractSpecs
 
+# -----------------------------------------------------------------------------------------------------------------------
+blacklist_token = ["GNO", "ENS", "BAL", "AURA", "COW", "AGVE"]
+whitelist_pairs = ["stETH", "wstETH", "ETH", "WBTC", "USDC", "USDT", "DAI"]
+
 
 # -----------------------------------------------------------------------------------------------------------------------
 # StrEnums
@@ -56,6 +60,26 @@ def seed_file(dao: DAO, blockchain: Blockchain) -> None:
             "positions": []
         }
         json.dump(data, f)
+
+def seed_dict(dao: DAO, blockchain: Blockchain, positions: list) -> dict:
+    data = {
+        "dao": dao,
+        "blockchain": f'{blockchain}',
+        "general_parameters": [
+            {
+                "name": "percentage",
+                "label": "Percentage",
+                "type": "input",
+                "rules": {
+                    "min": 0,
+                    "max": 100
+                }
+            }
+        ],
+        "positions": positions
+    }
+    return data
+
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -161,6 +185,20 @@ class DAOStrategiesBuilder:
     aura: list[AuraPosition] | None = None
     lido: list[LidoPosition] | None = None
 
+    def build_dict(self, w3: Web3) -> dict:
+        positions = []
+        print(f'Building dict for {self.dao}-{self.blockchain}')
+        print(f'    Adding Balancer positions')
+        if self.balancer:
+            positions.extend(self.build_balancer_positions(w3, self.balancer))
+        print(f'    Adding Aura positions')
+        if self.aura:
+            positions.extend(self.build_aura_positions(w3, self.aura))
+        print(f'    Adding Lido positions')
+        if self.lido:
+            positions.extend(self.build_lido_positions(w3, self.lido))
+        return seed_dict(self.dao, self.blockchain, positions)
+
     def build_json(self, w3: Web3):
         print(f'Building json for {self.dao}-{self.blockchain}')
         print(f'    Adding Balancer positions')
@@ -206,18 +244,20 @@ class DAOStrategiesBuilder:
             position = copy.deepcopy(balancer_template)
 
             if balancer_position.staked:
-                for item in range(2):
+                for item in range(3):
                     position['exec_config'].pop(0)
                     gauge_address = balancer_position.position_id_tech(w3)
-                for i in range(2):
+                for i in range(3):
                     position["exec_config"][i]["parameters"][0]["value"] = gauge_address
             else:
-                for item in range(2):
+                for item in range(3):
                     position['exec_config'].pop(-1)
-                for i in range(2):
+                for i in range(3):
                     position["exec_config"][i]["parameters"][0]["value"] = bpt_address
                     print("                Adding: ", position["exec_config"][i]["function_name"], 
                                 position["exec_config"][i]["label"])
+
+            del position["exec_config"][1]["parameters"][2]["options"][0]  # Remove the dummy element in template
 
             position["position_id"] = balancer_position.position_id
 
@@ -226,6 +266,14 @@ class DAOStrategiesBuilder:
                 position["position_id_tech"] = gauge_address if balancer_position.staked else bpt_address
                 position["position_id_human_readable"] = balancer_position.position_id_human_readable(w3, pool_tokens=pool_tokens)
                 print(f"        Done adding: Balancer position", position["position_id"], position["position_id_human_readable"])
+                if all(token["symbol"] in whitelist_pairs for token in pool_tokens):
+                    for token in pool_tokens:
+                        position["exec_config"][1]["parameters"][2]["options"].append({
+                            "value": token['address'],
+                            "label": token['symbol']
+                        })
+                else:
+                    del position["exec_config"][1]  # Remove the single token exit strategy if all tokens are not in whitelist pairs
 
             except Exception as e:
                 position["position_id_human_readable"] = f"AddressGivesError: {e}"
@@ -250,15 +298,27 @@ class DAOStrategiesBuilder:
             try:
                 aura_address = aura_position.position_id_tech(w3)
 
+                del position["exec_config"][2]["parameters"][2]["options"][0]  # Remove the dummy element in template
+
                 position["position_id"] = aura_position.position_id
                 position["position_id_tech"] = aura_address
-                for i in range(3):
+
+                for i in range(4):
                     position["exec_config"][i]["parameters"][0]["value"] = aura_address
                     print("                Adding: ", position["exec_config"][i]["function_name"], 
                                 position["exec_config"][i]["label"])
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
                 position["position_id_human_readable"] = aura_position.position_id_human_readable(w3, pool_tokens=pool_tokens)
                 print(f"        Done adding: Aura position", position["position_id"], position["position_id_human_readable"])
+                if all(token["symbol"] in whitelist_pairs for token in pool_tokens):
+                    for token in pool_tokens:
+
+                        position["exec_config"][2]["parameters"][2]["options"].append({
+                            "value": token['address'],
+                            "label": token['symbol']
+                        })
+                else:
+                    del position["exec_config"][2]  # Remove the single token exit strategy if all tokens are not in whitelist pairs
 
             except Exception as e:
                 position["position_id_human_readable"] = f"AddressGivesError: {e}"

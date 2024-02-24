@@ -17,8 +17,9 @@ def main(dao: DAO, blockchain: Blockchain, balancer: list[BalancerPosition], aur
     elif blockchain == Chain.ETHEREUM:
         w3 = w3_eth
 
-    jsons = DAOStrategiesBuilder(dao, blockchain, balancer=balancer, aura=aura, lido=lido)
-    jsons.build_json(w3)
+    strategies = DAOStrategiesBuilder(dao, blockchain, balancer=balancer, aura=aura, lido=lido)
+    strategies_dict = strategies.build_dict(w3)
+    return strategies_dict
 
 
 if __name__ == "__main__":
