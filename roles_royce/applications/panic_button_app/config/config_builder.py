@@ -265,7 +265,6 @@ class DAOStrategiesBuilder:
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
                 position["position_id_tech"] = gauge_address if balancer_position.staked else bpt_address
                 position["position_id_human_readable"] = balancer_position.position_id_human_readable(w3, pool_tokens=pool_tokens)
-                print(f"        Done adding: Balancer position", position["position_id"], position["position_id_human_readable"])
                 if all(token["symbol"] in whitelist_pairs for token in pool_tokens):
                     for token in pool_tokens:
                         position["exec_config"][1]["parameters"][2]["options"].append({
@@ -274,12 +273,13 @@ class DAOStrategiesBuilder:
                         })
                 else:
                     del position["exec_config"][1]  # Remove the single token exit strategy if all tokens are not in whitelist pairs
-
+                    print(f"        Removing because of no whitelisted tokens: Balancer position", position["position_id"], position["position_id_human_readable"])
+                
             except Exception as e:
                 position["position_id_human_readable"] = f"AddressGivesError: {e}"
 
             result.append(position)
-
+            print(f"        Done adding: Balancer position", position["position_id"], position["position_id_human_readable"])
         return result
 
     @staticmethod
@@ -309,7 +309,6 @@ class DAOStrategiesBuilder:
                                 position["exec_config"][i]["label"])
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
                 position["position_id_human_readable"] = aura_position.position_id_human_readable(w3, pool_tokens=pool_tokens)
-                print(f"        Done adding: Aura position", position["position_id"], position["position_id_human_readable"])
                 if all(token["symbol"] in whitelist_pairs for token in pool_tokens):
                     for token in pool_tokens:
 
@@ -319,12 +318,13 @@ class DAOStrategiesBuilder:
                         })
                 else:
                     del position["exec_config"][2]  # Remove the single token exit strategy if all tokens are not in whitelist pairs
-
+                    print("                Removing because no whitelisted tokens: ")
+            
             except Exception as e:
                 position["position_id_human_readable"] = f"AddressGivesError: {e}"
-
+                
             result.append(position)
-
+            print(f"        Done adding: Aura position", position["position_id"], position["position_id_human_readable"])
         return result
 
     @staticmethod

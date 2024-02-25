@@ -106,7 +106,7 @@
     },
     {
       "function_name": "exit_2_2",
-      "label": "Unstake from gauge and withdraw (Proportional)",
+      "label": "Unstake from gauge and withdraw (Single Token)",
       "test": true,
       "stresstest": false,
       "description": "Unstake BPT from gauge and withdraw a single token (specified by the user) by redeeming the BPT",
