@@ -11,7 +11,7 @@ from defabipedia.lido import ContractSpecs
 
 # -----------------------------------------------------------------------------------------------------------------------
 blacklist_token = ["GNO", "ENS", "BAL", "AURA", "COW", "AGVE"]
-whitelist_pairs = ["stETH", "wstETH", "ETH", "WBTC", "USDC", "USDT", "DAI"]
+whitelist_pairs = ["WETH", "stETH", "wstETH", "ETH", "WBTC", "USDC", "USDT", "DAI", "WXDAI", "rETH"]
 
 
 # -----------------------------------------------------------------------------------------------------------------------

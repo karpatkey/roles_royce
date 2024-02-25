@@ -12,8 +12,14 @@ from defabipedia.balancer import Abis as BalancerAbis
 from defabipedia.aura import Abis as AuraAbis
 
 from roles_royce.applications.panic_button_app.utils import recovery_mode_balancer
-from roles_royce.applications.panic_button_app.transaction_builder import main as tx_builder_main
+from roles_royce.applications.panic_button_app.transaction_builder import main as tx_builder
 from roles_royce.applications.panic_button_app.execute import main as tx_execute_main
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(levelname)-8s %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
+
+logger = logging.getLogger(__name__)
 
 @dataclass
 class DAO:
@@ -41,8 +47,8 @@ def stresstest(w3: Web3, positions_dict: dict, percentage: int, max_slippage: in
         protocol = position["protocol"]
         for exec_config in position["exec_config"]:
 
-            logging.info(f'Running stresstest on DAO: {dao}, Blockchain: {blockchain}, Protocol: {protocol}')
-            logging.info(f'Position: {exec_config["function_name"]}, description: {exec_config["description"]}')
+            logger.info(f'Running stresstest on DAO: {dao}, Blockchain: {blockchain}, Protocol: {protocol}')
+            logger.info(f'Position: {exec_config["function_name"]}, description: {exec_config["description"]}')
 
             arguments_build = [
                 'python', file_path_transaction_builder,
@@ -86,7 +92,7 @@ def stresstest(w3: Web3, positions_dict: dict, percentage: int, max_slippage: in
                 if test:
                     continue
                 
-            logging.info(f'Exit arguments: {exit_arguments}')
+            logger.info(f'Exit arguments: {exit_arguments}')
 
             parameters_json = json.dumps(exit_arguments)
             arguments_build.extend(['-a', parameters_json])
@@ -94,31 +100,31 @@ def stresstest(w3: Web3, positions_dict: dict, percentage: int, max_slippage: in
             try:
                 main = subprocess.run(arguments_build, capture_output=True, text=True)
                 if json.loads(main.stdout)["status"]!=200:
-                    logging.error(f'Error in transaction builder. Error: {json.loads(main.stdout)["message"]}')
+                    logger.error(f'Error in transaction builder. Error: {json.loads(main.stdout)["message"]}')
                 else:
-                    logging.info(f'Status of transaction builder: {json.loads(main.stdout)["status"]}')
+                    logger.info(f'Status of transaction builder: {json.loads(main.stdout)["status"]}')
+                    dict_message_stdout = json.loads(main.stdout[:-1])
+                    tx = json.dumps(dict_message_stdout['tx_data']['transaction'])
+
+                    arguments_execute = [
+                        'python', file_path_execute,
+                        '--dao', dao,
+                        '--blockchain', blockchain,
+                        '--transaction', tx
+                    ]
+
+                    try:
+                        main = subprocess.run(arguments_execute, capture_output=True, text=True)
+                        if json.loads(main.stdout)["status"]!=200:
+                            logger.error(f'Error in execution. Error: {json.loads(main.stdout)["message"]}')
+                        else:
+                            logger.info(f'Status of execution: {json.loads(main.stdout)["status"]}')
+                            exec_config['stresstest'] = True
+                    except Exception as f:
+                        logger.error(f'Error in execution. Error: {str(f)}')
+
             except Exception as e:
-                logging.error(f'Error in transaction builder. Error: {str(e)}')
-
-            dict_message_stdout = json.loads(main.stdout[:-1])
-            tx = json.dumps(dict_message_stdout['tx_data']['transaction'])
-
-            arguments_execute = [
-                'python', file_path_execute,
-                '--dao', dao,
-                '--blockchain', blockchain,
-                '--transaction', tx
-            ]
-
-            try:
-                main = subprocess.run(arguments_execute, capture_output=True, text=True)
-                if json.loads(main.stdout)["status"]!=200:
-                    logging.error(f'Error in execution. Error: {json.loads(main.stdout)["message"]}')
-                else:
-                    logging.info(f'Status of execution: {json.loads(main.stdout)["status"]}')
-                    exec_config['stresstest'] = True
-            except Exception as f:
-                logging.error(f'Error in execution. Error: {str(f)}')
+                logger.error(f'Error in transaction builder. Error: {str(e)}')
 
     return positions_dict
        
