@@ -249,6 +249,8 @@ class DAOStrategiesBuilder:
                     gauge_address = balancer_position.position_id_tech(w3)
                 for i in range(3):
                     position["exec_config"][i]["parameters"][0]["value"] = gauge_address
+                    print("                Adding: ", position["exec_config"][i]["function_name"], 
+                                position["exec_config"][i]["label"])
             else:
                 for item in range(3):
                     position['exec_config'].pop(-1)
