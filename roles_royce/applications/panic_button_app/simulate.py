@@ -28,7 +28,10 @@ def main():
                                sim_type='full',  # TODO: check if 'quick' is enough
                                share=True)
 
-        response_message = {"status": 200, "sim_data": sim_data}
+        response_message = {"status": 200, "sim_data": {
+            "share_url": sim_data["share_url"],
+            "error_message": sim_data["simulation"].get("error_message")
+        }}
 
     except Exception as e:
         response_message = {"status": 500, "message": f"Error: {e}"}
