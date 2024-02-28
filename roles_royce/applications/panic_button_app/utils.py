@@ -127,7 +127,6 @@ def start_the_engine(env: ENV) -> (Web3, Web3):
     if env.MODE == Modes.DEVELOPMENT:
         w3 = Web3(Web3.HTTPProvider(f'http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}'))
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
-        top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)  # Topping up disassembler address for testing
         w3_MEV = w3
     else:
         w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))

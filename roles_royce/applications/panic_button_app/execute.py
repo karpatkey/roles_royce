@@ -23,11 +23,11 @@ def main():
 
         if env.MODE == 'production':  # In production environment, send the transaction to the real blockchain
             signed = w3.eth.account.sign_transaction(tx, env.PRIVATE_KEY)
-            tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
+            tx_hash = w3_MEV.eth.send_raw_transaction(signed.rawTransaction)
         else:  # In development environment, send the transaction to the local fork with the unlocked account
             tx_hash = w3.eth.send_transaction(tx)
             w3.eth.wait_for_transaction_receipt(tx_hash)
-            #reset = fork_reset(w3, w3.manager.provider.endpoint_uri)
+            reset = fork_reset(w3, w3.manager.provider.endpoint_uri)
         response_message = {"status": 200, "tx_hash": tx_hash.hex()}
     except Exception as e:
         response_message = {"status": 500, "message": f"Error: {e}"}
