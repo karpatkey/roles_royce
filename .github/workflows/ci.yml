@@ -3,23 +3,22 @@ name: Roles Royce tests
 on: [push]
 
 env:
- GIT_REF: ${{ github.head_ref || github.ref_name }}
- DOCKER_REGISTRY: ${{ secrets.DOCKER_URL }}
- DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
- DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  GIT_REF: ${{ github.head_ref || github.ref_name }}
+  DOCKER_REGISTRY: ${{ secrets.DOCKER_URL }}
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
 jobs:
   Test:
-
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
-          cache: 'pip'
+          python-version: "3.10"
+          cache: "pip"
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
