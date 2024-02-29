@@ -31,4 +31,13 @@ COPY tests tests
 
 ENV PYTHONPATH=.
 
-CMD ["python3", "-u", "/app/roles_royce/applications/bridge_keeper/bridge_keeper.py"]
+
+# To run the specific bot an environment variable BOT_NAME must be defined.
+# Options are:
+# * BOT_NAME=bridge_keeper
+# * BOT_NAME=EURe_rebalancing
+# * BOT_NAME=spark_anti_liquidation
+#
+# In doubt check roles_royce/applications/run_bot.sh
+
+CMD ["/app/roles_royce/applications/run_bot.sh"]
