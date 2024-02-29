@@ -10,7 +10,9 @@ import json
 from roles_royce.roles_modifier import ROLES_ERRORS, set_gas_strategy, GasStrategies
 
 
-def main_runner(percentage, dao, blockchain, protocol, exit_strategy, exit_arguments):
+def build_transaction(
+    percentage, dao, blockchain, protocol, exit_strategy, exit_arguments
+):
     exec_config = ExecConfig(
         percentage=percentage,
         dao=dao,
@@ -110,7 +112,7 @@ def main():
     )
 
     args = parser.parse_args()
-    response = main_runner(
+    response = build_transaction(
         percentage=args.percentage,
         dao=args.dao,
         blockchain=args.blockchain,
