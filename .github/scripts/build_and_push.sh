@@ -13,7 +13,7 @@ git clone $REPO_URL repo
 cd repo
 git checkout $GIT_REF
 
-BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD) # should be the same as GIT_REF
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD | sed 's/[^a-zA-Z0-9]/-/g')  # should be the same as GIT_REF
 COMMIT_SHA=$(git rev-parse HEAD)
 
 DOCKER_TAG="${DOCKER_IMAGE_NAME}:${BRANCH_NAME}"
