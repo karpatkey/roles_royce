@@ -9,7 +9,7 @@ WORKDIR /build
 COPY . .
 
 # Install build dependencies and compile
-RUN apt-get update -q && apt-get upgrade -qq -y && \
+RUN apt-get update -qq && apt-get upgrade -qq -y && \
     apt-get install -qq -y git
 
 # Download safe_pysha3 wheels so there is no need to build them
