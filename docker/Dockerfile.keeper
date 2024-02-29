@@ -15,7 +15,7 @@ RUN apt-get update -q && apt-get upgrade -qq -y && \
 # Download safe_pysha3 wheels so there is no need to build them
 RUN git clone --depth=1 https://github.com/sanekto/safe_pysha3_whl.git /tmp/safe_pysha3_whl && \
     pip install --find-links=file:///tmp/safe_pysha3_whl . \
-    pip install -r roles_royce/applications/bridge_keeper/requirements.txt
+    pip install -r roles_royce/applications/bots_requirements.txt
 
 
 # Final Stage
