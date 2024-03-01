@@ -401,7 +401,7 @@ class MintNFT(Mint):
         # self.token0_max_price = 1.0001**(tick_index_max * pool.tick_spacing) / 10**(pool.token1_decimals - pool.token0_decimals)
 
         tick_lower = (
-            math.floor(
+            math.ceil(
                 (
                     math.log10(token0_min_price)
                     + (pool.token1_decimals - pool.token0_decimals)

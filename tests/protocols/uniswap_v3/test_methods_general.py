@@ -16,7 +16,7 @@ from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 
 def test_integration(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    local_node_eth.set_block(19276668)
+    local_node_eth.set_block(19336793)
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
