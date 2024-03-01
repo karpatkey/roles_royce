@@ -13,12 +13,17 @@ from roles_royce.constants import StrEnum
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address
 from roles_royce.protocols.base import ContractMethod
-from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler, LidoDisassembler
+from roles_royce.toolshed.disassembling import (
+    AuraDisassembler,
+    BalancerDisassembler,
+    Disassembler,
+    LidoDisassembler,
+)
 
 
 class Modes(StrEnum):
-    DEVELOPMENT = 'development'
-    PRODUCTION = 'production'
+    DEVELOPMENT = "development"
+    PRODUCTION = "production"
 
 
 # The next helper function allows to leave env variables unfilled in the .env file
@@ -26,7 +31,7 @@ def custom_config(variable, default, cast):
     """Attempts to read variable from .env file, if not found or empty it returns 'default' cast as type 'cast'"""
     value = config(variable, default=default)
 
-    return default if value == '' else config(variable, default=default, cast=cast)
+    return default if value == "" else config(variable, default=default, cast=cast)
 
 
 @dataclass
@@ -56,59 +61,94 @@ class ENV:
 
     def __post_init__(self):
         # Tenderly credentials
-        self.TENDERLY_ACCOUNT_ID: str = config('TENDERLY_ACCOUNT_ID', default='')
-        self.TENDERLY_PROJECT: str = config('TENDERLY_PROJECT', default='')
-        self.TENDERLY_API_TOKEN: str = config('TENDERLY_API_TOKEN', default='')
+        self.TENDERLY_ACCOUNT_ID: str = config("TENDERLY_ACCOUNT_ID", default="")
+        self.TENDERLY_PROJECT: str = config("TENDERLY_PROJECT", default="")
+        self.TENDERLY_API_TOKEN: str = config("TENDERLY_API_TOKEN", default="")
 
         # DAO and blockchain
-        if self.DAO not in ['GnosisDAO', 'GnosisLtd', 'karpatkey']:
+        if self.DAO not in ["GnosisDAO", "GnosisLtd", "karpatkey"]:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
-        if self.BLOCKCHAIN.lower() not in ['mainnet', 'ethereum', 'gnosis']:
-            raise ValueError(f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}. Options are either 'ethereum' or 'gnosis'.")
-        elif self.BLOCKCHAIN.lower() == 'mainnet':
-            self.BLOCKCHAIN = 'ethereum'
+        if self.BLOCKCHAIN.lower() not in ["mainnet", "ethereum", "gnosis"]:
+            raise ValueError(
+                f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}. Options are either 'ethereum' or 'gnosis'."
+            )
+        elif self.BLOCKCHAIN.lower() == "mainnet":
+            self.BLOCKCHAIN = "ethereum"
         self.BLOCKCHAIN = self.BLOCKCHAIN.lower()
 
         # RPC endpoints
-        self.RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT', default='')
-        self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_FALLBACK', default='')
-        self.RPC_ENDPOINT_MEV: str = config(self.BLOCKCHAIN.upper() + '_RPC_ENDPOINT_MEV', default='')
+        self.RPC_ENDPOINT: str = config(
+            self.BLOCKCHAIN.upper() + "_RPC_ENDPOINT", default=""
+        )
+        self.RPC_ENDPOINT_FALLBACK: str = config(
+            self.BLOCKCHAIN.upper() + "_RPC_ENDPOINT_FALLBACK", default=""
+        )
+        self.RPC_ENDPOINT_MEV: str = config(
+            self.BLOCKCHAIN.upper() + "_RPC_ENDPOINT_MEV", default=""
+        )
 
         # Configuration addresses and key
         self.AVATAR_SAFE_ADDRESS: Address = config(
-            self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_AVATAR_SAFE_ADDRESS', default='')
+            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_AVATAR_SAFE_ADDRESS",
+            default="",
+        )
         self.ROLES_MOD_ADDRESS: Address = config(
-            self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_ROLES_MOD_ADDRESS', default='')
-        self.ROLE: int = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_ROLE', cast=int, default=0)
-        self.PRIVATE_KEY: str = config(self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_PRIVATE_KEY', default='')
+            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLES_MOD_ADDRESS",
+            default="",
+        )
+        self.ROLE: int = config(
+            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLE",
+            cast=int,
+            default=0,
+        )
+        self.PRIVATE_KEY: str = config(
+            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_PRIVATE_KEY",
+            default="",
+        )
         self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
         self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
-        if self.PRIVATE_KEY != '':
+        if self.PRIVATE_KEY != "":
             self.DISASSEMBLER_ADDRESS = Account.from_key(self.PRIVATE_KEY).address
         else:
             self.DISASSEMBLER_ADDRESS = config(
-                self.DAO.upper() + '_' + self.BLOCKCHAIN.upper() + '_DISASSEMBLER_ADDRESS', default='')
+                self.DAO.upper()
+                + "_"
+                + self.BLOCKCHAIN.upper()
+                + "_DISASSEMBLER_ADDRESS",
+                default="",
+            )
 
         # Environment mode: development or production
-        self.MODE: Modes = custom_config('ENVIRONMENT', cast=Modes, default=Modes.DEVELOPMENT)
-        if self.MODE.lower() not in ['development', 'production']:
+        self.MODE: Modes = custom_config(
+            "ENVIRONMENT", cast=Modes, default=Modes.DEVELOPMENT
+        )
+        if self.MODE.lower() not in ["development", "production"]:
             raise ValueError(
-                f"ENVIRONMENT is not valid: {self.MODE}. Options are either 'development' or 'production'.")
+                f"ENVIRONMENT is not valid: {self.MODE}. Options are either 'development' or 'production'."
+            )
         else:
             self.MODE = self.MODE.lower()
         if self.MODE == Modes.DEVELOPMENT:
-            if self.BLOCKCHAIN == 'ethereum':
-                self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_ETHEREUM', cast=int, default=8546)
+            if self.BLOCKCHAIN == "ethereum":
+                self.LOCAL_FORK_PORT = custom_config(
+                    "LOCAL_FORK_PORT_ETHEREUM", cast=int, default=8546
+                )
             else:
-                self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_GNOSIS', cast=int, default=8547)
+                self.LOCAL_FORK_PORT = custom_config(
+                    "LOCAL_FORK_PORT_GNOSIS", cast=int, default=8547
+                )
         else:
             self.LOCAL_FORK_PORT = None
-        self.LOCAL_FORK_HOST: str = custom_config('LOCAL_FORK_HOST' + '_' + self.BLOCKCHAIN.upper(), default='localhost', cast=str)
+        self.LOCAL_FORK_HOST: str = custom_config(
+            "LOCAL_FORK_HOST" + "_" + self.BLOCKCHAIN.upper(),
+            default="localhost",
+            cast=str,
+        )
 
-        self.SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
+        self.SLACK_WEBHOOK_URL: str = config("SLACK_WEBHOOK_URL", default="")
 
     def __repr__(self):
-        return 'Environment variables'
+        return "Environment variables"
 
 
 @dataclass
@@ -123,10 +163,16 @@ class ExecConfig:
 
 # -----------------------------------------------------------------------------------------------------------------------
 
+
 def start_the_engine(env: ENV) -> (Web3, Web3):
     if env.MODE == Modes.DEVELOPMENT:
-        w3 = Web3(Web3.HTTPProvider(f'http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}'))
+        w3 = Web3(
+            Web3.HTTPProvider(f"http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}")
+        )
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
+        top_up_address(
+            w3, env.DISASSEMBLER_ADDRESS, 1
+        )  # Topping up disassembler address for testing
         w3_MEV = w3
     else:
         w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
@@ -157,7 +203,7 @@ def bytes_to_hex_in_iterable(data):
     if isinstance(data, tuple):
         return tuple(bytes_to_hex_in_iterable(element) for element in data)
     elif isinstance(data, bytes):
-        return '0x' + data.hex()
+        return "0x" + data.hex()
     else:
         return data
 
@@ -176,37 +222,48 @@ def decode_transaction(txns: list[ContractMethod], env: ENV) -> list[dict]:
     return result
 
 
-def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[Transactable]):
+def gear_up(
+    w3: Web3, env: ENV, exec_config: ExecConfig
+) -> (Disassembler, list[Transactable]):
     if exec_config.protocol == "Aura":
-        disassembler = AuraDisassembler(w3=w3,
-                                        avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
-                                        roles_mod_address=env.ROLES_MOD_ADDRESS,
-                                        role=env.ROLE,
-                                        signer_address=env.DISASSEMBLER_ADDRESS)
+        disassembler = AuraDisassembler(
+            w3=w3,
+            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
+            roles_mod_address=env.ROLES_MOD_ADDRESS,
+            role=env.ROLE,
+            signer_address=env.DISASSEMBLER_ADDRESS,
+        )
 
     elif exec_config.protocol == "Balancer":
-        disassembler = BalancerDisassembler(w3=w3,
-                                            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
-                                            roles_mod_address=env.ROLES_MOD_ADDRESS,
-                                            role=env.ROLE,
-                                            signer_address=env.DISASSEMBLER_ADDRESS)
+        disassembler = BalancerDisassembler(
+            w3=w3,
+            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
+            roles_mod_address=env.ROLES_MOD_ADDRESS,
+            role=env.ROLE,
+            signer_address=env.DISASSEMBLER_ADDRESS,
+        )
     elif exec_config.protocol == "Lido":
-        disassembler = LidoDisassembler(w3=w3,
-                                        avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
-                                        roles_mod_address=env.ROLES_MOD_ADDRESS,
-                                        role=env.ROLE,
-                                        signer_address=env.DISASSEMBLER_ADDRESS)
+        disassembler = LidoDisassembler(
+            w3=w3,
+            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
+            roles_mod_address=env.ROLES_MOD_ADDRESS,
+            role=env.ROLE,
+            signer_address=env.DISASSEMBLER_ADDRESS,
+        )
     else:
         raise Exception("Status 422: Invalid protocol")
 
     exit_strategy = getattr(disassembler, exec_config.exit_strategy)
 
-    txn_transactables = exit_strategy(percentage=exec_config.percentage, exit_arguments=exec_config.exit_arguments)
+    txn_transactables = exit_strategy(
+        percentage=exec_config.percentage, exit_arguments=exec_config.exit_arguments
+    )
 
     return disassembler, txn_transactables
 
 
 # -----------------------------------------------------------------------------------------------------------------------
+
 
 # TODO: all tools for dev environment should be in roles_royce
 def fork_unlock_account(w3, address):
@@ -216,8 +273,8 @@ def fork_unlock_account(w3, address):
 
 # These accounts are not guaranteed to hold tokens forever...
 Holders = {
-    Chain.ETHEREUM: '0x00000000219ab540356cBB839Cbe05303d7705Fa',  # BINANCE_ACCOUNT_WITH_LOTS_OF_ETH =
-    Chain.GNOSIS: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'  # WXDAI_CONTRACT_WITH_LOTS_OF_XDAI =
+    Chain.ETHEREUM: "0x00000000219ab540356cBB839Cbe05303d7705Fa",  # BINANCE_ACCOUNT_WITH_LOTS_OF_ETH =
+    Chain.GNOSIS: "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",  # WXDAI_CONTRACT_WITH_LOTS_OF_XDAI =
 }
 
 
@@ -229,12 +286,15 @@ def top_up_address(w3: Web3, address: str, amount: int) -> None:
     fork_unlock_account(w3, holder)
     try:
         w3.eth.send_transaction(
-            {"to": address, "value": Web3.to_wei(amount, "ether"), "from": holder})
+            {"to": address, "value": Web3.to_wei(amount, "ether"), "from": holder}
+        )
     except ContractLogicError:
         raise Exception("Address is a smart contract address with no payable function.")
-    
+
+
 def fork_reset(w3, url):
     """Reset the state of the forked node to the state of the mainnet node at the given block."""
     return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url}}])
+
 
 # -----------------------------------------------------------------------------------------------------------------------
