@@ -67,6 +67,8 @@ positions_mock = [
             {
                 "function_name": "exit_1",
                 "label": "Exit_1",
+                "test": True,
+                "stresstest": False,
                 "description": "Withdraw from Aura",
                 "parameters": [
                     {
@@ -84,7 +86,9 @@ positions_mock = [
             },
             {
                 "function_name": "exit_2_1",
-                "label": "Exit_2_1",
+                "label": "Exit_2_1",                
+                "test": True,
+                "stresstest": False,
                 "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing all assets in proportional way (not used for pools in recovery mode!)",
                 "parameters": [
                     {
@@ -103,6 +107,8 @@ positions_mock = [
             {
                 "function_name": "exit_2_2",
                 "label": "Exit_2_2",
+                "test": True,
+                "stresstest": False,
                 "description": "Withdraw funds from Aura and then from the Balancer pool withdrawing a single asset.",
                 "parameters": [
                     {
