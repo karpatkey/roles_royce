@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import logging
+from time import sleep
 
 from web3 import Web3
 
@@ -45,7 +46,6 @@ def stresstest(
     if not blockchain:
         blockchain = positions_dict["blockchain"]
 
-    # SOMETHING NOT WORKING WITH THE ITERATION ON POSITIONS, check the dicts die input zijn
     for position in positions_dict["positions"]:
         protocol = position["protocol"]
         for exec_config in position["exec_config"]:
@@ -138,10 +138,15 @@ def stresstest(
                         else:
                             logger.info(f'Status of execution: {result["status"]}')
                             exec_config["stresstest"] = True
+                            
                     except Exception as f:
                         logger.error(f"Error in execution. Error: {str(f)}")
+                        exec_config["stresstest"] = f"false, with error: {str(f)}"
+
 
             except Exception as e:
                 logger.error(f"Error in transaction builder. Error: {str(e)}")
+        
+        sleep(5)
 
     return positions_dict

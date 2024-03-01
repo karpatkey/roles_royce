@@ -63,7 +63,7 @@ class ENV:
         self.TENDERLY_API_TOKEN: str = config('TENDERLY_API_TOKEN', default='')
 
         # DAO and blockchain
-        if self.DAO not in ['GnosisDAO', 'GnosisLtd', 'karpatkey']:
+        if self.DAO not in ['GnosisDAO', 'GnosisLtd', 'karpatkey', "ENS", "BalancerDAO"]:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
         if self.BLOCKCHAIN.lower() not in ['mainnet', 'ethereum', 'gnosis']:
             raise ValueError(f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}. Options are either 'ethereum' or 'gnosis'.")
@@ -129,6 +129,7 @@ def start_the_engine(env: ENV) -> (Web3, Web3):
     if env.MODE == Modes.DEVELOPMENT:
         w3 = Web3(Web3.HTTPProvider(f'http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}'))
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
+        top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)
         w3_MEV = w3
     else:
         w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
