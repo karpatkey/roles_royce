@@ -40,8 +40,8 @@ class ENV:
     PROMETHEUS_PORT: int = custom_config('PROMETHEUS_PORT', default=8000, cast=int)
     TEST_MODE: bool = config('TEST_MODE', default=False, cast=bool)
     LOCAL_FORK_PORT: int = custom_config('LOCAL_FORK_PORT', default=8545, cast=int)
-    TOKEN0_ADDRESS: Address | ChecksumAddress | str = config('TOKEN0_ADDRESS')
-    TOKEN1_ADDRESS: Address | ChecksumAddress | str = config('TOKEN1_ADDRESS')
+    TOKEN0_ADDRESS: Address | ChecksumAddress | str = config('TOKEN0_ADDRESS', default='', cast=str)
+    TOKEN1_ADDRESS: Address | ChecksumAddress | str = config('TOKEN1_ADDRESS', default='', cast=str)
     MIN_PRICE_THRESHOLD: float = custom_config('MIN_PRICE_THRESHOLD', default=10, cast=float)
     MAX_PRICE_THRESHOLD: float = custom_config('MAX_PRICE_THRESHOLD', default=10, cast=float)
 
