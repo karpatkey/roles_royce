@@ -6,6 +6,7 @@ from karpatkit.constants import Address as GenAddr
 from defabipedia.types import Chain
 from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 from defabipedia.uniswap_v3 import ContractSpecs
+from roles_royce.constants import MAX_UINT128
 from roles_royce.protocols.base import Address
 from roles_royce.protocols.uniswap_v3.contract_methods import (
     ApproveForPositionsNFT,
@@ -31,22 +32,21 @@ from roles_royce.protocols.uniswap_v3.utils import (
 )
 from roles_royce.generic_method import Transactable
 
-
-COLLECT_AMOUNT_MAX = 340282366920938463463374607431768211455
+COLLECT_AMOUNT_MAX = MAX_UINT128
 
 
 def mint_nft(
-    w3: Web3,
-    avatar: Address,
-    token0: Address,
-    token1: Address,
-    fee: FeeAmount,
-    token0_min_price_perc_dev: float,
-    token0_max_price_perc_dev: float,
-    amount0_desired: float = None,
-    amount1_desired: float = None,
-    amount0_min_slippage: float = 1,
-    amount1_min_slippage: float = 1,
+        w3: Web3,
+        avatar: Address,
+        token0: Address,
+        token1: Address,
+        fee: FeeAmount,
+        token0_min_price_perc_dev: float,
+        token0_max_price_perc_dev: float,
+        amount0_desired: float = None,
+        amount1_desired: float = None,
+        amount0_min_slippage: float = 1,
+        amount1_min_slippage: float = 1,
 ) -> list[Transactable]:
     """Mint a position NFT in Uniswap V3 pool.
 
@@ -97,11 +97,11 @@ def mint_nft(
     if mint.value > 0:
         if mint.args.token0 != ETHAddr.WETH:
             if not check_allowance(
-                w3,
-                avatar,
-                ContractSpecs[blockchain].PositionsNFT.address,
-                mint.args.token0,
-                mint.args.amount0_desired,
+                    w3,
+                    avatar,
+                    ContractSpecs[blockchain].PositionsNFT.address,
+                    mint.args.token0,
+                    mint.args.amount0_desired,
             ):
                 mint_trasactables.append(
                     ApproveForPositionsNFT(
@@ -110,11 +110,11 @@ def mint_nft(
                 )
         else:
             if not check_allowance(
-                w3,
-                avatar,
-                ContractSpecs[blockchain].PositionsNFT.address,
-                mint.args.token1,
-                mint.args.amount1_desired,
+                    w3,
+                    avatar,
+                    ContractSpecs[blockchain].PositionsNFT.address,
+                    mint.args.token1,
+                    mint.args.amount1_desired,
             ):
                 mint_trasactables.append(
                     ApproveForPositionsNFT(
@@ -126,11 +126,11 @@ def mint_nft(
         mint_trasactables.append(RefundETH(blockchain))
     else:
         if not check_allowance(
-            w3,
-            avatar,
-            ContractSpecs[blockchain].PositionsNFT.address,
-            mint.args.token0,
-            mint.args.amount0_desired,
+                w3,
+                avatar,
+                ContractSpecs[blockchain].PositionsNFT.address,
+                mint.args.token0,
+                mint.args.amount0_desired,
         ):
             mint_trasactables.append(
                 ApproveForPositionsNFT(
@@ -138,11 +138,11 @@ def mint_nft(
                 )
             )
         if not check_allowance(
-            w3,
-            avatar,
-            ContractSpecs[blockchain].PositionsNFT.address,
-            mint.args.token1,
-            mint.args.amount1_desired,
+                w3,
+                avatar,
+                ContractSpecs[blockchain].PositionsNFT.address,
+                mint.args.token1,
+                mint.args.amount1_desired,
         ):
             mint_trasactables.append(
                 ApproveForPositionsNFT(
@@ -156,14 +156,14 @@ def mint_nft(
 
 
 def increase_liquidity_nft(
-    w3: Web3,
-    avatar: Address,
-    nft_id: int,
-    amount0_desired: float = None,
-    amount1_desired: float = None,
-    amount0_min_slippage: float = 1,
-    amount1_min_slippage: float = 1,
-    send_eth=False,
+        w3: Web3,
+        avatar: Address,
+        nft_id: int,
+        amount0_desired: float = None,
+        amount1_desired: float = None,
+        amount0_min_slippage: float = 1,
+        amount1_min_slippage: float = 1,
+        send_eth=False,
 ) -> list[Transactable]:
     """Increase liquidity of a position NFT in Uniswap V3 pool.
 
@@ -204,11 +204,11 @@ def increase_liquidity_nft(
     if increase_liquidity.value > 0:
         if increase_liquidity.nft_position.pool.token0 != ETHAddr.WETH:
             if not check_allowance(
-                w3,
-                avatar,
-                ContractSpecs[blockchain].PositionsNFT.address,
-                increase_liquidity.nft_position.pool.token0,
-                increase_liquidity.args.amount0_desired,
+                    w3,
+                    avatar,
+                    ContractSpecs[blockchain].PositionsNFT.address,
+                    increase_liquidity.nft_position.pool.token0,
+                    increase_liquidity.args.amount0_desired,
             ):
                 increase_liquidity_trasactables.append(
                     ApproveForPositionsNFT(
@@ -219,11 +219,11 @@ def increase_liquidity_nft(
                 )
         else:
             if not check_allowance(
-                w3,
-                avatar,
-                ContractSpecs[blockchain].PositionsNFT.address,
-                increase_liquidity.nft_position.pool.token1,
-                increase_liquidity.args.amount1_desired,
+                    w3,
+                    avatar,
+                    ContractSpecs[blockchain].PositionsNFT.address,
+                    increase_liquidity.nft_position.pool.token1,
+                    increase_liquidity.args.amount1_desired,
             ):
                 increase_liquidity_trasactables.append(
                     ApproveForPositionsNFT(
@@ -237,11 +237,11 @@ def increase_liquidity_nft(
         increase_liquidity_trasactables.append(RefundETH(blockchain))
     else:
         if not check_allowance(
-            w3,
-            avatar,
-            ContractSpecs[blockchain].PositionsNFT.address,
-            increase_liquidity.nft_position.pool.token0,
-            increase_liquidity.args.amount0_desired,
+                w3,
+                avatar,
+                ContractSpecs[blockchain].PositionsNFT.address,
+                increase_liquidity.nft_position.pool.token0,
+                increase_liquidity.args.amount0_desired,
         ):
             increase_liquidity_trasactables.append(
                 ApproveForPositionsNFT(
@@ -251,11 +251,11 @@ def increase_liquidity_nft(
                 )
             )
         if not check_allowance(
-            w3,
-            avatar,
-            ContractSpecs[blockchain].PositionsNFT.address,
-            increase_liquidity.nft_position.pool.token1,
-            increase_liquidity.args.amount1_desired,
+                w3,
+                avatar,
+                ContractSpecs[blockchain].PositionsNFT.address,
+                increase_liquidity.nft_position.pool.token1,
+                increase_liquidity.args.amount1_desired,
         ):
             increase_liquidity_trasactables.append(
                 ApproveForPositionsNFT(
@@ -271,13 +271,13 @@ def increase_liquidity_nft(
 
 
 def decrease_liquidity_nft(
-    w3: Web3,
-    recipient: Address,
-    nft_id: int,
-    removed_liquidity_percentage: float,
-    amount0_min_slippage: float = 1,
-    amount1_min_slippage: float = 1,
-    withdraw_eth=False,
+        w3: Web3,
+        recipient: Address,
+        nft_id: int,
+        removed_liquidity_percentage: float,
+        amount0_min_slippage: float = 1,
+        amount1_min_slippage: float = 1,
+        withdraw_eth=False,
 ) -> list[Transactable]:
     """Decrease liquidity of a position NFT in Uniswap V3 pool.
 
@@ -310,12 +310,9 @@ def decrease_liquidity_nft(
 
     blockchain = Chain.get_blockchain_from_web3(w3)
     if withdraw_eth:
-        amount_minimum_unwrap = 0
-        amount_minimum_sweep = 0
-
         if (
-            decrease_liquidity.nft_position.pool.token0 != ETHAddr.WETH
-            and decrease_liquidity.nft_position.pool.token1 != ETHAddr.WETH
+                decrease_liquidity.nft_position.pool.token0 != ETHAddr.WETH
+                and decrease_liquidity.nft_position.pool.token1 != ETHAddr.WETH
         ):
             raise ValueError("One of the tokens must be WETH")
         elif decrease_liquidity.nft_position.pool.token0 == ETHAddr.WETH:
@@ -352,18 +349,18 @@ def decrease_liquidity_nft(
 
 class MintNFT(Mint):
     def __init__(
-        self,
-        w3: Web3,
-        avatar: Address,
-        token0: Address,
-        token1: Address,
-        fee: FeeAmount,
-        token0_min_price_perc_dev: float,
-        token0_max_price_perc_dev: float,
-        amount0_desired: float | None = None,
-        amount1_desired: float | None = None,
-        amount0_min_slippage: float = 1,
-        amount1_min_slippage: float = 1,
+            self,
+            w3: Web3,
+            avatar: Address,
+            token0: Address,
+            token1: Address,
+            fee: FeeAmount,
+            token0_min_price_perc_dev: float,
+            token0_max_price_perc_dev: float,
+            amount0_desired: float | None = None,
+            amount1_desired: float | None = None,
+            amount0_min_slippage: float = 1,
+            amount1_min_slippage: float = 1,
     ):
         """Upper layer class for minting a position NFT in Uniswap V3 pool."""
         validate_tokens(token0, token1)
@@ -389,9 +386,9 @@ class MintNFT(Mint):
             send_eth = True
 
         if amount0_desired:
-            amount0_desired = Decimal(amount0_desired * 10**pool.token0_decimals)
+            amount0_desired = Decimal(amount0_desired * 10 ** pool.token0_decimals)
         else:
-            amount1_desired = Decimal(amount1_desired * 10**pool.token1_decimals)
+            amount1_desired = Decimal(amount1_desired * 10 ** pool.token1_decimals)
 
         token0_min_price = pool.price * (1 - Decimal(token0_min_price_perc_dev) / 100)
         token0_max_price = pool.price * (1 + Decimal(token0_max_price_perc_dev) / 100)
@@ -403,26 +400,26 @@ class MintNFT(Mint):
         # self.token0_max_price = 1.0001**(tick_index_max * pool.tick_spacing) / 10**(pool.token1_decimals - pool.token0_decimals)
 
         tick_lower = (
-            math.ceil(
-                (
-                    math.log10(token0_min_price)
-                    + (pool.token1_decimals - pool.token0_decimals)
+                math.ceil(
+                    (
+                            math.log10(token0_min_price)
+                            + (pool.token1_decimals - pool.token0_decimals)
+                    )
+                    / math.log10(1.0001)
+                    / pool.tick_spacing
                 )
-                / math.log10(1.0001)
-                / pool.tick_spacing
-            )
-            * pool.tick_spacing
+                * pool.tick_spacing
         )
         tick_upper = (
-            math.floor(
-                (
-                    math.log10(token0_max_price)
-                    + (pool.token1_decimals - pool.token0_decimals)
+                math.floor(
+                    (
+                            math.log10(token0_max_price)
+                            + (pool.token1_decimals - pool.token0_decimals)
+                    )
+                    / math.log10(1.0001)
+                    / pool.tick_spacing
                 )
-                / math.log10(1.0001)
-                / pool.tick_spacing
-            )
-            * pool.tick_spacing
+                * pool.tick_spacing
         )
 
         amount0_desired, amount1_desired = set_and_check_desired_amounts(
@@ -437,10 +434,10 @@ class MintNFT(Mint):
         )
 
         amount0_min = Decimal(amount0_desired) * (
-            1 - Decimal(amount0_min_slippage) / 100
+                1 - Decimal(amount0_min_slippage) / 100
         )
         amount1_min = Decimal(amount1_desired) * (
-            1 - Decimal(amount1_min_slippage) / 100
+                1 - Decimal(amount1_min_slippage) / 100
         )
 
         value = 0
@@ -469,15 +466,15 @@ class MintNFT(Mint):
 
 class IncreaseLiquidityNFT(IncreaseLiquidity):
     def __init__(
-        self,
-        w3: Web3,
-        avatar: Address,
-        nft_id: int,
-        amount0_desired: float = None,
-        amount1_desired: float = None,
-        amount0_min_slippage: float = 1,
-        amount1_min_slippage: float = 1,
-        send_eth=False,
+            self,
+            w3: Web3,
+            avatar: Address,
+            nft_id: int,
+            amount0_desired: float = None,
+            amount1_desired: float = None,
+            amount0_min_slippage: float = 1,
+            amount1_min_slippage: float = 1,
+            send_eth=False,
     ):
         """Upper layer class for increasing liquidity of a position NFT in Uniswap V3 pool."""
         amount0_desired, amount1_desired = validate_amounts(
@@ -489,12 +486,12 @@ class IncreaseLiquidityNFT(IncreaseLiquidity):
 
         if amount0_desired:
             amount0_desired = Decimal(
-            amount0_desired * 10**self.nft_position.pool.token0_decimals
-        )
+                amount0_desired * 10 ** self.nft_position.pool.token0_decimals
+            )
         else:
             amount1_desired = Decimal(
-            amount1_desired * 10**self.nft_position.pool.token1_decimals
-        )
+                amount1_desired * 10 ** self.nft_position.pool.token1_decimals
+            )
 
         amount0_desired, amount1_desired = set_and_check_desired_amounts(
             w3,
@@ -531,12 +528,12 @@ class IncreaseLiquidityNFT(IncreaseLiquidity):
 
 class DecreaseLiquidityNFT(DecreaseLiquidity):
     def __init__(
-        self,
-        w3: Web3,
-        nft_id: int,
-        removed_liquidity_percentage: float,
-        amount0_min_slippage: float = 1,
-        amount1_min_slippage: float = 1,
+            self,
+            w3: Web3,
+            nft_id: int,
+            removed_liquidity_percentage: float,
+            amount0_min_slippage: float = 1,
+            amount1_min_slippage: float = 1,
     ):
         """Upper layer class for decreasing liquidity of a position NFT in Uniswap V3 pool."""
         validate_removed_liquidity_percentage(removed_liquidity_percentage)
@@ -562,3 +559,27 @@ class DecreaseLiquidityNFT(DecreaseLiquidity):
             amount1_min=int(amount1_min),
             deadline=math.floor(datetime.now().timestamp() + 1800),
         )
+
+
+class CollectAllFees(Collect):
+    def __init__(self, w3: Web3, avatar: Address, nft_id: int):
+        """Upper layer class for collecting all fees of a position NFT in Uniswap V3 pool."""
+        super().__init__(
+            blockchain=Chain.get_blockchain_from_web3(w3),
+            avatar=avatar,
+            token_id=nft_id,
+            amount0_max=COLLECT_AMOUNT_MAX,
+            amount1_max=COLLECT_AMOUNT_MAX)
+
+def collect_all_fees(w3: Web3, avatar: Address, nft_id: int) -> list[Transactable]:
+    """Collect all fees of a position NFT in Uniswap V3 pool.
+
+    Args:
+        w3 (Web3): Web3 object.
+        avatar (Address): avatar address.
+        nft_id (int): NFT id of the position to collect all fees.
+
+    Returns
+        list[Transactable]: list of transactions to collect all fees of a position NFT in Uniswap V3 pool.
+    """
+    return [CollectAllFees(w3, avatar, nft_id)]

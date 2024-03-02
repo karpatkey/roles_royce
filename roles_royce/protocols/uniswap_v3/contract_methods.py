@@ -45,20 +45,20 @@ class Mint(ContractMethod):
     fixed_arguments = {"recipient": AvatarAddress}
 
     def __init__(
-        self,
-        blockchain: Blockchain,
-        avatar: Address,
-        token0: Address,
-        token1: Address,
-        fee: int,
-        tick_lower: int,
-        tick_upper: int,
-        amount0_desired: int,
-        amount1_desired: int,
-        amount0_min: int,
-        amount1_min: int,
-        deadline: int,
-        value: int = 0,
+            self,
+            blockchain: Blockchain,
+            avatar: Address,
+            token0: Address,
+            token1: Address,
+            fee: int,
+            tick_lower: int,
+            tick_upper: int,
+            amount0_desired: int,
+            amount1_desired: int,
+            amount0_min: int,
+            amount1_min: int,
+            deadline: int,
+            value: int = 0,
     ):
         self.target_address = ContractSpecs[blockchain].PositionsNFT.address
         super().__init__(avatar=avatar, value=value)
@@ -120,15 +120,15 @@ class IncreaseLiquidity(ContractMethod):
     )
 
     def __init__(
-        self,
-        blockchain: Blockchain,
-        token_id: int,
-        amount0_desired: int,
-        amount1_desired: int,
-        amount0_min: int,
-        amount1_min: int,
-        deadline: int,
-        value: int = 0,
+            self,
+            blockchain: Blockchain,
+            token_id: int,
+            amount0_desired: int,
+            amount1_desired: int,
+            amount0_min: int,
+            amount1_min: int,
+            deadline: int,
+            value: int = 0,
     ):
         self.target_address = ContractSpecs[blockchain].PositionsNFT.address
         super().__init__(value=value)
@@ -169,13 +169,13 @@ class DecreaseLiquidity(ContractMethod):
     )
 
     def __init__(
-        self,
-        blockchain: Blockchain,
-        token_id: int,
-        liquidity: int,
-        amount0_min: int,
-        amount1_min: int,
-        deadline: int,
+            self,
+            blockchain: Blockchain,
+            token_id: int,
+            liquidity: int,
+            amount0_min: int,
+            amount1_min: int,
+            deadline: int,
     ):
         self.target_address = ContractSpecs[blockchain].PositionsNFT.address
         super().__init__()
@@ -210,24 +210,23 @@ class Collect(ContractMethod):
             ),
         ),
     )
+    fixed_arguments = {"recipient": AvatarAddress}
 
     def __init__(
-        self,
-        blockchain: Blockchain,
-        recipient: Address,
-        token_id: int,
-        amount0_max: int,
-        amount1_max: int,
+            self,
+            blockchain: Blockchain,
+            avatar: Address,
+            token_id: int,
+            amount0_max: int,
+            amount1_max: int,
     ):
         self.target_address = ContractSpecs[blockchain].PositionsNFT.address
-        super().__init__()
+        super().__init__(avatar=avatar)
         self.args.token_id = token_id
-        self.args.recipient = recipient
         self.args.amount0_max = amount0_max
         self.args.amount1_max = amount1_max
         self.args.params = [
             self.args.token_id,
-            self.args.recipient,
             self.args.amount0_max,
             self.args.amount1_max,
         ]
@@ -258,11 +257,11 @@ class SweepToken(ContractMethod):
     fixed_arguments = {"recipient": AvatarAddress}
 
     def __init__(
-        self,
-        blockchain: Blockchain,
-        avatar: Address,
-        amount_minimum: int,
-        token: Address,
+            self,
+            blockchain: Blockchain,
+            avatar: Address,
+            amount_minimum: int,
+            token: Address,
     ):
         self.target_address = ContractSpecs[blockchain].PositionsNFT.address
         super().__init__(avatar=avatar)

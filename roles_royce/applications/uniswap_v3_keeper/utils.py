@@ -12,7 +12,7 @@ from defabipedia.tokens import erc20_contract
 from datetime import datetime
 from roles_royce import roles
 from roles_royce.toolshed.alerting.utils import Event, EventLogDecoder
-from roles_royce.protocols.uniswap_v3.methods_general import mint_nft, decrease_liquidity_nft
+from roles_royce.protocols.uniswap_v3.methods_general import mint_nft, decrease_liquidity_nft, collect_all_fees
 from roles_royce.protocols.uniswap_v3.utils import NFTPosition
 
 logger = logging.getLogger(__name__)
@@ -44,6 +44,10 @@ class ENV:
     TOKEN1_ADDRESS: Address | ChecksumAddress | str = config('TOKEN1_ADDRESS', default='', cast=str)
     MIN_PRICE_THRESHOLD: float = custom_config('MIN_PRICE_THRESHOLD', default=10, cast=float)
     MAX_PRICE_THRESHOLD: float = custom_config('MAX_PRICE_THRESHOLD', default=10, cast=float)
+    PRICE_RANGE_MULTIPLICATOR_SEED: float = custom_config('NEW_PRICE_RANGE_DELTA_PERCENTAGE_SEED', default=5,
+                                                          cast=float)
+    PRICE_RANGE_MULTIPLICATOR_PERCENTUAL_DECREMENT: float = custom_config('NEW_PRICE_RANGE_DELTA_PERCENTAGE_DECREMENT',
+                                                                          default=0.5, cast=float)
 
     BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
     TOKEN0_DECIMALS: int = field(init=False)
@@ -69,6 +73,12 @@ class ENV:
         if not 0 <= self.MAX_PRICE_THRESHOLD <= 100:
             raise ValueError(
                 f"MAX_PRICE_THRESHOLD must be between 0 and 100. MAX_PRICE_THRESHOLD inputted: {self.MAX_PRICE_THRESHOLD}.")
+        if self.PRICE_RANGE_MULTIPLICATOR_SEED <= 1:
+            raise ValueError(
+                f"PRICE_RANGE_MULTIPLICATOR_SEED must be greater than 1. PRICE_RANGE_MULTIPLICATOR_SEED inputted: {self.PRICE_RANGE_MULTIPLICATOR_SEED}.")
+        if not 0 < self.PRICE_RANGE_MULTIPLICATOR_PERCENTUAL_DECREMENT < 100:
+            raise ValueError(
+                f"PRICE_RANGE_MULTIPLICATOR_PERCENTUAL_DECREMENT must be between 0 and 100. PRICE_RANGE_MULTIPLICATOR_PERCENTUAL_DECREMENT inputted: {self.PRICE_RANGE_MULTIPLICATOR_PERCENTUAL_DECREMENT}.")
 
         self.BOT_ADDRESS = Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).eth.account.from_key(
             self.PRIVATE_KEY).address
@@ -221,7 +231,13 @@ class TransactionsManager:
                           roles_mod_address=self.roles_mod,
                           web3=w3)
 
-
+    def collect_all_fees(self, w3: Web3, nft_id: int) -> TxReceipt:
+        collect_all_fees_transactables = collect_all_fees(w3=w3, avatar=self.avatar, nft_id=nft_id)
+        return roles.send(collect_all_fees_transactables,
+                          role=self.role,
+                          private_key=self.private_key,
+                          roles_mod_address=self.roles_mod,
+                          web3=w3)
 
 
 def log_initial_data(env: ENV, messenger: Messenger):
