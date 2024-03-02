@@ -103,7 +103,8 @@ class ENV:
                 self.LOCAL_FORK_PORT = custom_config('LOCAL_FORK_PORT_GNOSIS', cast=int, default=8547)
         else:
             self.LOCAL_FORK_PORT = None
-        self.LOCAL_FORK_HOST: str = custom_config('LOCAL_FORK_HOST' + '_' + self.BLOCKCHAIN.upper(), default='localhost', cast=str)
+        self.LOCAL_FORK_HOST: str = custom_config('LOCAL_FORK_HOST' + '_' + self.BLOCKCHAIN.upper(),
+                                                  default='localhost', cast=str)
 
         self.SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
 
@@ -126,7 +127,7 @@ class ExecConfig:
 def start_the_engine(env: ENV) -> (Web3, Web3):
     if env.MODE == Modes.DEVELOPMENT:
         w3 = Web3(Web3.HTTPProvider(f'http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}'))
-        reset = fork_reset(w3, w3.manager.provider.endpoint_uri)
+        fork_reset_state(w3, env.RPC_ENDPOINT)
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
         w3_MEV = w3
     else:
@@ -233,9 +234,24 @@ def top_up_address(w3: Web3, address: str, amount: int) -> None:
             {"to": address, "value": Web3.to_wei(amount, "ether"), "from": holder})
     except ContractLogicError:
         raise Exception("Address is a smart contract address with no payable function.")
-    
-def fork_reset(w3, url):
-    """Reset the state of the forked node to the state of the mainnet node at the given block."""
-    return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url}}])
+
+
+def fork_reset_state(w3: Web3, url: str, block: int | str = "latest"):
+    """Reset the state of the forked node to the state of the blockchain node at the given block.
+
+    Args:
+        w3: Web3 instance of the local node
+        url: URL of the node from which to fork
+        block: Block number at which to fork the blockchain, or "latest" to use the latest block
+    """
+    latest_block = Web3(Web3.HTTPProvider(url)).eth.block_number
+
+    if isinstance(block, str):
+        if block == "latest":
+            block = latest_block
+    else:
+        if block > latest_block:
+            raise ValueError(f"Block number {block} is greater than the latest block {latest_block}")
+    return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
 
 # -----------------------------------------------------------------------------------------------------------------------
