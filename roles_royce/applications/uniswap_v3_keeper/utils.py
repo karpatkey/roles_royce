@@ -29,10 +29,10 @@ class ENV:
     RPC_ENDPOINT: str = config('RPC_ENDPOINT', default='')
     RPC_ENDPOINT_FALLBACK: str = config('RPC_ENDPOINT_FALLBACK', default='')
     RPC_ENDPOINT_MEV: str = config('RPC_ENDPOINT_MEV', default='')
-    PRIVATE_KEY: str = config('PRIVATE_KEY')
-    AVATAR_SAFE_ADDRESS: Address | ChecksumAddress | str = config('AVATAR_SAFE_ADDRESS')
-    ROLES_MOD_ADDRESS: Address | ChecksumAddress | str = config('ROLES_MOD_ADDRESS')
-    ROLE: int = config('ROLE', cast=int)
+    PRIVATE_KEY: str = config('PRIVATE_KEY', default='')
+    AVATAR_SAFE_ADDRESS: Address | ChecksumAddress | str = config('AVATAR_SAFE_ADDRESS', default='')
+    ROLES_MOD_ADDRESS: Address | ChecksumAddress | str = config('ROLES_MOD_ADDRESS', default='')
+    ROLE: int = custom_config('ROLE', default='', cast=int)
     COOLDOWN_MINUTES: float = custom_config('COOLDOWN_MINUTES', default=5, cast=float)
     SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
     TELEGRAM_BOT_TOKEN: str = config('TELEGRAM_BOT_TOKEN', default='')
@@ -172,12 +172,12 @@ def get_nft_id_from_mint_tx(w3: Web3, tx_receipt: TxReceipt, recipient: Address)
             event = event_log_decoder.decode_log(element)
             if not event:
                 continue
-            if event.name == "Transfer" and event['to'] == recipient:
+            if event.name == "Transfer" and event.values['to'] == recipient:
                 return event.values['tokenId']
     return None
 
 
-def get_all_nfts(w3: Web3, wallet: str) -> list:
+def get_all_active_nfts(w3: Web3, wallet: str) -> list:
     """Returns all NFT Ids owned by a wallet.
 
     Args:
@@ -194,7 +194,9 @@ def get_all_nfts(w3: Web3, wallet: str) -> list:
     nfts = nft_contract.functions.balanceOf(wallet).call()
     for nft_index in range(nfts):
         nft_id = nft_contract.functions.tokenOfOwnerByIndex(wallet, nft_index).call()
-        nftids.append(nft_id)
+        nft_position = NFTPosition(w3=w3, nft_id=nft_id)
+        if nft_position.liquidity > 0:
+            nftids.append(nft_id)
     return nftids
 
 
