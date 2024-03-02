@@ -127,7 +127,6 @@ class ExecConfig:
 def start_the_engine(env: ENV) -> (Web3, Web3):
     if env.MODE == Modes.DEVELOPMENT:
         w3 = Web3(Web3.HTTPProvider(f'http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}'))
-        fork_reset_state(w3, env.RPC_ENDPOINT)
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
         w3_MEV = w3
     else:
