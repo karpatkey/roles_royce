@@ -1,0 +1,189 @@
+from dataclasses import dataclass, field
+import threading
+from prometheus_client import Gauge
+from decouple import config
+from web3.types import Address, ChecksumAddress, TxReceipt
+from web3 import Web3
+from roles_royce.toolshed.alerting.alerting import Messenger, LoggingLevel
+import logging
+from defabipedia.uniswap_v3 import ContractSpecs
+from defabipedia.types import Chain
+from defabipedia.tokens import EthereumTokenAddr
+from datetime import datetime
+from roles_royce.toolshed.alerting.utils import Event, EventLogDecoder
+
+logger = logging.getLogger(__name__)
+
+
+# The next helper function allows to leave variables unfilled in the .env file
+def custom_config(variable, default, cast):
+    value = config(variable, default=default)
+    return default if value == '' else config(variable, default=default, cast=cast)
+
+
+@dataclass
+class ENV:
+    RPC_ENDPOINT: str = config('RPC_ENDPOINT', default='')
+    RPC_ENDPOINT_FALLBACK: str = config('RPC_ENDPOINT_FALLBACK', default='')
+    PRIVATE_KEY: str = config('PRIVATE_KEY')
+    COOLDOWN_MINUTES: float = custom_config('COOLDOWN_MINUTES', default=5, cast=float)
+    SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
+    TELEGRAM_BOT_TOKEN: str = config('TELEGRAM_BOT_TOKEN', default='')
+    TELEGRAM_CHAT_ID: int = custom_config('TELEGRAM_CHAT_ID', default='', cast=int)
+    PROMETHEUS_PORT: int = custom_config('PROMETHEUS_PORT', default=8000, cast=int)
+    TEST_MODE: bool = config('TEST_MODE', default=False, cast=bool)
+    LOCAL_FORK_PORT: int = custom_config('LOCAL_FORK_PORT_ETHEREUM', default=8545, cast=int)
+
+    BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
+
+    def __post_init__(self):
+        if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).is_connected():
+            raise ValueError(f"RPC_ENDPOINT is not valid or not active: {self.RPC_ENDPOINT}.")
+        if self.RPC_ENDPOINT_FALLBACK != '':
+            if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT_FALLBACK)).is_connected():
+                raise ValueError(
+                    f"FALLBACK_RPC_ENDPOINT is not valid or not active: {self.RPC_ENDPOINT_FALLBACK}.")
+
+        self.BOT_ADDRESS = Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).eth.account.from_key(
+            self.PRIVATE_KEY).address
+
+    def __repr__(self):
+        return 'Environment variables'
+
+
+@dataclass
+class Gauges:
+    bridge_DAI_balance = Gauge('bridge_DAI_balance', 'Bridge"s DAI balance')
+    bot_ETH_balance = Gauge('bot_ETH_balance', 'ETH balance of the bot')
+    next_claim_epoch = Gauge('next_claim_epoch', 'Next claim epoch')
+    refill_threshold = Gauge('refill_threshold', 'Refill threshold')
+    invest_threshold = Gauge('invest_threshold', 'Invest threshold')
+    min_cash_threshold = Gauge('min_cash_threshold', 'Minimum cash threshold')
+
+    def update(self, bridge_DAI_balance: int, bot_ETH_balance: int, next_claim_epoch: int, min_cash_threshold: int):
+        self.bot_ETH_balance.set(bot_ETH_balance / (10 ** 18))
+        self.bridge_DAI_balance.set(bridge_DAI_balance / (10 ** decimals_DAI))
+        self.next_claim_epoch.set(next_claim_epoch)
+        self.invest_threshold.set(ENV.INVEST_THRESHOLD)
+        self.refill_threshold.set(ENV.REFILL_THRESHOLD)
+        self.min_cash_threshold.set(min_cash_threshold / (10 ** decimals_DAI))
+
+
+@dataclass
+class Flags:
+    lack_of_gas_warning: threading.Event = field(default_factory=threading.Event)
+    interest_payed: threading.Event = field(default_factory=threading.Event)
+    tx_executed: threading.Event = field(default_factory=threading.Event)
+
+
+def get_nft_id_from_mint_tx(w3: Web3, tx_receipt: TxReceipt, recipient: Address) -> int | None:
+    """Returns the NFT Id of the minted NFT in the transaction.
+
+    Args:
+        w3 (Web3): Web3 instance.
+        tx_receipt (TxReceipt): Transaction receipt.
+
+    Returns:
+        int | None: NFT Id of the minted NFT in the transaction. Returns None if no NFT was minted to the recipient
+            in that transaction.
+
+    """
+    event_log_decoder = EventLogDecoder(
+        Web3().eth.contract(abi=ContractSpecs[Chain.get_blockchain_from_web3(w3)].PositionsNFT.abi))
+    for element in tx_receipt.logs:
+        if element['address'] == ContractSpecs[Chain.get_blockchain_from_web3(w3)].PositionsNFT.address:
+            event = event_log_decoder.decode_log(element)
+            if not event:
+                continue
+            if event.name == "Transfer" and event['to'] == recipient:
+                return event.values['tokenId']
+    return None
+
+
+def get_all_nfts(w3: Web3, wallet: str) -> list:
+    """Returns all NFT Ids owned by a wallet.
+
+    Args:
+        w3 (Web3): Web3 instance.
+        wallet (str): Wallet address.
+
+    Returns:
+        a list where each element is the nft id that is owned by the wallet (open and closed nfts)
+    """
+
+    nftids = []
+
+    nft_contract = ContractSpecs[Chain.get_blockchain_from_web3(w3)].PositionsNFT.contract(w3)
+    nfts = nft_contract.functions.balanceOf(wallet).call()
+    for nft_index in range(nfts):
+        nft_id = nft_contract.functions.tokenOfOwnerByIndex(wallet, nft_index).call()
+        nftids.append(nft_id)
+    return nftids
+
+
+def refill_bridge(w3: Web3, env: ENV) -> TxReceipt:
+    bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3)
+    unsigned_tx = bridge_contract.functions.refillBridge().build_transaction({
+        "from": env.BOT_ADDRESS,
+        "nonce": w3.eth.get_transaction_count(env.BOT_ADDRESS),
+    })
+    signed_tx = w3.eth.account.sign_transaction(unsigned_tx, private_key=env.PRIVATE_KEY)
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    return tx_receipt
+
+
+def invest_DAI(w3: Web3, env: ENV) -> TxReceipt:
+    bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3)
+    unsigned_tx = bridge_contract.functions.investDai().build_transaction({
+        "from": env.BOT_ADDRESS,
+        "nonce": w3.eth.get_transaction_count(env.BOT_ADDRESS),
+    })
+    signed_tx = w3.eth.account.sign_transaction(unsigned_tx, private_key=env.PRIVATE_KEY)
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    return tx_receipt
+
+
+def pay_interest(w3: Web3, env: ENV, amount: int) -> TxReceipt:
+    bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3)
+    unsigned_tx = bridge_contract.functions.payInterest(EthereumTokenAddr.DAI, amount).build_transaction({
+        "from": env.BOT_ADDRESS,
+        "nonce": w3.eth.get_transaction_count(env.BOT_ADDRESS),
+    })
+    signed_tx = w3.eth.account.sign_transaction(unsigned_tx, private_key=env.PRIVATE_KEY)
+
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    return tx_receipt
+
+
+decimals_DAI = 18
+
+
+def log_initial_data(env: ENV, messenger: Messenger):
+    title = "Bridge Keeper started"
+    message = (f"  xDAI bridge address: {ContractSpecs[Chain.ETHEREUM].xDaiBridge.address}\n"
+               f"  Bot address: {env.BOT_ADDRESS}\n"
+               f"  Refill threshold: {env.REFILL_THRESHOLD} DAI\n"
+               f"  Invest threshold: {env.INVEST_THRESHOLD} DAI\n"
+               f"  Amount of interest to pay: {env.AMOUNT_OF_INTEREST_TO_PAY} DAI\n"
+               f"  Minutes before claim epoch to pay interest: {env.MINUTES_BEFORE_CLAIM_EPOCH}\n"
+               f"  ETH gas alerting threshold: {env.GAS_ETH_THRESHOLD} ETH\n")
+    messenger.log_and_alert(LoggingLevel.Info, title, message)
+
+
+def log_status_update(env: ENV, bridge_DAI_balance: int, bot_ETH_balance: int, next_claim_epoch: int,
+                      min_cash_threshold: int):
+    title = 'Status update'
+    message = (f'  Bridge"s DAI balance: {bridge_DAI_balance / (10 ** decimals_DAI):.2f} DAI.\n'
+               f'  Bot"s ETH balance: {bot_ETH_balance / (10 ** 18):.5f} ETH.\n'
+               f'  Next claim epoch: {datetime.utcfromtimestamp(next_claim_epoch)} UTC.\n'
+               f'  Minimum cash threshold: {min_cash_threshold / (10 ** decimals_DAI):.2f} DAI.\n'
+               f'  Refill threshold: {ENV.REFILL_THRESHOLD:.2f} DAI.\n'
+               f'  Invest threshold: {ENV.INVEST_THRESHOLD:.2f} DAI.\n'
+               f"  Invest threshold: {env.INVEST_THRESHOLD} DAI\n"
+               f"  Amount of interest to pay: {env.AMOUNT_OF_INTEREST_TO_PAY} DAI\n"
+               f"  Minutes before claim epoch to pay interest: {env.MINUTES_BEFORE_CLAIM_EPOCH}\n"
+               f"  ETH gas alerting threshold: {env.GAS_ETH_THRESHOLD} ETH\n")
+    logger.info(title + '.\n' + message)
