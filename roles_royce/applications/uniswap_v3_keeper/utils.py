@@ -8,9 +8,12 @@ from roles_royce.toolshed.alerting.alerting import Messenger, LoggingLevel
 import logging
 from defabipedia.uniswap_v3 import ContractSpecs
 from defabipedia.types import Chain
-from defabipedia.tokens import EthereumTokenAddr
+from defabipedia.tokens import erc20_contract
 from datetime import datetime
+from roles_royce import roles
 from roles_royce.toolshed.alerting.utils import Event, EventLogDecoder
+from roles_royce.protocols.uniswap_v3.methods_general import mint_nft, decrease_liquidity_nft
+from roles_royce.protocols.uniswap_v3.utils import NFTPosition
 
 logger = logging.getLogger(__name__)
 
@@ -25,16 +28,26 @@ def custom_config(variable, default, cast):
 class ENV:
     RPC_ENDPOINT: str = config('RPC_ENDPOINT', default='')
     RPC_ENDPOINT_FALLBACK: str = config('RPC_ENDPOINT_FALLBACK', default='')
+    RPC_ENDPOINT_MEV: str = config('RPC_ENDPOINT_MEV', default='')
     PRIVATE_KEY: str = config('PRIVATE_KEY')
+    AVATAR_SAFE_ADDRESS: Address | ChecksumAddress | str = config('AVATAR_SAFE_ADDRESS')
+    ROLES_MOD_ADDRESS: Address | ChecksumAddress | str = config('ROLES_MOD_ADDRESS')
+    ROLE: int = config('ROLE', cast=int)
     COOLDOWN_MINUTES: float = custom_config('COOLDOWN_MINUTES', default=5, cast=float)
     SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
     TELEGRAM_BOT_TOKEN: str = config('TELEGRAM_BOT_TOKEN', default='')
     TELEGRAM_CHAT_ID: int = custom_config('TELEGRAM_CHAT_ID', default='', cast=int)
     PROMETHEUS_PORT: int = custom_config('PROMETHEUS_PORT', default=8000, cast=int)
     TEST_MODE: bool = config('TEST_MODE', default=False, cast=bool)
-    LOCAL_FORK_PORT: int = custom_config('LOCAL_FORK_PORT_ETHEREUM', default=8545, cast=int)
+    LOCAL_FORK_PORT: int = custom_config('LOCAL_FORK_PORT', default=8545, cast=int)
+    TOKEN0_ADDRESS: Address | ChecksumAddress | str = config('TOKEN0_ADDRESS')
+    TOKEN1_ADDRESS: Address | ChecksumAddress | str = config('TOKEN1_ADDRESS')
+    MIN_PRICE_THRESHOLD: float = custom_config('MIN_PRICE_THRESHOLD', default=10, cast=float)
+    MAX_PRICE_THRESHOLD: float = custom_config('MAX_PRICE_THRESHOLD', default=10, cast=float)
 
     BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
+    TOKEN0_DECIMALS: int = field(init=False)
+    TOKEN1_DECIMALS: int = field(init=False)
 
     def __post_init__(self):
         if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).is_connected():
@@ -43,6 +56,19 @@ class ENV:
             if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT_FALLBACK)).is_connected():
                 raise ValueError(
                     f"FALLBACK_RPC_ENDPOINT is not valid or not active: {self.RPC_ENDPOINT_FALLBACK}.")
+        if self.RPC_ENDPOINT_MEV != '':
+            if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT_MEV)).is_connected():
+                self.RPC_ENDPOINT_MEV = self.RPC_ENDPOINT
+        self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
+        self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
+        self.TOKEN0_ADDRESS = Web3.to_checksum_address(self.TOKEN0_ADDRESS)
+        self.TOKEN1_ADDRESS = Web3.to_checksum_address(self.TOKEN1_ADDRESS)
+        if not 0 <= self.MIN_PRICE_THRESHOLD <= 100:
+            raise ValueError(
+                f"MIN_PRICE_THRESHOLD must be between 0 and 100. MIN_PRICE_THRESHOLD inputted: {self.MIN_PRICE_THRESHOLD}.")
+        if not 0 <= self.MAX_PRICE_THRESHOLD <= 100:
+            raise ValueError(
+                f"MAX_PRICE_THRESHOLD must be between 0 and 100. MAX_PRICE_THRESHOLD inputted: {self.MAX_PRICE_THRESHOLD}.")
 
         self.BOT_ADDRESS = Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).eth.account.from_key(
             self.PRIVATE_KEY).address
@@ -52,27 +78,78 @@ class ENV:
 
 
 @dataclass
-class Gauges:
-    bridge_DAI_balance = Gauge('bridge_DAI_balance', 'Bridge"s DAI balance')
-    bot_ETH_balance = Gauge('bot_ETH_balance', 'ETH balance of the bot')
-    next_claim_epoch = Gauge('next_claim_epoch', 'Next claim epoch')
-    refill_threshold = Gauge('refill_threshold', 'Refill threshold')
-    invest_threshold = Gauge('invest_threshold', 'Invest threshold')
-    min_cash_threshold = Gauge('min_cash_threshold', 'Minimum cash threshold')
+class SystemData:
+    nft_id: int
+    bot_ETH_balance: float
+    safe_token0_balance: float
+    safe_token1_balance: float
+    token0_balance: float
+    token1_balance: float
+    price_min: float
+    price_max: float
+    price: float
+    min_price_threshold: float
+    max_price_threshold: float
 
-    def update(self, bridge_DAI_balance: int, bot_ETH_balance: int, next_claim_epoch: int, min_cash_threshold: int):
-        self.bot_ETH_balance.set(bot_ETH_balance / (10 ** 18))
-        self.bridge_DAI_balance.set(bridge_DAI_balance / (10 ** decimals_DAI))
-        self.next_claim_epoch.set(next_claim_epoch)
-        self.invest_threshold.set(ENV.INVEST_THRESHOLD)
-        self.refill_threshold.set(ENV.REFILL_THRESHOLD)
-        self.min_cash_threshold.set(min_cash_threshold / (10 ** decimals_DAI))
+    def check_triggering_condition(self) -> bool:
+        if (self.price - self.price_min) / (self.price_max - self.price_min) < self.min_price_threshold or (
+                self.price_max - self.price) / (self.price_max - self.price_min) < self.max_price_threshold:
+            return True
+        else:
+            return False
+
+
+def update_system_data(w3: Web3, nft_id: int, env: ENV) -> SystemData:
+    nft_position = NFTPosition(w3, nft_id)
+    balances = nft_position.get_balances()
+    return SystemData(nft_id=nft_id,
+                      bot_ETH_balance=w3.eth.get_balance(env.BOT_ADDRESS) / (10 ** 18),
+                      safe_token0_balance=erc20_contract(w3, env.TOKEN0_ADDRESS).functions.balanceOf(
+                          env.AVATAR_SAFE_ADDRESS).call() / (10 ** erc20_contract(w3,
+                                                                                  env.TOKEN0_ADDRESS).functions.decimals().call()),
+                      safe_token1_balance=erc20_contract(w3, env.TOKEN1_ADDRESS).functions.balanceOf(
+                          env.AVATAR_SAFE_ADDRESS).call() / (10 ** erc20_contract(w3,
+                                                                                  env.TOKEN1_ADDRESS).functions.decimals().call()),
+                      token0_balance=balances[0],
+                      token1_balance=balances[1],
+                      price_min=nft_position.price_min,
+                      price_max=nft_position.price_max,
+                      price=nft_position.pool.price,
+                      min_price_threshold=env.MIN_PRICE_THRESHOLD,
+                      max_price_threshold=env.MAX_PRICE_THRESHOLD)
+
+
+@dataclass
+class Gauges:
+    nft_id = Gauge('nft_id', 'NFT Id')
+    bot_ETH_balance = Gauge('bot_ETH_balance', 'ETH balance of the bot')
+    safe_token0_balance = Gauge('safe_token0_balance', 'Safe token0 balance')
+    safe_token1_balance = Gauge('safe_token1_balance', 'Safe token1 balance')
+    token0_balance = Gauge('token0_balance', 'Position token0 balance')
+    token1_balance = Gauge('token1_balance', 'Position token1 balance')
+    price_min = Gauge('price_min', 'Minimum range range price of token1 vs token0')
+    price_max = Gauge('price_max', 'Maximum range range price of token1 vs token0')
+    price = Gauge('price', 'Current price of token1 vs token0')
+    min_threshold = Gauge('min_threshold', 'Minimum price threshold')
+    max_threshold = Gauge('max_threshold', 'Maximum price threshold')
+
+    def update(self, system_data: SystemData):
+        self.nft_id.set(system_data.nft_id)
+        self.bot_ETH_balance.set(system_data.bot_ETH_balance)
+        self.safe_token0_balance.set(system_data.safe_token0_balance)
+        self.safe_token1_balance.set(system_data.safe_token1_balance)
+        self.token0_balance.set(system_data.token0_balance)
+        self.token1_balance.set(system_data.token1_balance)
+        self.price_min.set(system_data.price_min)
+        self.price_max.set(system_data.price_max)
+        self.price.set(system_data.price)
+        self.min_threshold.set(system_data.min_price_threshold * (self.price_max - self.price_min) + self.price_min)
+        self.max_threshold.set(self.price_max - system_data.max_price_threshold * (self.price_max - self.price_min))
 
 
 @dataclass
 class Flags:
     lack_of_gas_warning: threading.Event = field(default_factory=threading.Event)
-    interest_payed: threading.Event = field(default_factory=threading.Event)
     tx_executed: threading.Event = field(default_factory=threading.Event)
 
 
@@ -121,44 +198,28 @@ def get_all_nfts(w3: Web3, wallet: str) -> list:
     return nftids
 
 
-def refill_bridge(w3: Web3, env: ENV) -> TxReceipt:
-    bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3)
-    unsigned_tx = bridge_contract.functions.refillBridge().build_transaction({
-        "from": env.BOT_ADDRESS,
-        "nonce": w3.eth.get_transaction_count(env.BOT_ADDRESS),
-    })
-    signed_tx = w3.eth.account.sign_transaction(unsigned_tx, private_key=env.PRIVATE_KEY)
-    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    return tx_receipt
+@dataclass
+class TransactionsManager:
+    avatar: Address | ChecksumAddress | str
+    roles_mod: Address | ChecksumAddress | str
+    role: int
+    private_key: str
+
+    def disassemble_position(self, w3: Web3, nft_id: int) -> TxReceipt:
+        decrease_liquidity_transactables = decrease_liquidity_nft(w3=w3,
+                                                                  recipient=self.avatar,
+                                                                  nft_id=nft_id,
+                                                                  removed_liquidity_percentage=100,
+                                                                  amount0_min_slippage=10,
+                                                                  amount1_min_slippage=10,
+                                                                  withdraw_eth=False)
+        return roles.send(decrease_liquidity_transactables,
+                          role=self.role,
+                          private_key=self.private_key,
+                          roles_mod_address=self.roles_mod,
+                          web3=w3)
 
 
-def invest_DAI(w3: Web3, env: ENV) -> TxReceipt:
-    bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3)
-    unsigned_tx = bridge_contract.functions.investDai().build_transaction({
-        "from": env.BOT_ADDRESS,
-        "nonce": w3.eth.get_transaction_count(env.BOT_ADDRESS),
-    })
-    signed_tx = w3.eth.account.sign_transaction(unsigned_tx, private_key=env.PRIVATE_KEY)
-    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    return tx_receipt
-
-
-def pay_interest(w3: Web3, env: ENV, amount: int) -> TxReceipt:
-    bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3)
-    unsigned_tx = bridge_contract.functions.payInterest(EthereumTokenAddr.DAI, amount).build_transaction({
-        "from": env.BOT_ADDRESS,
-        "nonce": w3.eth.get_transaction_count(env.BOT_ADDRESS),
-    })
-    signed_tx = w3.eth.account.sign_transaction(unsigned_tx, private_key=env.PRIVATE_KEY)
-
-    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    return tx_receipt
-
-
-decimals_DAI = 18
 
 
 def log_initial_data(env: ENV, messenger: Messenger):

@@ -542,9 +542,7 @@ class DecreaseLiquidityNFT(DecreaseLiquidity):
 
         liquidity = self.nft_position.liquidity * removed_liquidity_percentage / 100
 
-        balances = self.nft_position.get_balances(
-            self.nft_position.pool.ic, self.nft_position.pool.sqrt_price
-        )
+        balances = self.nft_position.get_balances()
 
         amount0_desired = balances[0] * removed_liquidity_percentage / 100
         amount1_desired = balances[1] * removed_liquidity_percentage / 100

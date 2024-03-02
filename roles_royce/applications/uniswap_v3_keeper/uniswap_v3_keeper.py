@@ -4,16 +4,10 @@ from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Mes
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
 from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
-from utils import ENV, Gauges, Flags, log_initial_data, log_status_update
 import time
 import sys
-from datetime import datetime
-from defabipedia.xdai_bridge import ContractSpecs
-from defabipedia.tokens import EthereumContractSpecs as Tokens
-from defabipedia.types import Chain
-from decimal import Decimal
-from roles_royce.protocols.uniswap_v3.methods_general import mint_nft, decrease_liquidity_nft
-from roles_royce.protocols.uniswap_v3.utils import NFTPosition
+from utils import ENV, Gauges, Flags, log_initial_data, log_status_update, \
+    get_all_nfts, get_nft_id_from_mint_tx, SystemData, TransactionsManager, update_system_data
 
 # Importing the environment variables from the .env file
 ENV = ENV()
@@ -59,6 +53,11 @@ rpc_endpoint_failure_counter = 0
 
 log_initial_data(ENV, messenger)
 
+# -----------------------------------------------------------------------------------------------------------------------
+transactions_manager = TransactionsManager(avatar=ENV.AVATAR_SAFE_ADDRESS,
+                                           roles_mod=ENV.ROLES_MOD_ADDRESS,
+                                           role=ENV.ROLE,
+                                           private_key=ENV.PRIVATE_KEY)
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -66,6 +65,16 @@ log_initial_data(ENV, messenger)
 def bot_do(w3):
     global gauges
     global flags
+
+    nft_ids = get_all_nfts(w3, ENV.AVATAR_SAFE_ADDRESS)
+    # TODO: Check that it's the correct NFT Id
+    nft_id = nft_ids[-1]
+    system_data = update_system_data(w3=w3, nft_id=nft_id, env=ENV)
+
+    gauges.update(system_data)
+
+    if system_data.check_triggering_condition():
+        transactions_manager.disassemble_position(w3=w3, nft_id=system_data.nft_id)
 
 
 # -----------------------------MAIN LOOP-----------------------------------------
@@ -77,11 +86,11 @@ while True:
         if not test_mode:
             w3, rpc_endpoint_failure_counter = web3_connection_check(ENV.RPC_ENDPOINT, messenger,
                                                                      rpc_endpoint_failure_counter,
-                                                                     ENV.RPC_ENDPOINT_ETHEREUM_FALLBACK)
+                                                                     ENV.RPC_ENDPOINT_FALLBACK)
             if rpc_endpoint_failure_counter != 0:
                 continue
         else:
-            w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT_ETHEREUM}'))
+            w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
 
         try:
             bot_do(w3)

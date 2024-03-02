@@ -88,7 +88,7 @@ def test_integration(local_node_eth, accounts):
 
     # check nft
     nft = uniswap_v3.NFTPosition(w3, nft_id)
-    nft_balances = nft.get_balances(nft.pool.ic, nft.pool.sqrt_price)
+    nft_balances = nft.get_balances()
 
     assert nft_balances[1] / 10**18 == approx(1)
 
@@ -112,7 +112,7 @@ def test_integration(local_node_eth, accounts):
 
     # check nft
     nft = uniswap_v3.NFTPosition(w3, nft_id)
-    nft_balances = nft.get_balances(nft.pool.ic, nft.pool.sqrt_price)
+    nft_balances = nft.get_balances()
 
     assert nft_balances[1] / 10**18 == approx(2)
 
@@ -136,6 +136,6 @@ def test_integration(local_node_eth, accounts):
 
     # check nft
     nft = uniswap_v3.NFTPosition(w3, nft_id)
-    nft_balances = nft.get_balances(nft.pool.ic, nft.pool.sqrt_price)
+    nft_balances = nft.get_balances()
 
     assert nft_balances[1] / 10**18 == approx(1)

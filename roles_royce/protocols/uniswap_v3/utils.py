@@ -122,19 +122,19 @@ class NFTPosition:
         self.price_max = (Decimal(1.0001) ** Decimal(self.tick_upper * self.pool.tick_spacing) /
                           Decimal(10 ** (self.pool.token1_decimals - self.pool.token0_decimals)))
 
-    def get_balances(self, ic: int, sqrt_price: Decimal) -> list:
+    def get_balances(self) -> list:
         balances = []
 
         if self.liquidity != 0:
             sa = Decimal(1.0001) ** Decimal(int(self.tick_lower) / 2)
             sb = Decimal(1.0001) ** Decimal(int(self.tick_upper) / 2)
 
-            if self.tick_upper <= ic:
+            if self.tick_upper <= self.pool.ic:
                 amount0 = 0
                 amount1 = self.liquidity * (sb - sa)
-            elif self.tick_lower < ic < self.tick_upper:
-                amount0 = self.liquidity * (sb - sqrt_price) / (sqrt_price * sb)
-                amount1 = self.liquidity * (sqrt_price - sa)
+            elif self.tick_lower < self.pool.ic < self.tick_upper:
+                amount0 = self.liquidity * (sb - self.pool.sqrt_price) / (self.pool.sqrt_price * sb)
+                amount1 = self.liquidity * (self.pool.sqrt_price - sa)
             else:
                 amount0 = self.liquidity * (sb - sa) / (sa * sb)
                 amount1 = 0
