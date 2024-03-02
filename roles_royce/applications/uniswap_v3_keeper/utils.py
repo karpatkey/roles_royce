@@ -101,12 +101,13 @@ class SystemData:
     min_price_threshold: float
     max_price_threshold: float
 
-    def check_triggering_condition(self) -> bool:
-        if (self.price - self.price_min) / (self.price_max - self.price_min) < self.min_price_threshold or (
-                self.price_max - self.price) / (self.price_max - self.price_min) < self.max_price_threshold:
-            return True
+    def check_triggering_condition(self) -> (bool, float | None):
+        if (self.price - self.price_min) / (self.price_max - self.price_min) < self.min_price_threshold:
+            return (True, self.price- self.price_min)
+        elif (self.price_max - self.price) / (self.price_max - self.price_min) < self.max_price_threshold:
+            return (True, self.price_max - self.price)
         else:
-            return False
+            return (False, None)
 
 
 def update_system_data(w3: Web3, nft_id: int, env: ENV) -> SystemData:

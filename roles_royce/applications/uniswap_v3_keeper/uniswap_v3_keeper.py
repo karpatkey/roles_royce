@@ -72,8 +72,8 @@ def bot_do(w3):
     system_data = update_system_data(w3=w3, nft_id=nft_id, env=ENV)
 
     gauges.update(system_data)
-
-    if system_data.check_triggering_condition():
+    triggering_condition, delta = system_data.check_triggering_condition()
+    if triggering_condition:
         transactions_manager.collect_all_fees(w3=w3, nft_id=system_data.nft_id)
         # TODO: Add logs...
         transactions_manager.disassemble_position(w3=w3, nft_id=system_data.nft_id)
