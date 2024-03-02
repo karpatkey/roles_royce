@@ -14,7 +14,7 @@ def validate_tokens(token0: Address, token1: Address):
         raise ValueError("token0 and token1 must be different")
 
 
-def validate_amounts(amount0_desired: float, amount1_desired: float) -> (float, float):
+def validate_amounts(amount0_desired: float | None, amount1_desired: float | None) -> (float | None, float | None):
     if not amount0_desired and not amount1_desired:
         raise ValueError("Either amount0_desired or amount1_desired must be provided")
 
@@ -24,23 +24,18 @@ def validate_amounts(amount0_desired: float, amount1_desired: float) -> (float, 
         else:
             if amount1_desired:
                 raise ValueError("Only one amount can be provided")
-            else:
-                amount1_desired = 0
+
     else:
         if amount1_desired <= 0:
             raise ValueError("amount1_desired must be greater than 0")
         else:
             if amount0_desired:
                 raise ValueError("Only one amount can be provided")
-            else:
-                amount0_desired = 0
 
     return amount0_desired, amount1_desired
 
 
-def validate_price_percentage_deviation(
-        token0_min_price_perc_dev: float, token0_max_price_perc_dev: float
-):
+def validate_price_percentage_deviation(token0_min_price_perc_dev: float, token0_max_price_perc_dev: float) -> None:
     if not 0 <= token0_min_price_perc_dev <= 100:
         raise ValueError("token0_min_percentage_deviation must be between 0 and 100")
 
@@ -48,7 +43,7 @@ def validate_price_percentage_deviation(
         raise ValueError("token0_max_percentage_deviation must be between 0 and 100")
 
 
-def validate_slippage(amount0_min_slippage: float, amount1_min_slippage: float):
+def validate_slippage(amount0_min_slippage: float, amount1_min_slippage: float) -> None:
     if not 0 <= amount0_min_slippage <= 100:
         raise ValueError("amount0_min_slippage must be between 0 and 100")
 
@@ -56,7 +51,7 @@ def validate_slippage(amount0_min_slippage: float, amount1_min_slippage: float):
         raise ValueError("amount1_min_slippage must be between 0 and 100")
 
 
-def validate_removed_liquidity_percentage(removed_liquidity_percentage: float):
+def validate_removed_liquidity_percentage(removed_liquidity_percentage: float) -> None:
     if not 0 <= removed_liquidity_percentage <= 100:
         raise ValueError("removed_liquidity_percentage must be between 0 and 100")
 
@@ -179,12 +174,16 @@ def set_and_check_desired_amounts(w3: Web3,
     Raises:
         ValueError: If there is not enough balance of either token
     """
-    if amount0_desired:
+    if not amount0_desired and not amount1_desired:
+        raise ValueError("Either amount0_desired or amount1_desired must be provided")
+    elif amount0_desired and amount1_desired:
+        raise ValueError("Only one amount can be provided")
+    elif amount0_desired and (not amount1_desired):
         amount1_desired = (Decimal(amount0_desired) * Decimal(pool.sqrt_price_x96 * 1.0001 ** (tick_upper / 2) *
                                                               (pool.sqrt_price_x96 - 1.0001 ** (tick_lower / 2) * (
                                                                           2 ** 96))) /
                            Decimal((2 ** 96) * (1.0001 ** (tick_upper / 2) * (2 ** 96) - pool.sqrt_price_x96)))
-    elif amount1_desired:
+    else:
         amount0_desired = (Decimal(amount1_desired) * Decimal((2 ** 96) *
                                                               (1.0001 ** (tick_upper / 2) * (
                                                                           2 ** 96) - pool.sqrt_price_x96)) /

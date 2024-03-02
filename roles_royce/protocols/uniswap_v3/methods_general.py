@@ -360,8 +360,8 @@ class MintNFT(Mint):
         fee: FeeAmount,
         token0_min_price_perc_dev: float,
         token0_max_price_perc_dev: float,
-        amount0_desired: float = None,
-        amount1_desired: float = None,
+        amount0_desired: float | None = None,
+        amount1_desired: float | None = None,
         amount0_min_slippage: float = 1,
         amount1_min_slippage: float = 1,
     ):
@@ -388,8 +388,10 @@ class MintNFT(Mint):
         if token1 == GenAddr.E or token1 == GenAddr.ZERO:
             send_eth = True
 
-        amount0_desired = Decimal(amount0_desired * 10**pool.token0_decimals)
-        amount1_desired = Decimal(amount1_desired * 10**pool.token1_decimals)
+        if amount0_desired:
+            amount0_desired = Decimal(amount0_desired * 10**pool.token0_decimals)
+        else:
+            amount1_desired = Decimal(amount1_desired * 10**pool.token1_decimals)
 
         token0_min_price = pool.price * (1 - Decimal(token0_min_price_perc_dev) / 100)
         token0_max_price = pool.price * (1 + Decimal(token0_max_price_perc_dev) / 100)
@@ -485,10 +487,12 @@ class IncreaseLiquidityNFT(IncreaseLiquidity):
 
         self.nft_position = NFTPosition(w3, nft_id)
 
-        amount0_desired = Decimal(
+        if amount0_desired:
+            amount0_desired = Decimal(
             amount0_desired * 10**self.nft_position.pool.token0_decimals
         )
-        amount1_desired = Decimal(
+        else:
+            amount1_desired = Decimal(
             amount1_desired * 10**self.nft_position.pool.token1_decimals
         )
 
