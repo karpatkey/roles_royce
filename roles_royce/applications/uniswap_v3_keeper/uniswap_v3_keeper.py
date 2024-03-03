@@ -18,10 +18,8 @@ test_mode = ENV.TEST_MODE
 if test_mode:
     from tests.utils import top_up_address
 
-    w3_eth = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT_ETHEREUM}'))
-    top_up_address(w3_eth, ENV.BOT_ADDRESS, 1)
-    w3_gnosis = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT_GNOSIS}'))
-    top_up_address(w3_gnosis, ENV.BOT_ADDRESS, 1)
+    w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
+    top_up_address(w3, ENV.BOT_ADDRESS, 1)
 
 # -----------------------------------------------------------------------------------------------------------------------
 

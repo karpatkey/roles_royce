@@ -241,8 +241,20 @@ def accounts() -> list[LocalAccount]:
     return TEST_ACCOUNTS
 
 
-def steal_token(w3, token, holder, to, amount):
-    """Steal tokens from a holder sending them to another address (sends 1 ETH to the holder first)"""
+def steal_token(w3, token, holder, to, amount) -> TxReceipt:
+    """Steal tokens from a holder sending them to another address (sends 1 ETH to the holder first).
+
+    Args:
+        w3: Web3 instance
+        token: Token address
+        holder: Address to steal tokens from. If it is a smart contract address, it must have a payable function so that ETH can be sent to it
+        to: Address to send the tokens to
+        amount: Amount of tokens to send
+
+    Returns:
+        TxReceipt: Transaction receipt
+    """
+    # TODO: check if this works with non-EOA holders
     fork_unlock_account(w3, holder)
     top_up_address(w3=w3, address=holder, amount=1)
     ctract = w3.eth.contract(address=token, abi=erc20_abi)

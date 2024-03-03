@@ -48,6 +48,15 @@ def setup_common_roles(safe: SimpleSafe, roles_ctract):
 
 
 def apply_presets(safe: SimpleSafe, roles_ctract, json_data, replaces=None):
+    """Has a SimpleSafe execute a set of transactions sent to the roles contract, replacing some data if needed.
+    The preset json is meant to have a 'transactions' key with a list of transactions, each with a 'data' key.
+
+    Args:
+        safe: SimpleSafe instance
+        roles_ctract: Web3 contract instance
+        json_data: json str
+        replaces: list of tuples, each with two strings, the first being the string to replace and the second the new string
+    """
     presets_data = json.loads(json_data)
     for tx in presets_data["transactions"]:
         data: str = tx['data']

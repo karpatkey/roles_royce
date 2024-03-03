@@ -38,10 +38,11 @@ class ENV:
     TELEGRAM_BOT_TOKEN: str = config('TELEGRAM_BOT_TOKEN', default='')
     TELEGRAM_CHAT_ID: int = custom_config('TELEGRAM_CHAT_ID', default='', cast=int)
     PROMETHEUS_PORT: int = custom_config('PROMETHEUS_PORT', default=8000, cast=int)
-    TEST_MODE: bool = config('TEST_MODE', default=False, cast=bool)
+    TEST_MODE: bool = config('TEST_MODE', default=True, cast=bool)
     LOCAL_FORK_PORT: int = custom_config('LOCAL_FORK_PORT', default=8545, cast=int)
     TOKEN0_ADDRESS: Address | ChecksumAddress | str = config('TOKEN0_ADDRESS', default='', cast=str)
     TOKEN1_ADDRESS: Address | ChecksumAddress | str = config('TOKEN1_ADDRESS', default='', cast=str)
+    FEE: int = custom_config('FEE', default=3000, cast=int)
     MIN_PRICE_THRESHOLD: float = custom_config('MIN_PRICE_THRESHOLD', default=10, cast=float)
     MAX_PRICE_THRESHOLD: float = custom_config('MAX_PRICE_THRESHOLD', default=10, cast=float)
     PRICE_RANGE_MULTIPLICATOR_SEED: float = custom_config('NEW_PRICE_RANGE_DELTA_PERCENTAGE_SEED', default=5,
@@ -54,19 +55,21 @@ class ENV:
     TOKEN1_DECIMALS: int = field(init=False)
 
     def __post_init__(self):
-        if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).is_connected():
-            raise ValueError(f"RPC_ENDPOINT is not valid or not active: {self.RPC_ENDPOINT}.")
-        if self.RPC_ENDPOINT_FALLBACK != '':
-            if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT_FALLBACK)).is_connected():
-                raise ValueError(
-                    f"FALLBACK_RPC_ENDPOINT is not valid or not active: {self.RPC_ENDPOINT_FALLBACK}.")
-        if self.RPC_ENDPOINT_MEV != '':
-            if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT_MEV)).is_connected():
-                self.RPC_ENDPOINT_MEV = self.RPC_ENDPOINT
+        if not self.TEST_MODE:
+            if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).is_connected():
+                raise ValueError(f"RPC_ENDPOINT is not valid or not active: {self.RPC_ENDPOINT}.")
+            if self.RPC_ENDPOINT_FALLBACK != '':
+                if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT_FALLBACK)).is_connected():
+                    raise ValueError(
+                        f"FALLBACK_RPC_ENDPOINT is not valid or not active: {self.RPC_ENDPOINT_FALLBACK}.")
+            if self.RPC_ENDPOINT_MEV != '':
+                if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT_MEV)).is_connected():
+                    self.RPC_ENDPOINT_MEV = self.RPC_ENDPOINT
         self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
         self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
         self.TOKEN0_ADDRESS = Web3.to_checksum_address(self.TOKEN0_ADDRESS)
         self.TOKEN1_ADDRESS = Web3.to_checksum_address(self.TOKEN1_ADDRESS)
+        # TODO: add check for correct FEES
         if not 0 <= self.MIN_PRICE_THRESHOLD <= 100:
             raise ValueError(
                 f"MIN_PRICE_THRESHOLD must be between 0 and 100. MIN_PRICE_THRESHOLD inputted: {self.MIN_PRICE_THRESHOLD}.")
