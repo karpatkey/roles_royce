@@ -57,6 +57,10 @@ transactions_manager = TransactionsManager(avatar=ENV.AVATAR_SAFE_ADDRESS,
                                            role=ENV.ROLE,
                                            private_key=ENV.PRIVATE_KEY)
 
+all_nft_ids = get_all_nfts(w3, ENV.AVATAR_SAFE_ADDRESS, active=False, token0=ENV.TOKEN0_ADDRESS, token1=ENV.TOKEN1_ADDRESS, fee=ENV.FEE)
+active_nfts = get_all_nfts(w3, ENV.AVATAR_SAFE_ADDRESS, token0=ENV.TOKEN0_ADDRESS, token1=ENV.TOKEN1_ADDRESS, fee=ENV.FEE)
+discarded_nfts = list(set(all_nft_ids) - set(active_nfts))
+
 # -----------------------------------------------------------------------------------------------------------------------
 
 
@@ -64,7 +68,7 @@ def bot_do(w3):
     global gauges
     global flags
 
-    nft_ids = get_all_nfts(w3, ENV.AVATAR_SAFE_ADDRESS)
+    nft_ids = get_all_nfts(w3, ENV.AVATAR_SAFE_ADDRESS, discarded_nfts=discarded_nfts,token0=ENV.TOKEN0_ADDRESS, token1=ENV.TOKEN1_ADDRESS, fee=ENV.FEE)
     # TODO: Check that it's the correct NFT Id
     nft_id = nft_ids[-1]
     system_data = update_system_data(w3=w3, nft_id=nft_id, env=ENV)
@@ -72,10 +76,8 @@ def bot_do(w3):
     gauges.update(system_data)
     triggering_condition, delta = system_data.check_triggering_condition()
     if triggering_condition:
-        transactions_manager.collect_all_fees(w3=w3, nft_id=system_data.nft_id)
+        transactions_manager.collect_fees_and_disassemble_position(w3=w3, nft_id=system_data.nft_id)
         # TODO: Add logs...
-        transactions_manager.disassemble_position(w3=w3, nft_id=system_data.nft_id)
-        # TODO: Add logs
         system_data = update_system_data(w3=w3, nft_id=nft_id, env=ENV)
 
 

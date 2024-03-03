@@ -247,7 +247,7 @@ class TransactionsManager:
     role: int
     private_key: str
 
-    def disassemble_position(self, w3: Web3, nft_id: int) -> TxReceipt:
+    def collect_fees_and_disassemble_position(self, w3: Web3, nft_id: int) -> TxReceipt:
         decrease_liquidity_transactables = decrease_liquidity_nft(w3=w3,
                                                                   recipient=self.avatar,
                                                                   nft_id=nft_id,
@@ -255,15 +255,9 @@ class TransactionsManager:
                                                                   amount0_min_slippage=10,
                                                                   amount1_min_slippage=10,
                                                                   withdraw_eth=False)
-        return roles.send(decrease_liquidity_transactables,
-                          role=self.role,
-                          private_key=self.private_key,
-                          roles_mod_address=self.roles_mod,
-                          web3=w3)
-
-    def collect_all_fees(self, w3: Web3, nft_id: int) -> TxReceipt:
         collect_all_fees_transactables = collect_all_fees(w3=w3, avatar=self.avatar, nft_id=nft_id)
-        return roles.send(collect_all_fees_transactables,
+
+        return roles.send(collect_all_fees_transactables+decrease_liquidity_transactables,
                           role=self.role,
                           private_key=self.private_key,
                           roles_mod_address=self.roles_mod,
@@ -272,27 +266,12 @@ class TransactionsManager:
 
 def log_initial_data(env: ENV, messenger: Messenger):
     title = "Bridge Keeper started"
-    message = (f"  xDAI bridge address: {ContractSpecs[Chain.ETHEREUM].xDaiBridge.address}\n"
-               f"  Bot address: {env.BOT_ADDRESS}\n"
-               f"  Refill threshold: {env.REFILL_THRESHOLD} DAI\n"
-               f"  Invest threshold: {env.INVEST_THRESHOLD} DAI\n"
-               f"  Amount of interest to pay: {env.AMOUNT_OF_INTEREST_TO_PAY} DAI\n"
-               f"  Minutes before claim epoch to pay interest: {env.MINUTES_BEFORE_CLAIM_EPOCH}\n"
-               f"  ETH gas alerting threshold: {env.GAS_ETH_THRESHOLD} ETH\n")
+    message = (f"  Something")
     messenger.log_and_alert(LoggingLevel.Info, title, message)
 
 
 def log_status_update(env: ENV, bridge_DAI_balance: int, bot_ETH_balance: int, next_claim_epoch: int,
                       min_cash_threshold: int):
     title = 'Status update'
-    message = (f'  Bridge"s DAI balance: {bridge_DAI_balance / (10 ** decimals_DAI):.2f} DAI.\n'
-               f'  Bot"s ETH balance: {bot_ETH_balance / (10 ** 18):.5f} ETH.\n'
-               f'  Next claim epoch: {datetime.utcfromtimestamp(next_claim_epoch)} UTC.\n'
-               f'  Minimum cash threshold: {min_cash_threshold / (10 ** decimals_DAI):.2f} DAI.\n'
-               f'  Refill threshold: {ENV.REFILL_THRESHOLD:.2f} DAI.\n'
-               f'  Invest threshold: {ENV.INVEST_THRESHOLD:.2f} DAI.\n'
-               f"  Invest threshold: {env.INVEST_THRESHOLD} DAI\n"
-               f"  Amount of interest to pay: {env.AMOUNT_OF_INTEREST_TO_PAY} DAI\n"
-               f"  Minutes before claim epoch to pay interest: {env.MINUTES_BEFORE_CLAIM_EPOCH}\n"
-               f"  ETH gas alerting threshold: {env.GAS_ETH_THRESHOLD} ETH\n")
+    message = (f'  Something')
     logger.info(title + '.\n' + message)

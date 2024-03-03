@@ -88,14 +88,14 @@ def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
     monkeypatch.setenv('AVATAR_SAFE_ADDRESS', safe.address)
     monkeypatch.setenv('ROLES_MOD_ADDRESS', roles_mod_contract.address)
     monkeypatch.setenv('ROLE', str(1))
-    monkeypatch.setenv('PRIVATE_KEY', accounts[1].key)
+    monkeypatch.setenv('PRIVATE_KEY', accounts[1].key.hex())
     monkeypatch.setenv('TOKEN0_ADDRESS', USDC)
     monkeypatch.setenv('TOKEN1_ADDRESS', WETH)
     monkeypatch.setenv('FEE', str(500))
+    monkeypatch.setenv('LOCAL_FORK_PORT', str(8546))
 
     file_path_main = os.path.join(Path(os.path.dirname(__file__)).resolve().parent.parent.parent, 'roles_royce',
-                                  'applications', 'uniswap_v3_keeper',
-                                  'uniswap_v3_keeper.py')
+                                  'applications', 'uniswap_v3_keeper', 'uniswap_v3_keeper.py')
 
     main = subprocess.run(args=[sys.executable, file_path_main], capture_output=True, text=True, timeout=100000)
 
