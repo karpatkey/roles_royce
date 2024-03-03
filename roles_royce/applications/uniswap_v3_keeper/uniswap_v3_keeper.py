@@ -7,7 +7,7 @@ import logging
 import time
 import sys
 from utils import ENV, Gauges, Flags, log_initial_data, log_status_update, \
-    get_all_active_nfts, get_nft_id_from_mint_tx, SystemData, TransactionsManager, update_system_data
+    get_all_nfts, get_nft_id_from_mint_tx, SystemData, TransactionsManager, update_system_data
 
 # Importing the environment variables from the .env file
 ENV = ENV()
@@ -64,7 +64,7 @@ def bot_do(w3):
     global gauges
     global flags
 
-    nft_ids = get_all_active_nfts(w3, ENV.AVATAR_SAFE_ADDRESS)
+    nft_ids = get_all_nfts(w3, ENV.AVATAR_SAFE_ADDRESS)
     # TODO: Check that it's the correct NFT Id
     nft_id = nft_ids[-1]
     system_data = update_system_data(w3=w3, nft_id=nft_id, env=ENV)

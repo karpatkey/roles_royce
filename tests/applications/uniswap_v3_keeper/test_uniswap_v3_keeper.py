@@ -9,12 +9,6 @@ from defabipedia.types import Chain
 from roles_royce.protocols import uniswap_v3
 from roles_royce.constants import MAX_UINT256
 
-dao = 'GnosisDAO'
-blockchain = 'ETHEREUM'
-avatar_safe_address = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
-roles_mod_address = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
-role = 4
-
 
 def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
     block = 19346560

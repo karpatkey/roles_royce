@@ -190,18 +190,18 @@ def get_nft_id_from_mint_tx(w3: Web3, tx_receipt: TxReceipt, recipient: Address)
                 return event.values['tokenId']
     return None
 
-
-def get_all_active_nfts(w3: Web3, owner: str, discarded_nfts: list[int]=[],
+def get_all_nfts(w3: Web3, owner: str, discarded_nfts: list[int]=[], active: bool=True,
                         token0: Address | None=None, token1: Address | None=None,
                         fee: int | None=None) -> list[int]:
     """Returns all NFT Ids owned by a wallet with liquidity>0. It a priori filters any NFT Ids that are passed in the
-    discarded_nfts list (this allows for faster performance). It also filters by token0, token1 and fee if these are
-    specified.
+    discarded_nfts list (this allows for faster performance). If active=True, it will discard those with liquidity=0.
+    It also filters by token0, token1 and fee if these are specified.
 
     Args:
         w3 (Web3): Web3 instance.
-        wallet (str): Wallet address.
+        owner (str): Owner address.
         discarded_nfts (list[int], optional): List of NFT Ids to be discarded. Defaults to [].
+        active (bool, optional): If True, it will only return NFT Ids with liquidity>0. Defaults to True.
         token0 (Address | None, optional): Token0 address. Defaults to None. If specified it will only return NFT Ids
             having liquidity in a pool with token0 as token0.
         token1 (Address | None, optional): Token1 address. Defaults to None. If specified it will only return NFT Ids
@@ -222,8 +222,9 @@ def get_all_active_nfts(w3: Web3, owner: str, discarded_nfts: list[int]=[],
         if nft_id in discarded_nfts:
             continue
         nft_position = NFTPosition(w3=w3, nft_id=nft_id)
-        if nft_position.liquidity == 0:
-            continue
+        if active:
+            if nft_position.liquidity == 0:
+                continue
         if token0 is not None:
             if nft_position.pool.token0 != token0:
                 continue
@@ -235,6 +236,8 @@ def get_all_active_nfts(w3: Web3, owner: str, discarded_nfts: list[int]=[],
                 continue
         result.append(nft_id)
     return result
+
+
 
 
 @dataclass
