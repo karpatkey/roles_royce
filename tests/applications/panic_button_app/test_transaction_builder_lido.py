@@ -1,6 +1,7 @@
 from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
 from tests.utils import assign_role, local_node_eth, accounts
 import os
+import sys
 import json
 import pytest
 import subprocess
@@ -102,7 +103,7 @@ def test_transaction_builder_lido(local_node_eth, accounts, monkeypatch, args, e
                                   'transaction_builder.py')
 
     arguments = [
-        'python', file_path_main,
+        sys.executable, file_path_main, # use sys.executable instead of just 'python' to inherit venv
         '--percentage', str(23),
         '--dao', dao,
         '--blockchain', blockchain,

@@ -2,6 +2,7 @@ from roles_royce.applications.panic_button_app.utils import ENV
 from tests.utils import assign_role, local_node_eth, accounts, web3_eth, local_node_gc, web3_gnosis
 from tests.utils import top_up_address, fork_unlock_account 
 import os
+import sys
 import json
 import pytest
 import subprocess
@@ -158,7 +159,7 @@ def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch, dao, e
     logging.info(f'Position: {exec_config["function_name"]}, description: {exec_config["description"]}')
 
     arguments_build = [
-        'python', file_path_transaction_builder,
+        sys.executable, file_path_transaction_builder, # use sys.executable instead of just 'python' to inherit venv
         '--percentage', str(PERCENTAGE),
         '--dao', dao.name,
         '--blockchain', dao.blockchain,

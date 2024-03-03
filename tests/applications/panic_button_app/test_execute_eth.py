@@ -1,6 +1,7 @@
 from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
 from tests.utils import assign_role, local_node_eth, accounts
 import os
+import sys
 import json
 import pytest
 import subprocess
@@ -98,7 +99,7 @@ def test_execute(local_node_eth, accounts, monkeypatch, tx):
                                      'execute.py')
 
     arguments = [
-        'python', file_path_execute,
+        sys.executable, file_path_execute, # use sys.executable instead of just 'python' to inherit venv
         '--dao', dao,
         '--blockchain', blockchain,
         '--transaction', json.dumps(tx)

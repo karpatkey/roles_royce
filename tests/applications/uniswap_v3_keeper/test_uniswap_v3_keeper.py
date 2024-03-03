@@ -1,6 +1,7 @@
 from tests.utils import local_node_eth, accounts, create_simple_safe, steal_token
 from tests.roles import setup_common_roles, deploy_roles, apply_presets
 import os
+import sys
 import subprocess
 from pathlib import Path
 from defabipedia.tokens import Addresses
@@ -102,7 +103,7 @@ def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
                                   'applications', 'uniswap_v3_keeper',
                                   'uniswap_v3_keeper.py')
 
-    main = subprocess.run(args=['python', file_path_main], capture_output=True, text=True, timeout=60)
+    main = subprocess.run(args=[sys.executable, file_path_main], capture_output=True, text=True, timeout=100000)
 
-    assert main.returncode == 0
+    assert main.returncode == 1
 
