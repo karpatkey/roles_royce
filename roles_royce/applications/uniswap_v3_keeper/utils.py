@@ -191,27 +191,50 @@ def get_nft_id_from_mint_tx(w3: Web3, tx_receipt: TxReceipt, recipient: Address)
     return None
 
 
-def get_all_active_nfts(w3: Web3, wallet: str) -> list:
-    """Returns all NFT Ids owned by a wallet.
+def get_all_active_nfts(w3: Web3, owner: str, discarded_nfts: list[int]=[],
+                        token0: Address | None=None, token1: Address | None=None,
+                        fee: int | None=None) -> list[int]:
+    """Returns all NFT Ids owned by a wallet with liquidity>0. It a priori filters any NFT Ids that are passed in the
+    discarded_nfts list (this allows for faster performance). It also filters by token0, token1 and fee if these are
+    specified.
 
     Args:
         w3 (Web3): Web3 instance.
         wallet (str): Wallet address.
+        discarded_nfts (list[int], optional): List of NFT Ids to be discarded. Defaults to [].
+        token0 (Address | None, optional): Token0 address. Defaults to None. If specified it will only return NFT Ids
+            having liquidity in a pool with token0 as token0.
+        token1 (Address | None, optional): Token1 address. Defaults to None. If specified it will only return NFT Ids
+            having liquidity in a pool with token1 as token1.
+        fee (int | None, optional): Fee. Defaults to None. If specified it will only return NFT Ids having liquidity in
+            a pool with the specified fee.
 
     Returns:
-        a list where each element is the nft id that is owned by the wallet (open and closed nfts)
+        a list where each element is the nft id with liquidity>0 that is owned by the wallet (open and closed nfts)
     """
 
-    nftids = []
+    result = []
 
     nft_contract = ContractSpecs[Chain.get_blockchain_from_web3(w3)].PositionsNFT.contract(w3)
-    nfts = nft_contract.functions.balanceOf(wallet).call()
+    nfts = nft_contract.functions.balanceOf(owner).call()
     for nft_index in range(nfts):
-        nft_id = nft_contract.functions.tokenOfOwnerByIndex(wallet, nft_index).call()
+        nft_id = nft_contract.functions.tokenOfOwnerByIndex(owner, nft_index).call()
+        if nft_id in discarded_nfts:
+            continue
         nft_position = NFTPosition(w3=w3, nft_id=nft_id)
-        if nft_position.liquidity > 0:
-            nftids.append(nft_id)
-    return nftids
+        if nft_position.liquidity == 0:
+            continue
+        if token0 is not None:
+            if nft_position.pool.token0 != token0:
+                continue
+        if token1 is not None:
+            if nft_position.pool.token1 != token1:
+                continue
+        if fee is not None:
+            if nft_position.pool.fee != fee:
+                continue
+        result.append(nft_id)
+    return result
 
 
 @dataclass

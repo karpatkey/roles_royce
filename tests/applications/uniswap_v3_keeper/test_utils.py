@@ -18,5 +18,14 @@ def test_get_all_active_nfts(local_node_eth):
     block = 19346560
     recipient = '0xAD10e5921fde9ee5FFf49696239001CE1Fd36ea1'
     local_node_eth.set_block(block)
-    nfts = get_all_active_nfts(w3, recipient)
+    some_nfts_with_zero_liquidity = [676429, 677049, 677090, 677097, 677131, 677132, 677157, 677159, 677165, 677167,
+                                     677386, 677387, 677474, 677858, 678420, 678477, 678479, 678630, 678908, 678910,
+                                     678913, 678917, 678922, 678947, 679149, 679237, 679324, 679692, 680626, 681351,
+                                     681862, 681939, 681963, 683307, 683335, 684071, 684147, 684229, 684253, 684472,
+                                     684634, 685015, 685167, 685279, 685476, 685500, 685709, 686049, 686137, 686364,
+                                     686579, 686618, 686730]
+    nfts = get_all_active_nfts(w3, recipient, discarded_nfts=some_nfts_with_zero_liquidity)
     assert nfts == [679322, 686794]
+
+    nfts_2 = get_all_active_nfts(w3, recipient, discarded_nfts=some_nfts_with_zero_liquidity+[679322])
+    assert nfts_2 == [686794]
