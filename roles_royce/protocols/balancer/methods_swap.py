@@ -97,3 +97,20 @@ class ExactTokenOutSingleSwap(SingleSwap):
                          token_out_address=token_out_address,
                          amount=amount_out,
                          limit=max_amount_in)
+        
+class QuerySwap:
+    name = "querySwap"
+    out_signature = [("amount_out", "uint256")]
+
+class ExactSingleTokenInQuerySwap(QuerySwap, ExactTokenInSingleSwap):
+    def __init__(self,
+                 w3: Web3,
+                 pool_id: str,
+                 token_amount_in: int,
+                 token_out_address: Address):
+        super().__init__(w3=w3,
+                         pool_id=pool_id,
+                         avatar=AvatarAddress,
+                         bpt_amount_in=token_amount_in,
+                         token_out_address=token_out_address,
+                         min_amount_out=0)

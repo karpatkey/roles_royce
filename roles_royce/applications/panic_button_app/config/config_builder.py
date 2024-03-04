@@ -6,6 +6,7 @@ from .utils import get_tokens_from_bpt, get_gauge_address_from_bpt, get_aura_gau
 import os
 from dataclasses import dataclass
 from defabipedia.types import Blockchain, Chain
+from defabipedia.tokens import erc20_contract
 import copy
 from defabipedia.lido import ContractSpecs
 
@@ -22,6 +23,9 @@ class DAO(StrEnum):
     GnosisDAO = "GnosisDAO"
     GnosisLtd = "GnosisLtd"
     karpatkey = "karpatkey"
+    ENS = "ENS"
+    BalancerDAO = "BalancerDAO"
+    wallet_tokens = "WalletTokens"
 
     def __str__(self):
         return self.name
@@ -172,6 +176,24 @@ class LidoPosition:
             return f'{blockchain}_Lido_wstETH'
         else:
             return f'{blockchain}_Lido_stETH'
+        
+@dataclass
+class WalletPosition:
+    position_id: str
+    token_in_address: Address
+
+    def __post_init__(self):
+        self.token_in_address = Web3.to_checksum_address(self.token_in_address)
+
+    def position_id_tech(self) -> Address:
+        """The token address that will be swapped"""
+        return self.token_in_address
+    
+    def position_id_human_readable(self, w3: Web3) -> str:
+        blockchain = Chain.get_blockchain_from_web3(w3)
+        token_contract = erc20_contract(w3, self.token_in_address)
+        token_symbol = token_contract.functions.symbol().call()
+        return f'{blockchain}_WalletPosition_{token_symbol}'
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -184,6 +206,7 @@ class DAOStrategiesBuilder:
     balancer: list[BalancerPosition] | None = None
     aura: list[AuraPosition] | None = None
     lido: list[LidoPosition] | None = None
+    wallet_tokens: list[WalletPosition] | None = None
 
     def build_dict(self, w3: Web3) -> dict:
         positions = []
@@ -358,6 +381,25 @@ class DAOStrategiesBuilder:
                 
             print(f"        Done adding: Lido position", position["position_id"], position["position_id_human_readable"])
 
+            result.append(position)
+        return result
+    
+    @staticmethod
+    def build_wallet_positions(w3: Web3, positions: list[WalletPosition]) -> list[dict]:
+        with open(os.path.join(os.path.dirname(__file__), 'templates', 'swap_pool_template.json'), 'r') as f:
+            wallet_template = json.load(f)
+
+        result = []
+        for wallet_position in positions:
+            position = copy.deepcopy(wallet_template)
+            print("        Adding: ", wallet_position)
+            position["position_id"] = wallet_position.position_id
+            position["position_id_tech"] = wallet_position.position_id_tech()
+            position["position_id_human_readable"] = wallet_position.position_id_human_readable(w3)
+            for i in range(len(position['exec_config'])):
+                print("                Adding: ", position["exec_config"][i]["function_name"], 
+                                position["exec_config"][i]["label"])
+            print(f"        Done adding: Wallet position", position["position_id"], position["position_id_human_readable"])
             result.append(position)
         return result
 

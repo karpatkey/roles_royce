@@ -1,0 +1,118 @@
+{
+    "protocol": "Wallet",
+    "position_id": "FllMeWithPositionId",
+    "position_id_tech": "FillMeWithWalletTokenAddress",
+    "position_id_human_readable": "FillMeWithPositionIdHumanReadable",
+    "exec_config": [
+        {
+            "function_name": "exit_1",
+            "label": "Exchange Wallet Token on Balancer",
+            "test": true,
+            "stresstest": false,
+            "description": "Exchange a wallet token through Balancer",
+            "parameters": [
+              {
+                "name": "token_in_address",
+                "label": "Token in",
+                "type": "input",
+                "options": [
+                  {
+                    "value": "FillMewithTokenAddress",
+                    "label": "FillMeWithTokenSymbol"
+                  }
+                ]
+              },
+              {
+                "name": "max_slippage",
+                "label": "Max slippage",
+                "type": "input",
+                "rules": { "min": 0.001, "max": 100 }
+              },
+              {
+                "name": "token_out_address",
+                "label": "Token out",
+                "type": "input",
+                "options": [
+                  {
+                    "value": "FillMewithTokenAddress",
+                    "label": "FillMeWithTokenSymbol"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "function_name": "exit_2",
+            "label": "Exchange Wallet Token on Curve",
+            "test": true,
+            "stresstest": false,
+            "description": "Exchange a wallet token through Curve",
+            "parameters": [
+              {
+                "name": "token_in_address",
+                "label": "Token in",
+                "type": "input",
+                "options": [
+                  {
+                    "value": "FillMewithTokenAddress",
+                    "label": "FillMeWithTokenSymbol"
+                  }
+                ]
+              },
+              {
+                "name": "max_slippage",
+                "label": "Max slippage",
+                "type": "input",
+                "rules": { "min": 0.001, "max": 100 }
+              },
+              {
+                "name": "token_out_address",
+                "label": "Token out",
+                "type": "input",
+                "options": [
+                  {
+                    "value": "FillMewithTokenAddress",
+                    "label": "FillMeWithTokenSymbol"
+                  }
+                ]
+              }
+            ]
+          },{
+            "function_name": "exit_3",
+            "label": "Exchange Wallet Token on UniswapV3",
+            "test": true,
+            "stresstest": false,
+            "description": "Exchange a wallet token through UniswapV3",
+            "parameters": [
+              {
+                "name": "token_in_address",
+                "label": "Token in",
+                "type": "input",
+                "options": [
+                  {
+                    "value": "FillMewithTokenAddress",
+                    "label": "FillMeWithTokenSymbol"
+                  }
+                ]
+              },
+              {
+                "name": "max_slippage",
+                "label": "Max slippage",
+                "type": "input",
+                "rules": { "min": 0.001, "max": 100 }
+              },
+              {
+                "name": "token_out_address",
+                "label": "Token out",
+                "type": "input",
+                "options": [
+                  {
+                    "value": "FillMewithTokenAddress",
+                    "label": "FillMeWithTokenSymbol"
+                  }
+                ]
+              }
+            ]
+          }
+    ]
+}
