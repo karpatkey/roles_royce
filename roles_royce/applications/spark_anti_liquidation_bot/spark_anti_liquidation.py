@@ -62,7 +62,7 @@ gauges.health_factor_threshold.set(ENV.THRESHOLD_HEALTH_FACTOR)
 
 # -----------------------------------------------------------------------------------------------------------------------
 
-def bot_do(w3: Web3):
+def bot_do(w3: Web3) -> int:
     global gauges
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -222,6 +222,8 @@ def bot_do(w3: Web3):
         gauges.DAI_price.set(DAI_spark_price)
         gauges.last_updated.set_to_current_time()
 
+        return 0
+
 
 # -----------------------------MAIN LOOP-----------------------------------------
 
@@ -243,11 +245,12 @@ while True:
                 continue
         else:
             w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
+
         try:
-            bot_do(w3)
+            exception_counter = bot_do(w3) # If successful, resets the counter
         except:
             time.sleep(5)
-            bot_do(w3)  # Second attempt
+            exception_counter = bot_do(w3)  # Second attempt
 
     except Exception as e:
         messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e.args[0]))

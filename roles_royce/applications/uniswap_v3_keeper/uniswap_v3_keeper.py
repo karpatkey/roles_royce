@@ -64,9 +64,10 @@ discarded_nfts = list(set(all_nft_ids) - set(active_nfts))
 # -----------------------------------------------------------------------------------------------------------------------
 
 
-def bot_do(w3):
+def bot_do(w3) -> int:
     global gauges
     global flags
+    global exception_counter
 
     nft_ids = get_all_nfts(w3, ENV.AVATAR_SAFE_ADDRESS, discarded_nfts=discarded_nfts,token0=ENV.TOKEN0_ADDRESS, token1=ENV.TOKEN1_ADDRESS, fee=ENV.FEE)
     # TODO: Check that it's the correct NFT Id
@@ -79,7 +80,9 @@ def bot_do(w3):
         transactions_manager.collect_fees_and_disassemble_position(w3=w3, nft_id=system_data.nft_id)
         # TODO: Add logs...
         system_data = update_system_data(w3=w3, nft_id=nft_id, env=ENV)
+        gauges.update(system_data)
 
+    return 0
 
 # -----------------------------MAIN LOOP-----------------------------------------
 
@@ -97,10 +100,10 @@ while True:
             w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
 
         try:
-            bot_do(w3)
+            exception_counter = bot_do(w3) # If successful, resets the counter
         except:
             time.sleep(5)
-            bot_do(w3)
+            exception_counter = bot_do(w3)  # Second attempt
 
     except Exception as e:
         messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e.args[0]))

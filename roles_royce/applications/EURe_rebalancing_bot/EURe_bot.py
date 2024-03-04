@@ -56,7 +56,7 @@ lack_of_WXDAI_flag = False  # flag to stop alerting when the WXDAI balance is be
 lack_of_EURe_flag = False  # flag to stop alerting when the EURe balance is below 1
 
 
-def bot_do(w3):
+def bot_do(w3) -> int:
     global amount_WXDAI
     global amount_EURe
     global gauges
@@ -214,6 +214,8 @@ def bot_do(w3):
             f'  Bot"s xDAI balance: {bot_xDAI_balance / (10 ** 18):.5f}.\n'
         )
 
+        return 0
+
 
 # -----------------------------MAIN LOOP-----------------------------------------
 
@@ -229,10 +231,10 @@ while True:
         else:
             w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
         try:
-            bot_do(w3)
+            exception_counter = bot_do(w3) # If successful, resets the counter
         except:
             time.sleep(5)
-            bot_do(w3)  # Second attempt
+            exception_counter = bot_do(w3)  # Second attempt
 
     except Exception as e:
         messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e.args[0]))

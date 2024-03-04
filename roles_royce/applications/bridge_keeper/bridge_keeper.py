@@ -63,7 +63,7 @@ log_initial_data(ENV, messenger)
 # -----------------------------------------------------------------------------------------------------------------------
 
 
-def bot_do(w3_eth, w3_gnosis):
+def bot_do(w3_eth, w3_gnosis) -> int:
     global gauges
     global flags
 
@@ -148,6 +148,8 @@ def bot_do(w3_eth, w3_gnosis):
 
         flags.tx_executed.clear()
 
+    return 0
+
 
 # -----------------------------MAIN LOOP-----------------------------------------
 
@@ -169,10 +171,10 @@ while True:
             w3_gnosis = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT_GNOSIS}'))
 
         try:
-            bot_do(w3_eth, w3_gnosis)
+            exception_counter = bot_do(w3_eth, w3_gnosis) # If successful, resets the counter
         except:
             time.sleep(5)
-            bot_do(w3_eth, w3_gnosis)
+            exception_counter = bot_do(w3_eth, w3_gnosis)  # Second attempt
 
     except Exception as e:
         messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e.args[0]))
