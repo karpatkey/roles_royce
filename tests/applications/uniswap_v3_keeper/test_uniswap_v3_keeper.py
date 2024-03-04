@@ -1,3 +1,4 @@
+from decimal import Decimal
 from tests.utils import local_node_eth, accounts, create_simple_safe, steal_token
 from tests.roles import setup_common_roles, deploy_roles, apply_presets
 import os
@@ -8,6 +9,7 @@ from defabipedia.tokens import Addresses
 from defabipedia.types import Chain
 from roles_royce.protocols import uniswap_v3
 from roles_royce.constants import MAX_UINT256
+from roles_royce import roles
 
 
 def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
@@ -17,7 +19,9 @@ def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
 
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_mod_contract = deploy_roles(avatar=safe.address, w3=w3)
-    setup_common_roles(safe, roles_mod_contract) # We only care about creating role 1 and assigning it to accounts[1]
+    setup_common_roles(
+        safe, roles_mod_contract
+    )  # We only care about creating role 1 and assigning it to accounts[1]
 
     presets = """{
   "version": "1.0",
@@ -72,32 +76,93 @@ def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
   ]
 }"""
 
-    apply_presets(safe, roles_mod_contract, json_data=presets,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
+    apply_presets(
+        safe,
+        roles_mod_contract,
+        json_data=presets,
+        replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])],
+    )
 
     WETH = Addresses[Chain.get_blockchain_from_web3(w3)].WETH
     USDC = Addresses[Chain.get_blockchain_from_web3(w3)].USDC
 
-    ADDRESS_WITH_LOTS_OF_WETH = '0x8EB8a3b98659Cce290402893d0123abb75E3ab28'
-    AADRESS_WITH_LOTS_OF_USDC = '0xD6153F5af5679a75cC85D8974463545181f48772'
-    steal_token(w3=w3, token=WETH, holder=ADDRESS_WITH_LOTS_OF_WETH, to=safe.address, amount=int(100e18))
-    steal_token(w3=w3, token=USDC, holder=AADRESS_WITH_LOTS_OF_USDC, to=safe.address, amount=int(1_000_000e6))
-    safe.send([uniswap_v3.ApproveForPositionsNFT(blockchain=Chain.get_blockchain_from_web3(w3), token=WETH, amount=MAX_UINT256),
-               uniswap_v3.ApproveForPositionsNFT(blockchain=Chain.get_blockchain_from_web3(w3), token=USDC, amount=MAX_UINT256)])
+    ADDRESS_WITH_LOTS_OF_WETH = "0x8EB8a3b98659Cce290402893d0123abb75E3ab28"
+    AADRESS_WITH_LOTS_OF_USDC = "0xD6153F5af5679a75cC85D8974463545181f48772"
+    steal_token(
+        w3=w3,
+        token=WETH,
+        holder=ADDRESS_WITH_LOTS_OF_WETH,
+        to=safe.address,
+        amount=int(100e18),
+    )
+    steal_token(
+        w3=w3,
+        token=USDC,
+        holder=AADRESS_WITH_LOTS_OF_USDC,
+        to=safe.address,
+        amount=int(1_000_000e6),
+    )
+    safe.send(
+        [
+            uniswap_v3.ApproveForPositionsNFT(
+                blockchain=Chain.get_blockchain_from_web3(w3),
+                token=WETH,
+                amount=MAX_UINT256,
+            ),
+            uniswap_v3.ApproveForPositionsNFT(
+                blockchain=Chain.get_blockchain_from_web3(w3),
+                token=USDC,
+                amount=MAX_UINT256,
+            ),
+        ]
+    )
 
-    monkeypatch.setenv('AVATAR_SAFE_ADDRESS', safe.address)
-    monkeypatch.setenv('ROLES_MOD_ADDRESS', roles_mod_contract.address)
-    monkeypatch.setenv('ROLE', str(1))
-    monkeypatch.setenv('PRIVATE_KEY', accounts[1].key.hex())
-    monkeypatch.setenv('TOKEN0_ADDRESS', USDC)
-    monkeypatch.setenv('TOKEN1_ADDRESS', WETH)
-    monkeypatch.setenv('FEE', str(500))
-    monkeypatch.setenv('LOCAL_FORK_PORT', str(8546))
+    monkeypatch.setenv("AVATAR_SAFE_ADDRESS", safe.address)
+    monkeypatch.setenv("ROLES_MOD_ADDRESS", roles_mod_contract.address)
+    monkeypatch.setenv("ROLE", str(1))
+    monkeypatch.setenv("PRIVATE_KEY", accounts[1].key.hex())
+    monkeypatch.setenv("TOKEN0_ADDRESS", USDC)
+    monkeypatch.setenv("TOKEN1_ADDRESS", WETH)
+    monkeypatch.setenv("FEE", str(3000))
+    monkeypatch.setenv("LOCAL_FORK_PORT", str(8546))
 
-    file_path_main = os.path.join(Path(os.path.dirname(__file__)).resolve().parent.parent.parent, 'roles_royce',
-                                  'applications', 'uniswap_v3_keeper', 'uniswap_v3_keeper.py')
+    file_path_main = os.path.join(
+        Path(os.path.dirname(__file__)).resolve().parent.parent.parent,
+        "roles_royce",
+        "applications",
+        "uniswap_v3_keeper",
+        "uniswap_v3_keeper.py",
+    )
 
-    main = subprocess.run(args=[sys.executable, file_path_main], capture_output=True, text=True, timeout=100000)
+    pool = uniswap_v3.utils.Pool(w3, USDC, WETH, 3000)
+
+    token0_min_price = pool.price * Decimal(0.9)
+    token0_max_price = pool.price * Decimal(1.1)
+
+    # mint nft
+    mint_ntf_txns = uniswap_v3.mint_nft(
+        w3=w3,
+        avatar=safe.address,
+        token0=USDC,
+        token1=WETH,
+        fee=3000,
+        token0_min_price=token0_min_price,
+        token0_max_price=token0_max_price,
+        amount1_desired=10,
+    )
+    roles.send(
+        mint_ntf_txns,
+        role=1,
+        private_key=accounts[1].key,
+        roles_mod_address=roles_mod_contract.address,
+        web3=w3,
+    )
+
+    main = subprocess.run(
+        args=[sys.executable, file_path_main],
+        capture_output=True,
+        text=True,
+        timeout=100000,
+    )
 
     assert main.returncode == 1
-
