@@ -112,4 +112,6 @@ while True:
             messenger.log_and_alert(LoggingLevel.Error, title='Too many exceptions, exiting...', message='')
             time.sleep(5)  # Cooldown time for the messenger system to send messages in queue
             sys.exit(1)
+        time.sleep(30) # Time to breathe
+        continue
     time.sleep(ENV.COOLDOWN_MINUTES * 60)
