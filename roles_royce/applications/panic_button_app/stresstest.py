@@ -1,15 +1,15 @@
 import logging
 from dataclasses import dataclass
-from time import sleep
 
 from defabipedia.aura import Abis as AuraAbis
 from defabipedia.balancer import Abis as BalancerAbis
 from defabipedia.types import Chain
 from web3 import Web3
 
-from roles_royce.applications.panic_button_app.execute import execute
-from roles_royce.applications.panic_button_app.transaction_builder import build_transaction
-from roles_royce.applications.panic_button_app.utils import recovery_mode_balancer
+from roles_royce.applications.panic_button_app.execute import execute_env
+from roles_royce.applications.panic_button_app.pulley_fork import PulleyFork
+from roles_royce.applications.panic_button_app.transaction_builder import build_transaction_env
+from roles_royce.applications.panic_button_app.utils import ENV, recovery_mode_balancer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -38,10 +38,8 @@ def stresstest(
     dao: str | None = None,
     blockchain: str | None = None,
 ):
-    if not dao:
-        dao = positions_dict["dao"]
-    if not blockchain:
-        blockchain = positions_dict["blockchain"]
+    dao = dao or positions_dict["dao"]
+    blockchain = blockchain or positions_dict["blockchain"]
 
     for position in positions_dict["positions"]:
         protocol = position["protocol"]
@@ -61,21 +59,24 @@ def stresstest(
                     exit_arguments_dict[item["name"]] = item["options"][0]["value"]
             exit_arguments = [exit_arguments_dict]
 
-            blockchain = Chain.get_blockchain_from_web3(w3)
+            # blockchain = Chain.get_blockchain_from_web3(w3)
+            chain_id = {"ethereum": 1, "gnosis": 100}.get(blockchain)
+            bc = Chain.get_blockchain_by_chain_id(chain_id)
+
             if protocol == "Balancer" and (
                 exec_config["function_name"] == "exit_1_1" or exec_config["function_name"] == "exit_1_3"
             ):
                 bpt_address = exit_arguments_dict["bpt_address"]
-                test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"])
+                test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"], blockchain=bc)
                 if test:
                     continue
             elif protocol == "Balancer" and (
                 exec_config["function_name"] == "exit_2_1" or exec_config["function_name"] == "exit_2_3"
             ):
                 gauge_address = exit_arguments_dict["gauge_address"]
-                gauge_contract = w3.eth.contract(address=gauge_address, abi=BalancerAbis[blockchain].Gauge.abi)
+                gauge_contract = w3.eth.contract(address=gauge_address, abi=BalancerAbis[bc].Gauge.abi)
                 bpt_address = gauge_contract.functions.lp_token().call()
-                test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"])
+                test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"], blockchain=bc)
                 if test:
                     continue
             elif protocol == "Aura" and (
@@ -84,43 +85,44 @@ def stresstest(
                 aura_rewards_address = exit_arguments_dict["rewards_address"]
                 aura_rewards_contract = w3.eth.contract(
                     address=aura_rewards_address,
-                    abi=AuraAbis[blockchain].BaseRewardPool.abi,
+                    abi=AuraAbis[bc].BaseRewardPool.abi,
                 )
                 bpt_address = aura_rewards_contract.functions.asset().call()
-                test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"])
+                test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"], blockchain=bc)
                 if test:
                     continue
 
             logger.info(f"Exit arguments: {exit_arguments}")
 
             try:
-                result = build_transaction(
-                    percentage=percentage,
-                    dao=dao,
-                    blockchain=blockchain,
-                    protocol=protocol,
-                    exit_strategy=exit_strategy,
-                    exit_arguments=exit_arguments,
-                )
-                if result["status"] != 200:
-                    logger.error(f'Error in transaction builder. Error: {result["message"]}')
-                    exec_config["stresstest"] = f"false, with error: {result['message']}"
-                else:
-                    logger.info(f'Status of transaction builder: {result["status"]}')
-                    tx = result["tx_data"]["transaction"]
+                with PulleyFork(blockchain) as fork:
+                    env = ENV(DAO=dao or "", BLOCKCHAIN=blockchain, LOCAL_FORK_URL=fork.url())
+                    result = build_transaction_env(
+                        env=env,
+                        percentage=percentage,
+                        protocol=protocol,
+                        exit_strategy=exit_strategy,
+                        exit_arguments=exit_arguments,
+                    )
+                    if result["status"] != 200:
+                        logger.error(f'Error in transaction builder. Error1: {result["message"]}')
+                        exec_config["stresstest"] = f"false, with error: {result['message']}"
+                    else:
+                        logger.info(f'Status of transaction builder: {result["status"]}')
+                        tx = result["tx_data"]["transaction"]
 
-                    try:
-                        result = execute(dao=dao, blockchain=blockchain, transaction=tx)
-                        if result["status"] != 200:
-                            logger.error(f'Error in execution. Error: {result["message"]}')
-                            exec_config["stresstest"] = f"false, with error: {result['message']}"
-                        else:
-                            logger.info(f'Status of execution: {result["status"]}')
-                            exec_config["stresstest"] = True
+                        try:
+                            result = execute_env(env=env, transaction=tx)
+                            if result["status"] != 200:
+                                logger.error(f'Error in execution. Error: {result["message"]}')
+                                exec_config["stresstest"] = f"false, with error: {result['message']}"
+                            else:
+                                logger.info(f'Status of execution: {result["status"]}')
+                                exec_config["stresstest"] = True
 
-                    except Exception as f:
-                        logger.error(f"Error in execution. Error: {str(f)}")
-                        exec_config["stresstest"] = f"false, with error: {str(f)}"
+                        except Exception as f:
+                            logger.error(f"Exception in execution. Error: {f}")
+                            exec_config["stresstest"] = f"false, with error: {str(f)}"
 
             except Exception as e:
                 logger.error(f"Error in transaction builder. Error: {str(e)}")
