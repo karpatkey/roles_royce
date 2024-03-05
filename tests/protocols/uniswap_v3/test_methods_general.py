@@ -18,7 +18,7 @@ from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 
 def test_integration(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    local_node_eth.set_block(19336793)
+    local_node_eth.set_block(19368932)
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -68,17 +68,17 @@ def test_integration(local_node_eth, accounts):
         avatar=safe.address,
         token0=ETHAddr.USDC,
         token1=GenAddr.E,
-        fee=3000,
+        fee=FeeAmount.MEDIUM,
         token0_min_price=token0_min_price,
         token0_max_price=token0_max_price,
-        amount1_desired=1
+        amount1_desired=1,
     )
     mint_ntf_send = roles.send(
         mint_ntf_txns,
         role=1,
         private_key=accounts[1].key,
         roles_mod_address=roles_ctract.address,
-        web3=w3
+        web3=w3,
     )
 
     # nft id

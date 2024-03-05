@@ -1,6 +1,7 @@
 from decimal import Decimal
 from dataclasses import dataclass, field
 import threading
+from datetime import datetime
 from prometheus_client import Gauge
 from decouple import config
 from web3.types import Address, ChecksumAddress, TxReceipt
@@ -10,7 +11,7 @@ import logging
 from defabipedia.uniswap_v3 import ContractSpecs
 from defabipedia.types import Chain
 from defabipedia.tokens import erc20_contract
-from datetime import datetime
+
 from roles_royce import roles
 from roles_royce.toolshed.alerting.utils import Event, EventLogDecoder
 from roles_royce.protocols.uniswap_v3.methods_general import (
@@ -162,11 +163,11 @@ def update_system_data(w3: Web3, nft_id: int, env: ENV) -> SystemData:
         .functions.balanceOf(env.AVATAR_SAFE_ADDRESS)
         .call()
         / (10 ** erc20_contract(w3, env.TOKEN1_ADDRESS).functions.decimals().call()),
-        token0_balance=balances[0],
-        token1_balance=balances[1],
-        price_min=nft_position.price_min,
-        price_max=nft_position.price_max,
-        price=nft_position.pool.price,
+        token0_balance=float(balances[0]),
+        token1_balance=float(balances[1]),
+        price_min=float(nft_position.price_min),
+        price_max=float(nft_position.price_max),
+        price=float(nft_position.pool.price),
         min_price_threshold=env.MIN_PRICE_THRESHOLD,
         max_price_threshold=env.MAX_PRICE_THRESHOLD,
     )
@@ -198,7 +199,7 @@ class Gauges:
         self.price.set(system_data.price)
         self.min_threshold.set(
             float(
-                Decimal(system_data.min_price_threshold)
+                system_data.min_price_threshold
                 * (system_data.price_max - system_data.price_min)
                 + system_data.price_min
             )
@@ -206,7 +207,7 @@ class Gauges:
         self.max_threshold.set(
             float(
                 system_data.price_max
-                - Decimal(system_data.max_price_threshold)
+                - system_data.max_price_threshold
                 * (system_data.price_max - system_data.price_min)
             )
         )

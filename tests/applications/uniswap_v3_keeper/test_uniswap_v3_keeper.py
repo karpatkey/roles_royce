@@ -13,13 +13,15 @@ from roles_royce import roles
 
 
 def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
-    block = 19346560
+    block = 19369027
     local_node_eth.set_block(block)
     w3 = local_node_eth.w3
 
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_mod_contract = deploy_roles(avatar=safe.address, w3=w3)
-    setup_common_roles(safe, roles_mod_contract)  # We only care about creating role 1 and assigning it to accounts[1]
+    setup_common_roles(
+        safe, roles_mod_contract
+    )  # We only care about creating role 1 and assigning it to accounts[1]
 
     presets = """{
   "version": "1.0",
@@ -78,7 +80,8 @@ def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
         safe,
         roles_mod_contract,
         json_data=presets,
-        replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
+        replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])],
+    )
 
     WETH = Addresses[Chain.get_blockchain_from_web3(w3)].WETH
     USDC = Addresses[Chain.get_blockchain_from_web3(w3)].USDC
