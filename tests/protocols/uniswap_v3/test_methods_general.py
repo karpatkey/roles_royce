@@ -2,6 +2,7 @@ from decimal import Decimal
 from pytest import approx
 from karpatkit.constants import Address as GenAddr
 from roles_royce.protocols import uniswap_v3
+from roles_royce.protocols.uniswap_v3.types_and_enums import FeeAmount
 from roles_royce import roles
 from tests.utils import (
     local_node_eth,
@@ -56,10 +57,10 @@ def test_integration(local_node_eth, accounts):
         amount=100_000_000_000,
     )
 
-    pool = uniswap_v3.utils.Pool(w3, ETHAddr.USDC, GenAddr.E, 3000)
+    pool = uniswap_v3.utils.Pool(w3, ETHAddr.USDC, GenAddr.E, FeeAmount.MEDIUM)
 
     token0_min_price = pool.price * Decimal(0.9)
-    token0_max_price = pool.price * Decimal(0.9)
+    token0_max_price = pool.price * Decimal(1.1)
 
     # mint nft
     mint_ntf_txns = uniswap_v3.mint_nft(

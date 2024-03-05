@@ -18,7 +18,7 @@ from roles_royce.protocols.uniswap_v3.contract_methods import (
     UnwrapWETH9,
     SweepToken,
 )
-from roles_royce.protocols.uniswap_v3.types_and_enums import FeeAmount
+from roles_royce.protocols.uniswap_v3.types_and_enums import FeeAmount, TICK_SPACING
 from roles_royce.protocols.uniswap_v3.utils import (
     Pool,
     NFTPosition,
@@ -56,12 +56,16 @@ def mint_nft(
         token0 (Address): token0 address of Uniswap V3 pool. token0 must be ZER0 or E address to indicate ETH.
         token1 (Address): token1 address of Uniswap V3 pool. token1 must be ZER0 or E address to indicate ETH.
         fee (FeeAmount): fee amount of Uniswap V3 pool.
-        token0_min_price (float): Minimum range price of the position of token0 vs token1.
-        token0_max_price (float): Maximum range price of the position of token0 vs token1.
-        amount0_desired (float, optional): token0 amount desired. If this amount is greater than 0 then amount1_desired must be left to None since it's calculated automatically. Defaults to None.
-        amount1_desired (float, optional): token1 amount desired. If this amount is greater than 0 then amount1_desired must be left to None since it's calculated automatically. Defaults to None.
-        amount0_min_slippage (float, optional): token0 slippage percentage from the amount desired to obtain the amount0_min. Defaults to 1%.
-        amount1_min_slippage (float, optional): token1 slippage percentage from the amount desired to obtain the amount1_min .Defaults to 1%.
+        token0_min_price (float): Minimum range price of the position of token0 in terms of token1.
+        token0_max_price (float): Maximum range price of the position of token0 in terms of token1.
+        amount0_desired (float, optional): token0 amount desired. If this amount is greater than 0 then amount1_desired
+            must be left to None since it's calculated automatically. Defaults to None.
+        amount1_desired (float, optional): token1 amount desired. If this amount is greater than 0 then amount1_desired
+            must be left to None since it's calculated automatically. Defaults to None.
+        amount0_min_slippage (float, optional): token0 slippage percentage from the amount desired to obtain the
+            amount0_min. Defaults to 1%.
+        amount1_min_slippage (float, optional): token1 slippage percentage from the amount desired to obtain the
+            amount1_min .Defaults to 1%.
 
     Returns:
         list[Transactable]: list of transactions to mint a NFT in Uniswap V3 pool.
@@ -370,6 +374,7 @@ class MintNFT(Mint):
         validate_slippage(amount0_min_slippage, amount1_min_slippage)
 
         pool = Pool(w3, token0, token1, fee)
+        tick_spacing = TICK_SPACING[fee]
 
         validate_price_range(token0_min_price, token0_max_price, pool.price)
 
@@ -389,28 +394,15 @@ class MintNFT(Mint):
         else:
             amount1_desired = Decimal(amount1_desired * 10**pool.token1_decimals)
 
-        tick_lower = (
-            math.ceil(
-                (
-                    math.log10(token0_min_price)
-                    + (pool.token1_decimals - pool.token0_decimals)
-                )
-                / math.log10(1.0001)
-                / pool.tick_spacing
-            )
-            * pool.tick_spacing
-        )
-        tick_upper = (
-            math.floor(
-                (
-                    math.log10(token0_max_price)
-                    + (pool.token1_decimals - pool.token0_decimals)
-                )
-                / math.log10(1.0001)
-                / pool.tick_spacing
-            )
-            * pool.tick_spacing
-        )
+        tick_upper = - int(
+            Decimal(math.ceil(((Decimal(token0_min_price).log10() + Decimal(pool.token1_decimals - pool.token0_decimals)) /
+                               Decimal(1.0001).log10() / Decimal(tick_spacing)
+                               ).to_integral_value())) * Decimal(tick_spacing))
+
+        tick_lower = - int(
+            Decimal(math.floor(((Decimal(token0_max_price).log10() + Decimal(pool.token1_decimals - pool.token0_decimals)) /
+                                Decimal(1.0001).log10() / Decimal(tick_spacing)
+                                ).to_integral_value())) * Decimal(tick_spacing))
 
         amount0_desired, amount1_desired = set_and_check_desired_amounts(
             w3,

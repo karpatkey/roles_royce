@@ -2,11 +2,12 @@ from decimal import Decimal
 from web3 import Web3
 from karpatkit.constants import Address as GenAddr
 from roles_royce.protocols.base import Address
-from roles_royce.protocols.uniswap_v3.types_and_enums import FeeAmount
+from roles_royce.protocols.uniswap_v3.types_and_enums import FeeAmount, TICK_SPACING
 from defabipedia.uniswap_v3 import ContractSpecs, Abis
 from defabipedia.tokens import Abis as TokenAbis
 from defabipedia.types import Chain
 from defabipedia.tokens import EthereumTokenAddr as ETHAddr
+
 
 
 def validate_tokens(token0: Address, token1: Address):
@@ -15,7 +16,7 @@ def validate_tokens(token0: Address, token1: Address):
 
 
 def validate_amounts(
-    amount0_desired: float | None, amount1_desired: float | None
+        amount0_desired: float | None, amount1_desired: float | None
 ) -> (float | None, float | None):
     if not amount0_desired and not amount1_desired:
         raise ValueError("Either amount0_desired or amount1_desired must be provided")
@@ -38,15 +39,15 @@ def validate_amounts(
 
 
 def validate_price_range(
-    token0_min_price: float, token0_max_price: float, pool_price: float
+        token1_min_price: float, token1_max_price: float, pool_price: float
 ) -> None:
-    if not token0_min_price > 0:
+    if not token1_min_price > 0:
         raise ValueError("token0_min_price must be greater than 0")
 
-    if not token0_max_price > 0:
+    if not token1_max_price > 0:
         raise ValueError("token0_max_price must be greater than 0")
 
-    if not (token0_min_price <= pool_price <= token0_max_price):
+    if not (token1_min_price < pool_price < token1_max_price):
         raise ValueError("pool_price out of range")
 
 
@@ -64,7 +65,7 @@ def validate_removed_liquidity_percentage(removed_liquidity_percentage: float) -
 
 
 def check_allowance(
-    w3: Web3, owner: Address, spender: Address, token: Address, amount: Decimal
+        w3: Web3, owner: Address, spender: Address, token: Address, amount: Decimal
 ) -> bool:
     allowance = (
         w3.eth.contract(address=token, abi=TokenAbis.ERC20.abi)
@@ -75,6 +76,15 @@ def check_allowance(
 
 
 class Pool:
+    """Class to represent a Uniswap V3 pool. It contains the pool's data.
+
+    Args:
+        w3: Web3 instance
+        token0: Address of the token0
+        token1: Address of the token1
+        fee: FeeAmount of the pool, should be one of 100, 500, 3000, 10000.
+
+    """
     def __init__(self, w3: Web3, token0: Address, token1: Address, fee: FeeAmount):
         self.fee = fee
         blockchain = Chain.get_blockchain_from_web3(w3)
@@ -97,7 +107,7 @@ class Pool:
             address=self.addr, abi=Abis[blockchain].Pool.abi
         )
         self.sqrt_price_x96, self.ic = self.pool_contract.functions.slot0().call()[0:2]
-        self.sqrt_price = Decimal(self.sqrt_price_x96) / Decimal(2**96)
+        self.sqrt_price = Decimal(self.sqrt_price_x96) / Decimal(2 ** 96)
         self.token0 = self.pool_contract.functions.token0().call()
         self.token0_decimals = (
             w3.eth.contract(address=self.token0, abi=TokenAbis.ERC20.abi)
@@ -111,8 +121,8 @@ class Pool:
             .call()
         )
 
-        self.price = (self.sqrt_price**2) / 10 ** (
-            self.token1_decimals - self.token0_decimals
+        self.price = (self.sqrt_price ** 2) / Decimal(10 ** (
+                self.token1_decimals - self.token0_decimals)
         )
         self.tick_spacing = self.pool_contract.functions.tickSpacing().call()
 
@@ -132,21 +142,14 @@ class NFTPosition:
         except Exception as e:
             raise ValueError(e.args[0]) from e
 
-        token0 = position_data[2]
-        token1 = position_data[3]
-        fee = position_data[4]
-        self.pool = Pool(w3, token0, token1, fee)
+        self.pool = Pool(w3, token0=position_data[2], token1=position_data[3], fee=position_data[4])
         self.tick_lower = position_data[5]
         self.tick_upper = position_data[6]
         self.liquidity = position_data[7]
         self.fr0 = position_data[8]
         self.fr1 = position_data[9]
-        self.price_min = Decimal(1.0001) ** Decimal(self.tick_lower) / Decimal(
-            10 ** (self.pool.token1_decimals - self.pool.token0_decimals)
-        )
-        self.price_max = Decimal(1.0001) ** Decimal(self.tick_upper) / Decimal(
-            10 ** (self.pool.token1_decimals - self.pool.token0_decimals)
-        )
+        self.price_min = Decimal(1.0001) ** Decimal(self.tick_lower)
+        self.price_max = Decimal(1.0001) ** Decimal(self.tick_upper)
 
     def get_balances(self) -> list:
         balances = []
@@ -160,9 +163,9 @@ class NFTPosition:
                 amount1 = self.liquidity * (sb - sa)
             elif self.tick_lower < self.pool.ic < self.tick_upper:
                 amount0 = (
-                    self.liquidity
-                    * (sb - self.pool.sqrt_price)
-                    / (self.pool.sqrt_price * sb)
+                        self.liquidity
+                        * (sb - self.pool.sqrt_price)
+                        / (self.pool.sqrt_price * sb)
                 )
                 amount1 = self.liquidity * (self.pool.sqrt_price - sa)
             else:
@@ -180,14 +183,14 @@ class NFTPosition:
 
 
 def set_and_check_desired_amounts(
-    w3: Web3,
-    owner: Address,
-    amount0_desired: float | None,
-    amount1_desired: float | None,
-    pool: Pool,
-    tick_lower: int,
-    tick_upper: int,
-    send_eth: bool,
+        w3: Web3,
+        owner: Address,
+        amount0_desired: float | None,
+        amount1_desired: float | None,
+        pool: Pool,
+        tick_lower: int,
+        tick_upper: int,
+        send_eth: bool,
 ) -> (Decimal, Decimal):
     """
     Returns the amounts of tokens desired to deposit, calculating one amount from the other. If amount_0_desired is
@@ -217,29 +220,29 @@ def set_and_check_desired_amounts(
         raise ValueError("Only one amount can be provided")
     elif amount0_desired and (not amount1_desired):
         amount1_desired = (
-            Decimal(amount0_desired)
-            * Decimal(
-                pool.sqrt_price_x96
-                * 1.0001 ** (tick_upper / 2)
-                * (pool.sqrt_price_x96 - 1.0001 ** (tick_lower / 2) * (2**96))
-            )
-            / Decimal(
-                (2**96) * (1.0001 ** (tick_upper / 2) * (2**96) - pool.sqrt_price_x96)
-            )
+                Decimal(amount0_desired)
+                * Decimal(
+            pool.sqrt_price_x96
+            * 1.0001 ** (tick_upper / 2)
+            * (pool.sqrt_price_x96 - 1.0001 ** (tick_lower / 2) * (2 ** 96))
+        )
+                / Decimal(
+            (2 ** 96) * (1.0001 ** (tick_upper / 2) * (2 ** 96) - pool.sqrt_price_x96)
+        )
         )
     else:
         amount0_desired = (
-            Decimal(amount1_desired)
-            * Decimal(
-                (2**96) * (1.0001 ** (tick_upper / 2) * (2**96) - pool.sqrt_price_x96)
-            )
-            / (
-                Decimal(
-                    pool.sqrt_price_x96
-                    * 1.0001 ** (tick_upper / 2)
-                    * (pool.sqrt_price_x96 - 1.0001 ** (tick_lower / 2) * (2**96))
+                Decimal(amount1_desired)
+                * Decimal(
+            (2 ** 96) * (1.0001 ** (tick_upper / 2) * (2 ** 96) - pool.sqrt_price_x96)
+        )
+                / (
+                    Decimal(
+                        pool.sqrt_price_x96
+                        * 1.0001 ** (tick_upper / 2)
+                        * (pool.sqrt_price_x96 - 1.0001 ** (tick_lower / 2) * (2 ** 96))
+                    )
                 )
-            )
         )
     if send_eth:
         if pool.token0 != ETHAddr.WETH and pool.token1 != ETHAddr.WETH:
