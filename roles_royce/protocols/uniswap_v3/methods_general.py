@@ -46,7 +46,7 @@ def mint_nft(
     amount0_desired: float = None,
     amount1_desired: float = None,
     amount0_min_slippage: float = 1,
-    amount1_min_slippage: float = 1,
+    amount1_min_slippage: float = 1
 ) -> list[Transactable]:
     """Mint a position NFT in Uniswap V3 pool.
 
@@ -94,7 +94,7 @@ def mint_nft(
         amount0_desired,
         amount1_desired,
         amount0_min_slippage,
-        amount1_min_slippage,
+        amount1_min_slippage
     )
 
     blockchain = Chain.get_blockchain_from_web3(w3)
@@ -364,7 +364,7 @@ class MintNFT(Mint):
         amount0_desired: float | None = None,
         amount1_desired: float | None = None,
         amount0_min_slippage: float = 1,
-        amount1_min_slippage: float = 1,
+        amount1_min_slippage: float = 1
     ):
         """Upper layer class for minting a position NFT in Uniswap V3 pool."""
         validate_tokens(token0, token1)
@@ -412,7 +412,7 @@ class MintNFT(Mint):
             pool,
             tick_lower,
             tick_upper,
-            send_eth,
+            send_eth
         )
 
         amount0_min = Decimal(amount0_desired) * (
@@ -442,7 +442,7 @@ class MintNFT(Mint):
             amount0_min=int(amount0_min),
             amount1_min=int(amount1_min),
             deadline=math.floor(datetime.now().timestamp() + 1800),
-            value=int(value),
+            value=int(value)
         )
 
 
@@ -456,7 +456,7 @@ class IncreaseLiquidityNFT(IncreaseLiquidity):
         amount1_desired: float = None,
         amount0_min_slippage: float = 1,
         amount1_min_slippage: float = 1,
-        send_eth=False,
+        send_eth=False
     ):
         """Upper layer class for increasing liquidity of a position NFT in Uniswap V3 pool."""
         amount0_desired, amount1_desired = validate_amounts(
@@ -483,7 +483,7 @@ class IncreaseLiquidityNFT(IncreaseLiquidity):
             self.nft_position.pool,
             self.nft_position.tick_lower,
             self.nft_position.tick_upper,
-            send_eth,
+            send_eth
         )
 
         amount0_min = amount0_desired * (1 - Decimal(amount0_min_slippage) / 100)

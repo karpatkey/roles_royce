@@ -20,27 +20,24 @@ class Mint(ContractMethod):
     """Mint a position NFT in Uniswap V3 pool."""
 
     name = "mint"
-    in_signature = (
-        (
-            "params",
-            (
-                (
-                    ("token0", "address"),
-                    ("token1", "address"),
-                    ("fee", "uint24"),
-                    ("tick_lower", "int24"),
-                    ("tick_upper", "int24"),
-                    ("amount0_desired", "uint256"),
-                    ("amount1_desired", "uint256"),
-                    ("amount0_min", "uint256"),
-                    ("amount1_min", "uint256"),
-                    ("recipient", "address"),
-                    ("deadline", "uint256"),
-                ),
-                "tuple",
-            ),
-        ),
-    )
+    in_signature = [
+        ("params", (
+            [
+                ("token0", "address"),
+                ("token1", "address"),
+                ("fee", "uint24"),
+                ("tick_lower", "int24"),
+                ("tick_upper", "int24"),
+                ("amount0_desired", "uint256"),
+                ("amount1_desired", "uint256"),
+                ("amount0_min", "uint256"),
+                ("amount1_min", "uint256"),
+                ("recipient", "address"),
+                ("deadline", "uint256")
+            ],
+            "tuple")
+         )
+    ]
 
     fixed_arguments = {"recipient": AvatarAddress}
 
@@ -58,7 +55,7 @@ class Mint(ContractMethod):
             amount0_min: int,
             amount1_min: int,
             deadline: int,
-            value: int = 0,
+            value: int = 0
     ):
         self.target_address = ContractSpecs[blockchain].PositionsNFT.address
         super().__init__(avatar=avatar, value=value)
@@ -83,7 +80,7 @@ class Mint(ContractMethod):
             self.args.amount0_min,
             self.args.amount1_min,
             self.fixed_arguments["recipient"],
-            self.args.deadline,
+            self.args.deadline
         ]
 
 

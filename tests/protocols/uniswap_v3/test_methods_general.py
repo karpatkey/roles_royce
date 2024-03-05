@@ -71,14 +71,14 @@ def test_integration(local_node_eth, accounts):
         fee=3000,
         token0_min_price=token0_min_price,
         token0_max_price=token0_max_price,
-        amount1_desired=1,
+        amount1_desired=1
     )
     mint_ntf_send = roles.send(
         mint_ntf_txns,
         role=1,
         private_key=accounts[1].key,
         roles_mod_address=roles_ctract.address,
-        web3=w3,
+        web3=w3
     )
 
     # nft id
