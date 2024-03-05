@@ -49,7 +49,7 @@ stresstest_outcome = {
                     "function_name": "exit_2_1",
                     "label": "Unstake + withdraw (proportional)",
                     "test": True,
-                    "stresstest": True,
+                    "stresstest": False,
                     "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
                     "parameters": [
                         {

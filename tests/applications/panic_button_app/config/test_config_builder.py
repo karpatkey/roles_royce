@@ -49,11 +49,11 @@ def test_build_aura_positions(local_node_gc):
                              {'function_name': 'exit_2_1', 'label': 'Unstake + withdraw (proportional)', 'test': True, 'description': 
                               'Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)', 
                               'parameters': [{'name': 'rewards_address', 'type': 'constant', 'value': '0x750c5ED835d300d4ba5054cf2Fad946f0a0df0CD'},
-                                              {'name': 'max_slippage', 'label': 'Max Slippage', 'type': 'input', 'rules': {'min': 0, 'max': 100}}]}, 
+                                              {'name': 'max_slippage', 'label': 'Max Slippage', 'type': 'input', 'rules': {'min': 0.001, 'max': 100}}]}, 
                                               {'function_name': 'exit_2_3', 'label': 'Unstake + withdraw (proportional) (Recovery mode)', 'test': False, 
                                                'description': 'Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)', 
                                                'parameters': [{'name': 'rewards_address', 'type': 'constant', 'value': '0x750c5ED835d300d4ba5054cf2Fad946f0a0df0CD'}, 
-                                                              {'name': 'max_slippage', 'label': 'Max Slippage', 'type': 'input', 'rules': {'min': 0, 'max': 100}}]}]}]
+                                                              {'name': 'max_slippage', 'label': 'Max Slippage', 'type': 'input', 'rules': {'min': 0.001, 'max': 100}}]}]}]
 # Load the contents of your test JSON file
 with open(os.path.join(os.path.dirname(__file__), 'test_balancer_template.json'), 'r') as f:
     test_data = json.load(f)
@@ -93,8 +93,8 @@ def test_build_balancer_positions(local_node_gc):
                              [{'function_name': 'exit_1_1', 'label': 'Withdraw (proportional)', 'test': True, 
                                'description': 'Exit pool on Balancer with proportional exit. (Not for recovery mode)', 
                                'parameters': [{'name': 'bpt_address', 'type': 'constant', 'value': '0xF48f01DCB2CbB3ee1f6AaB0e742c2D3941039d56'},
-                                               {'name': 'max_slippage', 'label': 'Max slippage', 'type': 'input', 'rules': {'min': 0, 'max': 100}}]}, 
+                                               {'name': 'max_slippage', 'label': 'Max slippage', 'type': 'input', 'rules': {'min': 0.001, 'max': 100}}]}, 
                                                {'function_name': 'exit_1_3', 'label': 'Withdraw (proportional) (Recovery mode)', 'test': False, 
                                                 'description': 'Exit pool on Balancer with proportional exit. (Recovery Mode)', 'parameters':
                                                   [{'name': 'bpt_address', 'type': 'constant', 'value': '0xF48f01DCB2CbB3ee1f6AaB0e742c2D3941039d56'}, 
-                                                   {'name': 'max_slippage', 'label': 'Max slippage', 'type': 'input', 'rules': {'min': 0, 'max': 100}}]}]}]
+                                                   {'name': 'max_slippage', 'label': 'Max slippage', 'type': 'input', 'rules': {'min': 0.001, 'max': 100}}]}]}]
