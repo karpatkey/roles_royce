@@ -42,21 +42,21 @@ class UnstakeFromGauge(ContractMethod):
 
 class Exit(ContractMethod):
     name = "exitPool"
-    in_signature = (
+    in_signature = [
         ("pool_id", "bytes32"),
         ("sender", "address"),
         ("recipient", "address"),
         ("request", (
-            (
+            [
                 ("assets", "address[]"),  # list of tokens, ordered numerically
                 ("min_amounts_out", "uint256[]"),  # the lower limits for the tokens to receive
                 ("user_data", "bytes"),
                 # userData encodes a ExitKind to tell the pool what style of exit you're performing
                 ("to_internal_balance", "bool")
-            ),
-            "tuple"),
+            ],
+            "tuple")
          )
-    )
+    ]
     fixed_arguments = {"sender": AvatarAddress, "recipient": AvatarAddress, "to_internal_balance": False}
     user_data_abi = None
 
