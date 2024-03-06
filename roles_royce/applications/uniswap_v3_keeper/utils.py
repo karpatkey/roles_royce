@@ -17,7 +17,6 @@ from roles_royce.toolshed.alerting.utils import Event, EventLogDecoder
 from roles_royce.protocols.uniswap_v3.methods_general import (
     mint_nft,
     decrease_liquidity_nft,
-    collect_all_fees,
 )
 from roles_royce.protocols.uniswap_v3.utils import NFTPosition
 
@@ -324,12 +323,8 @@ class TransactionsManager:
             amount1_min_slippage=10,
             withdraw_eth=False,
         )
-        # collect_all_fees_transactables = collect_all_fees(
-        #     w3=w3, avatar=self.avatar, nft_id=nft_id
-        # )
 
         return roles.send(
-            # collect_all_fees_transactables + decrease_liquidity_transactables,
             decrease_liquidity_transactables,
             role=self.role,
             private_key=self.private_key,

@@ -556,29 +556,3 @@ class DecreaseLiquidityNFT(DecreaseLiquidity):
             amount1_min=int(amount1_min),
             deadline=math.floor(datetime.now().timestamp() + 1800),
         )
-
-
-class CollectAllFees(Collect):
-    def __init__(self, w3: Web3, avatar: Address, nft_id: int):
-        """Upper layer class for collecting all fees of a position NFT in Uniswap V3 pool."""
-        super().__init__(
-            blockchain=Chain.get_blockchain_from_web3(w3),
-            avatar=avatar,
-            token_id=nft_id,
-            amount0_max=COLLECT_AMOUNT_MAX,
-            amount1_max=COLLECT_AMOUNT_MAX,
-        )
-
-
-def collect_all_fees(w3: Web3, avatar: Address, nft_id: int) -> list[Transactable]:
-    """Collect all fees of a position NFT in Uniswap V3 pool.
-
-    Args:
-        w3 (Web3): Web3 object.
-        avatar (Address): avatar address.
-        nft_id (int): NFT id of the position to collect all fees.
-
-    Returns
-        list[Transactable]: list of transactions to collect all fees of a position NFT in Uniswap V3 pool.
-    """
-    return [CollectAllFees(w3, avatar, nft_id)]

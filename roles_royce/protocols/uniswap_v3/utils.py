@@ -2,7 +2,7 @@ from decimal import Decimal
 from web3 import Web3
 from karpatkit.constants import Address as GenAddr
 from roles_royce.protocols.base import Address
-from roles_royce.protocols.uniswap_v3.types_and_enums import FeeAmount, TICK_SPACING
+from roles_royce.protocols.uniswap_v3.types_and_enums import FeeAmount
 from defabipedia.uniswap_v3 import ContractSpecs, Abis
 from defabipedia.tokens import Abis as TokenAbis
 from defabipedia.types import Chain
