@@ -150,11 +150,12 @@ class NFTPosition:
         self.liquidity = position_data[7]
         self.fr0 = position_data[8]
         self.fr1 = position_data[9]
-        self.price_min = (Decimal(10 ** (self.pool.token1_decimals - self.pool.token0_decimals)) /
-                          (Decimal(1.0001) ** Decimal(self.tick_upper)))
-
-        self.price_max = (Decimal(10 ** (self.pool.token1_decimals - self.pool.token0_decimals)) /
-                          (Decimal(1.0001) ** Decimal(self.tick_lower)))
+        self.price_min = Decimal(1.0001) ** Decimal(self.tick_lower) / Decimal(
+            10 ** (self.pool.token1_decimals - self.pool.token0_decimals)
+        )
+        self.price_max = Decimal(1.0001) ** Decimal(self.tick_upper) / Decimal(
+            10 ** (self.pool.token1_decimals - self.pool.token0_decimals)
+        )
 
     def get_balances(self) -> list:
         balances = []
