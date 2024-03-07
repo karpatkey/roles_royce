@@ -361,8 +361,8 @@ class MintNFT(Mint):
         fee: FeeAmount,
         token0_min_price: float,
         token0_max_price: float,
-        amount0_desired: float | None = None,
-        amount1_desired: float | None = None,
+        amount0_desired: int | None = None,
+        amount1_desired: int | None = None,
         amount0_min_slippage: float = 1,
         amount1_min_slippage: float = 1,
     ):
@@ -387,11 +387,6 @@ class MintNFT(Mint):
 
         if token1 == GenAddr.E or token1 == GenAddr.ZERO:
             send_eth = True
-
-        if amount0_desired:
-            amount0_desired = Decimal(amount0_desired * 10**pool.token0_decimals)
-        else:
-            amount1_desired = Decimal(amount1_desired * 10**pool.token1_decimals)
 
         tick_lower = (
             math.ceil(
@@ -428,12 +423,8 @@ class MintNFT(Mint):
             send_eth,
         )
 
-        amount0_min = Decimal(amount0_desired) * (
-            1 - Decimal(amount0_min_slippage) / 100
-        )
-        amount1_min = Decimal(amount1_desired) * (
-            1 - Decimal(amount1_min_slippage) / 100
-        )
+        amount0_min = int(amount0_desired * (1 - amount0_min_slippage / 100))
+        amount1_min = int(amount1_desired * (1 - amount1_min_slippage / 100))
 
         value = 0
         if token0 == GenAddr.E or token0 == GenAddr.ZERO:
@@ -450,12 +441,12 @@ class MintNFT(Mint):
             fee=fee,
             tick_lower=tick_lower,
             tick_upper=tick_upper,
-            amount0_desired=int(amount0_desired),
-            amount1_desired=int(amount1_desired),
-            amount0_min=int(amount0_min),
-            amount1_min=int(amount1_min),
+            amount0_desired=amount0_desired,
+            amount1_desired=amount1_desired,
+            amount0_min=amount0_min,
+            amount1_min=amount1_min,
             deadline=math.floor(datetime.now().timestamp() + 1800),
-            value=int(value),
+            value=value,
         )
 
 
@@ -534,6 +525,8 @@ class DecreaseLiquidityNFT(DecreaseLiquidity):
         validate_removed_liquidity_percentage(removed_liquidity_percentage)
         validate_slippage(amount0_min_slippage, amount1_min_slippage)
 
+        removed_liquidity_percentage = Decimal(removed_liquidity_percentage)
+
         self.nft_position = NFTPosition(w3, nft_id)
 
         liquidity = (
@@ -542,8 +535,8 @@ class DecreaseLiquidityNFT(DecreaseLiquidity):
 
         balances = self.nft_position.get_balances()
 
-        amount0_desired = balances[0] * removed_liquidity_percentage / 100
-        amount1_desired = balances[1] * removed_liquidity_percentage / 100
+        amount0_desired = Decimal(balances[0]) * removed_liquidity_percentage / 100
+        amount1_desired = Decimal(balances[1]) * removed_liquidity_percentage / 100
 
         amount0_min = amount0_desired * Decimal((100 - amount0_min_slippage) / 100)
         amount1_min = amount1_desired * Decimal((100 - amount1_min_slippage) / 100)

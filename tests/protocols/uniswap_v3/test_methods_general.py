@@ -71,7 +71,7 @@ def test_integration(local_node_eth, accounts):
         fee=FeeAmount.MEDIUM,
         token0_min_price=token0_min_price,
         token0_max_price=token0_max_price,
-        amount1_desired=1,
+        amount1_desired=int(1e18),
     )
     mint_ntf_send = roles.send(
         mint_ntf_txns,

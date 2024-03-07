@@ -15,8 +15,8 @@ def validate_tokens(token0: Address, token1: Address):
 
 
 def validate_amounts(
-    amount0_desired: float | None, amount1_desired: float | None
-) -> (float | None, float | None):
+    amount0_desired: int | None, amount1_desired: int | None
+) -> (int | None, int | None):
     if not amount0_desired and not amount1_desired:
         raise ValueError("Either amount0_desired or amount1_desired must be provided")
 
@@ -157,7 +157,7 @@ class NFTPosition:
             10 ** (self.pool.token1_decimals - self.pool.token0_decimals)
         )
 
-    def get_balances(self) -> list:
+    def get_balances(self) -> list[int]:
         balances = []
 
         if self.liquidity != 0:
@@ -178,12 +178,12 @@ class NFTPosition:
                 amount0 = self.liquidity * (sb - sa) / (sa * sb)
                 amount1 = 0
 
-            balances.append(Decimal(amount0))
-            balances.append(Decimal(amount1))
+            balances.append(int(amount0))
+            balances.append(int(amount1))
 
         else:
-            balances.append(Decimal(0))
-            balances.append(Decimal(0))
+            balances.append(0)
+            balances.append(0)
 
         return balances
 
@@ -191,13 +191,13 @@ class NFTPosition:
 def set_and_check_desired_amounts(
     w3: Web3,
     owner: Address,
-    amount0_desired: float | None,
-    amount1_desired: float | None,
+    amount0_desired: int | None,
+    amount1_desired: int | None,
     pool: Pool,
     tick_lower: int,
     tick_upper: int,
     send_eth: bool,
-) -> (Decimal, Decimal):
+) -> (int, int):
     """
     Returns the amounts of tokens desired to deposit, calculating one amount from the other. If amount_0_desired is
     provided, amount_1_desired is calculated and vice versa. It also checks if there is enough balance of the
@@ -276,4 +276,4 @@ def set_and_check_desired_amounts(
         if amount1_desired > token1_balance:
             raise ValueError("Not enough token1 balance")
 
-    return Decimal(amount0_desired), Decimal(amount1_desired)
+    return int(amount0_desired), int(amount1_desired)
