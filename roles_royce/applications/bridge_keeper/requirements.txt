@@ -1,2 +1,3 @@
 prometheus_client
 python-decouple
+pytest
