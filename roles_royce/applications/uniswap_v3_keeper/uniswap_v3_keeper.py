@@ -150,10 +150,6 @@ def bot_do(w3: Web3, static_data: StaticData) -> int:
     triggering_condition = dynamic_data.check_triggering_condition(static_data)
     if triggering_condition:
         nft_position = NFTPosition(w3, dynamic_data.nft_id)
-        # TODO: Improve the choice of delta
-        a = Decimal(static_data.env.PRICE_RANGE_THRESHOLD / 100) * (nft_position.price_max - nft_position.price_min)
-        b = nft_position.pool.price - nft_position.price_min
-        c = nft_position.price_max - nft_position.pool.price
 
         delta = (Decimal(static_data.env.PRICE_DELTA_MULTIPLIER) * Decimal(static_data.env.PRICE_RANGE_THRESHOLD / 100)
                  * (nft_position.price_max - nft_position.price_min))
