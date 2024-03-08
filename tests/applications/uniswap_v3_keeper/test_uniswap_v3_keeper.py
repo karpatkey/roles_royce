@@ -87,7 +87,7 @@ def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
     USDC = Addresses[Chain.get_blockchain_from_web3(w3)].USDC
 
     ADDRESS_WITH_LOTS_OF_WETH = "0x8EB8a3b98659Cce290402893d0123abb75E3ab28"
-    AADRESS_WITH_LOTS_OF_USDC = "0xD6153F5af5679a75cC85D8974463545181f48772"
+    ADDRESS_WITH_LOTS_OF_USDC = "0xD6153F5af5679a75cC85D8974463545181f48772"
     steal_token(
         w3=w3,
         token=WETH,
@@ -98,7 +98,7 @@ def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
     steal_token(
         w3=w3,
         token=USDC,
-        holder=AADRESS_WITH_LOTS_OF_USDC,
+        holder=ADDRESS_WITH_LOTS_OF_USDC,
         to=safe.address,
         amount=int(1_000_000e6),
     )

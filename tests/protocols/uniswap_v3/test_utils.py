@@ -1,9 +1,10 @@
 from decimal import Decimal
 from roles_royce.protocols import uniswap_v3
 from roles_royce.protocols.uniswap_v3.types_and_enums import FeeAmount
-from tests.utils import local_node_eth
+from tests.utils import local_node_eth, steal_token, top_up_address
 from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 import pytest
+from pytest import approx
 
 
 def test_validate_tokens():
@@ -105,3 +106,127 @@ def test_nft_position(local_node_eth):
     assert nft_position.price_max == Decimal("1.006017734268817500507686164")
     assert nft_position.fr0 == 6653063644654570505260907049128192
     assert nft_position.fr1 == 3604572511083265637921001177185617
+
+
+def test_set_and_check_desired_amounts(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(19386603)
+
+    nft_position = uniswap_v3.NFTPosition(w3, 689161)
+    pool = nft_position.pool
+    balances = nft_position.get_balances()
+    amount0 = balances[0]
+    amount1 = balances[1]
+    tick_lower = nft_position.tick_lower
+    tick_upper = nft_position.tick_upper
+    owner = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
+    with pytest.raises(ValueError, match="Either amount0_desired or amount1_desired must be provided"):
+        uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                 owner=owner,
+                                                 amount0_desired=None,
+                                                 amount1_desired=None,
+                                                 pool=pool,
+                                                 tick_lower=tick_lower,
+                                                 tick_upper=tick_upper,
+                                                 send_eth=False)
+    with pytest.raises(ValueError, match="Only one amount can be provided"):
+        uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                 owner=owner,
+                                                 amount0_desired=amount0,
+                                                 amount1_desired=amount1,
+                                                 pool=pool,
+                                                 tick_lower=tick_lower,
+                                                 tick_upper=tick_upper,
+                                                 send_eth=False)
+    with pytest.raises(ValueError, match="amount0_desired must be greater than 0"):
+        uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                 owner=owner,
+                                                 amount0_desired=-amount0,
+                                                 amount1_desired=None,
+                                                 pool=pool,
+                                                 tick_lower=tick_lower,
+                                                 tick_upper=tick_upper,
+                                                 send_eth=False)
+    with pytest.raises(ValueError, match="amount1_desired must be greater than 0"):
+        uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                 owner=owner,
+                                                 amount0_desired=None,
+                                                 amount1_desired=-amount1,
+                                                 pool=pool,
+                                                 tick_lower=tick_lower,
+                                                 tick_upper=tick_upper,
+                                                 send_eth=False)
+    with pytest.raises(ValueError, match="Not enough token0 balance"):
+        uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                 owner=owner,
+                                                 amount0_desired=amount0 + 100000000000000000,
+                                                 amount1_desired=None,
+                                                 pool=pool,
+                                                 tick_lower=tick_lower,
+                                                 tick_upper=tick_upper,
+                                                 send_eth=False)
+    with pytest.raises(ValueError, match="Not enough token1 balance"):
+        uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                 owner=owner,
+                                                 amount0_desired=amount0,
+                                                 amount1_desired=None,
+                                                 pool=pool,
+                                                 tick_lower=tick_lower,
+                                                 tick_upper=tick_upper,
+                                                 send_eth=False)
+    with pytest.raises(ValueError, match="Not enough ETH balance"):
+        uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                 owner=owner,
+                                                 amount0_desired=amount0 + int(1000e18),
+                                                 amount1_desired=None,
+                                                 pool=pool,
+                                                 tick_lower=tick_lower,
+                                                 tick_upper=tick_upper,
+                                                 send_eth=True)
+    ADDRESS_WITH_LOTS_OF_WETH = "0x8EB8a3b98659Cce290402893d0123abb75E3ab28"
+    ADDRESS_WITH_LOTS_OF_USDC = "0xD6153F5af5679a75cC85D8974463545181f48772"
+    steal_token(w3=w3, token=pool.token0, holder=ADDRESS_WITH_LOTS_OF_USDC, to=owner, amount=int(1000_000e6))
+    steal_token(w3=w3, token=pool.token1, holder=ADDRESS_WITH_LOTS_OF_WETH, to=owner, amount=int(1000e18))
+    assert uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                    owner=owner,
+                                                    amount0_desired=amount0,
+                                                    amount1_desired=None,
+                                                    pool=pool,
+                                                    tick_lower=tick_lower,
+                                                    tick_upper=tick_upper,
+                                                    send_eth=False) == (amount0, approx(amount1))  # Small difference...
+    assert uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                    owner=owner,
+                                                    amount0_desired=None,
+                                                    amount1_desired=amount1,
+                                                    pool=pool,
+                                                    tick_lower=tick_lower,
+                                                    tick_upper=tick_upper,
+                                                    send_eth=False) == (amount0, amount1)
+    top_up_address(w3=w3, address=owner, amount=100)
+    assert uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                    owner=owner,
+                                                    amount0_desired=amount0,
+                                                    amount1_desired=None,
+                                                    pool=pool,
+                                                    tick_lower=tick_lower,
+                                                    tick_upper=tick_upper,
+                                                    send_eth=True) == (amount0, approx(amount1))
+    assert uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                    owner=owner,
+                                                    amount0_desired=None,
+                                                    amount1_desired=amount1,
+                                                    pool=pool,
+                                                    tick_lower=tick_lower,
+                                                    tick_upper=tick_upper,
+                                                    send_eth=True) == (amount0, amount1)
+    nft_position_2 = uniswap_v3.NFTPosition(w3, 689121)
+    with pytest.raises(ValueError, match="ETH can only be sent if one of the tokens is WETH"):
+        uniswap_v3.set_and_check_desired_amounts(w3=w3,
+                                                 owner=owner,
+                                                 amount0_desired=int(1e18),
+                                                 amount1_desired=None,
+                                                 pool=nft_position_2.pool,
+                                                 tick_lower=nft_position_2.tick_lower,
+                                                 tick_upper=nft_position_2.tick_upper,
+                                                 send_eth=True)

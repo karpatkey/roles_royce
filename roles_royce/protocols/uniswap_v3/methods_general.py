@@ -452,9 +452,8 @@ class IncreaseLiquidityNFT(IncreaseLiquidity):
             send_eth=False,
     ):
         """Upper layer class for increasing liquidity of a position NFT in Uniswap V3 pool."""
-        amount0_desired, amount1_desired = validate_amounts(
-            amount0_desired, amount1_desired
-        )
+
+        validate_amounts(amount0_desired, amount1_desired)
         validate_slippage(amount0_min_slippage, amount1_min_slippage)
 
         self.nft_position = NFTPosition(w3, nft_id)

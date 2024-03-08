@@ -232,12 +232,16 @@ def set_and_check_desired_amounts(
     elif amount0_desired and amount1_desired:
         raise ValueError("Only one amount can be provided")
     elif amount0_desired and (not amount1_desired):
+        if amount0_desired <= 0:
+            raise ValueError("amount0_desired must be greater than 0")
         amount1_desired = (
                 Decimal(amount0_desired) * sqrt_price_x96_decimal * price_max
                 * (sqrt_price_x96_decimal - price_min * Decimal(2 ** 96))
                 / Decimal(2 ** 96) / (price_max * Decimal(2 ** 96) - sqrt_price_x96_decimal)
         )
     else:
+        if amount1_desired <= 0:
+            raise ValueError("amount1_desired must be greater than 0")
         amount0_desired = (
                 Decimal(amount1_desired) * (Decimal(2 ** 96) * (price_max * Decimal(2 ** 96) - sqrt_price_x96_decimal))
                 / (sqrt_price_x96_decimal * price_max * (sqrt_price_x96_decimal - price_min * Decimal(2 ** 96)))
@@ -252,11 +256,7 @@ def set_and_check_desired_amounts(
             if amount1_desired > w3.eth.get_balance(owner):
                 raise ValueError("Not enough ETH balance")
     else:
-        token0_balance = (
-            w3.eth.contract(address=pool.token0, abi=TokenAbis.ERC20.abi)
-            .functions.balanceOf(owner)
-            .call()
-        )
+        token0_balance = (w3.eth.contract(address=pool.token0, abi=TokenAbis.ERC20.abi).functions.balanceOf(owner).call())
         if amount0_desired > token0_balance:
             raise ValueError("Not enough token0 balance")
 
