@@ -1,4 +1,5 @@
-from roles_royce.applications.uniswap_v3_keeper.utils import get_nft_id_from_mint_tx, get_all_nfts, get_amounts_quotient_from_price_delta
+from roles_royce.applications.uniswap_v3_keeper.utils import (get_nft_id_from_mint_tx, get_all_nfts,
+                                                              get_amounts_quotient_from_price_delta)
 from ...utils import local_node_eth
 from roles_royce.protocols.uniswap_v3 import NFTPosition
 from decimal import Decimal
@@ -51,11 +52,11 @@ def test_get_amounts_quotient_from_price_delta(local_node_eth):
     nft_position = NFTPosition(w3, 689161)
     pool = nft_position.pool
 
-    price_delta = 3
+    price_delta = Decimal(3)
     with pytest.raises(ValueError, match="Price delta has to be smaller than the pool's price."):
         assert get_amounts_quotient_from_price_delta(pool, price_delta)
 
-    price_delta = pool.price/10
+    price_delta = Decimal(pool.price/10)
     assert get_amounts_quotient_from_price_delta(pool, price_delta) == Decimal('284945693.1258959508080063298')
 
 

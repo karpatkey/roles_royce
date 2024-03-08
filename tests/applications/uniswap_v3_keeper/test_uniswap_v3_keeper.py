@@ -127,6 +127,13 @@ def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
     monkeypatch.setenv("TOKEN1_ADDRESS", WETH)
     monkeypatch.setenv("FEE", str(fee))
     monkeypatch.setenv("LOCAL_FORK_PORT", str(8546))
+    pool = uniswap_v3.utils.Pool(w3, USDC, WETH, fee)
+
+    monkeypatch.setenv("INITIAL_MIN_PRICE", str(float(pool.price * Decimal(0.9))))
+    monkeypatch.setenv("INITIAL_MAX_PRICE", str(float(pool.price * Decimal(1.1))))
+    monkeypatch.setenv("INITIAL_AMOUNT0", "")
+    monkeypatch.setenv("INITIAL_AMOUNT1", str(int(1e18)))
+    monkeypatch.setenv("MINIMUM_MIN_PRICE", str(0.0000001))
 
     file_path_main = os.path.join(
         Path(os.path.dirname(__file__)).resolve().parent.parent.parent,
@@ -136,29 +143,24 @@ def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
         "uniswap_v3_keeper.py",
     )
 
-    pool = uniswap_v3.utils.Pool(w3, USDC, WETH, fee)
-
-    token0_min_price = pool.price * Decimal(0.9)
-    token0_max_price = pool.price * Decimal(1.1)
-
     # mint nft
-    mint_ntf_txns = uniswap_v3.mint_nft(
-        w3=w3,
-        avatar=safe.address,
-        token0=USDC,
-        token1=WETH,
-        fee=fee,
-        token0_min_price=token0_min_price,
-        token0_max_price=token0_max_price,
-        amount1_desired=int(1e18),
-    )
-    roles.send(
-        mint_ntf_txns,
-        role=1,
-        private_key=accounts[1].key,
-        roles_mod_address=roles_mod_contract.address,
-        web3=w3,
-    )
+    # mint_ntf_txns = uniswap_v3.mint_nft(
+    #     w3=w3,
+    #     avatar=safe.address,
+    #     token0=USDC,
+    #     token1=WETH,
+    #     fee=fee,
+    #     token0_min_price=token0_min_price,
+    #     token0_max_price=token0_max_price,
+    #     amount1_desired=int(1e18),
+    # )
+    # roles.send(
+    #     mint_ntf_txns,
+    #     role=1,
+    #     private_key=accounts[1].key,
+    #     roles_mod_address=roles_mod_contract.address,
+    #     web3=w3,
+    # )
 
     try:
         main = subprocess.run(

@@ -24,7 +24,8 @@ from utils import (
     TransactionsManager,
     update_dynamic_data,
     get_amounts_quotient_from_price_delta,
-    NFTPosition
+    NFTPosition,
+    MinimumPriceError
 )
 
 # Importing the environment variables from the .env file
@@ -107,6 +108,17 @@ active_nfts = get_all_nfts(
     fee=static_data.env.FEE,
 )
 discarded_nfts = list(set(all_nft_ids) - set(active_nfts))
+if not active_nfts:
+    mint_receipt = transactions_manager.mint_nft(w3=w3,
+                                                 amount0=static_data.env.INITIAL_AMOUNT0,
+                                                 amount1=static_data.env.INITIAL_AMOUNT1,
+                                                 price_min=static_data.env.INITIAL_MIN_PRICE,
+                                                 price_max=static_data.env.INITIAL_MAX_PRICE,
+                                                 static_data=static_data)
+    nft_id = get_nft_id_from_mint_tx(w3=w3,
+                                     tx_receipt=mint_receipt,
+                                     recipient=static_data.env.AVATAR_SAFE_ADDRESS)
+    # TODO: Tell the main function this nft is active
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -128,18 +140,23 @@ def bot_do(w3: Web3, static_data: StaticData) -> int:
     # TODO: Check that it's the correct NFT Id
     nft_id = nft_ids[-1]
     dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
-
+    if dynamic_data.price < static_data.env.MINIMUM_MIN_PRICE:
+        raise MinimumPriceError(f"The current price is below the minimum min price ${static_data.env.MINIMUM_MIN_PRICE}")
     gauges.update(dynamic_data, static_data)
-    triggering_condition, delta = dynamic_data.check_triggering_condition()
+    triggering_condition = dynamic_data.check_triggering_condition()
     if triggering_condition:
-        transactions_manager.collect_fees_and_disassemble_position(
-            w3=w3, nft_id=dynamic_data.nft_id
-        )
+        nft_position = NFTPosition(w3, dynamic_data.nft_id)
+        # TODO: Improve the choice of delta
+        delta = max((Decimal(static_data.env.PRICE_DELTA_MULTIPLIER) * Decimal(static_data.env.PRICE_RANGE_THRESHOLD/100)
+                 * (nft_position.price_max - nft_position.price_min)),
+                    Decimal(static_data.env.PRICE_DELTA_MULTIPLIER) * min(nft_position.pool.price - nft_position.price_min,
+                        nft_position.price_max - nft_position.pool.price))
+        transactions_manager.collect_fees_and_disassemble_position(w3=w3, nft_id=dynamic_data.nft_id)
         # TODO: Add logs...
         dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
         gauges.update(dynamic_data, static_data)
         pool = NFTPosition(w3, dynamic_data.nft_id).pool
-        desired_quotient = get_amounts_quotient_from_price_delta(pool, static_data.env.PRICE_RANGE_MULTIPLIER * delta)
+        desired_quotient = get_amounts_quotient_from_price_delta(pool, delta)
         current_quotient = Decimal(dynamic_data.safe_token1_balance) / Decimal(dynamic_data.safe_token0_balance)
         if current_quotient < desired_quotient:
             amount0_desired = None
@@ -147,8 +164,8 @@ def bot_do(w3: Web3, static_data: StaticData) -> int:
         else:
             amount0_desired = dynamic_data.safe_token0_balance
             amount1_desired = None
-        price_min = dynamic_data.price - static_data.env.PRICE_RANGE_MULTIPLIER * delta
-        price_max = dynamic_data.price + static_data.env.PRICE_RANGE_MULTIPLIER * delta
+        price_min = max(float(Decimal(dynamic_data.price) - delta), static_data.env.MINIMUM_MIN_PRICE)
+        price_max = float(Decimal(dynamic_data.price) + delta)
         mint_receipt = transactions_manager.mint_nft(w3=w3,
                                                      amount0=amount0_desired,
                                                      amount1=amount1_desired,
@@ -188,6 +205,13 @@ while True:
         except:
             time.sleep(5)
             exception_counter = bot_do(w3, static_data)  # Second attempt
+
+    except MinimumPriceError:
+        messenger.log_and_alert(
+            LoggingLevel.Warning, title="Minimum Price Error", message="The current price is below the minimum min price"
+        )
+        time.sleep(5)
+        continue
 
     except Exception as e:
         messenger.log_and_alert(
