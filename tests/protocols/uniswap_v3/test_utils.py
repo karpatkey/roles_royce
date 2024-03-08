@@ -79,6 +79,14 @@ def test_check_allowance(local_node_eth):
     assert uniswap_v3.check_allowance(w3, owner, spender, token, 100) is True
 
 
+def test_get_tick_from_price(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(19368932)
+
+    nft_position = uniswap_v3.NFTPosition(w3, 424810)
+    assert uniswap_v3.get_tick_from_price(nft_position.pool, 1.006017734268817500507686164) == 60
+
+
 def test_pool(local_node_eth):
     w3 = local_node_eth.w3
     local_node_eth.set_block(19368932)
@@ -91,6 +99,8 @@ def test_pool(local_node_eth):
     assert pool.sqrt_price == Decimal("16322.82260952329333843603752")
     assert pool.price == Decimal("0.0002664345379419648155527995198")
     assert pool.tick_spacing == 60
+
+    assert uniswap_v3.get_tick_from_price(pool, 0.0002664345379419648155527995198) == -358632
 
 
 def test_nft_position(local_node_eth):
@@ -106,6 +116,7 @@ def test_nft_position(local_node_eth):
     assert nft_position.price_max == Decimal("1.006017734268817500507686164")
     assert nft_position.fr0 == 6653063644654570505260907049128192
     assert nft_position.fr1 == 3604572511083265637921001177185617
+    assert uniswap_v3.get_tick_from_price(nft_position.pool, 1.006017734268817500507686164) == 60
 
 
 def test_set_and_check_desired_amounts(local_node_eth):

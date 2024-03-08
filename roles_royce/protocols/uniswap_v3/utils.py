@@ -131,6 +131,21 @@ class Pool:
         self.tick_spacing = self.pool_contract.functions.tickSpacing().call()
 
 
+def get_tick_from_price(pool: Pool, price: float) -> int:
+    """Get the approximate corresponding tick to a price in a pool.
+
+    Args:
+        pool: Pool instance
+        price: Price to get the tick for
+
+    Returns:
+        int: Approximate tick corresponding to the price
+    """
+    price = Decimal(price)
+    return int(((price.log10() + pool.token0_decimals - pool.token1_decimals)
+                / (Decimal(1.0001).log10())).to_integral_value())
+
+
 class NFTPosition:
     def __init__(self, w3: Web3, nft_id: int):
         blockchain = Chain.get_blockchain_from_web3(w3)
@@ -256,7 +271,8 @@ def set_and_check_desired_amounts(
             if amount1_desired > w3.eth.get_balance(owner):
                 raise ValueError("Not enough ETH balance")
     else:
-        token0_balance = (w3.eth.contract(address=pool.token0, abi=TokenAbis.ERC20.abi).functions.balanceOf(owner).call())
+        token0_balance = (
+            w3.eth.contract(address=pool.token0, abi=TokenAbis.ERC20.abi).functions.balanceOf(owner).call())
         if amount0_desired > token0_balance:
             raise ValueError("Not enough token0 balance")
 
