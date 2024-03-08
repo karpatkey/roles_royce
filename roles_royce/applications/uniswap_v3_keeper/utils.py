@@ -350,8 +350,9 @@ class TransactionsManager:
 
 
 def get_amounts_quotient_from_price_delta(pool: Pool, price_delta: float) -> Decimal:
-    """Returns the quotient of the amounts of token0 and token1 in a pool after a price change. Returns the quotient
-    amount1/amount0 corresponding to prices price_min=price-delta and price_max=price+delta.
+    """Returns the quotient of the amounts of token0 and token1 in a pool for a given symmetric price range.
+    Specifically, returns the quotient amount1/amount0 corresponding to prices price_min=price-price_delta and
+    price_max=price+price_delta.
 
     Args:
         pool (Pool): Pool instance.
@@ -359,11 +360,17 @@ def get_amounts_quotient_from_price_delta(pool: Pool, price_delta: float) -> Dec
 
     Returns:
         Decimal: Quotient amount1/amount0.
+
+    Raises:
+        ValueError: If price_delta is greater than the current price.
     """
-    decimals_factor = Decimal(10 ** (pool.token1_decimals - pool.token0_decimals))
     delta = Decimal(price_delta)
+    if pool.price < price_delta:
+        raise ValueError("Price delta has to be smaller than the pool's price.")
+    decimals_factor = Decimal(10 ** (pool.token1_decimals - pool.token0_decimals))
     sqrt_price = pool.sqrt_price
     price = pool.price
+
     return (sqrt_price * ((price + delta) * decimals_factor).sqrt() * (
                 sqrt_price - ((price - delta) * decimals_factor).sqrt())
             / (((price + delta) * decimals_factor).sqrt() - sqrt_price))
