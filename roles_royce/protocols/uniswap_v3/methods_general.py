@@ -355,7 +355,10 @@ class MintNFT(Mint):
             amount0_min_slippage: float = 1,
             amount1_min_slippage: float = 1,
     ):
-        """Upper layer class for minting a position NFT in Uniswap V3 pool."""
+        """
+        FIXME: Add nice docstrings
+
+        """
         validate_tokens(token0, token1)
         validate_amounts(
             amount0_desired, amount1_desired

@@ -1,5 +1,7 @@
-from roles_royce.applications.uniswap_v3_keeper.utils import get_nft_id_from_mint_tx, get_all_nfts
+from roles_royce.applications.uniswap_v3_keeper.utils import get_nft_id_from_mint_tx, get_all_nfts, get_amounts_quotient_from_price_delta
 from ...utils import local_node_eth
+from roles_royce.protocols.uniswap_v3 import NFTPosition
+from decimal import Decimal
 
 
 def test_get_nft_id_from_mint_tx(local_node_eth):
@@ -39,5 +41,16 @@ def test_get_all_nfts(local_node_eth):
 
     nfts = get_all_nfts(w3, owner_2, discarded_nfts=nfts_to_discard, active=False, fee=3000)
     assert nfts == [683496, 686280, 686294]
+
+
+def test_get_amounts_quotient_from_price_delta(local_node_eth):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(19386603)
+
+    nft_position = NFTPosition(w3, 689161)
+    pool = nft_position.pool
+
+    price_delta = 3
+    assert get_amounts_quotient_from_price_delta(pool, price_delta) == Decimal('48221047202711169.56427028895')
 
 

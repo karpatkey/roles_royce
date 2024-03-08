@@ -165,7 +165,7 @@ def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
             args=[sys.executable, file_path_main],
             capture_output=True,
             text=True,
-            timeout=20,
+            timeout=120,
         )
     except subprocess.TimeoutExpired:
         pass

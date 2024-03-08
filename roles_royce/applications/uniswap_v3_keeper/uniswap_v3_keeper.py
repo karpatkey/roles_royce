@@ -11,6 +11,7 @@ from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
 import time
 import sys
+from decimal import Decimal
 from utils import (
     ENV,
     Gauges,
@@ -22,12 +23,13 @@ from utils import (
     StaticData,
     TransactionsManager,
     update_dynamic_data,
+    get_amounts_quotient_from_price_delta,
+    NFTPosition
 )
 
 # Importing the environment variables from the .env file
 env = ENV()
 static_data = StaticData(env=env)
-
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -73,11 +75,11 @@ if test_mode:
     top_up_address(w3, static_data.env.BOT_ADDRESS, 1)
 else:
     w3, rpc_endpoint_failure_counter = web3_connection_check(
-                    static_data.env.RPC_ENDPOINT,
-                    messenger,
-                    rpc_endpoint_failure_counter,
-                    static_data.env.RPC_ENDPOINT_FALLBACK,
-                )
+        static_data.env.RPC_ENDPOINT,
+        messenger,
+        rpc_endpoint_failure_counter,
+        static_data.env.RPC_ENDPOINT_FALLBACK,
+    )
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -106,10 +108,11 @@ active_nfts = get_all_nfts(
 )
 discarded_nfts = list(set(all_nft_ids) - set(active_nfts))
 
+
 # -----------------------------------------------------------------------------------------------------------------------
 
 
-def bot_do(w3: Web3) -> int:
+def bot_do(w3: Web3, static_data: StaticData) -> int:
     global gauges
     global flags
     global exception_counter
@@ -135,6 +138,29 @@ def bot_do(w3: Web3) -> int:
         # TODO: Add logs...
         dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
         gauges.update(dynamic_data, static_data)
+        pool = NFTPosition(w3, dynamic_data.nft_id).pool
+        desired_quotient = get_amounts_quotient_from_price_delta(pool, static_data.env.PRICE_RANGE_MULTIPLIER * delta)
+        current_quotient = Decimal(dynamic_data.safe_token1_balance) / Decimal(dynamic_data.safe_token0_balance)
+        if current_quotient < desired_quotient:
+            amount0_desired = None
+            amount1_desired = dynamic_data.safe_token1_balance
+        else:
+            amount0_desired = dynamic_data.safe_token0_balance
+            amount1_desired = None
+        price_min = dynamic_data.price - static_data.env.PRICE_RANGE_MULTIPLIER * delta
+        price_max = dynamic_data.price + static_data.env.PRICE_RANGE_MULTIPLIER * delta
+        mint_receipt = transactions_manager.mint_nft(w3=w3,
+                                                     amount0=amount0_desired,
+                                                     amount1=amount1_desired,
+                                                     price_min=price_min,
+                                                     price_max=price_max,
+                                                     static_data=static_data)
+        discarded_nfts.append(nft_id)
+        nft_id = get_nft_id_from_mint_tx(w3=w3,
+                                         tx_receipt=mint_receipt,
+                                         recipient=static_data.env.AVATAR_SAFE_ADDRESS)
+        dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
+        gauges.update(dynamic_data, static_data)
 
     return 0
 
@@ -155,13 +181,13 @@ while True:
             if rpc_endpoint_failure_counter != 0:
                 continue
         else:
-            w3 = Web3(Web3.HTTPProvider(f"http://localhost:{static_data.env.LOCAL_FORK_PORT}"))
+            w3 = Web3(Web3.HTTPProvider(f"http://{static_data.env.LOCAL_FORK_HOST}:{static_data.env.LOCAL_FORK_PORT}"))
 
         try:
-            exception_counter = bot_do(w3)  # If successful, resets the counter
+            exception_counter = bot_do(w3, static_data)  # If successful, resets the counter
         except:
             time.sleep(5)
-            exception_counter = bot_do(w3)  # Second attempt
+            exception_counter = bot_do(w3, static_data)  # Second attempt
 
     except Exception as e:
         messenger.log_and_alert(

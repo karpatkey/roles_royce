@@ -18,7 +18,7 @@ from roles_royce.protocols.uniswap_v3.methods_general import (
     mint_nft,
     decrease_liquidity_nft,
 )
-from roles_royce.protocols.uniswap_v3.utils import NFTPosition
+from roles_royce.protocols.uniswap_v3.utils import NFTPosition, Pool
 
 logger = logging.getLogger(__name__)
 
@@ -51,11 +51,9 @@ class ENV:
     FEE: int = custom_config("FEE", default=3000, cast=int)
     MIN_PRICE_THRESHOLD: float = custom_config("MIN_PRICE_THRESHOLD", default=10, cast=float)
     MAX_PRICE_THRESHOLD: float = custom_config("MAX_PRICE_THRESHOLD", default=10, cast=float)
-    PRICE_RANGE_MULTIPLICATOR_SEED: float = custom_config("NEW_PRICE_RANGE_DELTA_PERCENTAGE_SEED", default=5,
+    PRICE_RANGE_MULTIPLIER: float = custom_config("PRICE_RANGE_MULTIPLIER", default=5,
                                                           cast=float)
-    PRICE_RANGE_MULTIPLICATOR_PERCENTUAL_DECREMENT: float = custom_config(
-        "NEW_PRICE_RANGE_DELTA_PERCENTAGE_DECREMENT", default=0.5, cast=float
-    )
+    MINTING_SLIPPAGE_PERCENTAGE: float = custom_config("MINTING_SLIPPAGE_PERCENTAGE", default=0.5, cast=float)
 
     BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
 
@@ -92,13 +90,13 @@ class ENV:
             raise ValueError(
                 f"MAX_PRICE_THRESHOLD must be between 0 and 100. MAX_PRICE_THRESHOLD inputted: {self.MAX_PRICE_THRESHOLD}."
             )
-        if self.PRICE_RANGE_MULTIPLICATOR_SEED <= 1:
+        if self.PRICE_RANGE_MULTIPLIER <= 1:
             raise ValueError(
-                f"PRICE_RANGE_MULTIPLICATOR_SEED must be greater than 1. PRICE_RANGE_MULTIPLICATOR_SEED inputted: {self.PRICE_RANGE_MULTIPLICATOR_SEED}."
+                f"PRICE_RANGE_MULTIPLIER must be greater than 1. PRICE_RANGE_MULTIPLICATOR_SEED inputted: {self.PRICE_RANGE_MULTIPLIER}."
             )
-        if not 0 < self.PRICE_RANGE_MULTIPLICATOR_PERCENTUAL_DECREMENT < 100:
+        if not 0 < self.MINTING_SLIPPAGE_PERCENTAGE < 100:
             raise ValueError(
-                f"PRICE_RANGE_MULTIPLICATOR_PERCENTUAL_DECREMENT must be between 0 and 100. PRICE_RANGE_MULTIPLICATOR_PERCENTUAL_DECREMENT inputted: {self.PRICE_RANGE_MULTIPLICATOR_PERCENTUAL_DECREMENT}."
+                f"MINTING_SLIPPAGE_PERCENTAGE must be between 0 and 100. MINTING_SLIPPAGE_PERCENTAGE inputted: {self.MINTING_SLIPPAGE_PERCENTAGE}."
             )
 
         if self.PRIVATE_KEY != "":
@@ -121,7 +119,7 @@ class StaticData:
             w3 = Web3(Web3.HTTPProvider(f"http://{self.env.LOCAL_FORK_HOST}:{self.env.LOCAL_FORK_PORT}"))
         else:
             w3 = Web3(Web3.HTTPProvider(self.env.RPC_ENDPOINT))
-        self.token0_decimals = erc20_contract(w3,self.env.TOKEN0_ADDRESS).functions.decimals().call()
+        self.token0_decimals = erc20_contract(w3, self.env.TOKEN0_ADDRESS).functions.decimals().call()
         self.token1_decimals = erc20_contract(w3, self.env.TOKEN1_ADDRESS).functions.decimals().call()
 
 
@@ -188,7 +186,7 @@ class Gauges:
 
     def update(self, dynamic_data: DynamicData, static_data: StaticData) -> None:
         self.nft_id.set(dynamic_data.nft_id)
-        self.bot_ETH_balance.set(dynamic_data.bot_ETH_balance / (10**18))
+        self.bot_ETH_balance.set(dynamic_data.bot_ETH_balance / (10 ** 18))
         self.safe_token0_balance.set(dynamic_data.safe_token0_balance / (10 ** static_data.token0_decimals))
         self.safe_token1_balance.set(dynamic_data.safe_token1_balance / (10 ** static_data.token1_decimals))
         self.token0_balance.set(dynamic_data.token0_balance / (10 ** static_data.token0_decimals))
@@ -197,8 +195,9 @@ class Gauges:
         self.price_max.set(dynamic_data.price_max)
         self.price.set(dynamic_data.price)
         self.min_threshold.set(
-            float(dynamic_data.min_price_threshold * (dynamic_data.price_max - dynamic_data.price_min) + dynamic_data.price_min
-            )
+            float(dynamic_data.min_price_threshold * (
+                        dynamic_data.price_max - dynamic_data.price_min) + dynamic_data.price_min
+                  )
         )
         self.max_threshold.set(
             float(
@@ -221,16 +220,14 @@ def get_nft_id_from_mint_tx(w3: Web3, tx_receipt: TxReceipt, recipient: Address)
     Args:
         w3 (Web3): Web3 instance.
         tx_receipt (TxReceipt): Transaction receipt.
+        recipient (Address): Recipient address that receives the NFT.
 
     Returns:
         int | None: NFT Id of the minted NFT in the transaction. Returns None if no NFT was minted to the recipient
             in that transaction.
-
     """
     event_log_decoder = EventLogDecoder(
-        Web3().eth.contract(
-            abi=ContractSpecs[Chain.get_blockchain_from_web3(w3)].PositionsNFT.abi
-        )
+        Web3().eth.contract(abi=ContractSpecs[Chain.get_blockchain_from_web3(w3)].PositionsNFT.abi)
     )
     for element in tx_receipt.logs:
         if (
@@ -326,6 +323,50 @@ class TransactionsManager:
             roles_mod_address=self.roles_mod,
             web3=w3,
         )
+
+    def mint_nft(self, w3: Web3, amount0: int | None, amount1: int | None,
+                 price_min: float, price_max: float, static_data: StaticData) -> TxReceipt:
+        mint_transactables = mint_nft(
+            w3=w3,
+            avatar=self.avatar,
+            token0=static_data.env.TOKEN0_ADDRESS,
+            token1=static_data.env.TOKEN1_ADDRESS,
+            fee=static_data.env.FEE,
+            token0_min_price=price_min,
+            token0_max_price=price_max,
+            amount0_desired=amount0,
+            amount1_desired=amount1,
+            amount0_min_slippage=static_data.env.MINTING_SLIPPAGE_PERCENTAGE,
+            amount1_min_slippage=static_data.env.MINTING_SLIPPAGE_PERCENTAGE,
+        )
+
+        return roles.send(
+            mint_transactables,
+            role=self.role,
+            private_key=self.private_key,
+            roles_mod_address=self.roles_mod,
+            web3=w3,
+        )
+
+
+def get_amounts_quotient_from_price_delta(pool: Pool, price_delta: float) -> Decimal:
+    """Returns the quotient of the amounts of token0 and token1 in a pool after a price change. Returns the quotient
+    amount1/amount0 corresponding to prices price_min=price-delta and price_max=price+delta.
+
+    Args:
+        pool (Pool): Pool instance.
+        price_delta (float): Half of the length of the new symmetric price range.
+
+    Returns:
+        Decimal: Quotient amount1/amount0.
+    """
+    decimals_factor = Decimal(10 ** (pool.token1_decimals - pool.token0_decimals))
+    delta = Decimal(price_delta)
+    sqrt_price = pool.sqrt_price
+    price = pool.price
+    return (sqrt_price * ((price + delta) * decimals_factor).sqrt() * (
+                sqrt_price - ((price - delta) * decimals_factor).sqrt())
+            / (((price + delta) * decimals_factor).sqrt() - sqrt_price))
 
 
 def log_initial_data(env: ENV, messenger: Messenger):
