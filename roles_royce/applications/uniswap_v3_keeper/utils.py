@@ -134,6 +134,37 @@ class ENV:
         return "Environment variables"
 
 
+def check_initial_data(env: ENV):
+    if env.TEST_MODE:
+        w3 = Web3(Web3.HTTPProvider(f"http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}"))
+    else:
+        w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+    pool = Pool(w3=w3,
+                token0=env.TOKEN0_ADDRESS,
+                token1=env.TOKEN1_ADDRESS,
+                fee=env.FEE)
+
+    if pool.price < env.MINIMUM_MIN_PRICE:
+        raise MinimumPriceError(
+            f"The current price is below the minimum min price ${env.MINIMUM_MIN_PRICE}")
+
+    if (float(pool.price) - env.INITIAL_MIN_PRICE) / (
+            env.INITIAL_MAX_PRICE - env.INITIAL_MIN_PRICE) < env.PRICE_RANGE_THRESHOLD / 100 or (
+            env.INITIAL_MAX_PRICE - float(pool.price)) / (
+            env.INITIAL_MAX_PRICE - env.INITIAL_MIN_PRICE) < env.PRICE_RANGE_THRESHOLD / 100:
+        raise ValueError("The current price is already within the threshold near one of the edges of the price range."
+                         "Please adjust the initial price range.")
+    delta = (Decimal(env.PRICE_DELTA_MULTIPLIER) * Decimal(env.PRICE_RANGE_THRESHOLD / 100)
+             * Decimal(env.INITIAL_MAX_PRICE - env.INITIAL_MIN_PRICE))
+    if delta>pool.price:
+        1+1
+
+    if delta > pool.price:
+        raise ValueError(
+            "With the current parameters, the price delta is greater than the current price. Please adjust"
+            "the initial price range, the multiplier and the threshold")
+
+
 @dataclass
 class StaticData:
     env: ENV
@@ -160,12 +191,13 @@ class DynamicData:
     price_min: float
     price_max: float
     price: float
-    price_range_threshold: float
 
-    def check_triggering_condition(self) -> bool:
-        if (self.price - self.price_min) / (self.price_max - self.price_min) < self.price_range_threshold:
+    def check_triggering_condition(self, static_data: StaticData) -> bool:
+        if (self.price - self.price_min) / (
+                self.price_max - self.price_min) < static_data.env.PRICE_RANGE_THRESHOLD / 100:
             return True
-        elif (self.price_max - self.price) / (self.price_max - self.price_min) < self.price_range_threshold:
+        elif (self.price_max - self.price) / (
+                self.price_max - self.price_min) < static_data.env.PRICE_RANGE_THRESHOLD / 100:
             return True
         else:
             return False
@@ -185,8 +217,7 @@ def update_dynamic_data(w3: Web3, nft_id: int, static_data: StaticData) -> Dynam
         token1_balance=balances[1],
         price_min=float(nft_position.price_min),
         price_max=float(nft_position.price_max),
-        price=float(nft_position.pool.price),
-        price_range_threshold=static_data.env.PRICE_RANGE_THRESHOLD
+        price=float(nft_position.pool.price)
     )
 
 
@@ -215,7 +246,7 @@ class Gauges:
         self.price_max.set(dynamic_data.price_max)
         self.price.set(dynamic_data.price)
         self.price_range_threshold.set(
-            float(dynamic_data.price_range_threshold * (
+            float(static_data.env.PRICE_RANGE_THRESHOLD * (
                     dynamic_data.price_max - dynamic_data.price_min) + dynamic_data.price_min
                   )
         )

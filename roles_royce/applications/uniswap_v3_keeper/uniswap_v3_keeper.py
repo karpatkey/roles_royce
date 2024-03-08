@@ -6,6 +6,7 @@ from roles_royce.toolshed.alerting import (
     LoggingLevel,
     web3_connection_check,
 )
+from roles_royce.protocols.uniswap_v3 import Pool
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
 from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
@@ -25,11 +26,13 @@ from utils import (
     update_dynamic_data,
     get_amounts_quotient_from_price_delta,
     NFTPosition,
-    MinimumPriceError
+    MinimumPriceError,
+    check_initial_data
 )
 
 # Importing the environment variables from the .env file
 env = ENV()
+check_initial_data(env)
 static_data = StaticData(env=env)
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -72,7 +75,7 @@ test_mode = static_data.env.TEST_MODE
 if test_mode:
     from tests.utils import top_up_address
 
-    w3 = Web3(Web3.HTTPProvider(f"http://localhost:{static_data.env.LOCAL_FORK_PORT}"))
+    w3 = Web3(Web3.HTTPProvider(f"http://{static_data.env.LOCAL_FORK_HOST}:{static_data.env.LOCAL_FORK_PORT}"))
     top_up_address(w3, static_data.env.BOT_ADDRESS, 1)
 else:
     w3, rpc_endpoint_failure_counter = web3_connection_check(
@@ -118,8 +121,8 @@ if not active_nfts:
     nft_id = get_nft_id_from_mint_tx(w3=w3,
                                      tx_receipt=mint_receipt,
                                      recipient=static_data.env.AVATAR_SAFE_ADDRESS)
-    # TODO: Tell the main function this nft is active
-
+    dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
+    gauges.update(dynamic_data, static_data)
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -141,16 +144,19 @@ def bot_do(w3: Web3, static_data: StaticData) -> int:
     nft_id = nft_ids[-1]
     dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
     if dynamic_data.price < static_data.env.MINIMUM_MIN_PRICE:
-        raise MinimumPriceError(f"The current price is below the minimum min price ${static_data.env.MINIMUM_MIN_PRICE}")
+        raise MinimumPriceError(
+            f"The current price is below the minimum min price ${static_data.env.MINIMUM_MIN_PRICE}")
     gauges.update(dynamic_data, static_data)
-    triggering_condition = dynamic_data.check_triggering_condition()
+    triggering_condition = dynamic_data.check_triggering_condition(static_data)
     if triggering_condition:
         nft_position = NFTPosition(w3, dynamic_data.nft_id)
         # TODO: Improve the choice of delta
-        delta = max((Decimal(static_data.env.PRICE_DELTA_MULTIPLIER) * Decimal(static_data.env.PRICE_RANGE_THRESHOLD/100)
-                 * (nft_position.price_max - nft_position.price_min)),
-                    Decimal(static_data.env.PRICE_DELTA_MULTIPLIER) * min(nft_position.pool.price - nft_position.price_min,
-                        nft_position.price_max - nft_position.pool.price))
+        a = Decimal(static_data.env.PRICE_RANGE_THRESHOLD / 100) * (nft_position.price_max - nft_position.price_min)
+        b = nft_position.pool.price - nft_position.price_min
+        c = nft_position.price_max - nft_position.pool.price
+
+        delta = (Decimal(static_data.env.PRICE_DELTA_MULTIPLIER) * Decimal(static_data.env.PRICE_RANGE_THRESHOLD / 100)
+                 * (nft_position.price_max - nft_position.price_min))
         transactions_manager.collect_fees_and_disassemble_position(w3=w3, nft_id=dynamic_data.nft_id)
         # TODO: Add logs...
         dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
@@ -208,7 +214,8 @@ while True:
 
     except MinimumPriceError:
         messenger.log_and_alert(
-            LoggingLevel.Warning, title="Minimum Price Error", message="The current price is below the minimum min price"
+            LoggingLevel.Warning, title="Minimum Price Error",
+            message="The current price is below the minimum min price"
         )
         time.sleep(5)
         continue

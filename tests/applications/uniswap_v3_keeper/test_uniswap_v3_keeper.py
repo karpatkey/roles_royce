@@ -130,10 +130,13 @@ def test_uniswap_v3_keeper(local_node_eth, accounts, monkeypatch):
     pool = uniswap_v3.utils.Pool(w3, USDC, WETH, fee)
 
     monkeypatch.setenv("INITIAL_MIN_PRICE", str(float(pool.price * Decimal(0.9))))
-    monkeypatch.setenv("INITIAL_MAX_PRICE", str(float(pool.price * Decimal(1.1))))
+    monkeypatch.setenv("INITIAL_MAX_PRICE", str(float(pool.price * Decimal(1.5))))
     monkeypatch.setenv("INITIAL_AMOUNT0", "")
     monkeypatch.setenv("INITIAL_AMOUNT1", str(int(1e18)))
     monkeypatch.setenv("MINIMUM_MIN_PRICE", str(0.0000001))
+    monkeypatch.setenv("PRICE_RANGE_THRESHOLD", str(10))
+    monkeypatch.setenv("PRICE_RANGE_MULTIPLIER", str(2))
+
 
     file_path_main = os.path.join(
         Path(os.path.dirname(__file__)).resolve().parent.parent.parent,
