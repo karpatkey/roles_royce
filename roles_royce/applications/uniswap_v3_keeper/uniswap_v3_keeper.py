@@ -6,33 +6,33 @@ from roles_royce.toolshed.alerting import (
     LoggingLevel,
     web3_connection_check,
 )
-from roles_royce.protocols.uniswap_v3 import Pool
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
 from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
 import time
 import sys
 from decimal import Decimal
+from prometheus import Gauges
+from logs import log_initial_data, log_status_update
+from core import ENV, StaticData, TransactionsManager, update_dynamic_data
 from utils import (
-    ENV,
-    Gauges,
     Flags,
-    log_initial_data,
-    log_status_update,
-    get_all_nfts,
+    get_active_nft, store_active_nft,
     get_nft_id_from_mint_tx,
-    StaticData,
-    TransactionsManager,
-    update_dynamic_data,
     get_amounts_quotient_from_price_delta,
     NFTPosition,
     MinimumPriceError,
     check_initial_data
 )
+from web3.middleware import geth_poa_middleware
 
-# Importing the environment variables from the .env file
+
+# -----------------------------------------------------------------------------------------------------------------------
+
 env = ENV()
-check_initial_data(env)
+nft_id_initial = get_active_nft()
+# Importing the environment variables from the .env file
+check_initial_data(env, nft_id_initial)
 static_data = StaticData(env=env)
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -49,9 +49,7 @@ telegram_messenger = TelegramMessenger(
 telegram_messenger.start()
 
 # Configure logging settings
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Create a logger instance
 logger = logging.getLogger(__name__)
@@ -65,18 +63,13 @@ gauges = Gauges()
 exception_counter = 0
 rpc_endpoint_failure_counter = 0
 
-# -----------------------------------------------------------------------------------------------------------------------
 
-log_initial_data(static_data.env, messenger)
 
 # -----------------------------------------------------------------------------------------------------------------------
 
 test_mode = static_data.env.TEST_MODE
 if test_mode:
-    from tests.utils import top_up_address
-
     w3 = Web3(Web3.HTTPProvider(f"http://{static_data.env.LOCAL_FORK_HOST}:{static_data.env.LOCAL_FORK_PORT}"))
-    top_up_address(w3, static_data.env.BOT_ADDRESS, 1)
 else:
     w3, rpc_endpoint_failure_counter = web3_connection_check(
         static_data.env.RPC_ENDPOINT,
@@ -84,8 +77,12 @@ else:
         rpc_endpoint_failure_counter,
         static_data.env.RPC_ENDPOINT_FALLBACK,
     )
+if w3.eth.chain_id == 137:
+    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
 # -----------------------------------------------------------------------------------------------------------------------
+
+log_initial_data(static_data, messenger)
 
 
 transactions_manager = TransactionsManager(
@@ -95,23 +92,7 @@ transactions_manager = TransactionsManager(
     private_key=static_data.env.PRIVATE_KEY,
 )
 
-all_nft_ids = get_all_nfts(
-    w3,
-    static_data.env.AVATAR_SAFE_ADDRESS,
-    active=False,
-    token0=static_data.env.TOKEN0_ADDRESS,
-    token1=static_data.env.TOKEN1_ADDRESS,
-    fee=static_data.env.FEE,
-)
-active_nfts = get_all_nfts(
-    w3,
-    static_data.env.AVATAR_SAFE_ADDRESS,
-    token0=static_data.env.TOKEN0_ADDRESS,
-    token1=static_data.env.TOKEN1_ADDRESS,
-    fee=static_data.env.FEE,
-)
-discarded_nfts = list(set(all_nft_ids) - set(active_nfts))
-if not active_nfts:
+if not nft_id_initial:
     mint_receipt = transactions_manager.mint_nft(w3=w3,
                                                  amount0=static_data.env.INITIAL_AMOUNT0,
                                                  amount1=static_data.env.INITIAL_AMOUNT1,
@@ -123,6 +104,7 @@ if not active_nfts:
                                      recipient=static_data.env.AVATAR_SAFE_ADDRESS)
     dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
     gauges.update(dynamic_data, static_data)
+    store_active_nft(nft_id)
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -132,31 +114,29 @@ def bot_do(w3: Web3, static_data: StaticData) -> int:
     global flags
     global exception_counter
 
-    nft_ids = get_all_nfts(
-        w3,
-        static_data.env.AVATAR_SAFE_ADDRESS,
-        discarded_nfts=discarded_nfts,
-        token0=static_data.env.TOKEN0_ADDRESS,
-        token1=static_data.env.TOKEN1_ADDRESS,
-        fee=static_data.env.FEE,
-    )
-    # TODO: Check that it's the correct NFT Id
-    nft_id = nft_ids[-1]
+    nft_id = get_active_nft()
     dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
     if dynamic_data.price < static_data.env.MINIMUM_MIN_PRICE:
         raise MinimumPriceError(
             f"The current price is below the minimum min price ${static_data.env.MINIMUM_MIN_PRICE}")
+
+    log_status_update(static_data, dynamic_data)
     gauges.update(dynamic_data, static_data)
+
     triggering_condition = dynamic_data.check_triggering_condition(static_data)
     if triggering_condition:
         nft_position = NFTPosition(w3, dynamic_data.nft_id)
 
         delta = (Decimal(static_data.env.PRICE_DELTA_MULTIPLIER) * Decimal(static_data.env.PRICE_RANGE_THRESHOLD / 100)
                  * (nft_position.price_max - nft_position.price_min))
-        transactions_manager.collect_fees_and_disassemble_position(w3=w3, nft_id=dynamic_data.nft_id)
-        # TODO: Add logs...
+        tx_receipt = transactions_manager.collect_fees_and_disassemble_position(w3=w3, nft_id=dynamic_data.nft_id)
+        message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt, target_address=static_data.env.AVATAR_SAFE_ADDRESS, w3=w3)
+        messenger.log_and_alert(LoggingLevel.Info, f'Fees collected and position disassembled', message, slack_msg=message_slack)
         dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
         gauges.update(dynamic_data, static_data)
+        log_status_update(static_data, dynamic_data)
+
+
         pool = NFTPosition(w3, dynamic_data.nft_id).pool
         desired_quotient = get_amounts_quotient_from_price_delta(pool, delta)
         current_quotient = Decimal(dynamic_data.safe_token1_balance) / Decimal(dynamic_data.safe_token0_balance)
@@ -174,12 +154,13 @@ def bot_do(w3: Web3, static_data: StaticData) -> int:
                                                      price_min=price_min,
                                                      price_max=price_max,
                                                      static_data=static_data)
-        discarded_nfts.append(nft_id)
         nft_id = get_nft_id_from_mint_tx(w3=w3,
                                          tx_receipt=mint_receipt,
                                          recipient=static_data.env.AVATAR_SAFE_ADDRESS)
         dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
         gauges.update(dynamic_data, static_data)
+        log_status_update(static_data, dynamic_data)
+        store_active_nft(nft_id)
 
     return 0
 
@@ -201,6 +182,8 @@ while True:
                 continue
         else:
             w3 = Web3(Web3.HTTPProvider(f"http://{static_data.env.LOCAL_FORK_HOST}:{static_data.env.LOCAL_FORK_PORT}"))
+            if w3.eth.chain_id == 137:
+                w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
         try:
             exception_counter = bot_do(w3, static_data)  # If successful, resets the counter
