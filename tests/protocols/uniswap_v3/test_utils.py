@@ -57,9 +57,9 @@ def test_validate_slippage():
 
 def test_validate_removed_liquidity_percentage():
     assert uniswap_v3.validate_removed_liquidity_percentage(3) is True
-    with pytest.raises(ValueError, match="removed_liquidity_percentage must be between 0 and 100"):
+    with pytest.raises(ValueError, match="removed_liquidity_percentage must be greater than 0 and less or equal than 100"):
         assert uniswap_v3.validate_removed_liquidity_percentage(-1)
-    with pytest.raises(ValueError, match="removed_liquidity_percentage must be between 0 and 100"):
+    with pytest.raises(ValueError, match="removed_liquidity_percentage must be greater than 0 and less or equal than 100"):
         assert uniswap_v3.validate_removed_liquidity_percentage(101)
 
 

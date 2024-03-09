@@ -6,7 +6,7 @@ from web3 import Web3
 from defabipedia.uniswap_v3 import ContractSpecs
 from defabipedia.types import Chain
 from roles_royce.toolshed.alerting.utils import EventLogDecoder
-from core import ENV
+from roles_royce.applications.uniswap_v3_keeper.core import ENV
 from roles_royce.protocols.uniswap_v3.utils import NFTPosition, Pool
 import os
 import json
