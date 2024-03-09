@@ -56,8 +56,8 @@ def validate_slippage(amount0_min_slippage: float, amount1_min_slippage: float) 
 
 
 def validate_removed_liquidity_percentage(removed_liquidity_percentage: float) -> bool:
-    if not 0 <= removed_liquidity_percentage <= 100:
-        raise ValueError("removed_liquidity_percentage must be between 0 and 100")
+    if not 0 < removed_liquidity_percentage <= 100:
+        raise ValueError("removed_liquidity_percentage must be greater than 0 and less or equal than 100")
     return True
 
 
