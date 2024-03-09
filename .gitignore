@@ -109,3 +109,4 @@ ENV/
 
 config.json
 node_modules
+active_nft.json
