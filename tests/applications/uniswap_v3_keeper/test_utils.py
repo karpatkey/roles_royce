@@ -6,7 +6,7 @@ from decimal import Decimal
 import pytest
 
 
-def test_get_nft_id_from_mint_tx(local_node_eth, monkeypatch):
+def test_get_nft_id_from_mint_tx(local_node_eth):
     w3 = local_node_eth.w3
     tx_hash = '0xf2de66993c7038cd44312245f14245fd63cca3e2fefbbc112a59897fb81b6dc4'
     block = 19346560
