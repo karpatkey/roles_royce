@@ -26,7 +26,6 @@ from utils import (
 )
 from web3.middleware import geth_poa_middleware
 
-
 # -----------------------------------------------------------------------------------------------------------------------
 
 env = ENV()
@@ -41,10 +40,10 @@ static_data = StaticData(env=env)
 flags = Flags()
 
 # Messenger system
-slack_messenger = SlackMessenger(webhook=ENV.SLACK_WEBHOOK_URL)
+slack_messenger = SlackMessenger(webhook=env.SLACK_WEBHOOK_URL)
 slack_messenger.start()
 telegram_messenger = TelegramMessenger(
-    bot_token=ENV.TELEGRAM_BOT_TOKEN, chat_id=ENV.TELEGRAM_CHAT_ID
+    bot_token=env.TELEGRAM_BOT_TOKEN, chat_id=env.TELEGRAM_CHAT_ID
 )
 telegram_messenger.start()
 
@@ -63,27 +62,9 @@ gauges = Gauges()
 exception_counter = 0
 rpc_endpoint_failure_counter = 0
 
-
-
-# -----------------------------------------------------------------------------------------------------------------------
-
-test_mode = static_data.env.TEST_MODE
-if test_mode:
-    w3 = Web3(Web3.HTTPProvider(f"http://{static_data.env.LOCAL_FORK_HOST}:{static_data.env.LOCAL_FORK_PORT}"))
-else:
-    w3, rpc_endpoint_failure_counter = web3_connection_check(
-        static_data.env.RPC_ENDPOINT,
-        messenger,
-        rpc_endpoint_failure_counter,
-        static_data.env.RPC_ENDPOINT_FALLBACK,
-    )
-if w3.eth.chain_id == 137:
-    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-
 # -----------------------------------------------------------------------------------------------------------------------
 
 log_initial_data(static_data, messenger)
-
 
 transactions_manager = TransactionsManager(
     avatar=static_data.env.AVATAR_SAFE_ADDRESS,
@@ -91,6 +72,12 @@ transactions_manager = TransactionsManager(
     role=static_data.env.ROLE,
     private_key=static_data.env.PRIVATE_KEY,
 )
+
+w3, rpc_endpoint_failure_counter = web3_connection_check(
+    static_data.env.RPC_ENDPOINT,
+    messenger,
+    rpc_endpoint_failure_counter,
+    static_data.env.RPC_ENDPOINT_FALLBACK)
 
 if not nft_id_initial:
     mint_receipt = transactions_manager.mint_nft(w3=w3,
@@ -105,6 +92,7 @@ if not nft_id_initial:
     dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
     gauges.update(dynamic_data, static_data)
     store_active_nft(nft_id)
+
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -130,12 +118,14 @@ def bot_do(w3: Web3, static_data: StaticData) -> int:
         delta = (Decimal(static_data.env.PRICE_DELTA_MULTIPLIER) * Decimal(static_data.env.PRICE_RANGE_THRESHOLD / 100)
                  * (nft_position.price_max - nft_position.price_min))
         tx_receipt = transactions_manager.collect_fees_and_disassemble_position(w3=w3, nft_id=dynamic_data.nft_id)
-        message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt, target_address=static_data.env.AVATAR_SAFE_ADDRESS, w3=w3)
-        messenger.log_and_alert(LoggingLevel.Info, f'Fees collected and position disassembled', message, slack_msg=message_slack)
+        message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt,
+                                                                       target_address=static_data.env.AVATAR_SAFE_ADDRESS,
+                                                                       w3=w3)
+        messenger.log_and_alert(LoggingLevel.Info, f'Fees collected and position disassembled', message,
+                                slack_msg=message_slack)
         dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
         gauges.update(dynamic_data, static_data)
         log_status_update(static_data, dynamic_data)
-
 
         pool = NFTPosition(w3, dynamic_data.nft_id).pool
         desired_quotient = get_amounts_quotient_from_price_delta(pool, delta)
@@ -171,19 +161,14 @@ def bot_do(w3: Web3, static_data: StaticData) -> int:
 while True:
 
     try:
-        if not test_mode:
-            w3, rpc_endpoint_failure_counter = web3_connection_check(
-                static_data.env.RPC_ENDPOINT,
-                messenger,
-                rpc_endpoint_failure_counter,
-                static_data.env.RPC_ENDPOINT_FALLBACK,
-            )
-            if rpc_endpoint_failure_counter != 0:
-                continue
-        else:
-            w3 = Web3(Web3.HTTPProvider(f"http://{static_data.env.LOCAL_FORK_HOST}:{static_data.env.LOCAL_FORK_PORT}"))
-            if w3.eth.chain_id == 137:
-                w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+        w3, rpc_endpoint_failure_counter = web3_connection_check(
+            static_data.env.RPC_ENDPOINT,
+            messenger,
+            rpc_endpoint_failure_counter,
+            static_data.env.RPC_ENDPOINT_FALLBACK)
+
+        if rpc_endpoint_failure_counter != 0:
+            continue
 
         try:
             exception_counter = bot_do(w3, static_data)  # If successful, resets the counter
@@ -192,25 +177,17 @@ while True:
             exception_counter = bot_do(w3, static_data)  # Second attempt
 
     except MinimumPriceError:
-        messenger.log_and_alert(
-            LoggingLevel.Warning, title="Minimum Price Error",
-            message="The current price is below the minimum min price"
-        )
+        messenger.log_and_alert(LoggingLevel.Warning, title="Minimum Price Error",
+                                message="The current price is below the minimum min price")
         time.sleep(5)
         continue
 
     except Exception as e:
-        messenger.log_and_alert(
-            LoggingLevel.Error, title="Exception", message="  " + str(e.args[0])
-        )
+        messenger.log_and_alert(LoggingLevel.Error, title="Exception", message="  " + str(e.args[0]))
         exception_counter += 1
         if exception_counter == 5:  # TODO: this can be added as an environment variable
-            messenger.log_and_alert(
-                LoggingLevel.Error, title="Too many exceptions, exiting...", message=""
-            )
-            time.sleep(
-                5
-            )  # Cooldown time for the messenger system to send messages in queue
+            messenger.log_and_alert(LoggingLevel.Error, title="Too many exceptions, exiting...", message="")
+            time.sleep(5)  # Cooldown time for the messenger system to send messages in queue
             sys.exit(1)
         time.sleep(30)  # Time to breathe
         continue

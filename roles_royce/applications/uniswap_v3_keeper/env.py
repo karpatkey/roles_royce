@@ -39,21 +39,26 @@ class ENV:
     BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
 
     def __post_init__(self):
-        self.RPC_ENDPOINT = config("RPC_ENDPOINT", default="")
-        self.RPC_ENDPOINT_FALLBACK = config("RPC_ENDPOINT_FALLBACK", default="")
-        self.RPC_ENDPOINT_MEV = config("RPC_ENDPOINT_MEV", default="")
-        self.PRIVATE_KEY = config("PRIVATE_KEY", default="")
+        self.TEST_MODE = config("TEST_MODE", default=True, cast=bool)
+        self.LOCAL_FORK_HOST = custom_config("LOCAL_FORK_HOST", default='localhost', cast=str)
+        self.LOCAL_FORK_PORT = custom_config("LOCAL_FORK_PORT", default=8545, cast=int)
+        if self.TEST_MODE:
+            self.RPC_ENDPOINT = f"http://{self.LOCAL_FORK_HOST}:{self.LOCAL_FORK_PORT}"
+            self.RPC_ENDPOINT_FALLBACK = f"http://{self.LOCAL_FORK_HOST}:{self.LOCAL_FORK_PORT}"
+            self.RPC_ENDPOINT_MEV = f"http://{self.LOCAL_FORK_HOST}:{self.LOCAL_FORK_PORT}"
+        else:
+            self.RPC_ENDPOINT = config("RPC_ENDPOINT", default="", cast=str)
+            self.RPC_ENDPOINT_FALLBACK = custom_config("RPC_ENDPOINT_FALLBACK", default="", cast=str)
+            self.RPC_ENDPOINT_MEV = custom_config("RPC_ENDPOINT_MEV", default="", cast=str)
+        self.PRIVATE_KEY = custom_config("PRIVATE_KEY", default="", cast=str)
         self.AVATAR_SAFE_ADDRESS = config("AVATAR_SAFE_ADDRESS", default="")
         self.ROLES_MOD_ADDRESS = config("ROLES_MOD_ADDRESS", default="")
         self.ROLE = config("ROLE", cast=int)
         self.COOLDOWN_MINUTES = custom_config("COOLDOWN_MINUTES", default=5, cast=float)
-        self.SLACK_WEBHOOK_URL = config("SLACK_WEBHOOK_URL", default="")
-        self.TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
+        self.SLACK_WEBHOOK_URL = custom_config("SLACK_WEBHOOK_URL", default="", cast=str)
+        self.TELEGRAM_BOT_TOKEN = custom_config("TELEGRAM_BOT_TOKEN", default="", cast=str)
         self.TELEGRAM_CHAT_ID = custom_config("TELEGRAM_CHAT_ID", default="", cast=int)
         self.PROMETHEUS_PORT = custom_config("PROMETHEUS_PORT", default=8000, cast=int)
-        self.TEST_MODE = config("TEST_MODE", default=True, cast=bool)
-        self.LOCAL_FORK_HOST = custom_config("LOCAL_FORK_HOST", default='localhost', cast=str)
-        self.LOCAL_FORK_PORT = custom_config("LOCAL_FORK_PORT", default=8545, cast=int)
         self.TOKEN0_ADDRESS = config("TOKEN0_ADDRESS", default="", cast=str)
         self.TOKEN1_ADDRESS = config("TOKEN1_ADDRESS", default="", cast=str)
         self.FEE = config("FEE", default=3000, cast=int)
