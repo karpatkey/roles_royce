@@ -7,6 +7,8 @@ import logging
 import time
 from queue import Queue
 from web3 import Web3
+from web3.middleware import geth_poa_middleware
+
 
 
 class LoggingLevel(Enum):
@@ -205,4 +207,6 @@ def web3_connection_check(rpc_endpoint_url: str, messenger: Messenger, rpc_endpo
         sys.exit(1)
 
     else:
+        if w3.eth.chain_id == 137:
+            w3.middleware_onion.inject(geth_poa_middleware, layer=0)
         return w3, rpc_endpoint_failure_counter
