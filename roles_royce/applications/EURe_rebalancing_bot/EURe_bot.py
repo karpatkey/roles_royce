@@ -2,10 +2,13 @@ from web3 import Web3
 from defabipedia.types import Chain
 from defabipedia.tokens import erc20_contract
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
-from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel, web3_connection_check
+from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
 from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
-from utils import ENV, log_initial_data, Gauges
+from roles_royce.applications.utils import web3_connection_check
+from roles_royce.applications.EURe_rebalancing_bot.env import ENV
+from roles_royce.applications.EURe_rebalancing_bot.utils import log_initial_data
+from roles_royce.applications.EURe_rebalancing_bot.prometheus import Gauges
 from swaps import SwapsDataManager, Swapper, AddressesAndAbis, decimalsWXDAI, decimalsEURe
 import time
 import sys
@@ -17,9 +20,9 @@ ENV = ENV()
 test_mode = ENV.TEST_MODE
 if test_mode:
     from tests.utils import top_up_address
+
     w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
     top_up_address(w3, ENV.BOT_ADDRESS, 1)
-
 
 # Messenger system
 slack_messenger = SlackMessenger(webhook=ENV.SLACK_WEBHOOK_URL)
@@ -56,7 +59,7 @@ lack_of_WXDAI_flag = False  # flag to stop alerting when the WXDAI balance is be
 lack_of_EURe_flag = False  # flag to stop alerting when the EURe balance is below 1
 
 
-def bot_do(w3):
+def bot_do(w3) -> int:
     global amount_WXDAI
     global amount_EURe
     global gauges
@@ -214,31 +217,36 @@ def bot_do(w3):
             f'  Bot"s xDAI balance: {bot_xDAI_balance / (10 ** 18):.5f}.\n'
         )
 
+    return 0
+
 
 # -----------------------------MAIN LOOP-----------------------------------------
 
 while True:
 
     try:
-        if not test_mode:
-            w3, rpc_endpoint_failure_counter = web3_connection_check(ENV.RPC_ENDPOINT, messenger,
-                                                                     rpc_endpoint_failure_counter,
-                                                                     ENV.FALLBACK_RPC_ENDPOINT)
-            if rpc_endpoint_failure_counter != 0:
-                continue
-        else:
-            w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
+        w3, rpc_endpoint_failure_counter = web3_connection_check(
+            ENV.RPC_ENDPOINT,
+            messenger,
+            rpc_endpoint_failure_counter,
+            ENV.RPC_ENDPOINT_FALLBACK)
+
+        if rpc_endpoint_failure_counter != 0:
+            continue
+
         try:
-            bot_do(w3)
+            exception_counter = bot_do(w3)  # If successful, resets the counter
         except:
             time.sleep(5)
-            bot_do(w3)  # Second attempt
+            exception_counter = bot_do(w3)  # Second attempt
 
     except Exception as e:
-        messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e.args[0]))
+        messenger.log_and_alert(LoggingLevel.Warning, title="Exception", message="  " + str(e.args[0]))
         exception_counter += 1
-        if exception_counter == 5:  # TODO: this can be added as an environment variable
-            messenger.log_and_alert(LoggingLevel.Error, title='Too many exceptions, exiting...', message='')
+        if exception_counter == 5:
+            messenger.log_and_alert(LoggingLevel.Error, title="Too many exceptions, exiting...", message="")
             time.sleep(5)  # Cooldown time for the messenger system to send messages in queue
             sys.exit(1)
+        time.sleep(30)  # Time to breathe
+        continue
     time.sleep(ENV.COOLDOWN_MINUTES * 60)

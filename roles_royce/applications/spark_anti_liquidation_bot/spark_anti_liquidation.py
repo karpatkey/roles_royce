@@ -11,7 +11,9 @@ from roles_royce.toolshed.alerting import SlackMessenger, TelegramMessenger, Mes
     web3_connection_check
 from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
-from utils import ENV, log_initial_data, send_status, SchedulerThread, Gauges
+from roles_royce.applications.spark_anti_liquidation_bot.env import ENV
+from roles_royce.applications.spark_anti_liquidation_bot.prometheus import Gauges
+from roles_royce.applications.spark_anti_liquidation_bot.logs import log_initial_data, send_status, SchedulerThread
 import time
 from threading import Event
 import sys
@@ -62,7 +64,7 @@ gauges.health_factor_threshold.set(ENV.THRESHOLD_HEALTH_FACTOR)
 
 # -----------------------------------------------------------------------------------------------------------------------
 
-def bot_do(w3: Web3):
+def bot_do(w3: Web3) -> int:
     global gauges
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -101,16 +103,15 @@ def bot_do(w3: Web3):
     DAI_contract = w3.eth.contract(address=ETHAddr.DAI, abi=erc20_abi)
     DAI_balance = DAI_contract.functions.balanceOf(ENV.AVATAR_SAFE_ADDRESS).call()
 
-    gauges.bot_ETH_balance.set(bot_ETH_balance / 1e18)
-    gauges.health_factor.set(float(cdp.health_factor))
-    gauges.sDAI_balance.set(float(Decimal(sDAI_balance) / Decimal(1e18)))
-    gauges.DAI_equivalent.set(float(Decimal(sDAI_balance) * (Decimal(chi) / Decimal(1e27)) / Decimal(1e18)))
-    gauges.DAI_balance.set(float(Decimal(DAI_balance) / Decimal(1e18)))
-    gauges.wstETH_deposited.set(wstETH_deposited)
-    gauges.wstETH_price.set(wstETH_spark_price)
-    gauges.DAI_borrowed.set(DAI_borrowed)
-    gauges.DAI_price.set(DAI_spark_price)
-    gauges.last_updated.set_to_current_time()
+    gauges.update(health_factor=float(cdp.health_factor),
+                  bot_ETH_balance=bot_ETH_balance / 1e18,
+                  DAI_balance=float(Decimal(DAI_balance) / Decimal(1e18)),
+                  sDAI_balance=float(Decimal(sDAI_balance) / Decimal(1e18)),
+                  wstETH_deposited=wstETH_deposited,
+                  wstETH_spark_price=wstETH_spark_price,
+                  DAI_borrowed=DAI_borrowed,
+                  DAI_spark_price=DAI_spark_price,
+                  DAI_equivalent=float(Decimal(sDAI_balance) * (Decimal(chi) / Decimal(1e27)) / Decimal(1e18)))
 
     logger.info("SparK CDP data retrieved:\n"
                 f"{cdp}\n"
@@ -222,6 +223,8 @@ def bot_do(w3: Web3):
         gauges.DAI_price.set(DAI_spark_price)
         gauges.last_updated.set_to_current_time()
 
+        return 0
+
 
 # -----------------------------MAIN LOOP-----------------------------------------
 
@@ -236,27 +239,28 @@ if ENV.STATUS_NOTIFICATION_HOUR != '':
 while True:
 
     try:
-        if not test_mode:
-            w3, rpc_endpoint_failure_counter = web3_connection_check(ENV.RPC_ENDPOINT, messenger, rpc_endpoint_failure_counter,
-                                                         ENV.FALLBACK_RPC_ENDPOINT)
-            if rpc_endpoint_failure_counter != 0:
-                continue
-        else:
-            w3 = Web3(Web3.HTTPProvider(f'http://localhost:{ENV.LOCAL_FORK_PORT}'))
+        w3, rpc_endpoint_failure_counter = web3_connection_check(
+            ENV.RPC_ENDPOINT,
+            messenger,
+            rpc_endpoint_failure_counter,
+            ENV.RPC_ENDPOINT_FALLBACK)
+
+        if rpc_endpoint_failure_counter != 0:
+            continue
+
         try:
-            bot_do(w3)
+            exception_counter = bot_do(w3)  # If successful, resets the counter
         except:
             time.sleep(5)
-            bot_do(w3)  # Second attempt
+            exception_counter = bot_do(w3)  # Second attempt
 
     except Exception as e:
-        messenger.log_and_alert(LoggingLevel.Error, title='Exception', message='  ' + str(e.args[0]))
+        messenger.log_and_alert(LoggingLevel.Warning, title="Exception", message="  " + str(e.args[0]))
         exception_counter += 1
-        if exception_counter == 5:  # TODO: this can be added as an environment variable
-            messenger.log_and_alert(LoggingLevel.Error, title='Too many exceptions, exiting...', message='')
+        if exception_counter == 5:
+            messenger.log_and_alert(LoggingLevel.Error, title="Too many exceptions, exiting...", message="")
             time.sleep(5)  # Cooldown time for the messenger system to send messages in queue
             sys.exit(1)
+        time.sleep(30)  # Time to breathe
+        continue
     time.sleep(ENV.COOLDOWN_MINUTES * 60)
-
-
-
