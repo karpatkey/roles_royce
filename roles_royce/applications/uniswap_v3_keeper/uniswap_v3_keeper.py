@@ -149,6 +149,10 @@ def bot_do(w3: Web3, static_data: StaticData) -> int:
                                          recipient=static_data.env.AVATAR_SAFE_ADDRESS)
         dynamic_data = update_dynamic_data(w3=w3, nft_id=nft_id, static_data=static_data)
         gauges.update(dynamic_data, static_data)
+        message, message_slack = get_tx_receipt_message_with_transfers(mint_receipt,
+                                                                       target_address=static_data.env.AVATAR_SAFE_ADDRESS,
+                                                                       w3=w3)
+        messenger.log_and_alert(LoggingLevel.Info, f'New NFT minted', message, slack_msg=message_slack)
         log_status_update(static_data, dynamic_data)
         store_active_nft(nft_id)
 
@@ -183,9 +187,9 @@ while True:
         continue
 
     except Exception as e:
-        messenger.log_and_alert(LoggingLevel.Error, title="Exception", message="  " + str(e.args[0]))
+        messenger.log_and_alert(LoggingLevel.Warning, title="Exception", message="  " + str(e.args[0]))
         exception_counter += 1
-        if exception_counter == 5:  # TODO: this can be added as an environment variable
+        if exception_counter == 5:
             messenger.log_and_alert(LoggingLevel.Error, title="Too many exceptions, exiting...", message="")
             time.sleep(5)  # Cooldown time for the messenger system to send messages in queue
             sys.exit(1)
