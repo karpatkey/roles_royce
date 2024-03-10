@@ -250,10 +250,23 @@ def top_up_address(w3: Web3, address: str, amount: int) -> None:
         raise Exception("Address is a smart contract address with no payable function.")
 
 
-def fork_reset(w3, url):
-    """Reset the state of the forked node to the state of the mainnet node at the given block."""
-    return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url}}])
+def fork_reset_state(w3: Web3, url: str, block: int | str = "latest"):
+    """Reset the state of the forked node to the state of the blockchain node at the given block.
 
+    Args:
+        w3: Web3 instance of the local node
+        url: URL of the node from which to fork
+        block: Block number at which to fork the blockchain, or "latest" to use the latest block
+    """
+    latest_block = Web3(Web3.HTTPProvider(url)).eth.block_number
+
+    if isinstance(block, str):
+        if block == "latest":
+            block = latest_block
+    else:
+        if block > latest_block:
+            raise ValueError(f"Block number {block} is greater than the latest block {latest_block}")
+    return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
 
 # -----------------------------------------------------------------------------------------------------------------------
 
