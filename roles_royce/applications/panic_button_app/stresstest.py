@@ -105,6 +105,7 @@ def stresstest(
                 )
                 if result["status"] != 200:
                     logger.error(f'Error in transaction builder. Error: {result["message"]}')
+                    exec_config["stresstest"] = f"false, with error: {result['message']}"
                 else:
                     logger.info(f'Status of transaction builder: {result["status"]}')
                     tx = result["tx_data"]["transaction"]
@@ -113,6 +114,7 @@ def stresstest(
                         result = execute(dao=dao, blockchain=blockchain, transaction=tx)
                         if result["status"] != 200:
                             logger.error(f'Error in execution. Error: {result["message"]}')
+                            exec_config["stresstest"] = f"false, with error: {result['message']}"
                         else:
                             logger.info(f'Status of execution: {result["status"]}')
                             exec_config["stresstest"] = True
@@ -123,7 +125,6 @@ def stresstest(
 
             except Exception as e:
                 logger.error(f"Error in transaction builder. Error: {str(e)}")
-
-        sleep(5)
+                exec_config["stresstest"] = f"false, with error: {str(e)}"
 
     return positions_dict
