@@ -1,7 +1,7 @@
-from tests.utils import local_node_gc
+from tests.utils import local_node_gc, local_node_eth
 from unittest.mock import patch, mock_open
 from roles_royce.applications.panic_button_app.config.config_builder import DAO, AuraPosition, \
-    DAOStrategiesBuilder, BalancerPosition
+    DAOStrategiesBuilder, BalancerPosition, WalletPosition
 import json
 from defabipedia.types import Chain
 import os
@@ -98,3 +98,26 @@ def test_build_balancer_positions(local_node_gc):
                                                 'description': 'Exit pool on Balancer with proportional exit. (Recovery Mode)', 'parameters':
                                                   [{'name': 'bpt_address', 'type': 'constant', 'value': '0xF48f01DCB2CbB3ee1f6AaB0e742c2D3941039d56'}, 
                                                    {'name': 'max_slippage', 'label': 'Max slippage', 'type': 'input', 'rules': {'min': 0, 'max': 100}}]}]}]
+
+
+# Load the contents of your test JSON file
+with open(os.path.join(os.path.dirname(__file__), 'test_swap_pool_template.json'), 'r') as f:
+    test_data = json.load(f)
+
+# Convert the data to a string
+test_data_str = json.dumps(test_data)
+
+
+# Use patch to replace the open function
+@patch('builtins.open', mock_open(read_data=test_data_str))
+def test_build_swap_pool_positions(local_node_eth):
+    dao = DAO.GnosisDAO
+    blockchain = Chain.ETHEREUM
+    wallet_position = WalletPosition(position_id='226',
+                                            token_in_address='0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84')
+    w3 = local_node_eth.w3
+
+    builder = DAOStrategiesBuilder(dao, blockchain, wallet_tokens=[wallet_position])
+    result = builder.build_wallet_positions(w3, [wallet_position])
+
+    assert result == [{'protocol': 'Wallet', 'position_id': '226', 'position_id_tech': '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84', 'position_id_human_readable': 'ethereum_WalletPosition_stETH', 'exec_config': [{'function_name': 'exit_2', 'label': 'Exchange Wallet Token on Curve', 'test': True, 'stresstest': False, 'description': 'Exchange a wallet token through Curve', 'parameters': [{'name': 'token_in_address', 'label': 'Token in', 'type': 'input', 'options': [{'value': '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84', 'label': 'stETH'}]}, {'name': 'max_slippage', 'label': 'Max slippage', 'type': 'input', 'rules': {'min': 0.001, 'max': 100}}, {'name': 'token_out_address', 'label': 'Token out', 'type': 'input', 'options': [{'value': '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', 'label': 'ETH'}]}]}]}]

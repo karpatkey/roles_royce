@@ -5,14 +5,46 @@ from roles_royce.constants import StrEnum
 from .utils import get_tokens_from_bpt, get_gauge_address_from_bpt, get_aura_gauge_from_bpt
 import os
 from dataclasses import dataclass
-from defabipedia.types import Blockchain, Chain
+from defabipedia.types import Blockchain, Chain, SwapPools
 from defabipedia.tokens import erc20_contract
+from defabipedia.swap_pools import SwapPoolInstances
 import copy
 from defabipedia.lido import ContractSpecs
 
 # -----------------------------------------------------------------------------------------------------------------------
 blacklist_token = ["GNO", "ENS", "BAL", "AURA", "COW", "AGVE"]
 whitelist_pairs = ["WETH", "stETH", "wstETH", "ETH", "WBTC", "USDC", "USDT", "DAI", "WXDAI", "rETH"]
+wallet_tokens_swap = [{"ethereum":[{"token_in":["0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",#stETH
+                                                "0xae78736Cd615f374D3085123A210448E74Fc6393",#rETH
+                                                "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"],#wstETH
+                                    "token_out":["0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",#ETH
+                                                 "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",#USDC
+                                                 "0x6B175474E89094C44Da98b954EedeAC495271d0F"]#DAI
+                                                 },
+                                    {"token_in":["0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"],#ETH
+                                     "token_out":["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",#USDC
+                                                 "0x6B175474E89094C44Da98b954EedeAC495271d0F"]#DAI
+                                                 },
+                                    {"token_in":["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"],#USDC
+                                     "token_out":["0x6B175474E89094C44Da98b954EedeAC495271d0F"]#DAI
+                                                 },
+                                    {"token_in":["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"],#USDC
+                                     "token_out":["0x6B175474E89094C44Da98b954EedeAC495271d0F",#DAI
+                                                  "0xdAC17F958D2ee523a2206206994597C13D831ec7"]#USDT
+                                                 },
+                                    {"token_in":["0xdAC17F958D2ee523a2206206994597C13D831ec7"],#USDT
+                                     "token_out":["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",#USDC
+                                                  "0x6B175474E89094C44Da98b954EedeAC495271d0F"]#DAI
+                                                 },
+                                    {"token_in":["0x6B175474E89094C44Da98b954EedeAC495271d0F"],#DAI
+                                     "token_out":["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",#USDC
+                                                  "0xdAC17F958D2ee523a2206206994597C13D831ec7"]#USDT
+                                                 }]},
+                        {"gnosis":[{"token_in":["0xcB444e90D8198415266c6a2724b7900fb12FC56E"],#EURe
+                                    "token_out":["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",#USDC
+                                                "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",#USDT
+                                                "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"]#WXDAI
+                                                    }]}]
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -392,15 +424,71 @@ class DAOStrategiesBuilder:
         result = []
         for wallet_position in positions:
             position = copy.deepcopy(wallet_template)
-            print("        Adding: ", wallet_position)
+            blockchain = Chain.get_blockchain_from_web3(w3)
             position["position_id"] = wallet_position.position_id
             position["position_id_tech"] = wallet_position.position_id_tech()
             position["position_id_human_readable"] = wallet_position.position_id_human_readable(w3)
-            for i in range(len(position['exec_config'])):
-                print("                Adding: ", position["exec_config"][i]["function_name"], 
-                                position["exec_config"][i]["label"])
-            print(f"        Done adding: Wallet position", position["position_id"], position["position_id_human_readable"])
-            result.append(position)
-        return result
 
+            token_pairs = []
+            token_in_interest = wallet_position.position_id_tech()
+
+            for blockchain_config in wallet_tokens_swap:
+                if blockchain in blockchain_config:
+                    for swap_config in blockchain_config[blockchain]:
+                        if token_in_interest in swap_config['token_in']:
+                            for token_out in swap_config['token_out']:
+                                token_pairs.append([token_in_interest, token_out])
+
+
+            pools_class = SwapPoolInstances[blockchain]
+            instances = []
+            for token_pair in token_pairs:
+                token_in = token_pair[0]
+                token_out = token_pair[1]
+                
+                for attr_name in dir(pools_class):
+                    attr_value = getattr(pools_class, attr_name)
+                    if isinstance(attr_value, SwapPools):
+                        if token_in in attr_value.tokens and token_out in attr_value.tokens:
+                            instances.append({"pair": token_pair, "pool": attr_value})
+
+            for instance in instances:
+                if instance["pool"].protocol == 'Balancer':
+                    i = 0
+                elif instance["pool"].protocol == 'Curve':
+                    i = 1
+                elif instance["pool"].protocol == 'UniswapV3':
+                    i = 2
+                if instance["pair"][0] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                    token_in_symbol = "ETH"
+                    token_out_contract = erc20_contract(w3, instance["pair"][1])
+                    token_out_symbol = token_out_contract.functions.symbol().call()
+                elif instance["pair"][1] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                    token_out_symbol = "ETH"
+                    token_in_contract = erc20_contract(w3, instance["pair"][0])
+                    token_in_symbol = token_in_contract.functions.symbol().call()
+                else:
+                    token_in_contract = erc20_contract(w3, instance["pair"][0])
+                    token_in_symbol = token_in_contract.functions.symbol().call()
+                    token_out_contract = erc20_contract(w3, instance["pair"][1])
+                    token_out_symbol = token_out_contract.functions.symbol().call()
+                if position["exec_config"][i]["parameters"][0]["options"][0]["value"] == "FillMewithTokenAddress":
+                    del position["exec_config"][i]["parameters"][0]["options"][0]  # Remove the dummy token_in element in template
+                    del position["exec_config"][i]["parameters"][2]["options"][0]  # Remove the dummy token_out element in template
+                    position["exec_config"][i]["parameters"][0]["options"].append({"value": instance["pair"][0], "label": token_in_symbol})
+                    position["exec_config"][i]["parameters"][2]["options"].append({"value": instance["pair"][1], "label": token_out_symbol})
+                else:
+                    if not any(option["value"] == instance["pair"][1] for option in position["exec_config"][i]["parameters"][2]["options"]):
+                        position["exec_config"][i]["parameters"][2]["options"].append({
+                            "value": instance["pair"][1],
+                            "label": token_out_symbol
+                        })
+            for i in range(len(position["exec_config"]) -1, -1, -1):
+                if position["exec_config"][i]["parameters"][0]["options"][0]["value"] == "FillMewithTokenAddress":
+                    # Delete the element
+                    del position["exec_config"][i]
+
+            if len(position["exec_config"]) > 0:
+                result.append(position)
+        return result
 
