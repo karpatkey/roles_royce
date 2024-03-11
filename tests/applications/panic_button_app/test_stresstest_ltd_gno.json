@@ -1,0 +1,71 @@
+{
+    "dao": "GnosisLtd",
+    "blockchain": "gnosis",
+    "general_parameters": [
+        {
+            "name": "percentage",
+            "label": "Percentage",
+            "type": "input",
+            "rules": {
+                "min": 0.001,
+                "max": 100
+            }
+        }
+    ],
+    "positions": [
+        {
+            "protocol": "Balancer",
+            "position_id": "386",
+            "position_id_tech": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f",
+            "position_id_human_readable": "gnosis_Balancer_GBPe_WXDAI",
+            "exec_config": [
+                {
+                    "function_name": "exit_1_1",
+                    "label": "Withdraw (proportional)",
+                    "test": true,
+                    "stresstest": false,
+                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
+                    "parameters": [
+                        {
+                            "name": "bpt_address",
+                            "type": "constant",
+                            "value": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0.001,
+                                "max": 100
+                            }
+                        }
+                    ]
+                },
+                {
+                    "function_name": "exit_1_3",
+                    "label": "Withdraw (proportional) (Recovery mode)",
+                    "test": true,
+                    "stresstest": false,
+                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
+                    "parameters": [
+                        {
+                            "name": "bpt_address",
+                            "type": "constant",
+                            "value": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f"
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {
+                                "min": 0.001,
+                                "max": 100
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

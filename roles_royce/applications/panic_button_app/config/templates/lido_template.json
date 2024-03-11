@@ -8,6 +8,7 @@
       "function_name": "exit_1",
       "label": "Unstake stETH",
       "test": true,
+      "stresstest": false,
       "description": "Unstake stETH for ETH",
       "parameters": []
     },
@@ -15,6 +16,7 @@
       "function_name": "exit_2",
       "label": "Unstake wstETH",
       "test": true,
+      "stresstest": false,
       "description": "Unstake wstETH for ETH",
       "parameters": []
     },
@@ -22,6 +24,7 @@
       "function_name": "exit_3",
       "label": "Swap stETH",
       "test": true,
+      "stresstest": false,
       "description": "Swap stETH for ETH",
       "parameters": [
         {
@@ -39,6 +42,7 @@
       "function_name": "exit_4",
       "label": "Swap wstETH",
       "test": true,
+      "stresstest": false,
       "description": "Swap wstETH for ETH",
       "parameters": [
         {

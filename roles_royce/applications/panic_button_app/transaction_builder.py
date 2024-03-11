@@ -1,16 +1,17 @@
 import argparse
+import json
+
 from roles_royce.applications.panic_button_app.utils import (
     ENV,
     ExecConfig,
-    start_the_engine,
+    decode_transaction,
     gear_up,
+    start_the_engine,
 )
-from roles_royce.applications.panic_button_app.utils import decode_transaction
-import json
-from roles_royce.roles_modifier import ROLES_ERRORS, set_gas_strategy, GasStrategies
+from roles_royce.roles_modifier import ROLES_ERRORS, GasStrategies, set_gas_strategy
 
 
-def main_runner(percentage, dao, blockchain, protocol, exit_strategy, exit_arguments):
+def build_transaction(percentage, dao, blockchain, protocol, exit_strategy, exit_arguments):
     exec_config = ExecConfig(
         percentage=percentage,
         dao=dao,
@@ -33,14 +34,10 @@ def main_runner(percentage, dao, blockchain, protocol, exit_strategy, exit_argum
                 "message": "There are no funds in the position, no transactions to build",
             }
 
-        check_exit_tx = disassembler.check(
-            txns=txn_transactables, from_address=env.DISASSEMBLER_ADDRESS
-        )
+        check_exit_tx = disassembler.check(txns=txn_transactables, from_address=env.DISASSEMBLER_ADDRESS)
 
         if check_exit_tx:
-            tx = disassembler.build(
-                txns=txn_transactables, from_address=env.DISASSEMBLER_ADDRESS
-            )
+            tx = disassembler.build(txns=txn_transactables, from_address=env.DISASSEMBLER_ADDRESS)
             return {
                 "status": 200,
                 "tx_data": {
@@ -71,9 +68,7 @@ def main_runner(percentage, dao, blockchain, protocol, exit_strategy, exit_argum
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument(
         "-p",
@@ -83,16 +78,10 @@ def main():
         help="Percentage of liquidity to be removed, defaults to 100.",
     )
 
-    parser.add_argument(
-        "-d", "--dao", type=str, help="DAO whose funds are to be removed."
-    )
-    parser.add_argument(
-        "-b", "--blockchain", type=str, help="Blockchain where the funds are deposited."
-    )
+    parser.add_argument("-d", "--dao", type=str, help="DAO whose funds are to be removed.")
+    parser.add_argument("-b", "--blockchain", type=str, help="Blockchain where the funds are deposited.")
 
-    parser.add_argument(
-        "--protocol", type=str, help="Protocol where the funds are deposited."
-    )
+    parser.add_argument("--protocol", type=str, help="Protocol where the funds are deposited.")
     parser.add_argument(
         "-s",
         "--exit-strategy",
@@ -110,7 +99,7 @@ def main():
     )
 
     args = parser.parse_args()
-    response = main_runner(
+    response = build_transaction(
         percentage=args.percentage,
         dao=args.dao,
         blockchain=args.blockchain,
