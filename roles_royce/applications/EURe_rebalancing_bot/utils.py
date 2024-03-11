@@ -12,9 +12,6 @@ from prometheus_client import Gauge
 from swaps import decimalsWXDAI, decimalsEURe
 from roles_royce.applications.EURe_rebalancing_bot.env import ENV
 
-
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -43,6 +40,3 @@ class SchedulerThread(threading.Thread):
 
     def stop(self):
         self.running = False
-
-
-

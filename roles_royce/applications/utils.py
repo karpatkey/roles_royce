@@ -66,7 +66,8 @@ def web3_connection_check(rpc_endpoint_url: str,
 
     Returns:
         (Web3, Web3, int): The Web3 object for the RPC endpoint, the Web3 object for the MEV RPC endpoint, and the updated
-        RPC endpoint failure counter
+        RPC endpoint failure counter if there was any connection error. If no rpc_endpoint_mev_url is provided both Web3
+        objects are the same. If the maximum number of RPC endpoint failures is reached, the program exits.
     """
     w3 = Web3(Web3.HTTPProvider(rpc_endpoint_url))
     if not w3.is_connected(show_traceback=True):
