@@ -35,7 +35,8 @@ stresstest_outcome = {
                     "function_name": "exit_1_1",
                     "label": "Withdraw (proportional)",
                     "test": True,
-                    "stresstest": False,
+                    "stresstest": "false, with error: Role permissions error: "
+                       'ParameterNotOneOfAllowed()',
                     "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
                     "parameters": [
                         {
