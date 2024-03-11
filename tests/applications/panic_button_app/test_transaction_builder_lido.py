@@ -92,7 +92,7 @@ expected_outputs = [{'transaction': {'value': 0, 'chainId': 1, 'gas': 1030233, '
 @pytest.mark.parametrize("args, expected", zip(positions_mock[0]['exec_config'], expected_outputs))
 def test_transaction_builder_lido(local_node_eth, accounts, monkeypatch, args, expected):
     w3 = local_node_eth.w3
-    block = w3.eth.default_block
+    block = w3.eth.default_block = 19364630
     local_node_eth.set_block(block)
     private_key = set_up_roles(local_node_eth, accounts)
     set_env(monkeypatch, private_key)
