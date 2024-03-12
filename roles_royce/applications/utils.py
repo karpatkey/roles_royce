@@ -48,7 +48,7 @@ def web3_connection_check(rpc_endpoint_url: str,
                           messenger: Messenger,
                           rpc_endpoint_failure_counter: int,
                           rpc_endpoint_fallback_url: str = '',
-                          rpc_endpoint_mev_url: str = '',
+                          rpc_endpoint_execution_url: str = '',
                           max_rpc_endpoint_failures: int = 5) -> (Web3, Web3, int):
     """
     This function checks the connection to the RPC endpoint and the MEV RPC endpoint intended to be used for execution.
@@ -61,7 +61,8 @@ def web3_connection_check(rpc_endpoint_url: str,
         messenger (Messenger): The messenger object
         rpc_endpoint_failure_counter (int): The counter of the RPC endpoint failures
         rpc_endpoint_fallback_url (str): The fallback RPC endpoint URL- Can be empty
-        rpc_endpoint_mev_url (str): The MEV RPC endpoint URL intended to use for execution. Can be empty
+        rpc_endpoint_execution_url (str): Execution dedicated RPC endpoint, e.g. MEV blocker. Can be empty, and in that
+            case the same Web3 object is used for both RPC and MEV RPC endpoints
         max_rpc_endpoint_failures (int): The maximum number of RPC endpoint failures before the program exits
 
     Returns:
@@ -83,7 +84,7 @@ def web3_connection_check(rpc_endpoint_url: str,
                     time.sleep(5)
                     # Second attempt with fallback RPC endpoint
                     if not w3.is_connected(show_traceback=True):
-                        messenger.log_and_alert(LoggingLevel.Warning, title='Error',
+                        messenger.log_and_alert(LoggingLevel.Warning, title='Warning',
                                                 message=f'  RPC endpoint {rpc_endpoint_url} and fallback RPC '
                                                         f'endpoint {rpc_endpoint_fallback_url} are both not '
                                                         f'working.')
@@ -94,7 +95,7 @@ def web3_connection_check(rpc_endpoint_url: str,
                     rpc_endpoint_failure_counter = 0
             # Case where no fallback RPC endpoint is provided
             else:
-                messenger.log_and_alert(LoggingLevel.Warning, title='Error',
+                messenger.log_and_alert(LoggingLevel.Warning, title='Warning',
                                         message=f'  RPC endpoint {rpc_endpoint_url} is not working.')
                 rpc_endpoint_failure_counter += 1
         else:
@@ -102,15 +103,15 @@ def web3_connection_check(rpc_endpoint_url: str,
     else:
         rpc_endpoint_failure_counter = 0
 
-    if rpc_endpoint_mev_url != '':
-        w3_mev = Web3(Web3.HTTPProvider(rpc_endpoint_mev_url))
-        if not w3_mev.is_connected(show_traceback=True):
-            messenger.log_and_alert(LoggingLevel.Warning, title='Error',
-                                    message=f'  MEV RPC endpoint {rpc_endpoint_url} is not working.')
+    if rpc_endpoint_execution_url != '':
+        w3_execution = Web3(Web3.HTTPProvider(rpc_endpoint_execution_url))
+        if not w3_execution.is_connected(show_traceback=True):
+            messenger.log_and_alert(LoggingLevel.Warning, title='Warning',
+                                    message=f'  Execution RPC endpoint {rpc_endpoint_url} is not working.')
         else:
-            w3_mev = w3
+            w3_execution = w3
     else:
-        w3_mev = w3
+        w3_execution = w3
 
     if rpc_endpoint_failure_counter == max_rpc_endpoint_failures:
         messenger.log_and_alert(LoggingLevel.Error, title='Too many RPC endpoint failures, exiting...',
@@ -120,9 +121,9 @@ def web3_connection_check(rpc_endpoint_url: str,
 
     else:
         if 'anvil' in w3.client_version and w3.eth.chain_id == 137:
-            # When trying to execute transactions on the Polygon network using Anvil, the following error is raised:
+            # When trying to execute transactions on the Polygon network using Anvil the following error is raised:
             # The field extraData is 97 bytes, but should be 32. It is quite likely that you are connected to a POA chain
             # See https://stackoverflow.com/questions/70812529/the-field-extradata-is-97-bytes-but-should-be-32-it-is-quite-likely-that-you-a
             w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-            w3_mev.middleware_onion.inject(geth_poa_middleware, layer=0)
-        return w3, w3_mev, rpc_endpoint_failure_counter
+            w3_execution.middleware_onion.inject(geth_poa_middleware, layer=0)
+        return w3, w3_execution, rpc_endpoint_failure_counter

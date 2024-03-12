@@ -257,7 +257,7 @@ class SparkCDPManager:
     def repay_single_token_debt(self, spark_cdp: SparkCDP, token_in_address: str | ChecksumAddress | Address,
                                 rate_model: RateModel,
                                 token_in_amount: int, roles_mod_address: str | ChecksumAddress | Address,
-                                role: int, private_key: str) -> object:
+                                role: int, private_key: str, w3: Web3 = None) -> object:
 
         token_in_address = Web3.to_checksum_address(token_in_address)
         roles_mod_address = Web3.to_checksum_address(roles_mod_address)
@@ -277,23 +277,26 @@ class SparkCDPManager:
         lending_pool_address = pool_addresses_provider_contract.functions.getPool().call()
         allowance = token_in_contract.functions.allowance(self.owner_address, lending_pool_address).call()
 
+        if w3 is None:
+            w3 = self.w3
+
         if token_in_amount > allowance:
             tx_receipt = roles.send([spark.ApproveToken(token=token_in_address, amount=token_in_amount),
                                      spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
                                                  avatar=self.owner_address)], role=role, private_key=private_key,
                                     roles_mod_address=roles_mod_address,
-                                    web3=self.w3)
+                                    web3=w3)
         elif token_in_amount == allowance:
             tx_receipt = roles.send([spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
                                                  avatar=self.owner_address), ], role=role,
                                     private_key=private_key,
                                     roles_mod_address=roles_mod_address,
-                                    web3=self.w3)
+                                    web3=w3)
         else:
             tx_receipt = roles.send([spark.Repay(token=token_in_address, amount=token_in_amount, rate_model=rate_model,
                                                  avatar=self.owner_address),
                                      spark.ApproveToken(token=token_in_address, amount=0)], role=role,
                                     private_key=private_key,
                                     roles_mod_address=roles_mod_address,
-                                    web3=self.w3)
+                                    web3=w3)
         return tx_receipt
