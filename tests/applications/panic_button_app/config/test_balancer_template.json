@@ -8,6 +8,7 @@
       "function_name": "exit_1_1",
       "label": "Withdraw (proportional)",
       "test": true,
+      "stresstest": false,
       "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
       "parameters": [
         {
@@ -20,16 +21,48 @@
           "label": "Max slippage",
           "type": "input",
           "rules": {
-            "min": 0,
+            "min": 0.001,
             "max": 100
           }
+        }
+      ]
+    },    
+    {
+      "function_name": "exit_1_2",
+      "label": "Withdraw (Single Token)",
+      "test": true,
+      "stresstest": false,
+      "description": "Withdraw a single token (specified by the user) by redeeming the BPT",
+      "parameters": [
+        {
+          "name": "bpt_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        },
+        {
+          "name": "token_out_address",
+          "label": "Token out",
+          "type": "input",
+          "options": [
+            {
+              "value": "FillMewithTokenAddress",
+              "label": "FillMeWithTokenSymbol"
+            }
+          ]
         }
       ]
     },
     {
       "function_name": "exit_1_3",
       "label": "Withdraw (proportional) (Recovery mode)",
-      "test": false,
+      "test": true,
+      "stresstest": false,
       "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
       "parameters": [
         {
@@ -42,7 +75,7 @@
           "label": "Max slippage",
           "type": "input",
           "rules": {
-            "min": 0,
+            "min": 0.001,
             "max": 100
           }
         }
@@ -52,6 +85,7 @@
       "function_name": "exit_2_1",
       "label": "Unstake + withdraw (proportional)",
       "test": true,
+      "stresstest": false,
       "description": "Unstake the BPT from the Balancer gauge and exit pool with proportional exit. (Not for recovery mode)",
       "parameters": [
         {
@@ -64,16 +98,48 @@
           "label": "Max slippage",
           "type": "input",
           "rules": {
-            "min": 0,
+            "min": 0.001,
             "max": 100
           }
         }
       ]
     },
     {
+      "function_name": "exit_2_2",
+      "label": "Unstake from gauge and withdraw (Single Token)",
+      "test": true,
+      "stresstest": false,
+      "description": "Unstake BPT from gauge and withdraw a single token (specified by the user) by redeeming the BPT",
+      "parameters": [
+        {
+          "name": "gauge_address",
+          "type": "constant",
+          "value": "FillMeWithBptAddress"
+        },
+        {
+          "name": "max_slippage",
+          "label": "Max slippage",
+          "type": "input",
+          "rules": { "min": 0, "max": 100 }
+        },
+        {
+          "name": "token_out_address",
+          "label": "Token out",
+          "type": "input",
+          "options": [
+            {
+              "value": "FillMewithTokenAddress",
+              "label": "FillMeWithTokenSymbol"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "function_name": "exit_2_3",
       "label": "Unstake + withdraw (proportional) (Recovery mode)",
-      "test": false,
+      "test": true,
+      "stresstest": false,
       "description": "Unstake the BPT from the Balancer gauge and exit pool with proportional exit. (Recovery mode)",
       "parameters": [
         {
@@ -86,7 +152,7 @@
           "label": "Max slippage",
           "type": "input",
           "rules": {
-            "min": 0,
+            "min": 0.001,
             "max": 100
           }
         }
