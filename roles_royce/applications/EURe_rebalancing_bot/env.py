@@ -4,7 +4,7 @@ from web3.types import ChecksumAddress
 from web3 import Web3
 from roles_royce.protocols.base import Address
 import json
-from roles_royce.applications.utils import custom_config, to_dict
+from roles_royce.applications.utils import custom_config, to_dict, check_env_endpoints
 
 
 @dataclass
@@ -44,20 +44,13 @@ class ENV:
             self.RPC_ENDPOINT = config("RPC_ENDPOINT", default="", cast=str)
             self.RPC_ENDPOINT_FALLBACK = custom_config("RPC_ENDPOINT_FALLBACK", default="", cast=str)
             self.RPC_ENDPOINT_EXECUTION = custom_config("RPC_ENDPOINT_MEV", default="", cast=str)
-        if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).is_connected():
-            raise ValueError(
-                f"RPC_ENDPOINT is not valid or not active: {self.RPC_ENDPOINT}."
-            )
-        if self.RPC_ENDPOINT_FALLBACK != "":
-            if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT_FALLBACK)).is_connected():
-                raise ValueError(
-                    f"RPC_ENDPOINT_FALLBACK is not valid or not active: {self.RPC_ENDPOINT_FALLBACK}."
-                )
+
+        check_env_endpoints([(self.RPC_ENDPOINT, self.RPC_ENDPOINT_FALLBACK)])
 
         self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(config('AVATAR_SAFE_ADDRESS', cast=str))
         self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(config('ROLES_MOD_ADDRESS', cast=str))
         self.ROLE = config('ROLE', cast=int)
-        self.PRIVATE_KEY = config('PRIVATE_KEY', cast=str)
+        self.PRIVATE_KEY = custom_config('PRIVATE_KEY', default='', cast=str)
         self.FIXER_API_ACCESS_KEY = custom_config('FIXER_API_ACCESS_KEY', default='', cast=str)
         self.MAX_SLIPPAGE = custom_config('MAX_SLIPPAGE', default=0.01, cast=float)
         self.DRIFT_THRESHOLD = config('DRIFT_THRESHOLD', cast=float)

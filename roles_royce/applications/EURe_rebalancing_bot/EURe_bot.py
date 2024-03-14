@@ -70,7 +70,7 @@ def bot_do(w3, w3_mev) -> int:
     elif balance_WXDAI < amount_WXDAI * (10 ** decimalsWXDAI):
         if lack_of_WXDAI_flag is False:
             title = "Lack of WXDAI in the avatar safe"
-            message = f"  Im running outta WXDAI! Only {balance_WXDAI / (10 ** decimalsWXDAI):.5f} left."
+            message = f"  Im running outta WXDAI! Only {balance_WXDAI / (10 ** decimalsWXDAI):,.5f} left."
             messenger.log_and_alert(LoggingLevel.Warning, title, message,
                                     alert_flag=lack_of_WXDAI_flag)
 
@@ -92,7 +92,7 @@ def bot_do(w3, w3_mev) -> int:
     elif balance_EURe < amount_EURe * (10 ** decimalsEURe):
         if lack_of_EURe_flag is False:
             title = "Lack of EURe in the avatar safe"
-            message = f"  Im running outta EURe! Only {balance_EURe / (10 ** decimalsEURe):.5f} left."
+            message = f"  Im running outta EURe! Only {balance_EURe / (10 ** decimalsEURe):,.5f} left."
             messenger.log_and_alert(LoggingLevel.Warning, title, message,
                                     alert_flag=lack_of_EURe_flag)
         while balance_EURe < amount_EURe * (10 ** decimalsEURe) and amount_EURe > 1:
@@ -128,19 +128,19 @@ def bot_do(w3, w3_mev) -> int:
 
     logger.info(
         f'Status update:\n'
-        f'  EUR to USD oracle: {data.amount_EURe:.3f} EURe ---> {data.amount_EURe * data.EUR_price:.3f} USD.\n'
-        f'  EURe to WXDAI Curve: {data.amount_EURe:.3f} EURe ---> {data.EURe_to_WXDAI:.3f} WXDAI.\n'
-        f'  EURe to WXDAI drift: {drift_EURe_to_WXDAI:.5f}.\n'
+        f'  EUR to USD oracle: {data.amount_EURe:,.3f} EURe ---> {data.amount_EURe * data.EUR_price:,.3f} USD.\n'
+        f'  EURe to WXDAI Curve: {data.amount_EURe:,.3f} EURe ---> {data.EURe_to_WXDAI:,.3f} WXDAI.\n'
+        f'  EURe to WXDAI drift: {drift_EURe_to_WXDAI:,.5f}.\n'
         f'\n'
-        f'  USD to EUR oracle: {data.amount_WXDAI:.3f} USD ---> {data.amount_WXDAI / data.EUR_price:.3f} EURe.\n'
-        f'  WXDAI to EURe Curve: {data.amount_WXDAI:.3f} WXDAI ---> {data.WXDAI_to_EURe:.3f} EURe.\n'
-        f'  WXDAI to EURe drift: {drift_WXDAI_to_EURe:.5f}.\n'
+        f'  USD to EUR oracle: {data.amount_WXDAI:,.3f} USD ---> {data.amount_WXDAI / data.EUR_price:,.3f} EURe.\n'
+        f'  WXDAI to EURe Curve: {data.amount_WXDAI:,.3f} WXDAI ---> {data.WXDAI_to_EURe:,.3f} EURe.\n'
+        f'  WXDAI to EURe drift: {drift_WXDAI_to_EURe:,.5f}.\n'
         f'\n'
-        f'  Drift threshold: {env.DRIFT_THRESHOLD:.5f}.\n'
+        f'  Drift threshold: {env.DRIFT_THRESHOLD:,.5f}.\n'
         f'\n'
-        f'  Avatar safe"s WXDAI balance: {balance_WXDAI / (10 ** decimalsWXDAI):.5f}.\n'
-        f'  Avatar safe"s EURe balance: {balance_EURe / (10 ** decimalsEURe):.5f}.\n'
-        f'  Bot"s xDAI balance: {bot_xDAI_balance / (10 ** 18):.5f}.\n'
+        f'  Avatar safe"s WXDAI balance: {balance_WXDAI / (10 ** decimalsWXDAI):,.5f}.\n'
+        f'  Avatar safe"s EURe balance: {balance_EURe / (10 ** decimalsEURe):,.5f}.\n'
+        f'  Bot"s xDAI balance: {bot_xDAI_balance / (10 ** 18):,.5f}.\n'
     )
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -154,23 +154,23 @@ def bot_do(w3, w3_mev) -> int:
     # -----------------------------------------------------------------------------------------------------------------------
 
     if drift_EURe_to_WXDAI > env.DRIFT_THRESHOLD and balance_EURe >= amount_EURe * (10 ** decimalsEURe):
-        logger.info(f'Swapping {amount_EURe:.3f} EURe for WDAI...')
+        logger.info(f'Swapping {amount_EURe:,.3f} EURe for WDAI...')
         tx_receipt_EURe_to_WXDAI = swapper.swap_EURe_for_WXDAI(data)
 
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt_EURe_to_WXDAI,
                                                                        env.AVATAR_SAFE_ADDRESS, w3)
-        messenger.log_and_alert(LoggingLevel.Info, f'{amount_EURe:.3f} EURe swapped for WXDAI', message,
+        messenger.log_and_alert(LoggingLevel.Info, f'{amount_EURe:,.3f} EURe swapped for WXDAI', message,
                                 slack_msg=message_slack)
 
         tx_executed_flag = True
 
     elif drift_WXDAI_to_EURe > env.DRIFT_THRESHOLD and balance_WXDAI >= amount_WXDAI * (10 ** decimalsWXDAI):
-        logger.info(f'Swapping {amount_WXDAI:.3f} WXDAI for EURe...')
+        logger.info(f'Swapping {amount_WXDAI:,.3f} WXDAI for EURe...')
         tx_receipt_WXDAI_to_EURe = swapper.swap_WXDAI_for_EURe(data)
 
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt_WXDAI_to_EURe,
                                                                        env.AVATAR_SAFE_ADDRESS, w3)
-        messenger.log_and_alert(LoggingLevel.Info, f'{amount_WXDAI:.3f} WXDAI swapped for EURe', message,
+        messenger.log_and_alert(LoggingLevel.Info, f'{amount_WXDAI:,.3f} WXDAI swapped for EURe', message,
                                 slack_msg=message_slack)
 
         tx_executed_flag = True
@@ -193,19 +193,19 @@ def bot_do(w3, w3_mev) -> int:
 
         logger.info(
             f'Status update after swap:\n'
-            f'  New EUR to USD oracle: {data.amount_EURe:.3f} EURe ---> {data.amount_EURe * data.EUR_price:.3f} USD.\n'
-            f'  New EURe to WXDAI Curve: {data.amount_EURe:.3f} EURe ---> {data.EURe_to_WXDAI:.3f} WXDAI.\n'
-            f'  New EURe to WXDAI drift: {drift_EURe_to_WXDAI:.5f}.\n'
+            f'  New EUR to USD oracle: {data.amount_EURe:,.3f} EURe ---> {data.amount_EURe * data.EUR_price:,.3f} USD.\n'
+            f'  New EURe to WXDAI Curve: {data.amount_EURe:,.3f} EURe ---> {data.EURe_to_WXDAI:,.3f} WXDAI.\n'
+            f'  New EURe to WXDAI drift: {drift_EURe_to_WXDAI:,.5f}.\n'
             f'\n'
-            f'  New USD to EURe oracle: {data.amount_WXDAI:.3f} USD ---> {data.amount_WXDAI / data.EUR_price:.3f} EURe.\n'
-            f'  New WXDAI to EURe Curve: {data.amount_WXDAI:.3f} WXDAI ---> {data.WXDAI_to_EURe:.3f} EURe.\n'
-            f'  New WXDAI to EURe drift: {drift_WXDAI_to_EURe:.5f}.\n'
+            f'  New USD to EURe oracle: {data.amount_WXDAI:,.3f} USD ---> {data.amount_WXDAI / data.EUR_price:,.3f} EURe.\n'
+            f'  New WXDAI to EURe Curve: {data.amount_WXDAI:,.3f} WXDAI ---> {data.WXDAI_to_EURe:,.3f} EURe.\n'
+            f'  New WXDAI to EURe drift: {drift_WXDAI_to_EURe:,.5f}.\n'
             f'\n'
-            f'  Drift threshold: {env.DRIFT_THRESHOLD:.5f}.\n'
+            f'  Drift threshold: {env.DRIFT_THRESHOLD:,.5f}.\n'
             f'\n'
-            f'  Avatar safe"s WXDAI balance: {balance_WXDAI / (10 ** decimalsWXDAI):.5f}.\n'
-            f'  Avatar safe"s EURe balance: {balance_EURe / (10 ** decimalsEURe):.5f}.\n'
-            f'  Bot"s xDAI balance: {bot_xDAI_balance / (10 ** 18):.5f}.\n'
+            f'  Avatar safe"s WXDAI balance: {balance_WXDAI / (10 ** decimalsWXDAI):,.5f}.\n'
+            f'  Avatar safe"s EURe balance: {balance_EURe / (10 ** decimalsEURe):,.5f}.\n'
+            f'  Bot"s xDAI balance: {bot_xDAI_balance / (10 ** 18):,.5f}.\n'
         )
 
     return 0
