@@ -108,7 +108,6 @@ def web3_connection_check(rpc_endpoint_url: str,
         if not w3_execution.is_connected(show_traceback=True):
             messenger.log_and_alert(LoggingLevel.Warning, title='Warning',
                                     message=f'  Execution RPC endpoint {rpc_endpoint_url} is not working.')
-        else:
             w3_execution = w3
     else:
         w3_execution = w3
