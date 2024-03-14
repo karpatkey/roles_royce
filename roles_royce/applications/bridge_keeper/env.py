@@ -84,8 +84,8 @@ class ENV:
         self.TELEGRAM_CHAT_ID = custom_config('TELEGRAM_CHAT_ID', default='', cast=int)
         self.PROMETHEUS_PORT = custom_config('PROMETHEUS_PORT', default=8000, cast=int)
 
-        self.REFILL_THRESHOLD = config('REFILL_THRESHOLD', cast=int)
-        self.INVEST_THRESHOLD = config('INVEST_THRESHOLD', cast=int)
+        self.REFILL_THRESHOLD = config('REFILL_THRESHOLD', cast=float)
+        self.INVEST_THRESHOLD = config('INVEST_THRESHOLD', cast=float)
         self.GAS_ETH_THRESHOLD = custom_config('GAS_ETH_THRESHOLD', default=0.5, cast=float)
         self.MINUTES_BEFORE_CLAIM_EPOCH = custom_config('MINUTES_BEFORE_CLAIM_EPOCH', default=90, cast=int)
         self.AMOUNT_OF_INTEREST_TO_PAY = config('AMOUNT_OF_INTEREST_TO_PAY', cast=float)
