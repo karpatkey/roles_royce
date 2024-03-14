@@ -140,7 +140,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
 while True:
 
     try:
-        w3_eth, w3_eth_execution, rpc_endpoint_failure_counter = web3_connection_check(
+        w3_eth, w3_eth_execution, rpc_endpoint_failure_counter_eth = web3_connection_check(
             static_data.env.RPC_ENDPOINT_ETHEREUM,
             messenger,
             rpc_endpoint_failure_counter_eth,
@@ -152,7 +152,7 @@ while True:
             rpc_endpoint_failure_counter_eth,
             static_data.env.RPC_ENDPOINT_GNOSIS)
 
-        if rpc_endpoint_failure_counter != 0:
+        if rpc_endpoint_failure_counter_eth != 0 or rpc_endpoint_failure_counter_gnosis != 0:
             continue
 
         try:
