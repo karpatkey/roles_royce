@@ -57,7 +57,7 @@ def refill_bridge(w3: Web3, static_data: StaticData) -> TxReceipt:
         "nonce": w3.eth.get_transaction_count(static_data.env.BOT_ADDRESS),
     })
     if static_data.env.PRIVATE_KEY == "":
-        tx_hash = w3.eth.send_transaction(unsigned_tx) # The account has already been unlocked in the fork
+        tx_hash = w3.eth.send_transaction(unsigned_tx)  # The account has already been unlocked in the fork
     else:
         signed_tx = w3.eth.account.sign_transaction(unsigned_tx, private_key=static_data.env.PRIVATE_KEY)
         tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
@@ -72,7 +72,7 @@ def invest_DAI(w3: Web3, static_data: StaticData) -> TxReceipt:
         "nonce": w3.eth.get_transaction_count(static_data.env.BOT_ADDRESS),
     })
     if static_data.env.PRIVATE_KEY == "":
-        tx_hash = w3.eth.send_transaction(unsigned_tx) # The account has already been unlocked in the fork
+        tx_hash = w3.eth.send_transaction(unsigned_tx)  # The account has already been unlocked in the fork
     else:
         signed_tx = w3.eth.account.sign_transaction(unsigned_tx, private_key=static_data.env.PRIVATE_KEY)
         tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
@@ -83,13 +83,14 @@ def invest_DAI(w3: Web3, static_data: StaticData) -> TxReceipt:
 def pay_interest(w3: Web3, static_data: StaticData, dynamic_data: DynamicData) -> TxReceipt:
     bridge_contract = ContractSpecs[Chain.ETHEREUM].xDaiBridge.contract(w3)
     # see https://etherscan.io/address/0x166124b75c798cedf1b43655e9b5284ebd5203db#code#F7#L141
-    amount = min(int(Decimal(static_data.env.AMOUNT_OF_INTEREST_TO_PAY) * Decimal(10 ** static_data.decimals_DAI)), dynamic_data.claimable)
+    amount = min(int(Decimal(static_data.env.AMOUNT_OF_INTEREST_TO_PAY) * Decimal(10 ** static_data.decimals_DAI)),
+                 dynamic_data.claimable)
     unsigned_tx = bridge_contract.functions.payInterest(EthereumTokenAddr.DAI, amount).build_transaction({
         "from": static_data.env.BOT_ADDRESS,
         "nonce": w3.eth.get_transaction_count(static_data.env.BOT_ADDRESS),
     })
     if static_data.env.PRIVATE_KEY == "":
-        tx_hash = w3.eth.send_transaction(unsigned_tx) # The account has already been unlocked in the fork
+        tx_hash = w3.eth.send_transaction(unsigned_tx)  # The account has already been unlocked in the fork
     else:
         signed_tx = w3.eth.account.sign_transaction(unsigned_tx, private_key=static_data.env.PRIVATE_KEY)
         tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)

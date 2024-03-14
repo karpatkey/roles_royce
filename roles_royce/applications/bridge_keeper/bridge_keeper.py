@@ -9,11 +9,12 @@ from roles_royce.applications.bridge_keeper.utils import Flags
 from roles_royce.applications.bridge_keeper.prometheus import Gauges
 from roles_royce.applications.bridge_keeper.logs import log_initial_data, log_status_update
 from roles_royce.applications.utils import web3_connection_check
-import sys
+from decimal import Decimal
 from datetime import datetime
 from defabipedia.xdai_bridge import ContractSpecs
 from defabipedia.types import Chain
 import time
+import sys
 
 # Importing the environment variables from the .env file
 env = ENV()
@@ -106,7 +107,8 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
 
     # see claimable in https://etherscan.io/address/0x166124b75c798cedf1b43655e9b5284ebd5203db#code#F7#L142
     if (dynamic_data.next_claim_epoch - 60 * static_data.env.MINUTES_BEFORE_CLAIM_EPOCH < time.time() < dynamic_data.next_claim_epoch
-            and dynamic_data.min_interest_paid <= min(static_data.env.AMOUNT_OF_INTEREST_TO_PAY * (10 ** static_data.decimals_DAI), dynamic_data.claimable)
+            and dynamic_data.min_interest_paid <= min(
+        static_data.env.AMOUNT_OF_INTEREST_TO_PAY * (10 ** static_data.decimals_DAI), dynamic_data.claimable)
             and not flags.interest_payed.is_set()):
         title = 'Paying interest to interest receiver contract on Gnosis Chain...'
         message = f'  The next claim epoch {datetime.utcfromtimestamp(dynamic_data.next_claim_epoch)} is in less than {static_data.env.MINUTES_BEFORE_CLAIM_EPOCH} minutes.'
@@ -115,7 +117,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
         flags.tx_executed.set()
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt, ContractSpecs[
             Chain.ETHEREUM].xDaiBridge.address, w3_eth)
-        messenger.log_and_alert(LoggingLevel.Info, f'Interest payed', message,
+        messenger.log_and_alert(LoggingLevel.Info, f'Interest payed. Amount: {min(int(Decimal(static_data.env.AMOUNT_OF_INTEREST_TO_PAY) * Decimal(10 ** static_data.decimals_DAI)), dynamic_data.claimable) / (10 ** static_data.decimals_DAI):.2f} DAI', message,
                                 slack_msg=message_slack)
         flags.interest_payed.set()
     elif time.time() > dynamic_data.next_claim_epoch:
@@ -138,7 +140,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
 while True:
 
     try:
-        w3_eth,w3_eth_execution, rpc_endpoint_failure_counter = web3_connection_check(
+        w3_eth, w3_eth_execution, rpc_endpoint_failure_counter = web3_connection_check(
             static_data.env.RPC_ENDPOINT_ETHEREUM,
             messenger,
             rpc_endpoint_failure_counter_eth,
