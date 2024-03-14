@@ -127,3 +127,30 @@ def web3_connection_check(rpc_endpoint_url: str,
             w3.middleware_onion.inject(geth_poa_middleware, layer=0)
             w3_execution.middleware_onion.inject(geth_poa_middleware, layer=0)
         return w3, w3_execution, rpc_endpoint_failure_counter
+
+
+def check_env_endpoints(endpoints: list[(str, str)]) -> None:
+    """
+    This function checks if the RPC endpoints are valid and active. If not, it raises a ValueError. It is meant to
+    receive one tuple per chain, where the first element is the RPC endpoint and the second element is the fallback RPC
+    endpoint.
+
+    Args:
+        endpoints (list[(str, str)]): The list of RPC endpoints URLs TUPLES where each tuple is
+        (RPC_ENDPOINT_URL,RPC_ENDPOINT_FALLBACK_URL).
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If either the RPC endpoint or fallback RPC endpoint is not valid or not active in any of the tuples.
+        ValueError: If the RPC endpoint and fallback RPC endpoint are not for the same chain in any of the tuples.
+    """
+    for item in endpoints:
+        if not Web3(Web3.HTTPProvider(item[0])).is_connected():
+            raise ValueError(f"RPC_ENDPOINT: {item[0]} is not valid or not active.")
+        if not Web3(Web3.HTTPProvider(item[1])).is_connected():
+            raise ValueError(f"RPC_ENDPOINT_FALLBACK: {item[1]} is not valid or not active: {item[1]}.")
+        if Web3(Web3.HTTPProvider(item[0])).eth.chain_id != Web3(Web3.HTTPProvider(item[1])).eth.chain_id:
+            raise ValueError(
+                f"RPC_ENDPOINT: {item[0]} and RPC_ENDPOINT_FALLBACK: {item[1]} are not for the same chain.")

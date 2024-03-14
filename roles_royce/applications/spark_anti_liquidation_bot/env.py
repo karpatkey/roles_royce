@@ -9,7 +9,7 @@ from web3 import Web3
 from roles_royce.toolshed.alerting.alerting import Messenger, LoggingLevel
 from roles_royce.toolshed.anti_liquidation.spark import SparkCDP
 import logging
-from roles_royce.applications.utils import custom_config, to_dict
+from roles_royce.applications.utils import custom_config, to_dict, check_env_endpoints
 import json
 
 
@@ -27,7 +27,6 @@ class ENV:
     ROLE: int = field(init=False)
     PRIVATE_KEY: str = field(init=False)
     BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
-
 
     TARGET_HEALTH_FACTOR: float = field(init=False)
     THRESHOLD_HEALTH_FACTOR: float = field(init=False)
@@ -54,20 +53,12 @@ class ENV:
             self.RPC_ENDPOINT = config("RPC_ENDPOINT", default="", cast=str)
             self.RPC_ENDPOINT_FALLBACK = custom_config("RPC_ENDPOINT_FALLBACK", default="", cast=str)
             self.RPC_ENDPOINT_EXECUTION = custom_config("RPC_ENDPOINT_MEV", default="", cast=str)
-        if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).is_connected():
-            raise ValueError(
-                f"RPC_ENDPOINT is not valid or not active: {self.RPC_ENDPOINT}."
-            )
-        if self.RPC_ENDPOINT_FALLBACK != "":
-            if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT_FALLBACK)).is_connected():
-                raise ValueError(
-                    f"RPC_ENDPOINT_FALLBACK is not valid or not active: {self.RPC_ENDPOINT_FALLBACK}."
-                )
+        check_env_endpoints([(self.RPC_ENDPOINT, self.RPC_ENDPOINT_FALLBACK)])
 
         self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(config('AVATAR_SAFE_ADDRESS', cast=str))
         self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(config('ROLES_MOD_ADDRESS', cast=str))
         self.ROLE = config('ROLE', cast=int)
-        self.PRIVATE_KEY = config('PRIVATE_KEY', cast=str)
+        self.PRIVATE_KEY = custom_config('PRIVATE_KEY', default='', cast=str)
 
         self.TARGET_HEALTH_FACTOR = config('TARGET_HEALTH_FACTOR', cast=float)
         self.THRESHOLD_HEALTH_FACTOR = config('THRESHOLD_HEALTH_FACTOR', cast=float)
