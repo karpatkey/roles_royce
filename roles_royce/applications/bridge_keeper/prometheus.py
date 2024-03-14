@@ -13,6 +13,7 @@ class Gauges:
     min_cash_threshold = Gauge('min_cash_threshold', 'Minimum amount of underlying tokens that are not invested')
     claimable = Gauge('claimable', 'Claimable interest')
     min_interest_paid = Gauge('min_interest_paid', 'Minimum amount of interest that can be paid in a single call')
+    amount_of_interest_to_pay = Gauge('amount_of_interest_to_pay', 'Amount of interest to pay')
 
     def update(self, static_data: StaticData, dynamic_data: DynamicData):
         self.bot_ETH_balance.set(dynamic_data.bot_ETH_balance / (10 ** 18))
@@ -23,3 +24,4 @@ class Gauges:
         self.min_cash_threshold.set(dynamic_data.min_cash_threshold / (10 ** static_data.decimals_DAI))
         self.claimable.set(dynamic_data.claimable / (10 ** static_data.decimals_DAI))
         self.min_interest_paid.set(dynamic_data.min_interest_paid / (10 ** static_data.decimals_DAI))
+        self.amount_of_interest_to_pay.set(static_data.env.AMOUNT_OF_INTEREST_TO_PAY)
