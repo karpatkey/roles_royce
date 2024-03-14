@@ -115,8 +115,8 @@ def bot_do(w3: Web3, w3_execution: Web3) -> int:
 
     logger.info("SparK CDP data retrieved:\n"
                 f"{cdp}\n"
-                f"  DAI balance: {DAI_balance / 1e18:.3f}, sDAI balance: {sDAI_balance / 1E18:.3f}; Equivalent DAI: {float(Decimal(sDAI_balance) * (Decimal(chi) / Decimal(1e27)) / Decimal(1e18)):.3f}\n"
-                f"  Bot's ETH balance: {bot_ETH_balance / 1e18:.5f}\n"
+                f"  DAI balance: {DAI_balance / 1e18:,.3f}, sDAI balance: {sDAI_balance / 1E18:,.3f}; Equivalent DAI: {float(Decimal(sDAI_balance) * (Decimal(chi) / Decimal(1e27)) / Decimal(1e18)):,.3f}\n"
+                f"  Bot's ETH balance: {bot_ETH_balance / 1e18:,.5f}\n"
                 f"  Target health factor: {env.TARGET_HEALTH_FACTOR}, Alerting health factor: {env.ALERTING_HEALTH_FACTOR}, Health factor threshold: {env.THRESHOLD_HEALTH_FACTOR}")
 
     # -----------------------------------------------------------------------------------------------------------------------
@@ -150,22 +150,22 @@ def bot_do(w3: Web3, w3_execution: Web3) -> int:
             title = 'No sDAI to redeem'
             message = (f'  Current health factor: {cdp.health_factor}.\n'
                        f'  Target health factor: {env.TARGET_HEALTH_FACTOR}.\n'
-                       f'  Amount of sDAI needed to redeem: {amount_of_sDAI_to_redeem / 1e18:.5f}.\n'
-                       f'  Current sDAI balance: {sDAI_balance / 1e18:.5f}.')
+                       f'  Amount of sDAI needed to redeem: {amount_of_sDAI_to_redeem / 1e18:,.5f}.\n'
+                       f'  Current sDAI balance: {sDAI_balance / 1e18:,.5f}.')
             messenger.log_and_alert(LoggingLevel.Warning, title, message)
 
         elif 0 < sDAI_balance < amount_of_sDAI_to_redeem:
             title = 'Not enough sDAI to redeem'
             message = (f'  Current health factor: {cdp.health_factor}.\n'
                        f'  Target health factor: {env.TARGET_HEALTH_FACTOR}.\n'
-                       f'  Amount of DAI to repay: {amount_of_DAI_to_repay / 1e18:.5f}.\n'
-                       f'  Amount of sDAI needed to redeem: {amount_of_sDAI_to_redeem / 1e18:.5f}.\n'
-                       f'  Current sDAI balance: {sDAI_balance / 1e18:.5f}.')
+                       f'  Amount of DAI to repay: {amount_of_DAI_to_repay / 1e18:,.5f}.\n'
+                       f'  Amount of sDAI needed to redeem: {amount_of_sDAI_to_redeem / 1e18:,.5f}.\n'
+                       f'  Current sDAI balance: {sDAI_balance / 1e18:,.5f}.')
             messenger.log_and_alert(LoggingLevel.Warning, title, message)
 
             amount_of_sDAI_to_redeem = sDAI_balance
 
-            logger.info(f'Redeeming {amount_of_sDAI_to_redeem / 1e18:.5f} sDAI for DAI...')
+            logger.info(f'Redeeming {amount_of_sDAI_to_redeem / 1e18:,.5f} sDAI for DAI...')
             tx_receipt_sDAI_redeemed = roles.send(
                 [spark.RedeemSDAIforDAI(amount=amount_of_sDAI_to_redeem, avatar=env.AVATAR_SAFE_ADDRESS)],
                 role=env.ROLE, private_key=env.PRIVATE_KEY, roles_mod_address=env.ROLES_MOD_ADDRESS, web3=w3_execution)
@@ -179,16 +179,16 @@ def bot_do(w3: Web3, w3_execution: Web3) -> int:
             title = 'No DAI to repay debt'
             message = (f'  Current health factor: {cdp.health_factor}.\n'
                        f'  Target health factor: {env.TARGET_HEALTH_FACTOR}.\n'
-                       f'  Amount of sDAI needed to redeem: {amount_of_sDAI_to_redeem / 1e18:.5f}.\n'
-                       f'  Current sDAI balance: {sDAI_balance / 1e18:.5f}.')
+                       f'  Amount of sDAI needed to redeem: {amount_of_sDAI_to_redeem / 1e18:,.5f}.\n'
+                       f'  Current sDAI balance: {sDAI_balance / 1e18:,.5f}.')
             messenger.log_and_alert(LoggingLevel.Warning, title, message)
 
         elif 0 < DAI_balance < amount_of_DAI_to_repay:
             title = 'Not enough DAI to repay'
             message = (f'  Current health factor: {cdp.health_factor}.\n'
                        f'  Target health factor: {env.TARGET_HEALTH_FACTOR}.\n'
-                       f'  Amount of DAI to repay: {amount_of_DAI_to_repay / 1e18:.5f}.\n'
-                       f'  Current DAI balance: {DAI_balance / 1e18:.5f}.')
+                       f'  Amount of DAI to repay: {amount_of_DAI_to_repay / 1e18:,.5f}.\n'
+                       f'  Current DAI balance: {DAI_balance / 1e18:,.5f}.')
             messenger.log_and_alert(LoggingLevel.Warning, title, message)
 
             amount_of_DAI_to_repay = DAI_balance

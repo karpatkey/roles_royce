@@ -29,7 +29,7 @@ def send_status(messenger: Messenger, cdp: SparkCDP, bot_ETH_balance: float):
     title = "Spark CDP status update"
     message = (f"  Current health factor: {cdp.health_factor}\n"
                f"{cdp}\n"
-               f"Bot ETH balance: {bot_ETH_balance:.5f}")
+               f"Bot ETH balance: {bot_ETH_balance:,.5f}")
     messenger.log_and_alert(LoggingLevel.Info, title, message)
 
 

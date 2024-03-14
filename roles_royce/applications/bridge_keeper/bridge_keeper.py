@@ -80,7 +80,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
     if dynamic_data.bridge_DAI_balance < static_data.env.REFILL_THRESHOLD * (
             10 ** static_data.decimals_DAI) and dynamic_data.bridge_DAI_balance < dynamic_data.min_cash_threshold:
         title = 'Refilling the bridge...'
-        message = f'  The bridge"s DAI balance {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):.2f} dropped below the refill threshold {static_data.env.REFILL_THRESHOLD}.'
+        message = f'  The bridge"s DAI balance {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):,.2f} dropped below the refill threshold {static_data.env.REFILL_THRESHOLD}.'
         logger.info(title + '\n' + message)
         tx_receipt = refill_bridge(w3_eth, static_data)
         flags.tx_executed.set()
@@ -94,7 +94,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
     elif dynamic_data.bridge_DAI_balance > static_data.env.INVEST_THRESHOLD * (
             10 ** static_data.decimals_DAI) and dynamic_data.bridge_DAI_balance > dynamic_data.min_cash_threshold:
         title = 'Investing DAI...'
-        message = f'  The bridge"s DAI balance {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):.2f} surpassed the invest threshold {static_data.env.INVEST_THRESHOLD}.'
+        message = f'  The bridge"s DAI balance {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):,.2f} surpassed the invest threshold {static_data.env.INVEST_THRESHOLD}.'
         logger.info(title + '\n' + message)
         tx_receipt = invest_DAI(w3_eth, static_data)
         flags.tx_executed.set()
@@ -117,7 +117,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
         flags.tx_executed.set()
         message, message_slack = get_tx_receipt_message_with_transfers(tx_receipt, ContractSpecs[
             Chain.ETHEREUM].xDaiBridge.address, w3_eth)
-        messenger.log_and_alert(LoggingLevel.Info, f'Interest payed. Amount: {min(int(Decimal(static_data.env.AMOUNT_OF_INTEREST_TO_PAY) * Decimal(10 ** static_data.decimals_DAI)), dynamic_data.claimable) / (10 ** static_data.decimals_DAI):.2f} DAI', message,
+        messenger.log_and_alert(LoggingLevel.Info, f'Interest payed. Amount: {min(int(Decimal(static_data.env.AMOUNT_OF_INTEREST_TO_PAY) * Decimal(10 ** static_data.decimals_DAI)), dynamic_data.claimable) / (10 ** static_data.decimals_DAI):,.2f} DAI', message,
                                 slack_msg=message_slack)
         flags.interest_payed.set()
     elif time.time() > dynamic_data.next_claim_epoch:
