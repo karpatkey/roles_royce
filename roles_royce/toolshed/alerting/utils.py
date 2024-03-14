@@ -120,7 +120,11 @@ def get_tx_receipt_message_with_transfers(tx_receipt: object, target_address: st
     tx_executed_message, tx_executed_message_slack = get_tx_executed_msg(tx_receipt, chain)
     transfers, transfers_message = get_token_amounts_from_transfer_events(tx_receipt, target_address, w3)
 
-    message = tx_executed_message + '\n\n' + transfers_message
-    message_slack = tx_executed_message_slack + '\n\n' + transfers_message
+    if transfers_message != '':
+        message = tx_executed_message + '\n\n' + transfers_message
+        message_slack = tx_executed_message_slack + '\n\n' + transfers_message
+    else:
+        message = tx_executed_message
+        message_slack = tx_executed_message_slack
 
     return message, message_slack
