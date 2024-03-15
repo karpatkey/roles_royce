@@ -1,4 +1,4 @@
-from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress
+from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApprove
 from defabipedia.types import Blockchain
 from defabipedia.uniswap_v3 import ContractSpecs
 
@@ -24,6 +24,20 @@ class SwapCurve(ContractMethod):
         self.args.token_y = token_y
         self.args.amount_x = amount_x
         self.args.min_amount_y = min_amount_y
+
+class ApproveCurve(ContractMethod):
+    name = "approve"
+    in_signature = [("spender", "address"), ("amount", "uint256")]
+
+    def __init__(self,
+                 blockchain: Blockchain,
+                 token_address: Address,
+                 spender: Address,
+                 amount: int):
+        super().__init__()
+        self.target_address = token_address
+        self.args.spender = spender
+        self.args.amount = amount
 
 class SwapUniswapV3(ContractMethod):
     name = "exactInputSingle"

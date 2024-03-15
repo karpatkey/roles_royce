@@ -9,6 +9,7 @@ class QuoteCurve(ContractMethod):
         ("token_y", "int128"),
         ("amount_x", "uint256")
     )
+    out_signature = [("amount_y", "uint256")]
 
     def __init__(self,
                  blockchain: Blockchain,
