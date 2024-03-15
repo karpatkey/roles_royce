@@ -56,6 +56,7 @@ def refill_bridge(w3: Web3, static_data: StaticData) -> TxReceipt:
         "from": static_data.env.BOT_ADDRESS,
         "nonce": w3.eth.get_transaction_count(static_data.env.BOT_ADDRESS),
     })
+    unsigned_tx.update({'gas': int(1.5 * unsigned_tx['gas'])})
     if static_data.env.PRIVATE_KEY == "":
         tx_hash = w3.eth.send_transaction(unsigned_tx)  # The account has already been unlocked in the fork
     else:
@@ -71,6 +72,7 @@ def invest_DAI(w3: Web3, static_data: StaticData) -> TxReceipt:
         "from": static_data.env.BOT_ADDRESS,
         "nonce": w3.eth.get_transaction_count(static_data.env.BOT_ADDRESS),
     })
+    unsigned_tx.update({'gas': int(1.5 * unsigned_tx['gas'])})
     if static_data.env.PRIVATE_KEY == "":
         tx_hash = w3.eth.send_transaction(unsigned_tx)  # The account has already been unlocked in the fork
     else:
@@ -89,6 +91,7 @@ def pay_interest(w3: Web3, static_data: StaticData, dynamic_data: DynamicData) -
         "from": static_data.env.BOT_ADDRESS,
         "nonce": w3.eth.get_transaction_count(static_data.env.BOT_ADDRESS),
     })
+    unsigned_tx.update({'gas': int(1.5 * unsigned_tx['gas'])})
     if static_data.env.PRIVATE_KEY == "":
         tx_hash = w3.eth.send_transaction(unsigned_tx)  # The account has already been unlocked in the fork
     else:

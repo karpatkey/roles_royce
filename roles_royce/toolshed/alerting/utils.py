@@ -82,9 +82,9 @@ def get_token_amounts_from_transfer_events(tx_receipt: TxReceipt, target_address
             transfers.append(transfer)
 
             if transfer['from'] == target_address:
-                message = message + f"  {target_address}  ----- {transfer['amount']:.3f} {token_symbol} ---->  {transfer['to']}."
+                message = message + f"  {target_address}  ----- {transfer['amount']:,.3f} {token_symbol} ---->  {transfer['to']}."
             else:
-                message = message + f"  {target_address}  <---- {transfer['amount']:.3f} {token_symbol} -----  {transfer['from']}."
+                message = message + f"  {target_address}  <---- {transfer['amount']:,.3f} {token_symbol} -----  {transfer['from']}."
             if element != transfers[-1]:
                 message = message + '\n\n'
 
