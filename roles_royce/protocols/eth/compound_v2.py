@@ -1,5 +1,5 @@
-from roles_royce.constants import StrEnum, ETHAddr
-from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApproveForToken
+from roles_royce.constants import ETHAddr, StrEnum
+from roles_royce.protocols.base import Address, AvatarAddress, BaseApproveForToken, ContractMethod
 
 
 class Ctoken(StrEnum):
@@ -55,6 +55,7 @@ class Mint(CtokenBaseMethod):
 
     Sender deposits a specified amount of underlying asset in exchange for cTokens
     """
+
     name = "mint"
 
     def __init__(self, ctoken: Ctoken, amount: int):
@@ -66,6 +67,7 @@ class Redeem(CtokenBaseMethod):
 
     It is called when MAX underlying amount is withdrawn
     """
+
     name = "redeem"
 
 
@@ -74,11 +76,13 @@ class RedeemUnderlying(CtokenBaseMethod):
 
     It is called when MAX underlying amount is withdrawn
     """
+
     name = "redeemUnderlying"
 
 
 class EnterMarkets(ContractMethod):
     """Set asset as collateral"""
+
     name = "enterMarkets"
     in_signature = [("ctokens", "address[]")]
     target_address = ETHAddr.COMPOUND_V2_Comptroller
@@ -90,6 +94,7 @@ class EnterMarkets(ContractMethod):
 
 class ExitMarket(ContractMethod):
     """Unset asset as collateral"""
+
     name = "exitMarkets"
     in_signature = [("ctoken", "address")]
     target_address = ETHAddr.COMPOUND_V2_Comptroller
@@ -101,16 +106,19 @@ class ExitMarket(ContractMethod):
 
 class Borrow(CtokenBaseMethod):
     """Borrow underlying asset amount."""
+
     name = "borrow"
 
 
 class Repay(CtokenBaseMethod):
     """Repay underlying asset amount."""
+
     name = "repayBorrow"
 
 
 class RepayETH(ContractMethod):
     """Repay ETH amount"""
+
     name = "repayBehalf"
     in_signature = [("borrower", "address")]
     target_address = ETHAddr.COMPOUND_V2_Maximillion
@@ -122,6 +130,7 @@ class RepayETH(ContractMethod):
 
 class ClaimCOMP(ContractMethod):
     """Claim COMP rewards."""
+
     name = "claimComp"
     in_signature = [("holder", "address"), ("ctokens", "address[]")]
     target_address = ETHAddr.COMPOUND_V2_Comptroller

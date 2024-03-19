@@ -1,26 +1,18 @@
-from roles_royce.protocols import uniswap_v3
-from defabipedia.types import Chain
-from tests.utils import (
-    local_node_eth,
-    accounts,
-    get_balance,
-    steal_token,
-    create_simple_safe,
-    top_up_address,
-)
-from tests.roles import setup_common_roles, deploy_roles, apply_presets
-from roles_royce import roles
-from defabipedia.uniswap_v3 import ContractSpecs
 from defabipedia.tokens import EthereumTokenAddr as ETHAddr
+from defabipedia.types import Chain
+from defabipedia.uniswap_v3 import ContractSpecs
 from pytest import approx
+
+from roles_royce import roles
+from roles_royce.protocols import uniswap_v3
+from tests.roles import apply_presets, deploy_roles, setup_common_roles
+from tests.utils import accounts, create_simple_safe, get_balance, local_node_eth, steal_token, top_up_address
 
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
 
 
 def test_approve_method():
-    method = uniswap_v3.ApproveForPositionsNFT(
-        blockchain=Chain.ETHEREUM, token=ETHAddr.USDC, amount=123
-    )
+    method = uniswap_v3.ApproveForPositionsNFT(blockchain=Chain.ETHEREUM, token=ETHAddr.USDC, amount=123)
     assert (
         method.data
         == "0x095ea7b3000000000000000000000000c36442b4a4522e871399cd717abdd847ab11fe88000000000000000000000000000000000000000000000000000000000000007b"
@@ -99,9 +91,7 @@ def test_collect():
 
 
 def test_unwrap_weth9():
-    method = uniswap_v3.UnwrapWETH9(
-        blockchain=Chain.ETHEREUM, avatar=AVATAR, amount_minimum=0
-    )
+    method = uniswap_v3.UnwrapWETH9(blockchain=Chain.ETHEREUM, avatar=AVATAR, amount_minimum=0)
     assert (
         method.data
         == "0x49404b7c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d"
@@ -109,9 +99,7 @@ def test_unwrap_weth9():
 
 
 def test_sweep_token():
-    method = uniswap_v3.SweepToken(
-        blockchain=Chain.ETHEREUM, avatar=AVATAR, amount_minimum=0, token=ETHAddr.USDC
-    )
+    method = uniswap_v3.SweepToken(blockchain=Chain.ETHEREUM, avatar=AVATAR, amount_minimum=0, token=ETHAddr.USDC)
     assert (
         method.data
         == "0xdf2ab5bb000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000000000000000000000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d"
@@ -206,8 +194,7 @@ def test_integration_eth(local_node_eth, accounts):
     nft_id = None
     for log in send_mint["logs"]:
         if (
-            log["topics"][0].hex()
-            == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f"
+            log["topics"][0].hex() == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f"
         ):  # IncreaseLiquidity
             nft_id = int(log["topics"][1].hex(), 16)
             break
@@ -298,9 +285,7 @@ def test_integration_eth(local_node_eth, accounts):
     )
 
     # unwrap weth9
-    unwrap_weth9 = uniswap_v3.UnwrapWETH9(
-        blockchain=Chain.ETHEREUM, avatar=safe.address, amount_minimum=0
-    )
+    unwrap_weth9 = uniswap_v3.UnwrapWETH9(blockchain=Chain.ETHEREUM, avatar=safe.address, amount_minimum=0)
 
     send_unwrap_weth9 = roles.send(
         [unwrap_weth9],
@@ -438,8 +423,7 @@ def test_integration_no_eth(local_node_eth, accounts):
     nft_id = None
     for log in send_mint["logs"]:
         if (
-            log["topics"][0].hex()
-            == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f"
+            log["topics"][0].hex() == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f"
         ):  # IncreaseLiquidity
             nft_id = int(log["topics"][1].hex(), 16)
             break

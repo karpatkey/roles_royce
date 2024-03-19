@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Protocol
+
 from web3 import Web3
 from web3.types import HexStr
+
 from .roles_modifier import Operation
 
 

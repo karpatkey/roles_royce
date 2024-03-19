@@ -1,12 +1,14 @@
 from decimal import Decimal
-from web3 import Web3
+
+from defabipedia.tokens import Abis as TokenAbis
+from defabipedia.tokens import EthereumTokenAddr as ETHAddr
+from defabipedia.types import Chain
+from defabipedia.uniswap_v3 import Abis, ContractSpecs
 from karpatkit.constants import Address as GenAddr
+from web3 import Web3
+
 from roles_royce.protocols.base import Address
 from roles_royce.protocols.uniswap_v3.types_and_enums import FeeAmount
-from defabipedia.uniswap_v3 import ContractSpecs, Abis
-from defabipedia.tokens import Abis as TokenAbis
-from defabipedia.types import Chain
-from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 
 
 def validate_tokens(token0: Address, token1: Address):
@@ -38,9 +40,7 @@ def validate_amounts(amount0_desired: float, amount1_desired: float) -> tuple:
     return amount0_desired, amount1_desired
 
 
-def validate_price_percentage_deviation(
-    token0_min_price_perc_dev: float, token0_max_price_perc_dev: float
-):
+def validate_price_percentage_deviation(token0_min_price_perc_dev: float, token0_max_price_perc_dev: float):
     if not 0 <= token0_min_price_perc_dev <= 100:
         raise ValueError("token0_min_percentage_deviation must be between 0 and 100")
 
@@ -61,14 +61,8 @@ def validate_removed_liquidity_percentage(removed_liquidity_percentage: float):
         raise ValueError("removed_liquidity_percentage must be between 0 and 100")
 
 
-def check_allowance(
-    w3: Web3, owner: Address, spender: Address, token: Address, amount: Decimal
-) -> bool:
-    allowance = (
-        w3.eth.contract(address=token, abi=TokenAbis.ERC20.abi)
-        .functions.allowance(owner, spender)
-        .call()
-    )
+def check_allowance(w3: Web3, owner: Address, spender: Address, token: Address, amount: Decimal) -> bool:
+    allowance = w3.eth.contract(address=token, abi=TokenAbis.ERC20.abi).functions.allowance(owner, spender).call()
     return allowance >= amount
 
 
@@ -91,26 +85,14 @@ class Pool:
         self.addr = factory.functions.getPool(token0, token1, self.fee).call()
         if self.addr == GenAddr.ZERO:
             raise ValueError("Pool does not exist")
-        self.pool_contract = w3.eth.contract(
-            address=self.addr, abi=Abis[blockchain].Pool.abi
-        )
+        self.pool_contract = w3.eth.contract(address=self.addr, abi=Abis[blockchain].Pool.abi)
         self.sqrt_price_x96, self.ic = self.pool_contract.functions.slot0().call()[0:2]
         self.sqrt_price = Decimal(self.sqrt_price_x96) / Decimal(2**96)
         self.token0 = self.pool_contract.functions.token0().call()
-        self.token0_decimals = (
-            w3.eth.contract(address=self.token0, abi=TokenAbis.ERC20.abi)
-            .functions.decimals()
-            .call()
-        )
+        self.token0_decimals = w3.eth.contract(address=self.token0, abi=TokenAbis.ERC20.abi).functions.decimals().call()
         self.token1 = self.pool_contract.functions.token1().call()
-        self.token1_decimals = (
-            w3.eth.contract(address=self.token1, abi=TokenAbis.ERC20.abi)
-            .functions.decimals()
-            .call()
-        )
-        self.price = (self.sqrt_price**2) / 10 ** (
-            self.token1_decimals - self.token0_decimals
-        )
+        self.token1_decimals = w3.eth.contract(address=self.token1, abi=TokenAbis.ERC20.abi).functions.decimals().call()
+        self.price = (self.sqrt_price**2) / 10 ** (self.token1_decimals - self.token0_decimals)
         self.tick_spacing = self.pool_contract.functions.tickSpacing().call()
 
 
@@ -184,15 +166,10 @@ def set_and_check_desired_amounts(
                 * 1.0001 ** (tick_upper / 2)
                 * (pool.sqrt_price_x96 - 1.0001 ** (tick_lower / 2) * (2**96))
             )
-        ) / Decimal(
-            (2**96) * (1.0001 ** (tick_upper / 2) * (2**96) - pool.sqrt_price_x96)
-        )
+        ) / Decimal((2**96) * (1.0001 ** (tick_upper / 2) * (2**96) - pool.sqrt_price_x96))
     elif amount1_desired:
         amount0_desired = Decimal(
-            amount1_desired
-            * Decimal(
-                (2**96) * (1.0001 ** (tick_upper / 2) * (2**96) - pool.sqrt_price_x96)
-            )
+            amount1_desired * Decimal((2**96) * (1.0001 ** (tick_upper / 2) * (2**96) - pool.sqrt_price_x96))
         ) / (
             Decimal(
                 pool.sqrt_price_x96
@@ -211,19 +188,11 @@ def set_and_check_desired_amounts(
             if amount1_desired > w3.eth.get_balance(owner):
                 raise ValueError("Not enough ETH balance")
     else:
-        token0_balance = (
-            w3.eth.contract(address=pool.token0, abi=TokenAbis.ERC20.abi)
-            .functions.balanceOf(owner)
-            .call()
-        )
+        token0_balance = w3.eth.contract(address=pool.token0, abi=TokenAbis.ERC20.abi).functions.balanceOf(owner).call()
         if amount0_desired > token0_balance:
             raise ValueError("Not enough token0 balance")
 
-        token1_balance = (
-            w3.eth.contract(address=pool.token1, abi=TokenAbis.ERC20.abi)
-            .functions.balanceOf(owner)
-            .call()
-        )
+        token1_balance = w3.eth.contract(address=pool.token1, abi=TokenAbis.ERC20.abi).functions.balanceOf(owner).call()
         if amount1_desired > token1_balance:
             raise ValueError("Not enough token1 balance")
 

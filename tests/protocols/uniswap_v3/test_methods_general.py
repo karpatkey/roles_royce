@@ -1,17 +1,11 @@
-from pytest import approx
-from karpatkit.constants import Address as GenAddr
-from roles_royce.protocols import uniswap_v3
-from roles_royce import roles
-from tests.utils import (
-    local_node_eth,
-    accounts,
-    get_balance,
-    steal_token,
-    create_simple_safe,
-    top_up_address,
-)
-from tests.roles import setup_common_roles, deploy_roles, apply_presets
 from defabipedia.tokens import EthereumTokenAddr as ETHAddr
+from karpatkit.constants import Address as GenAddr
+from pytest import approx
+
+from roles_royce import roles
+from roles_royce.protocols import uniswap_v3
+from tests.roles import apply_presets, deploy_roles, setup_common_roles
+from tests.utils import accounts, create_simple_safe, get_balance, local_node_eth, steal_token, top_up_address
 
 
 def test_integration(local_node_eth, accounts):
@@ -78,8 +72,7 @@ def test_integration(local_node_eth, accounts):
     nft_id = None
     for log in mint_ntf_send["logs"]:
         if (
-            log["topics"][0].hex()
-            == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f"
+            log["topics"][0].hex() == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f"
         ):  # IncreaseLiquidity
             nft_id = int(log["topics"][1].hex(), 16)
             break

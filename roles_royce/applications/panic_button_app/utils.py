@@ -16,6 +16,7 @@ from roles_royce.constants import StrEnum
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address, ContractMethod
 from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler, LidoDisassembler
+from roles_royce.utils import to_checksum_address
 
 
 class Modes(StrEnum):
@@ -35,6 +36,7 @@ def custom_config(variable, default, cast):
 class ENV:
     DAO: str
     BLOCKCHAIN: str
+    LOCAL_FORK_URL: str | None = None
 
     TENDERLY_ACCOUNT_ID: str = field(init=False)
     TENDERLY_PROJECT: str = field(init=False)
@@ -63,7 +65,13 @@ class ENV:
         self.TENDERLY_API_TOKEN: str = config("TENDERLY_API_TOKEN", default="")
 
         # DAO and blockchain
-        if self.DAO not in ["GnosisDAO", "GnosisLtd", "karpatkey", "ENS", "BalancerDAO"]:
+        if self.DAO not in [
+            "GnosisDAO",
+            "GnosisLtd",
+            "karpatkey",
+            "ENS",
+            "BalancerDAO",
+        ]:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
         if self.BLOCKCHAIN.lower() not in ["mainnet", "ethereum", "gnosis"]:
             raise ValueError(f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}. Options are either 'ethereum' or 'gnosis'.")
@@ -78,20 +86,30 @@ class ENV:
 
         # Configuration addresses and key
         self.AVATAR_SAFE_ADDRESS: Address = config(
-            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_AVATAR_SAFE_ADDRESS", default=""
+            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_AVATAR_SAFE_ADDRESS",
+            default="",
         )
         self.ROLES_MOD_ADDRESS: Address = config(
-            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLES_MOD_ADDRESS", default=""
+            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLES_MOD_ADDRESS",
+            default="",
         )
-        self.ROLE: int = config(self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLE", cast=int, default=0)
-        self.PRIVATE_KEY: str = config(self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_PRIVATE_KEY", default="")
-        self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
-        self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
+        self.ROLE: int = config(
+            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLE",
+            cast=int,
+            default=0,
+        )
+        self.PRIVATE_KEY: str = config(
+            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_PRIVATE_KEY",
+            default="",
+        )
+        self.AVATAR_SAFE_ADDRESS = to_checksum_address(self.AVATAR_SAFE_ADDRESS)
+        self.ROLES_MOD_ADDRESS = to_checksum_address(self.ROLES_MOD_ADDRESS)
         if self.PRIVATE_KEY != "":
             self.DISASSEMBLER_ADDRESS = Account.from_key(self.PRIVATE_KEY).address
         else:
             self.DISASSEMBLER_ADDRESS = config(
-                self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_DISASSEMBLER_ADDRESS", default=""
+                self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_DISASSEMBLER_ADDRESS",
+                default="",
             )
 
         # Environment mode: development or production
@@ -110,7 +128,9 @@ class ENV:
         else:
             self.LOCAL_FORK_PORT = None
         self.LOCAL_FORK_HOST: str = custom_config(
-            "LOCAL_FORK_HOST" + "_" + self.BLOCKCHAIN.upper(), default="localhost", cast=str
+            "LOCAL_FORK_HOST" + "_" + self.BLOCKCHAIN.upper(),
+            default="localhost",
+            cast=str,
         )
 
         self.SLACK_WEBHOOK_URL: str = config("SLACK_WEBHOOK_URL", default="")
@@ -134,7 +154,7 @@ class ExecConfig:
 
 def start_the_engine(env: ENV) -> (Web3, Web3):
     if env.MODE == Modes.DEVELOPMENT:
-        w3 = Web3(Web3.HTTPProvider(f"http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}"))
+        w3 = Web3(Web3.HTTPProvider(env.LOCAL_FORK_URL or f"http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}"))
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
         top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)
         w3_MEV = w3
@@ -268,11 +288,12 @@ def fork_reset_state(w3: Web3, url: str, block: int | str = "latest"):
             raise ValueError(f"Block number {block} is greater than the latest block {latest_block}")
     return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
 
+
 # -----------------------------------------------------------------------------------------------------------------------
 
 
-def recovery_mode_balancer(w3, bpt_address: str, exit_strategy: str):
-    blockchain = Chain.get_blockchain_from_web3(w3)
+def recovery_mode_balancer(w3, bpt_address: str, exit_strategy: str, blockchain=None):
+    blockchain = blockchain or Chain.get_blockchain_from_web3(w3)
     try:
         bpt_contract = w3.eth.contract(address=bpt_address, abi=BalancerAbis[blockchain].UniversalBPT.abi)
         bpt_pool_recovery_mode = bpt_contract.functions.inRecoveryMode().call()

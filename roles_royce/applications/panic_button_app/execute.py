@@ -5,9 +5,8 @@ from roles_royce.applications.panic_button_app.utils import ENV, fork_reset_stat
 from roles_royce.roles_modifier import GasStrategies, set_gas_strategy, update_gas_fees_parameters_and_nonce
 
 
-def execute(dao, blockchain, transaction):
+def execute_env(env, transaction):
     try:
-        env = ENV(DAO=dao, BLOCKCHAIN=blockchain)
         w3, w3_MEV = start_the_engine(env)
 
         set_gas_strategy(GasStrategies.AGGRESIVE)
@@ -19,8 +18,16 @@ def execute(dao, blockchain, transaction):
         else:  # In development environment, send the transaction to the local fork with the unlocked account
             tx_hash = w3.eth.send_transaction(tx)
             w3.eth.wait_for_transaction_receipt(tx_hash)
-            #fork_reset_state(w3, w3.manager.provider.endpoint_uri)
+            # fork_reset_state(w3, w3.manager.provider.endpoint_uri)
         return {"status": 200, "tx_hash": tx_hash.hex()}
+    except Exception as e:
+        return {"status": 500, "message": f"Error: {e}"}
+
+
+def execute(dao, blockchain, transaction):
+    try:
+        env = ENV(DAO=dao, BLOCKCHAIN=blockchain)
+        return execute_env(env, transaction)
     except Exception as e:
         return {"status": 500, "message": f"Error: {e}"}
 

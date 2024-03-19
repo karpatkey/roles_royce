@@ -5,7 +5,7 @@ class StrEnum(str, Enum):
     def __new__(cls, value):
         # values must already be of type `str`
         if not isinstance(value, str):
-            raise TypeError('%r is not a string' % (value,))
+            raise TypeError("%r is not a string" % (value,))
         value = str(value)
         member = str.__new__(cls, value)
         member._value_ = value
@@ -62,7 +62,7 @@ class ETHAddr(StrEnum):
     USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
     USDT = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
     unstETH = "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
-    rETH = '0xae78736Cd615f374D3085123A210448E74Fc6393'
+    rETH = "0xae78736Cd615f374D3085123A210448E74Fc6393"
     WBTC = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
     LINK = "0x514910771AF9Ca656af840dff83E8264EcF986CA"
 
@@ -70,5 +70,3 @@ class ETHAddr(StrEnum):
 class GCAddr(StrEnum):
     USDT = "0x4ECaBa5870353805a9F068101A40E0f32ed605C6"
     CowSwapSigner = "0xe522f854b978650dc838ade0e39fbc1417a2ffb0"
-
-

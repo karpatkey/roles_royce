@@ -1,9 +1,12 @@
 import logging
-from .generic_method import GenericMethodTransaction, Transactable
-from .roles_modifier import Operation
+
 from defabipedia.types import Chain
 
+from .generic_method import GenericMethodTransaction, Transactable
+from .roles_modifier import Operation
+
 logging.getLogger(__name__).addHandler(logging.NullHandler())
+
 
 def add_stderr_logger(level: int = logging.DEBUG) -> logging.StreamHandler:
     """Helper for quickly adding a StreamHandler to the logger. Useful for
