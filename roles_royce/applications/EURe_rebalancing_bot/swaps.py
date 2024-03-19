@@ -10,6 +10,7 @@ from web3.types import TxReceipt
 from roles_royce import roles
 from roles_royce.applications.EURe_rebalancing_bot.addresses_and_abis import AddressesAndAbis
 from roles_royce.protocols.base import Address, ContractMethod
+from roles_royce.utils import to_checksum_address
 
 decimalsEURe = 18
 decimalsWXDAI = 18

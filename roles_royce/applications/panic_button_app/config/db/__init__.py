@@ -6,6 +6,8 @@ from defabipedia.types import Chain
 from web3 import Web3
 from web3.types import Address
 
+from roles_royce.utils import to_checksum_address
+
 
 def update_aura_db(w3: Web3) -> list[dict]:
     """
