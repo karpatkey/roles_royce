@@ -140,8 +140,8 @@ class Swapper:
         max_slippage: float,
     ):
         self.w3 = w3
-        self.avatar_safe_address = Web3.to_checksum_address(avatar_safe_address)
-        self.roles_mod_address = Web3.to_checksum_address(roles_mod_address)
+        self.avatar_safe_address = to_checksum_address(avatar_safe_address)
+        self.roles_mod_address = to_checksum_address(roles_mod_address)
         self.role = role
         self.private_keys = private_keys
         self.max_slippage = max_slippage

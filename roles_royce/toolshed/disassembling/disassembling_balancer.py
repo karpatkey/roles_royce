@@ -9,6 +9,7 @@ from roles_royce.generic_method import Transactable
 from roles_royce.protocols import balancer
 from roles_royce.protocols.base import Address
 from roles_royce.toolshed.disassembling.disassembler import Disassembler, validate_percentage
+from roles_royce.utils import to_checksum_address
 
 
 class Exit11ArgumentElement(TypedDict):
@@ -79,7 +80,7 @@ class BalancerDisassembler(Disassembler):
         txns = []
 
         for element in exit_arguments:
-            bpt_address = Web3.to_checksum_address(element["bpt_address"])
+            bpt_address = to_checksum_address(element["bpt_address"])
             max_slippage = element["max_slippage"] / 100
 
             bpt_contract = self.w3.eth.contract(address=bpt_address, abi=Abis[self.blockchain].UniversalBPT.abi)
@@ -141,9 +142,9 @@ class BalancerDisassembler(Disassembler):
         txns = []
 
         for element in exit_arguments:
-            bpt_address = Web3.to_checksum_address(element["bpt_address"])
+            bpt_address = to_checksum_address(element["bpt_address"])
             max_slippage = element["max_slippage"] / 100
-            token_out_address = Web3.to_checksum_address(element["token_out_address"])
+            token_out_address = to_checksum_address(element["token_out_address"])
 
             bpt_contract = self.w3.eth.contract(address=bpt_address, abi=Abis[self.blockchain].UniversalBPT.abi)
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
@@ -197,7 +198,7 @@ class BalancerDisassembler(Disassembler):
 
         txns = []
         for element in exit_arguments:
-            bpt_address = Web3.to_checksum_address(element["bpt_address"])
+            bpt_address = to_checksum_address(element["bpt_address"])
 
             bpt_contract = self.w3.eth.contract(address=bpt_address, abi=Abis[self.blockchain].UniversalBPT.abi)
 
@@ -249,7 +250,7 @@ class BalancerDisassembler(Disassembler):
 
         txns = []
         for element in exit_arguments:
-            gauge_address = Web3.to_checksum_address(element["gauge_address"])
+            gauge_address = to_checksum_address(element["gauge_address"])
             max_slippage = element["max_slippage"] / 100
 
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
@@ -303,8 +304,8 @@ class BalancerDisassembler(Disassembler):
 
         txns = []
         for element in exit_arguments:
-            gauge_address = Web3.to_checksum_address(element["gauge_address"])
-            token_out_address = Web3.to_checksum_address(element["token_out_address"])
+            gauge_address = to_checksum_address(element["gauge_address"])
+            token_out_address = to_checksum_address(element["token_out_address"])
 
             max_slippage = element["max_slippage"] / 100
 
@@ -355,7 +356,7 @@ class BalancerDisassembler(Disassembler):
 
         txns = []
         for element in exit_arguments:
-            gauge_address = Web3.to_checksum_address(element["gauge_address"])
+            gauge_address = to_checksum_address(element["gauge_address"])
 
             if amount_to_redeem is None:  # The amount to redeem might be calculated in a previous step
                 amount_to_redeem = self.get_bpt_amount_to_redeem_from_gauge(gauge_address, fraction)

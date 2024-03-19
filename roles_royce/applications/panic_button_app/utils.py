@@ -16,6 +16,7 @@ from roles_royce.constants import StrEnum
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address, ContractMethod
 from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler, LidoDisassembler
+from roles_royce.utils import to_checksum_address
 
 
 class Modes(StrEnum):
@@ -101,8 +102,8 @@ class ENV:
             self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_PRIVATE_KEY",
             default="",
         )
-        self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
-        self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
+        self.AVATAR_SAFE_ADDRESS = to_checksum_address(self.AVATAR_SAFE_ADDRESS)
+        self.ROLES_MOD_ADDRESS = to_checksum_address(self.ROLES_MOD_ADDRESS)
         if self.PRIVATE_KEY != "":
             self.DISASSEMBLER_ADDRESS = Account.from_key(self.PRIVATE_KEY).address
         else:

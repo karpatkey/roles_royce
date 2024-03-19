@@ -5,7 +5,7 @@ from web3 import Web3
 
 from roles_royce.evm_utils import roles_abi, roles_bytecode
 from roles_royce.generic_method import TxData
-from roles_royce.utils import MULTISENDS
+from roles_royce.utils import MULTISENDS, to_checksum_address
 
 from .utils import TEST_ACCOUNTS, SimpleSafe
 
@@ -17,7 +17,7 @@ def deploy_roles(w3: Web3, avatar):
 
     ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
 
-    owner = avatar = target = w3.to_checksum_address(avatar)
+    owner = avatar = target = to_checksum_address(avatar)
     tx_hash = ctract.constructor(owner, avatar, target).transact({"from": avatar})  # deploy!
     roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5).contractAddress
 
