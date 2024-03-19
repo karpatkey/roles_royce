@@ -107,8 +107,8 @@ class ENV:
             self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_PRIVATE_KEY",
             default="",
         )
-        self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
-        self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
+        self.AVATAR_SAFE_ADDRESS = to_checksum_address(self.AVATAR_SAFE_ADDRESS)
+        self.ROLES_MOD_ADDRESS = to_checksum_address(self.ROLES_MOD_ADDRESS)
         if self.PRIVATE_KEY != "":
             self.DISASSEMBLER_ADDRESS = Account.from_key(self.PRIVATE_KEY).address
         else:

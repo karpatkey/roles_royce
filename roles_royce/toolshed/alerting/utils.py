@@ -12,6 +12,7 @@ from web3.contract import Contract
 from web3.types import Address, ChecksumAddress, TxReceipt
 
 from roles_royce.evm_utils import erc20_abi
+from roles_royce.utils import to_checksum_address
 
 
 @dataclass
@@ -72,8 +73,8 @@ def get_token_amounts_from_transfer_events(
         if event.name == "Transfer" and (
             event.values["to"] == target_address or event.values["from"] == target_address
         ):
-            token_address = Web3.to_checksum_address(address)
-            target_address = Web3.to_checksum_address(target_address)
+            token_address = to_checksum_address(address)
+            target_address = to_checksum_address(target_address)
             token_contract = w3.eth.contract(address=token_address, abi=erc20_abi)
             a = w3.eth.block_number
             token_decimals = token_contract.functions.decimals().call()

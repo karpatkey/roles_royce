@@ -75,7 +75,7 @@ def update_gauge_db(w3: Web3) -> list[dict]:
 
     logs = event_filter.get_all_entries()
     result = []
-    decoded_addresses = [Web3.to_checksum_address((f"0x{log['topics'][1].hex()[-40:]}")) for log in logs]
+    decoded_addresses = [to_checksum_address((f"0x{log['topics'][1].hex()[-40:]}")) for log in logs]
 
     for address in decoded_addresses:
         gauge_contr = w3.eth.contract(address=address, abi=balancer.Abis[blockchain].Gauge.abi)

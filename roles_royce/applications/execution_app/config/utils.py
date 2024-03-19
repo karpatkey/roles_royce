@@ -8,6 +8,7 @@ from web3 import Web3
 from web3.types import Address
 
 from roles_royce.protocols.balancer.utils import Pool, PoolKind
+from roles_royce.utils import to_checksum_address
 
 
 def get_aura_gauge_from_bpt(w3: Web3, bpt_address: Address) -> Address:
@@ -27,7 +28,7 @@ def get_aura_gauge_from_bpt(w3: Web3, bpt_address: Address) -> Address:
     ) as f:
         aura_db = json.load(f)
     for item in aura_db:
-        if Web3.to_checksum_address(item.get("bpt_address")) == bpt_address:
+        if to_checksum_address(item.get("bpt_address")) == bpt_address:
             aura_address = item.get("aura_address")
             return aura_address
 
@@ -84,7 +85,7 @@ def get_gauge_address_from_bpt(w3: Web3, bpt_address: Address) -> Address:
         ) as f:
             gauge_db = json.load(f)
         for item in gauge_db:
-            if Web3.to_checksum_address(item.get("bpt_address")) == bpt_address:
+            if to_checksum_address(item.get("bpt_address")) == bpt_address:
                 gauge_address = item.get("gauge_address")
                 return gauge_address
 
