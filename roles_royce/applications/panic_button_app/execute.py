@@ -19,7 +19,7 @@ def execute(dao, blockchain, transaction):
         else:  # In development environment, send the transaction to the local fork with the unlocked account
             tx_hash = w3.eth.send_transaction(tx)
             w3.eth.wait_for_transaction_receipt(tx_hash)
-            #fork_reset_state(w3, w3.manager.provider.endpoint_uri)
+            # fork_reset_state(w3, w3.manager.provider.endpoint_uri)
         return {"status": 200, "tx_hash": tx_hash.hex()}
     except Exception as e:
         return {"status": 500, "message": f"Error: {e}"}

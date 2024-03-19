@@ -1,13 +1,15 @@
 import logging
-from typing import List
-from eth_abi import abi
-from web3 import Web3
-import requests
-from gnosis.safe.multi_send import MultiSend, MultiSendOperation, MultiSendTx
-from roles_royce.roles_modifier import Operation
-from defabipedia.types import Blockchain, Chain
-from roles_royce.generic_method import Transactable, TxData
 from dataclasses import dataclass
+from typing import List
+
+import requests
+from defabipedia.types import Blockchain, Chain
+from eth_abi import abi
+from gnosis.safe.multi_send import MultiSend, MultiSendOperation, MultiSendTx
+from web3 import Web3
+
+from roles_royce.generic_method import Transactable, TxData
+from roles_royce.roles_modifier import Operation
 
 TENDERLY_API_URL = "https://api.tenderly.co/api/v1/"
 TENDERLY_DASHBOARD_URL = "https://dashboard.tenderly.co/"
@@ -28,23 +30,24 @@ class TenderlyCredentials:
     api_token: str
 
 
-def tenderly_simulate(tenderly_credentials: TenderlyCredentials,
-                      block_number: int,
-                      from_addr: str,
-                      to_addr: str,
-                      calldata: str,
-                      gas: int,
-                      save: bool = True,
-                      save_if_fails: bool = True,
-                      gas_price: int | None = None,
-                      value: int = 0,
-                      network_id: str = "1",
-                      transaction_index: int = 0,
-                      access_list: list | None = None,
-                      sim_type: str = "full",
-                      block_header: dict | None = None,
-                      state_objects: dict | None = None
-                      ) -> dict:
+def tenderly_simulate(
+    tenderly_credentials: TenderlyCredentials,
+    block_number: int,
+    from_addr: str,
+    to_addr: str,
+    calldata: str,
+    gas: int,
+    save: bool = True,
+    save_if_fails: bool = True,
+    gas_price: int | None = None,
+    value: int = 0,
+    network_id: str = "1",
+    transaction_index: int = 0,
+    access_list: list | None = None,
+    sim_type: str = "full",
+    block_header: dict | None = None,
+    state_objects: dict | None = None,
+) -> dict:
     """Simulate a transaction using the Tenderly Simulation API.
 
     Check the docs at https://docs.tenderly.co/simulations-and-forks/reference/tenderly-simulation-api
@@ -73,7 +76,9 @@ def tenderly_simulate(tenderly_credentials: TenderlyCredentials,
     Returns:
         Simulation data dictionary as returned by Tenderly
     """
-    url = TENDERLY_API_URL + f"account/{tenderly_credentials.account_id}/project/{tenderly_credentials.project}/simulate"
+    url = (
+        TENDERLY_API_URL + f"account/{tenderly_credentials.account_id}/project/{tenderly_credentials.project}/simulate"
+    )
     headers = {"X-Access-Key": tenderly_credentials.api_token}
     data = {
         "network_id": network_id,
@@ -103,8 +108,14 @@ def tenderly_simulate(tenderly_credentials: TenderlyCredentials,
     return data
 
 
-def simulate_tx(tx: dict, block: int, tenderly_credentials: TenderlyCredentials, sim_type: str = 'full',
-                share: bool = False, **kwargs) -> dict:
+def simulate_tx(
+    tx: dict,
+    block: int,
+    tenderly_credentials: TenderlyCredentials,
+    sim_type: str = "full",
+    share: bool = False,
+    **kwargs,
+) -> dict:
     """Helper function to simulate an already built transaction
 
     Args:
@@ -119,27 +130,27 @@ def simulate_tx(tx: dict, block: int, tenderly_credentials: TenderlyCredentials,
     Returns:
         Return the simulation data.
     """
-    sim_data = tenderly_simulate(tenderly_credentials=tenderly_credentials,
-                                 from_addr=tx['from'],
-                                 to_addr=tx['to'],
-                                 value=tx['value'],
-                                 network_id=str(tx['chainId']),
-                                 gas=tx['gas'],
-                                 calldata=tx['data'],
-                                 block_number=block,
-                                 sim_type=sim_type,
-                                 **kwargs,
-                                 )
+    sim_data = tenderly_simulate(
+        tenderly_credentials=tenderly_credentials,
+        from_addr=tx["from"],
+        to_addr=tx["to"],
+        value=tx["value"],
+        network_id=str(tx["chainId"]),
+        gas=tx["gas"],
+        calldata=tx["data"],
+        block_number=block,
+        sim_type=sim_type,
+        **kwargs,
+    )
     if share:
-        url = tenderly_share_simulation(tenderly_credentials=tenderly_credentials,
-                                        simulation_id=sim_data['simulation']['id'])
-        sim_data['share_url'] = url
+        url = tenderly_share_simulation(
+            tenderly_credentials=tenderly_credentials, simulation_id=sim_data["simulation"]["id"]
+        )
+        sim_data["share_url"] = url
     return sim_data
 
 
-def tenderly_share_simulation(tenderly_credentials: TenderlyCredentials,
-                              simulation_id: str,
-                              share=True):
+def tenderly_share_simulation(tenderly_credentials: TenderlyCredentials, simulation_id: str, share=True):
     """Publicly share a simulation.
 
     Args:
@@ -147,7 +158,10 @@ def tenderly_share_simulation(tenderly_credentials: TenderlyCredentials,
         simulation_id (str): Get it from the simulated data 'id' field.
         share (bool): Use False to unshare a shared simulation.
     """
-    url = TENDERLY_API_URL + f"account/{tenderly_credentials.account_id}/project/{tenderly_credentials.project}/simulations/{simulation_id}/"
+    url = (
+        TENDERLY_API_URL
+        + f"account/{tenderly_credentials.account_id}/project/{tenderly_credentials.project}/simulations/{simulation_id}/"
+    )
     url += "share" if share else "unshare"
     headers = {"X-Access-Key": tenderly_credentials.api_token}
     response = requests.post(url=url, headers=headers)
