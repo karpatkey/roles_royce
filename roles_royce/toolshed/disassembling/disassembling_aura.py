@@ -8,6 +8,7 @@ from web3.types import ChecksumAddress
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.eth import aura
 from roles_royce.toolshed.disassembling import BalancerDisassembler, Disassembler, validate_percentage
+from roles_royce.utils import to_checksum_address
 
 
 class Exit1ArgumentElement(TypedDict):
@@ -58,7 +59,7 @@ class AuraDisassembler(Disassembler):
         txns = []
 
         for element in exit_arguments:
-            aura_rewards_address = Web3.to_checksum_address(element["rewards_address"])
+            aura_rewards_address = to_checksum_address(element["rewards_address"])
 
             bpt_address, amount_to_redeem = self.aura_contracts_helper(
                 aura_rewards_address=aura_rewards_address, fraction=fraction
@@ -95,7 +96,7 @@ class AuraDisassembler(Disassembler):
         txns = []
 
         for element in exit_arguments:
-            aura_rewards_address = Web3.to_checksum_address(element["rewards_address"])
+            aura_rewards_address = to_checksum_address(element["rewards_address"])
             max_slippage = element["max_slippage"]
 
             bpt_address, amount_to_redeem = self.aura_contracts_helper(
@@ -153,9 +154,9 @@ class AuraDisassembler(Disassembler):
         txns = []
 
         for element in exit_arguments:
-            aura_rewards_address = Web3.to_checksum_address(element["rewards_address"])
+            aura_rewards_address = to_checksum_address(element["rewards_address"])
             max_slippage = element["max_slippage"]
-            token_out_address = Web3.to_checksum_address(element["token_out_address"])
+            token_out_address = to_checksum_address(element["token_out_address"])
 
             bpt_address, amount_to_redeem = self.aura_contracts_helper(
                 aura_rewards_address=aura_rewards_address, fraction=fraction
@@ -212,7 +213,7 @@ class AuraDisassembler(Disassembler):
         txns = []
 
         for element in exit_arguments:
-            aura_rewards_address = Web3.to_checksum_address(element[0]["value"])
+            aura_rewards_address = to_checksum_address(element[0]["value"])
 
             bpt_address, amount_to_redeem = self.aura_contracts_helper(
                 aura_rewards_address=aura_rewards_address, fraction=fraction
