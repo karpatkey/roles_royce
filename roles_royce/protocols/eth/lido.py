@@ -1,38 +1,48 @@
-from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApprove
 from defabipedia.cowswap_signer import ContractSpecs as CowswapSignerContractSpecs
 from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 from defabipedia.types import Chain
 
+from roles_royce.protocols.base import Address, AvatarAddress, BaseApprove, ContractMethod
+
+
 class ApproveRelayerStETH(BaseApprove):
     """approve relayer to spend stETH"""
+
     fixed_arguments = {"spender": CowswapSignerContractSpecs[Chain.ETHEREUM].CowswapRelayer.address}
     token = ETHAddr.stETH
 
+
 class ApproveRelayerWstETH(BaseApprove):
     """approve relayer to spend wstETH"""
+
     fixed_arguments = {"spender": CowswapSignerContractSpecs[Chain.ETHEREUM].CowswapRelayer.address}
     token = ETHAddr.wstETH
 
+
 class ApproveWithdrawalStETHwithWstETH(BaseApprove):
     """approve stETH withdrawal with wstETH as spender"""
+
     fixed_arguments = {"spender": ETHAddr.wstETH}
     token = ETHAddr.stETH
 
 
 class ApproveWithdrawalStETHWithUnstETH(BaseApprove):
     """approve stETH withdrawal with unstETH as spender"""
+
     fixed_arguments = {"spender": ETHAddr.unstETH}
     token = ETHAddr.stETH
 
 
 class ApproveWithdrawalWstETH(BaseApprove):
     """approve wstETH withdrawal with unstETH as spender"""
+
     fixed_arguments = {"spender": ETHAddr.unstETH}
     token = ETHAddr.wstETH
 
 
 class Deposit(ContractMethod):
     """sender deposits ETH and receives stETH"""
+
     name = "submit"
     in_signature = [("referral", "address")]
     fixed_arguments = {"referral": ETHAddr.ZERO}
@@ -59,6 +69,7 @@ class Wrap(ContractMethod):
 
 class Unwrap(ContractMethod):
     """Sender redeems wstETH and receives stETH."""
+
     name = "unwrap"
     in_signature = [("amount", "uint256")]
     target_address = ETHAddr.wstETH
@@ -74,6 +85,7 @@ class RequestWithdrawalsStETH(ContractMethod):
 
     Locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue
     """
+
     name = "requestWithdrawals"
     in_signature = [("amounts", "uint256[]"), ("owner", "address")]
     fixed_arguments = {"owner": AvatarAddress}
@@ -86,22 +98,19 @@ class RequestWithdrawalsStETH(ContractMethod):
 
 # TODO: the amounts is a list, because it has a max of 1000 stETH per element, should built that in
 
+
 class RequestWithdrawalsWithPermitStETH(ContractMethod):
     """Sender requests a claim on his ETH from wstETH.
 
     When the unstETH has no allowance over the owner's stETH locks your stETH in the queue.
     In exchange, you receive an NFT that represents your position in the queue
     """
+
     name = "requestWithdrawalsWithPermit"
     in_signature = [
         ("amounts", "uint256[]"),
         ("owner", "address"),
-        ("permit",
-         ("value", "uint256"),
-         ("deadline", "uint256"),
-         ("v", "uint8"),
-         ("r", "bytes32"),
-         ("s", "bytes32"))
+        ("permit", ("value", "uint256"), ("deadline", "uint256"), ("v", "uint8"), ("r", "bytes32"), ("s", "bytes32")),
     ]
     fixed_arguments = {"owner": AvatarAddress}
     target_address = ETHAddr.unstETH
@@ -116,6 +125,7 @@ class RequestWithdrawalsWstETH(RequestWithdrawalsStETH):
 
     Then it locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue
     """
+
     name = "requestWithdrawalsWstETH"
 
 
@@ -124,6 +134,7 @@ class RequestWithdrawalsWithPermitWstETH(RequestWithdrawalsWithPermitStETH):
 
     Then it locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue
     """
+
     name = "requestWithdrawalsWithPermitWstETH"
 
 
@@ -144,6 +155,7 @@ class ClaimWithdrawal(ContractMethod):
     Once the request is finalized by the oracle report and becomes claimable,
     this function claims your ether and burns the NFT.
     """
+
     name = "claimWithdrawals"
     in_signature = [("request_id", "uint256")]
     target_address = ETHAddr.unstETH
@@ -155,6 +167,7 @@ class ClaimWithdrawal(ContractMethod):
 
 class ClaimWithdrawals(ContractMethod):
     """sender wants to claim his ETH in batches or optimize on hint search"""
+
     name = "claimWithdrawals"
     in_signature = [("request_ids", "uint256[]"), ("hints", "uint256[]")]
     target_address = ETHAddr.unstETH
@@ -169,16 +182,20 @@ class GetWithdrawalStatus(ContractMethod):
     name = "getWithdrawalStatus"
     in_signature = [("request_ids", "uint256[]")]
     out_signature = [
-        ("statuses", [
-            (  # an array of structs
-                ("amount_of_stETH", "uint256"),
-                ("amount_of_shares", "uint256"),
-                ("owner", "address"),
-                ("timestamp", "uint256"),
-                ("is_finalized", "bool"),
-                ("is_claimed", "bool"),
-            ), "tuple[]"]
-         )
+        (
+            "statuses",
+            [
+                (  # an array of structs
+                    ("amount_of_stETH", "uint256"),
+                    ("amount_of_shares", "uint256"),
+                    ("owner", "address"),
+                    ("timestamp", "uint256"),
+                    ("is_finalized", "bool"),
+                    ("is_claimed", "bool"),
+                ),
+                "tuple[]",
+            ],
+        )
     ]
     target_address = ETHAddr.unstETH
 

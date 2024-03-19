@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
-from web3.types import Address, ChecksumAddress, TxReceipt, TxParams
-from web3 import Web3
+
 from defabipedia.types import Blockchain, Chain
+from web3 import Web3
+from web3.types import Address, ChecksumAddress, TxParams, TxReceipt
+
 from roles_royce import roles
 from roles_royce.generic_method import Transactable
 
@@ -16,7 +18,6 @@ class Disassembler:
     signer_address: Address | ChecksumAddress | str | None = None
 
     def __post_init__(self):
-
         self.avatar_safe_address = Web3.to_checksum_address(self.avatar_safe_address)
         self.roles_mod_address = Web3.to_checksum_address(self.roles_mod_address)
         self.blockchain = Chain.get_blockchain_from_web3(self.w3)
@@ -35,13 +36,16 @@ class Disassembler:
         """
         if w3 is None:
             w3 = self.w3
-        return roles.send(txns,
-                          role=self.role,
-                          private_key=private_key,
-                          roles_mod_address=self.roles_mod_address,
-                          web3=w3)
+        return roles.send(
+            txns, role=self.role, private_key=private_key, roles_mod_address=self.roles_mod_address, web3=w3
+        )
 
-    def check(self, txns: list[Transactable], block: int | str = 'latest', from_address: Address | ChecksumAddress | str | None = None) -> bool:
+    def check(
+        self,
+        txns: list[Transactable],
+        block: int | str = "latest",
+        from_address: Address | ChecksumAddress | str | None = None,
+    ) -> bool:
         """Checks whether the multisend batched transaction built from the transactables is successfully executed with static call.
 
         Args:
@@ -57,12 +61,9 @@ class Disassembler:
             account = self.signer_address
         else:
             raise ValueError("Either from_address or self.signer_address must be provided.")
-        return roles.check(txns,
-                           role=self.role,
-                           account=account,
-                           roles_mod_address=self.roles_mod_address,
-                           web3=self.w3,
-                           block=block)
+        return roles.check(
+            txns, role=self.role, account=account, roles_mod_address=self.roles_mod_address, web3=self.w3, block=block
+        )
 
     def build(self, txns: list[Transactable], from_address: Address | ChecksumAddress | str | None = None) -> TxParams:
         """Builds a multisend batched transaction from the transactables.
@@ -79,15 +80,13 @@ class Disassembler:
             account = self.signer_address
         else:
             raise ValueError("Either from_address or self.signer_address must be provided.")
-        return roles.build(txns,
-                           role=self.role,
-                           account=account,
-                           roles_mod_address=self.roles_mod_address,
-                           web3=self.w3)
+        return roles.build(
+            txns, role=self.role, account=account, roles_mod_address=self.roles_mod_address, web3=self.w3
+        )
 
 
 def validate_percentage(percentage: float) -> float:
     if percentage <= 0 or percentage > 100:
         raise ValueError("Percentage of liquidity to remove must be greater than 0 and less or equal than 100.")
     else:
-        return percentage/100
+        return percentage / 100

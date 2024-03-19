@@ -2,13 +2,25 @@ from web3 import Web3
 from roles_royce.applications.execution_app.config.config_builder import DAOStrategiesBuilder, DAO, \
     BalancerPosition, AuraPosition, LidoPosition, WalletPosition
 import os
-from defabipedia.types import Chain, Blockchain
 
+from defabipedia.types import Blockchain, Chain
+from web3 import Web3
 
 def main(dao: DAO, blockchain: Blockchain, balancer: list[BalancerPosition], aura: list[AuraPosition],
          lido: list[LidoPosition], wallet_tokens: list[WalletPosition]):
     PUBLIC_ETH_NODE_URL = 'https://eth.llamarpc.com'
     PUBLIC_GC_NODE_URL = 'https://rpc.ankr.com/gnosis'
+
+
+def main(
+    dao: DAO,
+    blockchain: Blockchain,
+    balancer: list[BalancerPosition],
+    aura: list[AuraPosition],
+    lido: list[LidoPosition],
+):
+    PUBLIC_ETH_NODE_URL = "https://eth.llamarpc.com"
+    PUBLIC_GC_NODE_URL = "https://rpc.ankr.com/gnosis"
 
     w3_eth = Web3(Web3.HTTPProvider(os.environ.get("RR_ETH_FORK_URL", PUBLIC_ETH_NODE_URL)))
     w3_gc = Web3(Web3.HTTPProvider(os.environ.get("RR_GC_FORK_URL", PUBLIC_GC_NODE_URL)))

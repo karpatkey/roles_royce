@@ -1,7 +1,10 @@
 from dataclasses import dataclass
+
 from prometheus_client import Gauge
 from roles_royce.applications.bridge_keeper.core import StaticData, DynamicData
 from roles_royce.applications.bridge_keeper.utils import Flags
+
+from roles_royce.applications.bridge_keeper.core import DynamicData, StaticData
 
 
 @dataclass
@@ -25,9 +28,9 @@ class Gauges:
         self.next_claim_epoch.set(dynamic_data.next_claim_epoch)
         self.invest_threshold.set(static_data.env.INVEST_THRESHOLD)
         self.refill_threshold.set(static_data.env.REFILL_THRESHOLD)
-        self.min_cash_threshold.set(dynamic_data.min_cash_threshold / (10 ** static_data.decimals_DAI))
-        self.claimable.set(dynamic_data.claimable / (10 ** static_data.decimals_DAI))
-        self.min_interest_paid.set(dynamic_data.min_interest_paid / (10 ** static_data.decimals_DAI))
+        self.min_cash_threshold.set(dynamic_data.min_cash_threshold / (10**static_data.decimals_DAI))
+        self.claimable.set(dynamic_data.claimable / (10**static_data.decimals_DAI))
+        self.min_interest_paid.set(dynamic_data.min_interest_paid / (10**static_data.decimals_DAI))
         self.amount_of_interest_to_pay.set(static_data.env.AMOUNT_OF_INTEREST_TO_PAY)
         self.lack_of_gas_warning.set(flags.lack_of_gas_warning.is_set())
         self.interest_payed.set(flags.interest_payed.is_set())

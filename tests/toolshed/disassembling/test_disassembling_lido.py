@@ -1,11 +1,14 @@
 import json
-import requests
 
+import requests
 from defabipedia.lido import ContractSpecs
 from defabipedia.types import Chain
+
 from roles_royce.protocols.eth import lido
-from roles_royce.toolshed.disassembling import LidoDisassembler
 from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
+from roles_royce.toolshed.disassembling import LidoDisassembler
+from tests.roles import apply_presets, deploy_roles, setup_common_roles
+from tests.utils import accounts, create_simple_safe, local_node_eth, steal_token
 
 from tests.utils import (local_node_eth, accounts, create_simple_safe, steal_token)
 from tests.roles import setup_common_roles, deploy_roles, apply_presets
@@ -232,8 +235,12 @@ def test_integration_exit_3(local_node_eth, accounts):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(avatar_safe, roles_contract, json_data=preset_cowswap_easy,
-                  replaces=[("E522f854b978650Dc838Ade0e39FbC1417A2FfB0", "23dA9AdE38E4477b23770DeD512fD37b12381FAB")])
+    apply_presets(
+        avatar_safe,
+        roles_contract,
+        json_data=preset_cowswap_easy,
+        replaces=[("E522f854b978650Dc838Ade0e39FbC1417A2FfB0", "23dA9AdE38E4477b23770DeD512fD37b12381FAB")],
+    )
 
     blockchain = Chain.get_blockchain_from_web3(w3)
     steal_token(w3=w3, token=ContractSpecs[blockchain].stETH.address,
@@ -288,8 +295,12 @@ def test_integration_exit_4(local_node_eth, accounts):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(avatar_safe, roles_contract, json_data=preset_cowswap_easy,
-                  replaces=[("E522f854b978650Dc838Ade0e39FbC1417A2FfB0", "23dA9AdE38E4477b23770DeD512fD37b12381FAB")])
+    apply_presets(
+        avatar_safe,
+        roles_contract,
+        json_data=preset_cowswap_easy,
+        replaces=[("E522f854b978650Dc838Ade0e39FbC1417A2FfB0", "23dA9AdE38E4477b23770DeD512fD37b12381FAB")],
+    )
 
     blockchain = Chain.get_blockchain_from_web3(w3)
     steal_token(w3=w3, token=ContractSpecs[blockchain].wstETH.address,

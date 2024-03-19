@@ -1,17 +1,20 @@
-from roles_royce.constants import MAX_UINT256
+from defabipedia.balancer import ContractSpecs
 from defabipedia.types import Blockchain, Chain
-from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
-from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from web3 import Web3
 from defabipedia.balancer import ContractSpecs
 from roles_royce.roles_modifier import Operation
+
+from roles_royce.constants import MAX_UINT256
+from roles_royce.protocols.balancer.types_and_enums import SwapKind
+from roles_royce.protocols.base import Address, AvatarAddress, ContractMethod
 
 
 class SingleSwap(ContractMethod):
     target_address = None
     name = "swap"
     in_signature = (
-        ("single_swap", (
+        (
+            "single_swap",
             (
                 ("pool_id", "bytes32"),
                 ("kind", "uint8"),
@@ -20,14 +23,17 @@ class SingleSwap(ContractMethod):
                 ("amount_in", "uint256"),
                 ("user_data", "bytes"),
             ),
-            "tuple"),
-         ),
-        ("funds", (
+        ),
+        (
+            "funds",
             (
-                ("sender", "address"),
-                ("from_internal_balance", "bool"),
-                ("recipient", "address"),
-                ("to_internal_balance", "bool")
+                (
+                    ("sender", "address"),
+                    ("from_internal_balance", "bool"),
+                    ("recipient", "address"),
+                    ("to_internal_balance", "bool"),
+                ),
+                "tuple",
             ),
             "tuple"),
          ),
@@ -66,14 +72,16 @@ class SingleSwap(ContractMethod):
 
 
 class ExactTokenInSingleSwap(SingleSwap):
-    def __init__(self,
-                 w3: Web3,
-                 pool_id: str,
-                 avatar: Address,
-                 token_in_address: Address,
-                 token_out_address: Address,
-                 amount_in: int,
-                 min_amount_out: int):
+    def __init__(
+        self,
+        w3: Web3,
+        pool_id: str,
+        avatar: Address,
+        token_in_address: Address,
+        token_out_address: Address,
+        amount_in: int,
+        min_amount_out: int,
+    ):
         swap_kind = SwapKind.OutGivenExactIn
         super().__init__(blockchain=Chain.get_blockchain_by_chain_id(w3),
                          pool_id=pool_id,
@@ -87,14 +95,16 @@ class ExactTokenInSingleSwap(SingleSwap):
 
 
 class ExactTokenOutSingleSwap(SingleSwap):
-    def __init__(self,
-                 w3: Web3,
-                 pool_id: str,
-                 avatar: Address,
-                 token_in_address: Address,
-                 token_out_address: Address,
-                 amount_out: int,
-                 max_amount_in: int):
+    def __init__(
+        self,
+        w3: Web3,
+        pool_id: str,
+        avatar: Address,
+        token_in_address: Address,
+        token_out_address: Address,
+        amount_out: int,
+        max_amount_in: int,
+    ):
         swap_kind = SwapKind.InGivenExactOut
         super().__init__(blockchain=Chain.get_blockchain_by_chain_id(w3),
                          pool_id=pool_id,

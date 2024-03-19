@@ -1,3 +1,9 @@
+import json
+from time import time
+
+import requests
+from defabipedia.types import Chain
+
 from roles_royce import roles
 from roles_royce.protocols.cowswap.contract_methods import SignOrder
 from roles_royce.protocols.cowswap.utils import QuoteOrderCowSwap
@@ -92,8 +98,12 @@ def test_cowswap_signer(local_node_eth, accounts):
             ]
             }"""
 
-    apply_presets(avatar_safe, roles_contract, json_data=presets,
-                  replaces=[("E522f854b978650Dc838Ade0e39FbC1417A2FfB0", "23dA9AdE38E4477b23770DeD512fD37b12381FAB")])
+    apply_presets(
+        avatar_safe,
+        roles_contract,
+        json_data=presets,
+        replaces=[("E522f854b978650Dc838Ade0e39FbC1417A2FfB0", "23dA9AdE38E4477b23770DeD512fD37b12381FAB")],
+    )
 
     blockchain = Chain.get_blockchain_from_web3(w3)
 

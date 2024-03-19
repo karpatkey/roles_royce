@@ -276,6 +276,7 @@ def fork_reset_state(w3: Web3, url: str, block: int | str = "latest"):
             raise ValueError(f"Block number {block} is greater than the latest block {latest_block}")
     return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
 
+
 # -----------------------------------------------------------------------------------------------------------------------
 
 

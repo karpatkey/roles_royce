@@ -3,28 +3,29 @@ import codecs
 import json
 import logging
 import os
+import shlex
 import shutil
-
-import pytest
 import socket
 import subprocess
-import shlex
 import time
 
+import pytest
 from eth_account import Account
 from eth_account.signers.local import LocalAccount
-
-from web3 import Web3, HTTPProvider
+from web3 import HTTPProvider, Web3
 from web3.exceptions import ContractLogicError
 from web3.types import TxReceipt
-from roles_royce.evm_utils import erc20_abi
+
 from roles_royce.constants import ETHAddr
+from roles_royce.evm_utils import erc20_abi
+
 from .safe import SimpleSafe
 
 REMOTE_ETH_NODE_URL = codecs.decode(
-    b'x\x9c\xcb())(\xb6\xd2\xd7O-\xc9\xd0\xcdM\xcc\xcc\xcbK-\xd1K\xd7K\xccI\xceH\xcd\xad\xd4K\xce\xcf\xd5/3\xd2\x0f'
-    b'u)74-6NNu\xb3\xcc\x0f\nH\n\xcb\xccq4\xd4u\xcd3(53+\xf32\n(\x06\x00Q\x92\x17X',
-    "zlib").decode()
+    b"x\x9c\xcb())(\xb6\xd2\xd7O-\xc9\xd0\xcdM\xcc\xcc\xcbK-\xd1K\xd7K\xccI\xceH\xcd\xad\xd4K\xce\xcf\xd5/3\xd2\x0f"
+    b"u)74-6NNu\xb3\xcc\x0f\nH\n\xcb\xccq4\xd4u\xcd3(53+\xf32\n(\x06\x00Q\x92\x17X",
+    "zlib",
+).decode()
 REMOTE_GC_NODE_URL = "https://rpc.ankr.com/gnosis"
 
 ETH_FORK_NODE_URL = os.environ.get("RR_ETH_FORK_URL", REMOTE_ETH_NODE_URL)
@@ -54,7 +55,8 @@ def gen_test_accounts() -> list[LocalAccount]:
         "0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e",
         "0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356",
         "0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97",
-        "0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6"]
+        "0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6",
+    ]
     return [Account.from_key(key) for key in keys]
 
 
@@ -72,7 +74,7 @@ def web3_eth() -> Web3:
     return Web3(HTTPProvider(REMOTE_ETH_NODE_URL))
 
 
-def wait_for_port(port, host='localhost', timeout=5.0):
+def wait_for_port(port, host="localhost", timeout=5.0):
     """Wait until a port starts accepting TCP connections."""
     start_time = time.time()
     while True:
@@ -130,7 +132,7 @@ def fork_reset_state(w3: Web3, url: str, block: int | str = "latest"):
     """
     latest_block = Web3(Web3.HTTPProvider(url)).eth.block_number
 
-    if isinstance(block,str):
+    if isinstance(block, str):
         if block == "latest":
             block = latest_block
     else:
@@ -147,7 +149,7 @@ def run_hardhat():
         if "hardhat" not in json.loads(subprocess.check_output([npm, "list", "--json"])).get("dependencies", {}):
             raise subprocess.CalledProcessError
     except subprocess.CalledProcessError:
-        raise RuntimeError('Hardhat is not installed properly. Check the README for instructions.')
+        raise RuntimeError("Hardhat is not installed properly. Check the README for instructions.")
 
     log_filename = "/tmp/rr_hardhat_log.txt"
     logger.info(f"Writing Hardhat log to {log_filename}")
@@ -155,7 +157,7 @@ def run_hardhat():
     npx = shutil.which("npx")
     node = SimpleDaemonRunner(
         cmd=f"{npx} hardhat node --show-stack-traces --fork '{ETH_FORK_NODE_URL}' --fork-block-number {ETH_LOCAL_NODE_DEFAULT_BLOCK} --port {ETH_LOCAL_NODE_PORT}",
-        popen_kwargs={'stdout': hardhat_log, 'stderr': hardhat_log}
+        popen_kwargs={"stdout": hardhat_log, "stderr": hardhat_log},
     )
     node.start()
     return node
@@ -168,7 +170,7 @@ def run_anvil(url, block, port):
     log = open(log_filename, "w")
     node = SimpleDaemonRunner(
         cmd=f"anvil --accounts 15 -f '{url}' --fork-block-number {block} --port {port}",
-        popen_kwargs={'stdout': log, 'stderr': log}
+        popen_kwargs={"stdout": log, "stderr": log},
     )
 
     node.start()
@@ -213,6 +215,7 @@ def _local_node(request, node: LocalNode):
 
         def __call__(self, method, params):
             import time
+
             start_time = time.monotonic()
             response = self.make_request(method, params)
             logger.debug("Web3 time spent in %s: %f seconds", method, time.monotonic() - start_time)
@@ -224,14 +227,14 @@ def _local_node(request, node: LocalNode):
     return node
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def local_node_eth(request) -> LocalNode:
     node = LocalNode(ETH_FORK_NODE_URL, ETH_LOCAL_NODE_PORT, ETH_LOCAL_NODE_DEFAULT_BLOCK)
     _local_node(request, node)
     return node
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def local_node_gc(request) -> LocalNode:
     node = LocalNode(GC_FORK_NODE_URL, GC_LOCAL_NODE_PORT, GC_LOCAL_NODE_DEFAULT_BLOCK)
     _local_node(request, node)
@@ -250,7 +253,7 @@ def local_node_gc_reset(local_node_gc):
     local_node_gc.reset_state()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def accounts() -> list[LocalAccount]:
     return TEST_ACCOUNTS
 
@@ -301,34 +304,36 @@ def top_up_address(w3: Web3, address: str, amount: int) -> None:
 def to_hex_32_bytes(value: str | int) -> str:
     """Convert a value to a 32 bytes hex string"""
     if isinstance(value, str):
-        if value.startswith('0x') and len(value) <= 66:
-            return '0x' + value[2:].rjust(64, '0')
+        if value.startswith("0x") and len(value) <= 66:
+            return "0x" + value[2:].rjust(64, "0")
         else:
-            raise ValueError('Invalid value. Value must be a hex string with or without 0x prefix and length <= 66')
+            raise ValueError("Invalid value. Value must be a hex string with or without 0x prefix and length <= 66")
     elif isinstance(value, int):
-        return Web3.to_hex(Web3.to_bytes(value).rjust(32, b'\0'))
+        return Web3.to_hex(Web3.to_bytes(value).rjust(32, b"\0"))
     else:
-        raise ValueError('Invalid value. Value must be an int or a hex string with 0x prefix and length <= 66')
+        raise ValueError("Invalid value. Value must be an int or a hex string with 0x prefix and length <= 66")
 
 
 def assign_role(local_node, avatar_safe_address: str, roles_mod_address: str, role: int, asignee: str) -> TxReceipt:
     asignee_32_bytes = to_hex_32_bytes(asignee)
     role_32_byes = to_hex_32_bytes(role)
     a = asignee_32_bytes[2:]
-    calldata_to_assign_role = f'0xa6edf38f' \
-                              f'{asignee_32_bytes[2:]}' \
-                              f'0000000000000000000000000000000000000000000000000000000000000060' \
-                              f'00000000000000000000000000000000000000000000000000000000000000a0' \
-                              f'0000000000000000000000000000000000000000000000000000000000000001' \
-                              f'{role_32_byes[2:]}' \
-                              f'0000000000000000000000000000000000000000000000000000000000000001' \
-                              f'0000000000000000000000000000000000000000000000000000000000000001'
+    calldata_to_assign_role = (
+        f"0xa6edf38f"
+        f"{asignee_32_bytes[2:]}"
+        f"0000000000000000000000000000000000000000000000000000000000000060"
+        f"00000000000000000000000000000000000000000000000000000000000000a0"
+        f"0000000000000000000000000000000000000000000000000000000000000001"
+        f"{role_32_byes[2:]}"
+        f"0000000000000000000000000000000000000000000000000000000000000001"
+        f"0000000000000000000000000000000000000000000000000000000000000001"
+    )
 
     tx_to_assign_role = {
         "from": avatar_safe_address,
         "to": roles_mod_address,
         "data": calldata_to_assign_role,
-        "value": "0"
+        "value": "0",
     }
 
     local_node.unlock_account(avatar_safe_address)
