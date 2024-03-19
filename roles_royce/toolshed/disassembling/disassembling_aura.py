@@ -7,8 +7,10 @@ from web3.types import ChecksumAddress
 
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.eth import aura
-from roles_royce.toolshed.disassembling import BalancerDisassembler, Disassembler, validate_percentage
 from roles_royce.utils import to_checksum_address
+
+from .disassembler import Disassembler, validate_percentage
+from .disassembling_balancer import BalancerDisassembler
 
 
 class Exit1ArgumentElement(TypedDict):
