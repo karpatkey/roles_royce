@@ -83,7 +83,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
         static_data.env.AMOUNT_OF_INTEREST_TO_PAY * (10 ** static_data.decimals_DAI), dynamic_data.claimable)
             and not flags.interest_payed.is_set()):
         title = 'Paying interest to interest receiver contract on Gnosis Chain...'
-        message = f'  The next claim epoch {datetime.utcfromtimestamp(dynamic_data.next_claim_epoch)} is in less than {static_data.env.MINUTES_BEFORE_CLAIM_EPOCH} minutes.'
+        message = f'  The next claim epoch {datetime.utcfromtimestamp(dynamic_data.next_claim_epoch)} UTC is in less than {static_data.env.MINUTES_BEFORE_CLAIM_EPOCH} minutes.'
         logger.info(title + '\n' + message)
         tx_receipt = pay_interest(w3_eth, static_data, dynamic_data)
         flags.tx_executed.set()
