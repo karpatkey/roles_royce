@@ -1,4 +1,4 @@
-from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApprove
+from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApproveForToken, Operation
 from defabipedia.types import Blockchain
 from defabipedia.uniswap_v3 import ContractSpecs
 
@@ -41,7 +41,7 @@ class ApproveCurve(ContractMethod):
 
 class SwapUniswapV3(ContractMethod):
     name = "exactInputSingle"
-    in_signature = (
+    in_signature = [("params",((
         ("token_in", "address"),
         ("token_out", "address"),
         ("fee", "uint24"),
@@ -50,7 +50,7 @@ class SwapUniswapV3(ContractMethod):
         ("amount_in", "uint256"),
         ("min_amount_out", "uint256"),
         ("limit_price", "uint160")
-    )
+    ),"tuple"))]
     fixed_arguments = {"recipient": AvatarAddress, "limit_price": 0} 
 
     def __init__(self,
@@ -70,3 +70,27 @@ class SwapUniswapV3(ContractMethod):
         self.args.amount_in = amount_in
         self.args.min_amount_out = min_amount_out
         self.args.fee = fee
+        self.args.receiver = avatar
+        self.args.params = [self.args.token_in, 
+                            self.args.token_out, 
+                            self.args.fee,
+                            self.args.receiver,
+                            self.args.deadline,
+                            self.args.amount_in,
+                            self.args.min_amount_out,
+                            self.fixed_arguments["limit_price"]]
+        self.operation = Operation.DELEGATE_CALL
+
+class ApproveUniswapV3(ContractMethod):
+    name = "approve"
+    in_signature = [("spender", "address"), ("amount", "uint256")]
+
+    def __init__(self,
+                 blockchain: Blockchain,
+                 token_address: Address,
+                 amount: int):
+        super().__init__()
+        self.target_address = token_address
+        self.args.spender = ContractSpecs[blockchain].ApprovePermit2.address
+        self.args.amount = amount
+

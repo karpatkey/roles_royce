@@ -24,14 +24,21 @@ class QuoteCurve(ContractMethod):
         self.args.amount_x = amount_x
 
 class QuoteUniswapV3(ContractMethod):
+    target_address = None
     name = "quoteExactInputSingle"
-    in_signature = (
-        ("token_in", "address"),
-        ("token_out", "address"),
-        ("fee", "uint24"),
-        ("amount_in", "uint256"),
-        ("limit_price", "uint160")
-    )
+    in_signature = [("params",( (
+            ("token_in", "address"),
+            ("token_out", "address"),
+            ("amount_in", "uint256"),
+            ("fee", "uint24"),
+            ("limit_price", "uint160")
+            ),"tuple")
+    )]
+
+    out_signature = [("amount_out", "uint256"),
+                     ("limit_price_after", "uint160"),
+                     ("ticks_crossed", "uint32"),
+                     ("gas_estimate", "uint256")]
     fixed_arguments = {"limit_price": 0} 
 
     def __init__(self,
@@ -46,3 +53,8 @@ class QuoteUniswapV3(ContractMethod):
         self.args.token_out = token_out
         self.args.amount_in = amount_in
         self.args.fee = fee
+        self.args.params = [self.args.token_in, 
+                            self.args.token_out, 
+                            self.args.amount_in,
+                            self.args.fee, 
+                            self.fixed_arguments["limit_price"]]

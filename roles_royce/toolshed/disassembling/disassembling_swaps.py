@@ -10,7 +10,7 @@ from roles_royce.toolshed.disassembling.disassembler import Disassembler, valida
 from web3 import Web3
 from web3.exceptions import ContractLogicError
 from roles_royce.protocols.base import Address
-from roles_royce.protocols.swap_pools.swap_methods import SwapCurve, SwapUniswapV3, ApproveCurve
+from roles_royce.protocols.swap_pools.swap_methods import SwapCurve, SwapUniswapV3, ApproveCurve, ApproveUniswapV3
 from roles_royce.protocols.swap_pools.quote_methods import QuoteUniswapV3, QuoteCurve
 from roles_royce.protocols.balancer.methods_swap import QuerySwap, SingleSwap, ExactTokenInSingleSwap
 from time import time
@@ -59,7 +59,7 @@ class SwapDisassembler(Disassembler):
         elif swap_pool.protocol == "UniswapV3":
             quote = QuoteUniswapV3(self.blockchain, token_in, token_out, amount_in, swap_pool.uni_fee)
             amount_out = quote.call(web3=self.w3)
-            return swap_pool, amount_out
+            return swap_pool, amount_out[0]
         
         elif swap_pool.protocol == "Balancer":
             pool_id = self.get_pool_id(swap_pool.address)
@@ -109,11 +109,10 @@ class SwapDisassembler(Disassembler):
                     quotes.append(quote)
             
             pool_id = self.get_pool_id(swap_pool.address)
-            #get the best quote
             best_quote = max(quotes)
             amount_out_min_slippage = int(Decimal(best_quote) * Decimal(1 - max_slippage))
+
             approve_vault = ApproveForVault(token=token_in,amount=amount_to_redeem)
-            #build the transaction
             swap_balancer = SingleSwap(blockchain=self.blockchain,
                                        pool_id=pool_id,
                                        avatar=self.avatar_safe_address,
@@ -186,8 +185,8 @@ class SwapDisassembler(Disassembler):
         return txns
     
     def exit_3(self, percentage: float, exit_arguments: list[dict]=None, amount_to_redeem: int = None) -> list[
-        Transactable]:
-        """Make a swap on Curve with best amount out
+        Transactable]:  
+        """Make a swap on UniswapV3 with best amount out
         Args:
             percentage (float): Percentage of token to remove.
             exit_arguments (list[dict], optional): List of dictionaries with the withdrawal parameters.
@@ -220,22 +219,26 @@ class SwapDisassembler(Disassembler):
                 raise ValueError("No pools found with the specified tokens")
             else:
                 for pool in pools:
-                    pool, quote = self.get_quote(pool, token_in, token_out, amount_to_redeem)
-                    quotes.append({'pool': pool, 'quote': quote})
+                    swap_pool, quote = self.get_quote(pool, token_in, token_out, amount_to_redeem)
+                    quotes.append(quote)
 
             #get the best quote
-            best_quote = max(quote, key=lambda x: x['quote'])
+            best_quote = max(quotes)
             amount_out_min_slippage = int(Decimal(best_quote) * Decimal(1 - max_slippage))
-
-            swap_uniswap_v3 = SwapUniswapV3(blockchain=self.blockchain,
-                                            token_in=token_in,
-                                            token_out=token_out,
-                                            avatar=self.avatar_safe_address,
-                                            deadline=int(time()) + 60,
-                                            amount_in=amount_to_redeem,
-                                            amount_out_min=amount_out_min_slippage,
-                                            fee=pools.uni_fee)
+            approve_uniswapV3 = ApproveUniswapV3(blockchain=self.blockchain,
+                                         token_address=token_in,
+                                         amount=amount_to_redeem,)
             
-            txns.append(swap_uniswap_v3)
+            swap_uniswapV3 = SwapUniswapV3(blockchain=self.blockchain,
+                                   token_in=token_in,
+                                   token_out=token_out,
+                                   avatar=self.avatar_safe_address,
+                                   deadline=int(int(time())+600),
+                                   amount_in=amount_to_redeem,
+                                   min_amount_out=amount_out_min_slippage,
+                                   fee=swap_pool.uni_fee)
+            
+            txns.append(approve_uniswapV3)
+            txns.append(swap_uniswapV3)
         return txns
     
