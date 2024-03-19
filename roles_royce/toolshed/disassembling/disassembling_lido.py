@@ -12,7 +12,8 @@ from roles_royce.protocols.base import Address
 from roles_royce.protocols.cowswap.contract_methods import SignOrder
 from roles_royce.protocols.cowswap.utils import QuoteOrderCowSwap
 from roles_royce.protocols.eth import lido
-from roles_royce.toolshed.disassembling.disassembler import Disassembler, validate_percentage
+
+from .disassembler import Disassembler, validate_percentage
 
 
 @dataclass

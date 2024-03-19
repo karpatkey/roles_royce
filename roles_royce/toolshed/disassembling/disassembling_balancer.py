@@ -8,8 +8,9 @@ from web3.exceptions import ContractLogicError
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols import balancer
 from roles_royce.protocols.base import Address
-from roles_royce.toolshed.disassembling.disassembler import Disassembler, validate_percentage
 from roles_royce.utils import to_checksum_address
+
+from .disassembler import Disassembler, validate_percentage
 
 
 class Exit11ArgumentElement(TypedDict):
