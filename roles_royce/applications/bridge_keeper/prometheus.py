@@ -5,6 +5,8 @@ from prometheus_client import Gauge
 from roles_royce.applications.bridge_keeper.core import DynamicData, StaticData
 from roles_royce.applications.bridge_keeper.utils import Flags
 
+from roles_royce.applications.bridge_keeper.core import DynamicData, StaticData
+
 
 @dataclass
 class Gauges:

@@ -7,6 +7,10 @@ from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from roles_royce.protocols.base import Address, AvatarAddress, ContractMethod
 from roles_royce.roles_modifier import Operation
 
+from roles_royce.constants import MAX_UINT256
+from roles_royce.protocols.balancer.types_and_enums import SwapKind
+from roles_royce.protocols.base import Address, AvatarAddress, ContractMethod
+
 
 class SingleSwap(ContractMethod):
     target_address = None

@@ -10,6 +10,12 @@ from roles_royce.applications.bridge_keeper.core import DynamicData, StaticData
 from roles_royce.applications.bridge_keeper.utils import Flags
 from roles_royce.toolshed.alerting.alerting import LoggingLevel, Messenger
 
+from defabipedia.types import Chain
+from defabipedia.xdai_bridge import ContractSpecs
+
+from roles_royce.applications.bridge_keeper.core import DynamicData, StaticData
+from roles_royce.toolshed.alerting.alerting import LoggingLevel, Messenger
+
 logger = logging.getLogger(__name__)
 
 
