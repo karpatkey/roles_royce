@@ -13,6 +13,7 @@ from web3.types import TxReceipt
 from roles_royce import roles
 from defabipedia.chainlink import ContractSpecs as ChainlinkContractSpecs
 from defabipedia.curve import ContractSpecs as CurveContractSpecs
+from roles_royce.utils import to_checksum_address
 
 decimalsEURe = 18
 decimalsWXDAI = 18
