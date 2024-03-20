@@ -5,6 +5,7 @@ import json
 import pytest
 import subprocess
 from pathlib import Path
+import sys
 
 dao = 'GnosisDAO'
 blockchain = 'ETHEREUM'
@@ -102,7 +103,7 @@ def test_transaction_builder_lido(local_node_eth, accounts, monkeypatch, args, e
                                   'transaction_builder.py')
 
     arguments = [
-        'python', file_path_main,
+        sys.executable, file_path_main,
         '--percentage', str(23),
         '--dao', dao,
         '--blockchain', blockchain,

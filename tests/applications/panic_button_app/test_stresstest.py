@@ -16,6 +16,7 @@ from web3.exceptions import ContractLogicError
 from defabipedia.balancer import Abis as BalancerAbis
 from defabipedia.aura import Abis as AuraAbis
 from defabipedia.types import Chain
+import sys
 
 logging.basicConfig(
     filename="stresstest.log",

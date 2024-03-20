@@ -5,7 +5,7 @@ import json
 import pytest
 import subprocess
 from pathlib import Path
-
+import sys
 
 dao = 'GnosisDAO'
 blockchain = 'ETHEREUM'
@@ -98,7 +98,7 @@ def test_execute(local_node_eth, accounts, monkeypatch, tx):
                                      'execute.py')
 
     arguments = [
-        'python', file_path_execute,
+        sys.executable, file_path_execute,
         '--dao', dao,
         '--blockchain', blockchain,
         '--transaction', json.dumps(tx)

@@ -83,7 +83,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
         static_data.env.AMOUNT_OF_INTEREST_TO_PAY * (10 ** static_data.decimals_DAI), dynamic_data.claimable)
             and not flags.interest_payed.is_set()):
         title = 'Paying interest to interest receiver contract on Gnosis Chain...'
-        message = f'  The next claim epoch {datetime.utcfromtimestamp(dynamic_data.next_claim_epoch)} is in less than {static_data.env.MINUTES_BEFORE_CLAIM_EPOCH} minutes.'
+        message = f'  The next claim epoch {datetime.utcfromtimestamp(dynamic_data.next_claim_epoch)} UTC is in less than {static_data.env.MINUTES_BEFORE_CLAIM_EPOCH} minutes.'
         logger.info(title + '\n' + message)
         tx_receipt = pay_interest(w3_eth, static_data, dynamic_data)
         flags.tx_executed.set()
@@ -110,7 +110,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
             10 ** static_data.decimals_DAI), dynamic_data.min_cash_threshold):
         title = 'Refilling the bridge...'
         message = f'  The bridge"s DAI balance {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):,.2f}' \
-                  'dropped below the refill threshold {static_data.env.REFILL_THRESHOLD:,.2f}.'
+                  f' dropped below the refill threshold {min(static_data.env.REFILL_THRESHOLD * (10 ** static_data.decimals_DAI), dynamic_data.min_cash_threshold):,.2f}.'
         logger.info(title + '\n' + message)
         tx_receipt = refill_bridge(w3_eth, static_data)
         flags.tx_executed.set()
@@ -124,7 +124,9 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
     elif dynamic_data.bridge_DAI_balance > static_data.env.INVEST_THRESHOLD * (
             10 ** static_data.decimals_DAI) + dynamic_data.min_cash_threshold:
         title = 'Investing DAI...'
-        message = f'  The bridge"s DAI balance {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):,.2f} surpassed Invest threshold + Minimum cash threshold = {static_data.env.INVEST_THRESHOLD + dynamic_data.min_cash_threshold / (10 ** static_data.decimals_DAI):,.2f}.'
+        message = (f'  The bridge"s DAI balance {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):,.2f}'
+                   f' surpassed Invest threshold + Minimum cash threshold = '
+                   f'{static_data.env.INVEST_THRESHOLD + dynamic_data.min_cash_threshold / (10 ** static_data.decimals_DAI):,.2f}.')
         logger.info(title + '\n' + message)
         tx_receipt = invest_DAI(w3_eth, static_data)
         flags.tx_executed.set()
