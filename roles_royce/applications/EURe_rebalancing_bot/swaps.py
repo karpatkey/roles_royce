@@ -68,7 +68,7 @@ class SwapsDataManager:
         Returns:
             Amount of WXDAI that would be received in a swap for the given amount of EURe.
         """
-        contract = ChainlinkContractSpecs[Chain.GNOSIS].EurPriceFeed.contract(self.w3)
+        contract = CurveContractSpecs[Chain.GNOSIS].EURe_x3RCV_deposit_zap.contract(self.w3)
 
         amount_int = int(amount * (10 ** decimalsEURe))
         if amount_int == 0:
@@ -87,7 +87,7 @@ class SwapsDataManager:
             Amount of EURe that would be received in a swap for the given amount of WXDAI.
         """
 
-        contract = ChainlinkContractSpecs[Chain.GNOSIS].EURe_x3RCV_deposit_zap.contract(self.w3)
+        contract = CurveContractSpecs[Chain.GNOSIS].EURe_x3RCV_deposit_zap.contract(self.w3)
         amount_int = int(Decimal(amount) * Decimal(10 ** decimalsWXDAI))
         if amount_int == 0:
             raise ValueError('Amount of WXDAI too small. Amount of WXDAI: %f.' % (amount * (10 ** decimalsWXDAI)))
