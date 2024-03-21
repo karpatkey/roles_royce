@@ -8,7 +8,8 @@ from roles_royce.applications.utils import web3_connection_check
 from roles_royce.applications.EURe_rebalancing_bot.env import ENV
 from roles_royce.applications.EURe_rebalancing_bot.utils import log_initial_data
 from roles_royce.applications.EURe_rebalancing_bot.prometheus import Gauges
-from swaps import SwapsDataManager, Swapper, AddressesAndAbis, decimalsWXDAI, decimalsEURe
+from swaps import SwapsDataManager, Swapper, decimalsWXDAI, decimalsEURe
+from defabipedia.tokens import erc20_contract, GnosisTokenAddr
 import time
 import sys
 
@@ -60,7 +61,7 @@ def bot_do(w3, w3_mev) -> int:
 
     # -----------------------------------------------------------------------------------------------------------------------
 
-    WXDAI_contract = erc20_contract(w3, AddressesAndAbis[Chain.GNOSIS].WXDAI.address)
+    WXDAI_contract = erc20_contract(w3, GnosisTokenAddr.WXDAI)
     balance_WXDAI = WXDAI_contract.functions.balanceOf(env.AVATAR_SAFE_ADDRESS).call()
     if 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance_WXDAI and amount_WXDAI < env.AMOUNT:
         while 10 * amount_WXDAI * (10 ** decimalsWXDAI) < balance_WXDAI and 10 * amount_WXDAI <= env.AMOUNT:
@@ -81,8 +82,7 @@ def bot_do(w3, w3_mev) -> int:
 
     # -----------------------------------------------------------------------------------------------------------------------
 
-    EURe_contract = w3.eth.contract(address=AddressesAndAbis[Chain.GNOSIS].EURe.address,
-                                    abi=AddressesAndAbis[Chain.GNOSIS].ERC20.abi)
+    EURe_contract = erc20_contract(w3, GnosisTokenAddr.EURe)
     balance_EURe = EURe_contract.functions.balanceOf(env.AVATAR_SAFE_ADDRESS).call()
     if 10 * amount_EURe * (10 ** decimalsEURe) < balance_EURe and amount_EURe < env.AMOUNT:
         while 10 * amount_EURe * (10 ** decimalsEURe) < balance_EURe and 10 * amount_EURe <= env.AMOUNT:
