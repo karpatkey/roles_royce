@@ -58,8 +58,6 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
     dynamic_data_manager = DynamicDataManager(w3_gnosis, w3_eth, static_data)
 
     dynamic_data = dynamic_data_manager.get_data(amount_x3CRV, amount_GBPe)
-    log_status_update(static_data=static_data, dynamic_data=dynamic_data)
-    gauges.update(static_data=static_data, dynamic_data=dynamic_data)
 
     # -----------------------------------------------------------------------------------------------------------------------
 
