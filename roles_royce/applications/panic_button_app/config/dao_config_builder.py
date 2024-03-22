@@ -1,11 +1,12 @@
 from web3 import Web3
 from roles_royce.applications.panic_button_app.config.config_builder import DAOStrategiesBuilder, DAO, \
-    BalancerPosition, AuraPosition, LidoPosition
+    BalancerPosition, AuraPosition, LidoPosition, WalletPosition
 import os
 from defabipedia.types import Chain, Blockchain
 
 
-def main(dao: DAO, blockchain: Blockchain, balancer: list[BalancerPosition], aura: list[AuraPosition], lido: list[LidoPosition]):
+def main(dao: DAO, blockchain: Blockchain, balancer: list[BalancerPosition], aura: list[AuraPosition], 
+         lido: list[LidoPosition], wallet_tokens: list[WalletPosition]):
     PUBLIC_ETH_NODE_URL = 'https://eth.llamarpc.com'
     PUBLIC_GC_NODE_URL = 'https://rpc.ankr.com/gnosis'
 
@@ -17,7 +18,7 @@ def main(dao: DAO, blockchain: Blockchain, balancer: list[BalancerPosition], aur
     elif blockchain == Chain.ETHEREUM:
         w3 = w3_eth
 
-    strategies = DAOStrategiesBuilder(dao, blockchain, balancer=balancer, aura=aura, lido=lido)
+    strategies = DAOStrategiesBuilder(dao, blockchain, balancer=balancer, aura=aura, lido=lido, wallet_tokens=wallet_tokens)
     strategies_dict = strategies.build_dict(w3)
     return strategies_dict
 
