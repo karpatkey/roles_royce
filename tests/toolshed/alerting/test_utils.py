@@ -26,10 +26,10 @@ def test_get_token_transfers(local_node_eth, web3_gnosis):
     assert message == ('  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  <---- 0.055 WETH -----  '
                        '0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD.\n'
                        '\n'
-                       '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 5992277071.012 X2.0 ---->  '
+                       '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 5,992,277,071.012 X2.0 ---->  '
                        '0xBa3B918D8663b9A872E89Fa24b96e2EC77778707.\n'
                        '\n'
-                       '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 60528051.222 X2.0 ---->  '
+                       '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 60,528,051.222 X2.0 ---->  '
                        '0xff30a1cF914a4a4e3B5514cD167bD2E69607e173.\n')
     message, message_slack = get_tx_executed_msg(tx_receipt, Chain.ETHEREUM)
     assert message == ('  Txn hash (Success): '
@@ -48,10 +48,10 @@ def test_get_token_transfers(local_node_eth, web3_gnosis):
                        '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  <---- 0.055 WETH -----  '
                        '0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD.\n'
                        '\n'
-                       '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 5992277071.012 X2.0 '
+                       '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 5,992,277,071.012 X2.0 '
                        '---->  0xBa3B918D8663b9A872E89Fa24b96e2EC77778707.\n'
                        '\n'
-                       '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 60528051.222 X2.0 ---->  '
+                       '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 60,528,051.222 X2.0 ---->  '
                        '0xff30a1cF914a4a4e3B5514cD167bD2E69607e173.\n')
     assert message_slack == ('  *Txn hash (Success):* '
                              '<https://etherscan.io/tx'
@@ -61,10 +61,10 @@ def test_get_token_transfers(local_node_eth, web3_gnosis):
                              '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  <---- 0.055 WETH -----  '
                              '0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD.\n'
                              '\n'
-                             '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 5992277071.012 X2.0 '
+                             '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 5,992,277,071.012 X2.0 '
                              '---->  0xBa3B918D8663b9A872E89Fa24b96e2EC77778707.\n'
                              '\n'
-                             '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 60528051.222 X2.0 ---->  '
+                             '  0x65389F6FFe361C0C27Ea5D9691616a2060f8a167  ----- 60,528,051.222 X2.0 ---->  '
                              '0xff30a1cF914a4a4e3B5514cD167bD2E69607e173.\n')
 
     # THis has to be fixed, we're getting the logs RPC endpoint error...
@@ -79,10 +79,10 @@ def test_get_token_transfers(local_node_eth, web3_gnosis):
                          {'amount': 2839.9402939711113,
                           'from': '0xE43e60736b1cb4a75ad25240E2f9a62Bff65c0C0',
                           'to': '0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f'}]
-    assert message == ('  0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f  ----- 28623.230 DXS ---->  '
+    assert message == ('  0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f  ----- 28,623.230 DXS ---->  '
                        '0xD7b118271B1B7d26C9e044Fc927CA31DccB22a5a.\n'
                        '\n'
-                       '  0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f  <---- 2839.940 GNO -----  '
+                       '  0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f  <---- 2,839.940 GNO -----  '
                        '0xE43e60736b1cb4a75ad25240E2f9a62Bff65c0C0.\n')
 
     message, message_slack = get_tx_executed_msg(tx_receipt, Chain.GNOSIS)

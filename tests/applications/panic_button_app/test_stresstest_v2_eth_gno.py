@@ -5,7 +5,7 @@ import json
 from roles_royce.applications.panic_button_app.utils import ENV
 from roles_royce.applications.panic_button_app.stresstest import stresstest
 from tests.utils import assign_role, local_node_eth, accounts, web3_eth, local_node_gc, web3_gnosis
-from tests.utils import top_up_address, fork_unlock_account 
+from tests.utils import top_up_address, fork_unlock_account
 
 PERCENTAGE = 20
 MAX_SLIPPAGE = 1
@@ -96,6 +96,7 @@ stresstest_outcome = {
     ]
 }
 
+
 @dataclass
 class DAO:
     name: str
@@ -104,11 +105,13 @@ class DAO:
     roles_mod_address: str
     role: int
 
+
 dao = DAO(name="GnosisDAO",
-            blockchain="ETHEREUM",
-            avatar_safe_address="0x849D52316331967b6fF1198e5E32A0eB168D039d",
-            roles_mod_address="0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc",
-            role=4)
+          blockchain="ETHEREUM",
+          avatar_safe_address="0x849D52316331967b6fF1198e5E32A0eB168D039d",
+          roles_mod_address="0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc",
+          role=4)
+
 
 def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
     if dao.blockchain == 'ETHEREUM':
@@ -146,15 +149,15 @@ def set_env(monkeypatch, private_key: str, dao: DAO) -> ENV:
     monkeypatch.setenv(f'{dao.name.upper()}_{dao.blockchain.upper()}_PRIVATE_KEY', private_key)
     return ENV(dao.name, dao.blockchain)
 
-def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch):
 
+def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch):
     w3, private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
     with open(os.path.join(os.path.dirname(__file__), 'test_stresstest_v2_eth_gno.json'), 'r') as f:
         test_data = json.load(f)
 
-    stresstest_tester = stresstest(w3=w3, positions_dict=test_data, percentage=PERCENTAGE, max_slippage=MAX_SLIPPAGE, dao=dao.name, blockchain=dao.blockchain)
+    stresstest_tester = stresstest(w3=w3, positions_dict=test_data, percentage=PERCENTAGE, max_slippage=MAX_SLIPPAGE,
+                                   dao=dao.name, blockchain=dao.blockchain)
 
     assert stresstest_tester == stresstest_outcome
-
