@@ -429,7 +429,7 @@ class DAOStrategiesBuilder:
                     for swap_entry in blockchain_entry[blockchain]:
                         token_in_address = wallet_position.position_id_tech()
                         if token_in_address in swap_entry['token_in']:
-
+                            print("        Adding: ", wallet_position)
                             position = copy.deepcopy(wallet_template)
                             
                             position["position_id"] = wallet_position.position_id
@@ -490,5 +490,8 @@ class DAOStrategiesBuilder:
 
                             if len(position["exec_config"]) > 0:
                                 result.append(position)
+                            print(f"        Done adding: Wallet position", position["position_id"], position["position_id_human_readable"])
+                        else:
+                            print("        Not adding: ", wallet_position)
         return result
 
