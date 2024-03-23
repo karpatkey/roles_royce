@@ -252,6 +252,9 @@ class DAOStrategiesBuilder:
         print(f'    Adding Lido positions')
         if self.lido:
             positions.extend(self.build_lido_positions(w3, self.lido))
+        print(f'    Adding Wallet positions')
+        if self.wallet_tokens:
+            positions.extend(self.build_wallet_positions(w3, self.wallet_tokens))
         return seed_dict(self.dao, self.blockchain, positions)
 
     def build_json(self, w3: Web3):
@@ -265,6 +268,9 @@ class DAOStrategiesBuilder:
         print(f'    Adding Lido positions')
         if self.lido:
             self.add_to_json(self.build_lido_positions(w3, self.lido))
+        print(f'    Adding Wallet positions')
+        if self.wallet_tokens:
+            self.add_to_json(self.build_wallet_positions(w3, self.wallet_tokens))
 
     def add_to_json(self, positions: list[dict]):
         file = os.path.join(os.path.dirname(__file__), 'strategies', f"{self.dao}-{self.blockchain}.json")
