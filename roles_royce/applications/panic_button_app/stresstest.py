@@ -60,6 +60,8 @@ def stresstest(
                     exit_arguments_dict[item["name"]] = max_slippage
                 elif item["name"] == "token_out_address":
                     exit_arguments_dict[item["name"]] = item["options"][0]["value"]
+                elif item["name"] == "token_in_address":
+                    exit_arguments_dict[item["name"]] = item["options"][0]["value"]
             exit_arguments = [exit_arguments_dict]
 
             blockchain = Chain.get_blockchain_from_web3(w3)
