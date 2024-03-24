@@ -94,7 +94,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
                                 message,
                                 slack_msg=message_slack)
         flags.interest_payed.set()
-    elif time.time() > dynamic_data.next_claim_epoch:
+    elif dynamic_data.next_claim_epoch - time.time() > 60 * 60 * 24:
         flags.interest_payed.clear()
 
     if flags.tx_executed.is_set():
