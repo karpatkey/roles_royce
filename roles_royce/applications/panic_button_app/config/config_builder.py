@@ -223,9 +223,12 @@ class WalletPosition:
     
     def position_id_human_readable(self, w3: Web3) -> str:
         blockchain = Chain.get_blockchain_from_web3(w3)
-        token_contract = erc20_contract(w3, self.token_in_address)
-        token_symbol = token_contract.functions.symbol().call()
-        return f'{blockchain}_WalletPosition_{token_symbol}'
+        if self.token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+            return f'{blockchain}_WalletPosition_ETH'
+        else:
+            token_contract = erc20_contract(w3, self.token_in_address)
+            token_symbol = token_contract.functions.symbol().call()
+            return f'{blockchain}_WalletPosition_{token_symbol}'
 
 
 # -----------------------------------------------------------------------------------------------------------------------
