@@ -4,6 +4,8 @@ import logging
 from defabipedia.xdai_bridge import ContractSpecs
 from defabipedia.types import Chain
 from datetime import datetime
+from roles_royce.applications.bridge_keeper.utils import Flags
+import json
 import time
 
 logger = logging.getLogger(__name__)
@@ -21,9 +23,11 @@ def log_initial_data(static_data: StaticData, messenger: Messenger):
     messenger.log_and_alert(LoggingLevel.Info, title, message)
 
 
-def log_status_update(static_data: StaticData, dynamic_data: DynamicData):
+def log_status_update(static_data: StaticData, dynamic_data: DynamicData, flags: Flags):
+    status = json.dumps({"dynamic_data": json.loads(f"{dynamic_data}"), "static_data": json.loads(f"{static_data}"), "flags": json.loads(f"{flags}")})
     title = 'Status update'
     message = (
+        f'  {status}\n'
         f'  Static data:\n'
         f'    Refill threshold: {static_data.env.REFILL_THRESHOLD:,.2f} DAI.\n'
         f'    Invest threshold: {static_data.env.INVEST_THRESHOLD:,.2f} DAI.\n'
@@ -38,11 +42,16 @@ def log_status_update(static_data: StaticData, dynamic_data: DynamicData):
         f'    Claimable interest: {dynamic_data.claimable / (10 ** static_data.decimals_DAI):,.2f} DAI.\n'
         f'    Minimum interest paid: {dynamic_data.min_interest_paid / (10 ** static_data.decimals_DAI):,.2f} DAI.\n'
         f'    Bot"s ETH balance: {dynamic_data.bot_ETH_balance / (10 ** 18):,.5f} ETH.\n'
+        f'  Flags:\n'
+        f'    Lack of gas warning: {flags.lack_of_gas_warning.is_set()}.\n'
+        f'    Interest paid: {flags.interest_payed.is_set()}.\n'
+        f'    Transaction executed: {flags.tx_executed.is_set()}.\n'
         f'  Execution Triggering Conditions:\n'
         f'    Interest is paid if the next claim epoch is in less than (Minutes before claim epoch) and '
         f'Minimum interest paid <  min(Amount of interest to pay, Claimable interest).\n'
         f'    The bridge is refilled if Bridge"s DAI balance < min(Refill threshold, Minimum cash threshold).\n'
         f'    DAI is invested if Bridge"s DAI balance > Invest threshold + Minimum cash threshold.'
+        f'    \n'
     )
 
     logger.info(title + '.\n' + message)

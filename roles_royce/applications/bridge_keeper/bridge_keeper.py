@@ -60,8 +60,8 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
     global flags
 
     dynamic_data = update_dynamic_data(w3_eth, w3_gnosis, static_data)
-    log_status_update(static_data=static_data, dynamic_data=dynamic_data)
-    gauges.update(static_data=static_data, dynamic_data=dynamic_data)
+    log_status_update(static_data=static_data, dynamic_data=dynamic_data, flags=flags)
+    gauges.update(static_data=static_data, dynamic_data=dynamic_data, flags=flags)
 
     # -----------------------------------------------------------------------------------------------------------------------
 
@@ -100,8 +100,8 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
     if flags.tx_executed.is_set():
         # Update data
         dynamic_data = update_dynamic_data(w3_eth, w3_gnosis, static_data)
-        log_status_update(static_data=static_data, dynamic_data=dynamic_data)
-        gauges.update(static_data=static_data, dynamic_data=dynamic_data)
+        log_status_update(static_data=static_data, dynamic_data=dynamic_data, flags=flags)
+        gauges.update(static_data=static_data, dynamic_data=dynamic_data, flags=flags)
 
     # -----------------------------------------------------------------------------------------------------------------------
 
@@ -138,8 +138,8 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
     if flags.tx_executed.is_set():
         # Update data
         dynamic_data = update_dynamic_data(w3_eth, w3_gnosis, static_data)
-        log_status_update(static_data=static_data, dynamic_data=dynamic_data)
-        gauges.update(static_data=static_data, dynamic_data=dynamic_data)
+        log_status_update(static_data=static_data, dynamic_data=dynamic_data, flags=flags)
+        gauges.update(static_data=static_data, dynamic_data=dynamic_data, flags=flags)
 
     # -----------------------------------------------------------------------------------------------------------------------
 
