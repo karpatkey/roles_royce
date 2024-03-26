@@ -7,9 +7,9 @@ from defabipedia.balancer import Abis as BalancerAbis
 from defabipedia.types import Chain
 from web3 import Web3
 
-from roles_royce.applications.panic_button_app.execute import execute
-from roles_royce.applications.panic_button_app.transaction_builder import build_transaction
-from roles_royce.applications.panic_button_app.utils import recovery_mode_balancer
+from roles_royce.applications.execution_app.execute import execute
+from roles_royce.applications.execution_app.transaction_builder import build_transaction
+from roles_royce.applications.execution_app.utils import recovery_mode_balancer
 
 logging.basicConfig(
     level=logging.INFO,

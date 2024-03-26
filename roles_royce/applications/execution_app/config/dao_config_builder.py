@@ -1,5 +1,5 @@
 from web3 import Web3
-from roles_royce.applications.panic_button_app.config.config_builder import DAOStrategiesBuilder, DAO, \
+from roles_royce.applications.execution_app.config.config_builder import DAOStrategiesBuilder, DAO, \
     BalancerPosition, AuraPosition, LidoPosition, WalletPosition
 import os
 from defabipedia.types import Chain, Blockchain
