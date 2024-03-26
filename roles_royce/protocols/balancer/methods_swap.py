@@ -4,6 +4,7 @@ from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
 from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from web3 import Web3
 from defabipedia.balancer import ContractSpecs
+from roles_royce.roles_modifier import Operation
 
 
 class SingleSwap(ContractMethod):
@@ -16,7 +17,7 @@ class SingleSwap(ContractMethod):
                 ("kind", "uint8"),
                 ("asset_in", "address"),
                 ("asset_out", "address"),
-                ("amount", "uint256"),
+                ("amount_in", "uint256"),
                 ("user_data", "bytes"),
             ),
             "tuple"),
@@ -30,33 +31,38 @@ class SingleSwap(ContractMethod):
             ),
             "tuple"),
          ),
-        ("limit", "uint256"),
+        ("min_amount_out", "uint256"),
         ("deadline", "uint256")
     )
     fixed_arguments = {"sender": AvatarAddress, "recipient": AvatarAddress, "from_internal_balance": False,
-                       "to_internal_balance": False, "user_data": "0x", "deadline": MAX_UINT256}
+                       "to_internal_balance": False, "user_data": "0x"}
 
     def __init__(self,
-                 blockchain: Blockchain,
+                 blockchain: str,
                  pool_id: str,
                  avatar: Address,
-                 swap_kind: SwapKind,
+                 kind: SwapKind,
                  token_in_address: Address,
                  token_out_address: Address,
-                 amount: int,
-                 limit: int):
-        self.target_address = ContractSpecs[blockchain].Vault.address
+                 amount_in: int,
+                 min_amount_out: int,
+                 deadline: int):
+        
         super().__init__(avatar=avatar)
-        self.args.single_swap["pool_id"] = pool_id
-        self.args.single_swap["kind"] = swap_kind
-        self.args.single_swap["asset_in"] = token_in_address
-        self.args.single_swap["asset_out"] = token_out_address
-        self.args.single_swap["amount"] = amount
-        self.args.single_swap["user_data"] = self.fixed_arguments["user_data"]
+        self.target_address = ContractSpecs[blockchain].Vault.address
+        self.args.pool_id = pool_id
+        self.args.kind = kind
+        self.args.asset_in = token_in_address
+        self.args.asset_out = token_out_address
+        self.args.amount_in = amount_in
+        self.args.user_data = self.fixed_arguments["user_data"]
+        self.args.single_swap = [self.args.pool_id, self.args.kind, 
+                                 self.args.asset_in, self.args.asset_out,
+                                 self.args.amount_in, self.args.user_data]
         self.args.funds = [self.fixed_arguments["sender"], self.fixed_arguments["from_internal_balance"],
                            self.fixed_arguments["recipient"], self.fixed_arguments["to_internal_balance"]]
-        self.args.deadline = self.fixed_arguments["deadline"]
-        self.args.limit = limit
+        self.args.deadline = deadline
+        self.args.min_amount_out = min_amount_out
 
 
 class ExactTokenInSingleSwap(SingleSwap):
@@ -75,8 +81,9 @@ class ExactTokenInSingleSwap(SingleSwap):
                          swap_kind=swap_kind,
                          token_in_address=token_in_address,
                          token_out_address=token_out_address,
-                         amount=amount_in,
-                         limit=min_amount_out)
+                         amount_in=amount_in,
+                         min_amount_out=min_amount_out)
+        
 
 
 class ExactTokenOutSingleSwap(SingleSwap):
@@ -96,4 +103,54 @@ class ExactTokenOutSingleSwap(SingleSwap):
                          token_in_address=token_in_address,
                          token_out_address=token_out_address,
                          amount=amount_out,
-                         limit=max_amount_in)
+                         max_amount_in=max_amount_in)
+        
+class QuerySwap(ContractMethod):
+    target_address = None
+    name = "querySwap"
+    out_signature = [("amount_out", "uint256")]
+    in_signature = (
+        ("single_swap", (
+            (
+                ("pool_id", "bytes32"),
+                ("kind", "uint8"),
+                ("asset_in", "address"),
+                ("asset_out", "address"),
+                ("amount", "uint256"),
+                ("user_data", "bytes")
+            ),
+            "tuple"),
+         ),
+        ("funds", (
+            (
+                ("sender", "address"),
+                ("from_internal_balance", "bool"),
+                ("recipient", "address"),
+                ("to_internal_balance", "bool")
+            ),
+            "tuple"),
+         )
+    )
+    fixed_arguments = {"sender": AvatarAddress, "recipient": AvatarAddress, "from_internal_balance": False,
+                       "to_internal_balance": False, "user_data": "0x", "kind": SwapKind.OutGivenExactIn}
+
+    def __init__(self,
+                 blockchain: Blockchain,
+                 pool_id: str,
+                 avatar: Address,
+                 token_in_address: Address,
+                 token_out_address: Address,
+                 amount: int):
+        super().__init__(avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].Queries.address
+        self.args.pool_id = pool_id
+        self.args.asset_in = token_in_address
+        self.args.asset_out = token_out_address
+        self.args.amount = amount
+        self.args.user_data = self.fixed_arguments["user_data"]
+        self.args.single_swap = [self.args.pool_id, self.fixed_arguments["kind"], 
+                                 self.args.asset_in, self.args.asset_out,
+                                 self.args.amount, self.args.user_data]
+        self.args.funds = [self.fixed_arguments["sender"], self.fixed_arguments["from_internal_balance"],
+                           self.fixed_arguments["recipient"], self.fixed_arguments["to_internal_balance"]]
+

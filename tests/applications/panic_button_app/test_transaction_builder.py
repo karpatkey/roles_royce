@@ -2,7 +2,7 @@ from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
 from roles_royce.applications.panic_button_app.transaction_builder import (
     build_transaction,
 )
-from tests.utils import assign_role,local_node_eth, accounts
+from tests.utils import assign_role, local_node_eth, accounts
 import pytest
 
 dao = "GnosisDAO"

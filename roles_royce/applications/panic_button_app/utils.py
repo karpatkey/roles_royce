@@ -15,7 +15,7 @@ from web3.types import Address
 from roles_royce.constants import StrEnum
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address, ContractMethod
-from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler, LidoDisassembler
+from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler, LidoDisassembler, SwapDisassembler
 
 
 class Modes(StrEnum):
@@ -206,6 +206,14 @@ def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[
         )
     elif exec_config.protocol == "Lido":
         disassembler = LidoDisassembler(
+            w3=w3,
+            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
+            roles_mod_address=env.ROLES_MOD_ADDRESS,
+            role=env.ROLE,
+            signer_address=env.DISASSEMBLER_ADDRESS,
+        )
+    elif exec_config.protocol == "Wallet":
+        disassembler = SwapDisassembler(
             w3=w3,
             avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
             roles_mod_address=env.ROLES_MOD_ADDRESS,
