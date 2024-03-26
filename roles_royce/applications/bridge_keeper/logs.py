@@ -6,6 +6,7 @@ from defabipedia.types import Chain
 from datetime import datetime
 from roles_royce.applications.bridge_keeper.utils import Flags
 import json
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ def log_status_update(static_data: StaticData, dynamic_data: DynamicData, flags:
         f'  Dynamic data:\n'
         f'    Bridge"s DAI balance: {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):,.2f} DAI.\n'
         f'    Next claim epoch: {datetime.utcfromtimestamp(dynamic_data.next_claim_epoch)} UTC.\n'
+        f'    Minutes left till next interest payment: {int((dynamic_data.next_claim_epoch - 60 * static_data.env.MINUTES_BEFORE_CLAIM_EPOCH - time.time())/60)}\n'
         f'    Minimum cash threshold: {dynamic_data.min_cash_threshold / (10 ** static_data.decimals_DAI):,.2f} DAI.\n'
         f'    Claimable interest: {dynamic_data.claimable / (10 ** static_data.decimals_DAI):,.2f} DAI.\n'
         f'    Minimum interest paid: {dynamic_data.min_interest_paid / (10 ** static_data.decimals_DAI):,.2f} DAI.\n'
