@@ -1,5 +1,5 @@
-from roles_royce.applications.panic_button_app.utils import start_the_engine, gear_up, decode_transaction
-from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig, Modes
+from roles_royce.applications.execution_app.utils import start_the_engine, gear_up, decode_transaction
+from roles_royce.applications.execution_app.utils import ENV, ExecConfig, Modes
 from tests.utils import local_node_eth, accounts
 import pytest
 
@@ -118,4 +118,3 @@ def test_decode_transaction(local_node_eth, accounts, monkeypatch):
             'to_address': '0xBA12222222228d8Ba445958a75a0704d566BF2C8',
             'type': 'function',
             'value': 0}]
-

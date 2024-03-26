@@ -1,6 +1,6 @@
 name: Update and Push Json
 
-on: 
+on:
   schedule:
     - cron: '0 0 * * *'  # Scheduled every night at 12
   workflow_dispatch: {} # Manual triggering
@@ -37,10 +37,10 @@ jobs:
           pip3 install web3
           pip3 install -e .
           pip3 install --upgrade setuptools
-           
+
       - name: Run Python script
         run: |
-          RR_ETH_FORK_URL=${{ secrets.NODE_ETH }} RR_GC_FORK_URL=${{ secrets.NODE_XDAI }} python3 roles_royce/applications/panic_button_app/config/dao_config_builder.py
+          RR_ETH_FORK_URL=${{ secrets.NODE_ETH }} RR_GC_FORK_URL=${{ secrets.NODE_XDAI }} python3 roles_royce/applications/execution_app/config/dao_config_builder.py
 
       - name: Commit and Push changes
         run: |

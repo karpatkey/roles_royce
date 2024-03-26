@@ -1,6 +1,6 @@
 from tests.utils import local_node_gc, local_node_eth
 from unittest.mock import patch, mock_open
-from roles_royce.applications.panic_button_app.config.config_builder import DAO, AuraPosition, \
+from roles_royce.applications.execution_app.config.config_builder import DAO, AuraPosition, \
     DAOStrategiesBuilder, BalancerPosition, WalletPosition
 import json
 from defabipedia.types import Chain
@@ -18,9 +18,9 @@ test_data_str = json.dumps(test_data)
 @patch('builtins.open', mock_open(read_data=test_data_str))
 def test_build_aura_positions(local_node_gc):
     with patch(
-            'roles_royce.applications.panic_button_app.config.config_builder.get_aura_gauge_from_bpt') as mock_get_aura_gauge_from_bpt, \
+            'roles_royce.applications.execution_app.config.config_builder.get_aura_gauge_from_bpt') as mock_get_aura_gauge_from_bpt, \
             patch(
-                'roles_royce.applications.panic_button_app.config.config_builder.get_tokens_from_bpt') as mock_get_tokens_from_bpt:
+                'roles_royce.applications.execution_app.config.config_builder.get_tokens_from_bpt') as mock_get_tokens_from_bpt:
         dao = DAO.GnosisDAO
         blockchain = Chain.GNOSIS
         aura_position = AuraPosition(position_id='226', bpt_address='0xf48f01dcb2cbb3ee1f6aab0e742c2d3941039d56')
@@ -56,7 +56,7 @@ test_data_str = json.dumps(test_data)
 @patch('builtins.open', mock_open(read_data=test_data_str))
 def test_build_balancer_positions(local_node_gc):
     with patch(
-            'roles_royce.applications.panic_button_app.config.config_builder.get_tokens_from_bpt') as mock_get_tokens_from_bpt:
+            'roles_royce.applications.execution_app.config.config_builder.get_tokens_from_bpt') as mock_get_tokens_from_bpt:
         dao = DAO.GnosisDAO
         blockchain = Chain.GNOSIS
         balancer_position = BalancerPosition(position_id='226',
@@ -97,4 +97,3 @@ def test_build_swap_pool_positions(local_node_eth):
     result = builder.build_wallet_positions(w3, [wallet_position])
 
     assert result == [{'protocol': 'Wallet', 'position_id': '226', 'position_id_tech': '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84', 'position_id_human_readable': 'ethereum_WalletPosition_stETH', 'exec_config': [{'function_name': 'exit_2', 'label': 'Exchange Wallet Token on Curve', 'test': True, 'stresstest': False, 'description': 'Exchange a wallet token through Curve', 'parameters': [{'name': 'token_in_address', 'label': 'Token in', 'type': 'input', 'options': [{'value': '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84', 'label': 'stETH'}]}, {'name': 'max_slippage', 'label': 'Max slippage', 'type': 'input', 'rules': {'min': 0.001, 'max': 100}}, {'name': 'token_out_address', 'label': 'Token out', 'type': 'input', 'options': [{'value': '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', 'label': 'ETH'}]}]}]}]
-    

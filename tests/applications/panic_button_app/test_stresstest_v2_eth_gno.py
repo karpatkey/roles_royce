@@ -2,8 +2,8 @@ from dataclasses import dataclass
 import os
 import json
 
-from roles_royce.applications.panic_button_app.utils import ENV
-from roles_royce.applications.panic_button_app.stresstest import stresstest
+from roles_royce.applications.execution_app.utils import ENV
+from roles_royce.applications.execution_app.stresstest import stresstest
 from tests.utils import assign_role, local_node_eth, accounts, web3_eth, local_node_gc, web3_gnosis
 from tests.utils import top_up_address, fork_unlock_account
 

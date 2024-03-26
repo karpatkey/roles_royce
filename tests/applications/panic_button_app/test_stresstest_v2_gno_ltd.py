@@ -2,10 +2,10 @@ from dataclasses import dataclass
 import os
 import json
 
-from roles_royce.applications.panic_button_app.utils import ENV
-from roles_royce.applications.panic_button_app.stresstest import stresstest
+from roles_royce.applications.execution_app.utils import ENV
+from roles_royce.applications.execution_app.stresstest import stresstest
 from tests.utils import assign_role, local_node_eth, accounts, web3_eth, local_node_gc, web3_gnosis
-from tests.utils import top_up_address, fork_unlock_account 
+from tests.utils import top_up_address, fork_unlock_account
 
 PERCENTAGE = 20
 MAX_SLIPPAGE = 1
@@ -144,6 +144,3 @@ def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch):
     stresstest_tester = stresstest(w3=w3, positions_dict=test_data, percentage=PERCENTAGE, max_slippage=MAX_SLIPPAGE, dao=dao.name, blockchain=dao.blockchain)
 
     assert stresstest_tester == stresstest_outcome
-
-
-

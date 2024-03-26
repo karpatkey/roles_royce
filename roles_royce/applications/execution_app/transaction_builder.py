@@ -1,7 +1,7 @@
 import argparse
 import json
 
-from roles_royce.applications.panic_button_app.utils import (
+from roles_royce.applications.execution_app.utils import (
     ENV,
     ExecConfig,
     decode_transaction,
