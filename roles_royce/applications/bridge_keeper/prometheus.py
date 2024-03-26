@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from prometheus_client import Gauge
 from roles_royce.applications.bridge_keeper.core import StaticData, DynamicData
+from roles_royce.applications.bridge_keeper.utils import Flags
 
 
 @dataclass
@@ -14,8 +15,11 @@ class Gauges:
     claimable = Gauge('claimable', 'Claimable interest')
     min_interest_paid = Gauge('min_interest_paid', 'Minimum amount of interest that can be paid in a single call')
     amount_of_interest_to_pay = Gauge('amount_of_interest_to_pay', 'Amount of interest to pay')
+    lack_of_gas_warning = Gauge('lack_of_tx_executed', 'Lack of gas warning flag')
+    interest_payed = Gauge('interest_payed', 'Interest payed flag')
+    tx_executed = Gauge('tx_executed', 'Transaction executed flag')
 
-    def update(self, static_data: StaticData, dynamic_data: DynamicData):
+    def update(self, static_data: StaticData, dynamic_data: DynamicData, flags: Flags):
         self.bot_ETH_balance.set(dynamic_data.bot_ETH_balance / (10 ** 18))
         self.bridge_DAI_balance.set(dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI))
         self.next_claim_epoch.set(dynamic_data.next_claim_epoch)
@@ -25,3 +29,6 @@ class Gauges:
         self.claimable.set(dynamic_data.claimable / (10 ** static_data.decimals_DAI))
         self.min_interest_paid.set(dynamic_data.min_interest_paid / (10 ** static_data.decimals_DAI))
         self.amount_of_interest_to_pay.set(static_data.env.AMOUNT_OF_INTEREST_TO_PAY)
+        self.lack_of_gas_warning.set(flags.tx_executed.is_set())
+        self.interest_payed.set(flags.interest_payed.is_set())
+        self.tx_executed.set(flags.tx_executed.is_set())

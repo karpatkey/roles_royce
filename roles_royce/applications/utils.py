@@ -40,6 +40,8 @@ def to_dict(obj: Any, exclude_key: str = None) -> dict:
         return {key: to_dict(value, exclude_key) for key, value in obj.__dict__.items() if key != exclude_key}
     elif isinstance(obj, list):
         return [to_dict(item, exclude_key) for item in obj]
+    elif isinstance(obj, int):
+        return str(obj)  # Convert int to string explicitly
     else:
         return obj
 

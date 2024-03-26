@@ -16,7 +16,7 @@ class StaticData:
     decimals_DAI: int = 18
 
     def __str__(self):
-        return json.dumps(to_dict(self, exclude_key="PRIVATE_KEY"), indent=4)
+        return json.dumps(to_dict(self, exclude_key="PRIVATE_KEY"), separators=(',', ':'))
 
 
 @dataclass
@@ -29,7 +29,7 @@ class DynamicData:
     min_interest_paid: int
 
     def __str__(self):
-        return json.dumps(to_dict(self, exclude_key="PRIVATE_KEY"), indent=4)
+        return json.dumps(to_dict(self, exclude_key="PRIVATE_KEY"), separators=(',', ':'))
 
 
 def update_dynamic_data(w3_eth: Web3, w3_gnosis: Web3, static_data: StaticData) -> DynamicData:

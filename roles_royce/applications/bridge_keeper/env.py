@@ -91,4 +91,4 @@ class ENV:
         self.AMOUNT_OF_INTEREST_TO_PAY = config('AMOUNT_OF_INTEREST_TO_PAY', cast=float)
 
     def __str__(self):
-        return json.dumps(to_dict(self, exclude_key="PRIVATE_KEY"), indent=4)
+        return json.dumps(to_dict(self, exclude_key="PRIVATE_KEY"), separators=(',', ':'))
