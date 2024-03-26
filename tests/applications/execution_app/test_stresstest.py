@@ -1,8 +1,8 @@
-from roles_royce.applications.panic_button_app.execute import execute
-from roles_royce.applications.panic_button_app.transaction_builder import (
+from roles_royce.applications.execution_app.execute import execute
+from roles_royce.applications.execution_app.transaction_builder import (
     build_transaction,
 )
-from roles_royce.applications.panic_button_app.utils import ENV
+from roles_royce.applications.execution_app.utils import ENV
 from tests.utils import (
     assign_role,
 )
@@ -83,7 +83,7 @@ for dao in daos:
         Path(os.path.dirname(__file__)).resolve().parent.parent.parent,
         "roles_royce",
         "applications",
-        "panic_button_app",
+        "execution_app",
         "config",
         "strategies",
         f"{dao.name}-{dao.blockchain.lower()}.json",

@@ -2,8 +2,8 @@ from dataclasses import dataclass
 import os
 import json
 
-from roles_royce.applications.panic_button_app.utils import ENV
-from roles_royce.applications.panic_button_app.stresstest import stresstest
+from roles_royce.applications.execution_app.utils import ENV
+from roles_royce.applications.execution_app.stresstest import stresstest
 from tests.utils import assign_role, local_node_eth, accounts, web3_eth, local_node_gc, web3_gnosis
 from tests.utils import top_up_address, fork_unlock_account
 
@@ -11,8 +11,8 @@ PERCENTAGE = 20
 MAX_SLIPPAGE = 1
 
 stresstest_outcome = {
-    "dao": "GnosisDAO",
-    "blockchain": "ethereum",
+    "dao": "GnosisLtd",
+    "blockchain": "gnosis",
     "general_parameters": [
         {
             "name": "percentage",
@@ -26,40 +26,27 @@ stresstest_outcome = {
     ],
     "positions": [
         {
-            "position_id": "33",
-            "position_id_tech": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
-            "position_id_human_readable": "ethereum_Aura_rETH_WETH",
-            "protocol": "Aura",
+            "protocol": "Balancer",
+            "position_id": "386",
+            "position_id_tech": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f",
+            "position_id_human_readable": "gnosis_Balancer_GBPe_WXDAI",
             "exec_config": [
                 {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
+                    "function_name": "exit_1_1",
+                    "label": "Withdraw (proportional)",
                     "test": True,
-                    "stresstest": True,
-                    "description": "Unstake BPT from Aura gauge",
+                    "stresstest": "false, with error: Role permissions error: "
+                       'ParameterNotOneOfAllowed()',
+                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
                     "parameters": [
                         {
-                            "name": "rewards_address",
+                            "name": "bpt_address",
                             "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
-                        }
-                    ]
-                },
-                {
-                    "function_name": "exit_2_1",
-                    "label": "Unstake + withdraw (proportional)",
-                    "test": True,
-                    "stresstest": True,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
+                            "value": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f"
                         },
                         {
                             "name": "max_slippage",
-                            "label": "Max Slippage",
+                            "label": "Max slippage",
                             "type": "input",
                             "rules": {
                                 "min": 0.001,
@@ -69,20 +56,20 @@ stresstest_outcome = {
                     ]
                 },
                 {
-                    "function_name": "exit_2_3",
-                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
+                    "function_name": "exit_1_3",
+                    "label": "Withdraw (proportional) (Recovery mode)",
                     "test": True,
                     "stresstest": False,
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
+                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
                     "parameters": [
                         {
-                            "name": "rewards_address",
+                            "name": "bpt_address",
                             "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
+                            "value": "0xEA54604e7E1DdEc8320cF838CFE857FbF44Aad9f"
                         },
                         {
                             "name": "max_slippage",
-                            "label": "Max Slippage",
+                            "label": "Max slippage",
                             "type": "input",
                             "rules": {
                                 "min": 0.001,
@@ -96,7 +83,6 @@ stresstest_outcome = {
     ]
 }
 
-
 @dataclass
 class DAO:
     name: str
@@ -105,13 +91,11 @@ class DAO:
     roles_mod_address: str
     role: int
 
-
-dao = DAO(name="GnosisDAO",
-          blockchain="ETHEREUM",
-          avatar_safe_address="0x849D52316331967b6fF1198e5E32A0eB168D039d",
-          roles_mod_address="0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc",
-          role=4)
-
+dao = DAO(name="GnosisLtd",
+            blockchain="GNOSIS",
+            avatar_safe_address="0x10E4597fF93cbee194F4879f8f1d54a370DB6969",
+            roles_mod_address="0x494ec5194123487E8A6ba0b6bc96D57e340025e7",
+            role=4)
 
 def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
     if dao.blockchain == 'ETHEREUM':
@@ -149,15 +133,14 @@ def set_env(monkeypatch, private_key: str, dao: DAO) -> ENV:
     monkeypatch.setenv(f'{dao.name.upper()}_{dao.blockchain.upper()}_PRIVATE_KEY', private_key)
     return ENV(dao.name, dao.blockchain)
 
-
 def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch):
+
     w3, private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
-    with open(os.path.join(os.path.dirname(__file__), 'test_stresstest_v2_eth_gno.json'), 'r') as f:
+    with open(os.path.join(os.path.dirname(__file__), 'test_stresstest_ltd_gno.json'), 'r') as f:
         test_data = json.load(f)
 
-    stresstest_tester = stresstest(w3=w3, positions_dict=test_data, percentage=PERCENTAGE, max_slippage=MAX_SLIPPAGE,
-                                   dao=dao.name, blockchain=dao.blockchain)
+    stresstest_tester = stresstest(w3=w3, positions_dict=test_data, percentage=PERCENTAGE, max_slippage=MAX_SLIPPAGE, dao=dao.name, blockchain=dao.blockchain)
 
     assert stresstest_tester == stresstest_outcome

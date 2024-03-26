@@ -1,4 +1,4 @@
-from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
+from roles_royce.applications.execution_app.utils import ENV, ExecConfig
 from tests.utils import assign_role, local_node_eth, accounts
 import os
 import json
@@ -99,7 +99,7 @@ def test_transaction_builder_lido(local_node_eth, accounts, monkeypatch, args, e
     set_env(monkeypatch, private_key)
 
     file_path_main = os.path.join(Path(os.path.dirname(__file__)).resolve().parent.parent.parent, 'roles_royce',
-                                  'applications', 'panic_button_app',
+                                  'applications', 'execution_app',
                                   'transaction_builder.py')
 
     arguments = [
