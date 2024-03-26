@@ -79,7 +79,6 @@ class SwapUniswapV3(ContractMethod):
                             self.args.amount_in,
                             self.args.min_amount_out,
                             self.fixed_arguments["limit_price"]]
-        self.operation = Operation.DELEGATE_CALL
 
 class ApproveUniswapV3(ContractMethod):
     name = "approve"
@@ -91,6 +90,6 @@ class ApproveUniswapV3(ContractMethod):
                  amount: int):
         super().__init__()
         self.target_address = token_address
-        self.args.spender = ContractSpecs[blockchain].ApprovePermit2.address
+        self.args.spender = ContractSpecs[blockchain].UniV3_SwapRouter.address
         self.args.amount = amount
 
