@@ -15,7 +15,7 @@ class Gauges:
     claimable = Gauge('claimable', 'Claimable interest')
     min_interest_paid = Gauge('min_interest_paid', 'Minimum amount of interest that can be paid in a single call')
     amount_of_interest_to_pay = Gauge('amount_of_interest_to_pay', 'Amount of interest to pay')
-    lack_of_gas_warning = Gauge('lack_of_tx_executed', 'Lack of gas warning flag')
+    lack_of_gas_warning = Gauge('lack_of_gas_executed', 'Lack of gas warning flag')
     interest_payed = Gauge('interest_payed', 'Interest payed flag')
     tx_executed = Gauge('tx_executed', 'Transaction executed flag')
 
@@ -29,6 +29,6 @@ class Gauges:
         self.claimable.set(dynamic_data.claimable / (10 ** static_data.decimals_DAI))
         self.min_interest_paid.set(dynamic_data.min_interest_paid / (10 ** static_data.decimals_DAI))
         self.amount_of_interest_to_pay.set(static_data.env.AMOUNT_OF_INTEREST_TO_PAY)
-        self.lack_of_gas_warning.set(flags.tx_executed.is_set())
+        self.lack_of_gas_warning.set(flags.lack_of_gas_warning.is_set())
         self.interest_payed.set(flags.interest_payed.is_set())
         self.tx_executed.set(flags.tx_executed.is_set())
