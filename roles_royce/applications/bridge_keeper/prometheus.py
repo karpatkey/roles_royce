@@ -15,7 +15,7 @@ class Gauges:
     claimable = Gauge('claimable', 'Claimable interest')
     min_interest_paid = Gauge('min_interest_paid', 'Minimum amount of interest that can be paid in a single call')
     amount_of_interest_to_pay = Gauge('amount_of_interest_to_pay', 'Amount of interest to pay')
-    lack_of_gas_warning = Gauge('lack_of_gas_executed', 'Lack of gas warning flag')
+    lack_of_gas_warning = Gauge('lack_of_gas_warning', 'Lack of gas warning flag')
     interest_payed = Gauge('interest_payed', 'Interest payed flag')
     tx_executed = Gauge('tx_executed', 'Transaction executed flag')
 
