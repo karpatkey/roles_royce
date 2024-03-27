@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from prometheus_client import Gauge
 from roles_royce.applications.bridge_keeper.core import StaticData, DynamicData
 from roles_royce.applications.bridge_keeper.utils import Flags
+import time
 
 
 @dataclass
@@ -18,6 +19,7 @@ class Gauges:
     lack_of_gas_warning = Gauge('lack_of_gas_warning', 'Lack of gas warning flag')
     interest_payed = Gauge('interest_payed', 'Interest payed flag')
     tx_executed = Gauge('tx_executed', 'Transaction executed flag')
+    minutes_till_interest_payment = Gauge('minutes_till_interest_payment', 'Minutes left till next interest payment')
 
     def update(self, static_data: StaticData, dynamic_data: DynamicData, flags: Flags):
         self.bot_ETH_balance.set(dynamic_data.bot_ETH_balance / (10 ** 18))
@@ -32,3 +34,5 @@ class Gauges:
         self.lack_of_gas_warning.set(flags.lack_of_gas_warning.is_set())
         self.interest_payed.set(flags.interest_payed.is_set())
         self.tx_executed.set(flags.tx_executed.is_set())
+        self.minutes_till_interest_payment.set(int((dynamic_data.next_claim_epoch - 60 * static_data.env.MINUTES_BEFORE_CLAIM_EPOCH - time.time())/60))
+
