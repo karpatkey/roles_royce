@@ -142,7 +142,7 @@ def stresstest(
         for exec_config in position["exec_config"]:
             executions.append([w3, percentage, max_slippage, dao, blockchain, protocol, exec_config, bc])
 
-    results = Parallel(n_jobs=10, backend="threading")(delayed(single_stresstest)(*args) for args in executions)
+    results = Parallel(n_jobs=4, backend="threading")(delayed(single_stresstest)(*args) for args in executions)
     collections.deque(results, maxlen=0)
 
     return positions_dict
