@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import ContractMethod, Address, AvatarAddress, BaseApprove, BaseApproveForToken
+from roles_royce.protocols.base import Address, AvatarAddress, BaseApprove, BaseApproveForToken, ContractMethod
 
 
 class RateModel(IntEnum):
@@ -11,22 +11,27 @@ class RateModel(IntEnum):
 
 class ApproveDAIforSDAI(BaseApprove):
     """approve DAI with sDAI as spender"""
+
     fixed_arguments = {"spender": ETHAddr.sDAI}
     token = ETHAddr.DAI
 
 
 class ApproveToken(BaseApproveForToken):
     """approve Token with SparkLendingPoolV3 as spender"""
+
     fixed_arguments = {"spender": ETHAddr.SparkLendingPoolV3}
 
 
 class DepositToken(ContractMethod):
     """Sender deposits Token and receives spToken in exchange"""
+
     name = "deposit"
-    in_signature = (("asset", "address"),
-                    ("amount", "uint256"),
-                    ("on_behalf_of", "address"),
-                    ("referral_code", "uint16"))
+    in_signature = (
+        ("asset", "address"),
+        ("amount", "uint256"),
+        ("on_behalf_of", "address"),
+        ("referral_code", "uint16"),
+    )
     fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
     target_address = ETHAddr.SparkLendingPoolV3
 
@@ -38,6 +43,7 @@ class DepositToken(ContractMethod):
 
 class DepositDAIforSDAI(ContractMethod):
     """Sender deposits DAI and receives sDAI in exchange (the DAI is deposited in Maker - DSR)"""
+
     name = "deposit"
     in_signature = [("amount", "uint256"), ("receiver", "address")]
     fixed_arguments = {"receiver": AvatarAddress}
@@ -50,6 +56,7 @@ class DepositDAIforSDAI(ContractMethod):
 
 class WithdrawToken(ContractMethod):
     """Sender redeems spToken and withdraws Token"""
+
     name = "withdraw"
     in_signature = [("asset", "address"), ("amount", "uint256"), ("receiver", "address")]
     fixed_arguments = {"receiver": AvatarAddress}
@@ -63,6 +70,7 @@ class WithdrawToken(ContractMethod):
 
 class RedeemSDAIforDAI(ContractMethod):
     """Sender redeems sDAI and withdraws DAI"""
+
     name = "redeem"
     in_signature = [("amount", "uint256"), ("receiver", "address"), ("owner", "address")]
     fixed_arguments = {"receiver": AvatarAddress, "owner": AvatarAddress}
@@ -86,12 +94,15 @@ class SetUserUseReserveAsCollateral(ContractMethod):
 
 class Borrow(ContractMethod):
     """Sender receives Token and receives debtToken (stable or variable debt) token"""
+
     name = "borrow"
-    in_signature = (("asset", "address"),
-                    ("amount", "uint256"),
-                    ("rate_model", "uint256"),
-                    ("referral_code", "uint16"),
-                    ("on_behalf_of", "address"))
+    in_signature = (
+        ("asset", "address"),
+        ("amount", "uint256"),
+        ("rate_model", "uint256"),
+        ("referral_code", "uint16"),
+        ("on_behalf_of", "address"),
+    )
     fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
     target_address = ETHAddr.SparkLendingPoolV3
 
@@ -104,11 +115,9 @@ class Borrow(ContractMethod):
 
 class Repay(ContractMethod):
     """Repay borrowed Token"""
+
     name = "repay"
-    in_signature = (("asset", "address"),
-                    ("amount", "uint256"),
-                    ("rate_model", "uint256"),
-                    ("on_behalf_of", "address"))
+    in_signature = (("asset", "address"), ("amount", "uint256"), ("rate_model", "uint256"), ("on_behalf_of", "address"))
     fixed_arguments = {"on_behalf_of": AvatarAddress}
     target_address = ETHAddr.SparkLendingPoolV3
 
