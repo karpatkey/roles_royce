@@ -4,9 +4,11 @@ import requests
 class PulleyFork(object):
     def __init__(self, chain: str):
         self.base_url = "http://localhost:4000"
-        self.chain = {"ethereum": "1", "gnosis": "100"}.get(chain)
-        if not self.chain:
-            raise ValueError(f"Invalid blockchain: #{chain}. Must be Ethereum or Gnosis")
+        c = {"ethereum": "1", "gnosis": "100"}.get(chain.lower())
+        if not c:
+            raise ValueError(f"Invalid blockchain: '{chain}'. Must be Ethereum or Gnosis")
+        else:
+            self.chain = c
         self.fork_id = ""
 
     def __enter__(self):
