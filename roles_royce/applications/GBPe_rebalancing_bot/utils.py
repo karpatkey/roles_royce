@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field
 import threading
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -14,4 +14,3 @@ class Flags:
     lack_of_GBPe: threading.Event = field(default_factory=threading.Event)
 
     tx_executed: threading.Event = field(default_factory=threading.Event)
-

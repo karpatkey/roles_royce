@@ -2,10 +2,18 @@ import json
 import os
 from dataclasses import dataclass
 
-from roles_royce.applications.execution_app.utils import ENV
 from roles_royce.applications.execution_app.stresstest import stresstest
-from tests.utils import assign_role, local_node_eth, accounts, web3_eth, local_node_gc, web3_gnosis
-from tests.utils import top_up_address, fork_unlock_account
+from roles_royce.applications.execution_app.utils import ENV
+from tests.utils import (
+    accounts,
+    assign_role,
+    fork_unlock_account,
+    local_node_eth,
+    local_node_gc,
+    top_up_address,
+    web3_eth,
+    web3_gnosis,
+)
 
 PERCENTAGE = 20
 MAX_SLIPPAGE = 1

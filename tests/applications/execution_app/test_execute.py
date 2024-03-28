@@ -1,14 +1,18 @@
-from roles_royce.applications.execution_app.utils import ENV, ExecConfig
-from tests.utils import assign_role, local_node_eth, accounts
+import json
 import os
 import subprocess
-from pathlib import Path
 import sys
+from pathlib import Path
 
-dao = 'GnosisDAO'
-blockchain = 'ETHEREUM'
-avatar_safe_address = '0x849D52316331967b6fF1198e5E32A0eB168D039d'
-roles_mod_address = '0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc'
+import pytest
+
+from roles_royce.applications.execution_app.utils import ENV, ExecConfig
+from tests.utils import accounts, assign_role, local_node_eth
+
+dao = "GnosisDAO"
+blockchain = "ETHEREUM"
+avatar_safe_address = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
+roles_mod_address = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
 role = 4
 
 
@@ -98,15 +102,23 @@ def test_execute(local_node_eth, accounts, monkeypatch, tx):
     private_key = set_up_roles(local_node_eth, accounts)
     set_env(monkeypatch, private_key)
 
-    file_path_execute = os.path.join(Path(os.path.dirname(__file__)).resolve().parent.parent.parent, 'roles_royce',
-                                     'applications', 'execution_app',
-                                     'execute.py')
+    file_path_execute = os.path.join(
+        Path(os.path.dirname(__file__)).resolve().parent.parent.parent,
+        "roles_royce",
+        "applications",
+        "execution_app",
+        "execute.py",
+    )
 
     arguments = [
-        sys.executable, file_path_execute,
-        '--dao', dao,
-        '--blockchain', blockchain,
-        '--transaction', json.dumps(tx)
+        sys.executable,
+        file_path_execute,
+        "--dao",
+        dao,
+        "--blockchain",
+        blockchain,
+        "--transaction",
+        json.dumps(tx),
     ]
 
     main = subprocess.run(arguments, capture_output=True, text=True)

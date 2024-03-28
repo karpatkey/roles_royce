@@ -308,7 +308,6 @@ class AaveV3CDPManager:
         role: int,
         private_key: str,
     ) -> object:
-
         token_in_address = to_checksum_address(token_in_address)
         roles_mod_address = to_checksum_address(roles_mod_address)
 

@@ -1,18 +1,16 @@
 import json
 from dataclasses import dataclass, field
-from web3 import Web3
-from defabipedia.types import Chain
-from roles_royce.protocols.base import ContractMethod, Address
 from decimal import Decimal
 
 import requests
+from defabipedia.chainlink import ContractSpecs as ChainlinkContractSpecs
+from defabipedia.curve import ContractSpecs as CurveContractSpecs
 from defabipedia.types import Chain
 from web3 import Web3
 from web3.types import TxReceipt
 
 from roles_royce import roles
-from defabipedia.chainlink import ContractSpecs as ChainlinkContractSpecs
-from defabipedia.curve import ContractSpecs as CurveContractSpecs
+from roles_royce.protocols.base import Address, ContractMethod
 from roles_royce.utils import to_checksum_address
 
 decimalsEURe = 18
@@ -75,7 +73,7 @@ class SwapsDataManager:
         """
         contract = CurveContractSpecs[Chain.GNOSIS].EURe_x3RCV_deposit_zap.contract(self.w3)
 
-        amount_int = int(amount * (10 ** decimalsEURe))
+        amount_int = int(amount * (10**decimalsEURe))
         if amount_int == 0:
             raise ValueError("Amount of EURe too small. Amount of EURe: %f." % (amount * (10**decimalsEURe)))
         rate = contract.functions.get_dy_underlying(0, 1, amount_int).call()
@@ -93,7 +91,7 @@ class SwapsDataManager:
         """
 
         contract = CurveContractSpecs[Chain.GNOSIS].EURe_x3RCV_deposit_zap.contract(self.w3)
-        amount_int = int(Decimal(amount) * Decimal(10 ** decimalsWXDAI))
+        amount_int = int(Decimal(amount) * Decimal(10**decimalsWXDAI))
         if amount_int == 0:
             raise ValueError("Amount of WXDAI too small. Amount of WXDAI: %f." % (amount * (10**decimalsWXDAI)))
         rate = contract.functions.get_dy_underlying(1, 0, amount_int).call()
@@ -114,11 +112,11 @@ class SwapsDataManager:
                 "https://data.fixer.io/api/latest?access_key=%s&base=EUR&symbols=USD" % self.fixer_api_key
             )
             if data_from_api.status_code == 200:
-                response = json.loads(data_from_api.content.decode('utf-8'))
-                if response['success']:
-                    return response['rates']['USD']
+                response = json.loads(data_from_api.content.decode("utf-8"))
+                if response["success"]:
+                    return response["rates"]["USD"]
         contract = ChainlinkContractSpecs[Chain.GNOSIS].EurPriceFeed.contract(self.w3)
-        chainlink_price = float(Decimal(contract.functions.latestAnswer().call()) / Decimal((10 ** 8)))
+        chainlink_price = float(Decimal(contract.functions.latestAnswer().call()) / Decimal((10**8)))
         return chainlink_price
 
     def get_data(self, amount_WXDAI: float, amount_EURe: float) -> SwapsData:

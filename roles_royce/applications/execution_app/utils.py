@@ -15,7 +15,13 @@ from web3.types import Address
 from roles_royce.constants import StrEnum
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address, ContractMethod
-from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler, LidoDisassembler, SwapDisassembler
+from roles_royce.toolshed.disassembling import (
+    AuraDisassembler,
+    BalancerDisassembler,
+    Disassembler,
+    LidoDisassembler,
+    SwapDisassembler,
+)
 from roles_royce.utils import to_checksum_address
 
 

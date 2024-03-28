@@ -1,14 +1,12 @@
-from roles_royce.applications.execution_app.utils import ENV, ExecConfig
-from tests.utils import assign_role, local_node_eth, accounts
 import os
 import subprocess
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
 
-from roles_royce.applications.panic_button_app.utils import ENV, ExecConfig
-from tests.utils import accounts, assign_role, local_node_eth
+from roles_royce.applications.execution_app.utils import ENV, ExecConfig
+from tests.utils import assign_role
 
 dao = "GnosisDAO"
 blockchain = "ETHEREUM"
@@ -197,17 +195,27 @@ def test_transaction_builder_lido(local_node_eth, accounts, monkeypatch, args, e
     private_key = set_up_roles(local_node_eth, accounts)
     set_env(monkeypatch, private_key)
 
-    file_path_main = os.path.join(Path(os.path.dirname(__file__)).resolve().parent.parent.parent, 'roles_royce',
-                                  'applications', 'execution_app',
-                                  'transaction_builder.py')
+    file_path_main = os.path.join(
+        Path(os.path.dirname(__file__)).resolve().parent.parent.parent,
+        "roles_royce",
+        "applications",
+        "execution_app",
+        "transaction_builder.py",
+    )
 
     arguments = [
-        sys.executable, file_path_main,
-        '--percentage', str(23),
-        '--dao', dao,
-        '--blockchain', blockchain,
-        '--protocol', positions_mock[0]['protocol'],
-        '--exit-strategy', args['function_name'],
+        sys.executable,
+        file_path_main,
+        "--percentage",
+        str(23),
+        "--dao",
+        dao,
+        "--blockchain",
+        blockchain,
+        "--protocol",
+        positions_mock[0]["protocol"],
+        "--exit-strategy",
+        args["function_name"],
     ]
 
     exit_arguments_dict = {}

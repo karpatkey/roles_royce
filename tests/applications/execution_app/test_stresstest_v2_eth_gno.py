@@ -2,10 +2,18 @@ import json
 import os
 from dataclasses import dataclass
 
-from roles_royce.applications.execution_app.utils import ENV
 from roles_royce.applications.execution_app.stresstest import stresstest
-from tests.utils import assign_role, local_node_eth, accounts, web3_eth, local_node_gc, web3_gnosis
-from tests.utils import top_up_address, fork_unlock_account
+from roles_royce.applications.execution_app.utils import ENV
+from tests.utils import (
+    accounts,
+    assign_role,
+    fork_unlock_account,
+    local_node_eth,
+    local_node_gc,
+    top_up_address,
+    web3_eth,
+    web3_gnosis,
+)
 
 PERCENTAGE = 20
 MAX_SLIPPAGE = 1
@@ -92,11 +100,13 @@ class DAO:
     role: int
 
 
-dao = DAO(name="GnosisDAO",
-          blockchain="ETHEREUM",
-          avatar_safe_address="0x849D52316331967b6fF1198e5E32A0eB168D039d",
-          roles_mod_address="0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc",
-          role=4)
+dao = DAO(
+    name="GnosisDAO",
+    blockchain="ETHEREUM",
+    avatar_safe_address="0x849D52316331967b6fF1198e5E32A0eB168D039d",
+    roles_mod_address="0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc",
+    role=4,
+)
 
 
 def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
@@ -147,7 +157,13 @@ def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch):
     with open(os.path.join(os.path.dirname(__file__), "test_stresstest_v2_eth_gno.json"), "r") as f:
         test_data = json.load(f)
 
-    stresstest_tester = stresstest(w3=w3, positions_dict=test_data, percentage=PERCENTAGE, max_slippage=MAX_SLIPPAGE,
-                                   dao=dao.name, blockchain=dao.blockchain)
+    stresstest_tester = stresstest(
+        w3=w3,
+        positions_dict=test_data,
+        percentage=PERCENTAGE,
+        max_slippage=MAX_SLIPPAGE,
+        dao=dao.name,
+        blockchain=dao.blockchain,
+    )
 
     assert stresstest_tester == stresstest_outcome

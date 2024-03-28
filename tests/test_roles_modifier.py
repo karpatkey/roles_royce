@@ -2,6 +2,18 @@ from unittest.mock import patch
 
 import pytest
 
+from roles_royce.roles_modifier import (
+    AGGRESIVE_FEE_MULTIPLER,
+    AGGRESIVE_GAS_LIMIT_MULTIPLIER,
+    NORMAL_FEE_MULTIPLER,
+    NORMAL_GAS_LIMIT_MULTIPLIER,
+    GasStrategies,
+    RolesMod,
+    set_gas_strategy,
+)
+
+from .utils import local_node_gc
+
 ROLE = 2
 ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"
 ACCOUNT = "0x7e19DE37A31E40eec58977CEA36ef7fB70e2c5CD"
@@ -59,9 +71,10 @@ def test_gas_limit_estimation(local_node_gc):
     # "https://rpc.ankr.com/gnosis" returns 101887
     # "https://gnosis-mainnet.public.blastapi.io" returns 94608
     # Some endpoints fail when calling the estimate_gas method
-    assert roles.estimate_gas(contract_address=USDT, data=usdt_approve,
-                              block=TEST_BLOCK) == 94608 or roles.estimate_gas(contract_address=USDT,
-                                                                               data=usdt_approve) == 101887
+    assert (
+        roles.estimate_gas(contract_address=USDT, data=usdt_approve, block=TEST_BLOCK) == 94608
+        or roles.estimate_gas(contract_address=USDT, data=usdt_approve) == 101887
+    )
 
 
 @pytest.mark.skip(reason="test passes locally but we get different gas results on CI")
@@ -92,6 +105,6 @@ def test_gas_strategy(local_node_gc):
                 role=ROLE, contract_address="0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503", web3=w3, account=ACCOUNT
             )
             tx = roles.build(contract_address=USDT, data=usdt_approve, max_priority_fee=2000)
-            assert tx['gas'] == estimated_gas * AGGRESIVE_GAS_LIMIT_MULTIPLIER
-            assert tx['maxPriorityFeePerGas'] == 2000
-            assert tx['maxFeePerGas'] == 2000 + base_fee_per_gas * AGGRESIVE_FEE_MULTIPLER
+            assert tx["gas"] == estimated_gas * AGGRESIVE_GAS_LIMIT_MULTIPLIER
+            assert tx["maxPriorityFeePerGas"] == 2000
+            assert tx["maxFeePerGas"] == 2000 + base_fee_per_gas * AGGRESIVE_FEE_MULTIPLER

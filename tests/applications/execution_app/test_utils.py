@@ -1,9 +1,6 @@
-from roles_royce.applications.execution_app.utils import start_the_engine, gear_up, decode_transaction
-from roles_royce.applications.execution_app.utils import ENV, ExecConfig, Modes
-from tests.utils import local_node_eth, accounts
 import pytest
 
-from roles_royce.applications.panic_button_app.utils import (
+from roles_royce.applications.execution_app.utils import (
     ENV,
     ExecConfig,
     Modes,
@@ -11,7 +8,6 @@ from roles_royce.applications.panic_button_app.utils import (
     gear_up,
     start_the_engine,
 )
-from tests.utils import accounts, local_node_eth
 
 dao = "GnosisDAO"
 blockchain = "ETHEREUM"

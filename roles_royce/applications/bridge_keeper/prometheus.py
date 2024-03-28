@@ -1,30 +1,29 @@
 from dataclasses import dataclass
 
 from prometheus_client import Gauge
-from roles_royce.applications.bridge_keeper.core import StaticData, DynamicData
-from roles_royce.applications.bridge_keeper.utils import Flags
 
 from roles_royce.applications.bridge_keeper.core import DynamicData, StaticData
+from roles_royce.applications.bridge_keeper.utils import Flags
 
 
 @dataclass
 class Gauges:
-    bridge_DAI_balance = Gauge('bridge_DAI_balance', 'Bridge"s DAI balance')
-    bot_ETH_balance = Gauge('bot_ETH_balance', 'ETH balance of the bot')
-    next_claim_epoch = Gauge('next_claim_epoch', 'Next claim epoch')
-    refill_threshold = Gauge('refill_threshold', 'Refill threshold')
-    invest_threshold = Gauge('invest_threshold', 'Invest threshold')
-    min_cash_threshold = Gauge('min_cash_threshold', 'Minimum amount of underlying tokens that are not invested')
-    claimable = Gauge('claimable', 'Claimable interest')
-    min_interest_paid = Gauge('min_interest_paid', 'Minimum amount of interest that can be paid in a single call')
-    amount_of_interest_to_pay = Gauge('amount_of_interest_to_pay', 'Amount of interest to pay')
-    lack_of_gas_warning = Gauge('lack_of_gas_executed', 'Lack of gas warning flag')
-    interest_payed = Gauge('interest_payed', 'Interest payed flag')
-    tx_executed = Gauge('tx_executed', 'Transaction executed flag')
+    bridge_DAI_balance = Gauge("bridge_DAI_balance", 'Bridge"s DAI balance')
+    bot_ETH_balance = Gauge("bot_ETH_balance", "ETH balance of the bot")
+    next_claim_epoch = Gauge("next_claim_epoch", "Next claim epoch")
+    refill_threshold = Gauge("refill_threshold", "Refill threshold")
+    invest_threshold = Gauge("invest_threshold", "Invest threshold")
+    min_cash_threshold = Gauge("min_cash_threshold", "Minimum amount of underlying tokens that are not invested")
+    claimable = Gauge("claimable", "Claimable interest")
+    min_interest_paid = Gauge("min_interest_paid", "Minimum amount of interest that can be paid in a single call")
+    amount_of_interest_to_pay = Gauge("amount_of_interest_to_pay", "Amount of interest to pay")
+    lack_of_gas_warning = Gauge("lack_of_gas_executed", "Lack of gas warning flag")
+    interest_payed = Gauge("interest_payed", "Interest payed flag")
+    tx_executed = Gauge("tx_executed", "Transaction executed flag")
 
     def update(self, static_data: StaticData, dynamic_data: DynamicData, flags: Flags):
-        self.bot_ETH_balance.set(dynamic_data.bot_ETH_balance / (10 ** 18))
-        self.bridge_DAI_balance.set(dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI))
+        self.bot_ETH_balance.set(dynamic_data.bot_ETH_balance / (10**18))
+        self.bridge_DAI_balance.set(dynamic_data.bridge_DAI_balance / (10**static_data.decimals_DAI))
         self.next_claim_epoch.set(dynamic_data.next_claim_epoch)
         self.invest_threshold.set(static_data.env.INVEST_THRESHOLD)
         self.refill_threshold.set(static_data.env.REFILL_THRESHOLD)

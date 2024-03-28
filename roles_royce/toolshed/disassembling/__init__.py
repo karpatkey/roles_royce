@@ -5,8 +5,8 @@ from .disassembling_lido import LidoDisassembler
 from .disassembling_swaps import SwapDisassembler
 
 DISASSEMBLERS = {
-    'balancer': BalancerDisassembler,
-    'aura': AuraDisassembler,
-    'lido': LidoDisassembler,
-    'swaps': SwapDisassembler
+    "balancer": BalancerDisassembler,
+    "aura": AuraDisassembler,
+    "lido": LidoDisassembler,
+    "swaps": SwapDisassembler,
 }

@@ -2,7 +2,7 @@ import logging
 import sys
 import time
 
-from defabipedia.tokens import erc20_contract
+from defabipedia.tokens import GnosisTokenAddr, erc20_contract
 from defabipedia.types import Chain
 from prometheus_client import start_http_server as prometheus_start_http_server
 from swaps import AddressesAndAbis, Swapper, SwapsDataManager, decimalsEURe, decimalsWXDAI
@@ -10,11 +10,6 @@ from swaps import AddressesAndAbis, Swapper, SwapsDataManager, decimalsEURe, dec
 from roles_royce.applications.EURe_rebalancing_bot.env import ENV
 from roles_royce.applications.EURe_rebalancing_bot.prometheus import Gauges
 from roles_royce.applications.EURe_rebalancing_bot.utils import log_initial_data
-from roles_royce.applications.EURe_rebalancing_bot.prometheus import Gauges
-from swaps import SwapsDataManager, Swapper, decimalsWXDAI, decimalsEURe
-from defabipedia.tokens import erc20_contract, GnosisTokenAddr
-import time
-import sys
 
 # Importing the environment variables from the .env file
 env = ENV()

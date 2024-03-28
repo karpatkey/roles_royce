@@ -1,17 +1,17 @@
 import json
-import requests
-import pytest
 
-from defabipedia.types import Chain
+import pytest
+import requests
 from defabipedia.rocket_pool import ContractSpecs
 from defabipedia.swap_pools import EthereumSwapPools
 from defabipedia.tokens import Abis
-from roles_royce.protocols.eth import lido
-from roles_royce.toolshed.disassembling import SwapDisassembler
-from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
+from defabipedia.types import Chain
 
-from tests.utils import (local_node_eth, accounts, create_simple_safe, steal_token)
-from tests.roles import setup_common_roles, deploy_roles, apply_presets
+from roles_royce.protocols.eth import lido
+from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
+from roles_royce.toolshed.disassembling import SwapDisassembler
+from tests.roles import apply_presets, deploy_roles, setup_common_roles
+from tests.utils import accounts, create_simple_safe, local_node_eth, steal_token
 
 ROLE = 4
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
@@ -50,7 +50,8 @@ presets_balancer = """{
 ]
 }"""
 
-#TODO: add tests for exit strategies
+# TODO: add tests for exit strategies
+
 
 def test_integration_exit_1(local_node_eth, accounts):
     w3 = local_node_eth.w3
@@ -60,13 +61,22 @@ def test_integration_exit_1(local_node_eth, accounts):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(avatar_safe, roles_contract, json_data=presets_balancer,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
-    
+    apply_presets(
+        avatar_safe,
+        roles_contract,
+        json_data=presets_balancer,
+        replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
+    )
+
     blockchain = Chain.get_blockchain_from_web3(w3)
-    steal_token(w3=w3, token=EthereumSwapPools.bal_rETH_WETH.tokens[0], holder="0xB3668730E4a8ABe282a6d471c75Baf75557FfFf3",
-                to=avatar_safe.address, amount=8_999_999_999_999_000_000)
-    
+    steal_token(
+        w3=w3,
+        token=EthereumSwapPools.bal_rETH_WETH.tokens[0],
+        holder="0xB3668730E4a8ABe282a6d471c75Baf75557FfFf3",
+        to=avatar_safe.address,
+        amount=8_999_999_999_999_000_000,
+    )
+
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address
     private_key = accounts[4].key
@@ -77,11 +87,13 @@ def test_integration_exit_1(local_node_eth, accounts):
 
     amount_in = 1_000_000_000_000_000_000
 
-    swap_balancer_disassembler = SwapDisassembler(w3=w3,
-                                                  avatar_safe_address=avatar_safe_address,
-                                                  roles_mod_address=roles_contract.address,
-                                                  role=role,
-                                                  signer_address=disassembler_address)
+    swap_balancer_disassembler = SwapDisassembler(
+        w3=w3,
+        avatar_safe_address=avatar_safe_address,
+        roles_mod_address=roles_contract.address,
+        role=role,
+        signer_address=disassembler_address,
+    )
 
     reth_contract = ContractSpecs[blockchain].rETH.contract(w3)
     reth_balance = reth_contract.functions.balanceOf(avatar_safe_address).call()
@@ -91,13 +103,13 @@ def test_integration_exit_1(local_node_eth, accounts):
     weth_balance = weth_contract.functions.balanceOf(avatar_safe_address).call()
     assert weth_balance == 0
 
-    txn_transactable = swap_balancer_disassembler.exit_1(percentage=50,
-                                                         exit_arguments=[{"token_in_address": token_in,
-                                                                         "max_slippage": 1,
-                                                                         "token_out_address": token_out}])
+    txn_transactable = swap_balancer_disassembler.exit_1(
+        percentage=50,
+        exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
+    )
     send_it = swap_balancer_disassembler.send(txn_transactable, private_key)
 
-    assert send_it   
+    assert send_it
 
     weth_balance = weth_contract.functions.balanceOf(avatar_safe_address).call()
     assert weth_balance > 0
@@ -136,7 +148,8 @@ presets_curve = """{
 ]
 }"""
 
-#TODO: add tests for exit strategies
+# TODO: add tests for exit strategies
+
 
 def test_integration_exit_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
@@ -146,13 +159,22 @@ def test_integration_exit_2(local_node_eth, accounts):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(avatar_safe, roles_contract, json_data=presets_curve,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
-    
+    apply_presets(
+        avatar_safe,
+        roles_contract,
+        json_data=presets_curve,
+        replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
+    )
+
     blockchain = Chain.get_blockchain_from_web3(w3)
-    steal_token(w3=w3, token=EthereumSwapPools.TriPool.tokens[0], holder="0xfE175398f22f267Ea8f5718e5848ef1e0047bF32",
-                to=avatar_safe.address, amount=8_999_999_999_999_000_000)
-    
+    steal_token(
+        w3=w3,
+        token=EthereumSwapPools.TriPool.tokens[0],
+        holder="0xfE175398f22f267Ea8f5718e5848ef1e0047bF32",
+        to=avatar_safe.address,
+        amount=8_999_999_999_999_000_000,
+    )
+
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address
     private_key = accounts[4].key
@@ -163,11 +185,13 @@ def test_integration_exit_2(local_node_eth, accounts):
 
     amount_in = 1_000_000_000_000_000_000
 
-    swap_curve_disassembler = SwapDisassembler(w3=w3,
-                                                  avatar_safe_address=avatar_safe_address,
-                                                  roles_mod_address=roles_contract.address,
-                                                  role=role,
-                                                  signer_address=disassembler_address)
+    swap_curve_disassembler = SwapDisassembler(
+        w3=w3,
+        avatar_safe_address=avatar_safe_address,
+        roles_mod_address=roles_contract.address,
+        role=role,
+        signer_address=disassembler_address,
+    )
 
     dai_contract = w3.eth.contract(address=EthereumSwapPools.TriPool.tokens[0], abi=Abis.ERC20.abi)
     dai_balance = dai_contract.functions.balanceOf(avatar_safe_address).call()
@@ -177,16 +201,17 @@ def test_integration_exit_2(local_node_eth, accounts):
     usdc_balance = usdc_contract.functions.balanceOf(avatar_safe_address).call()
     assert usdc_balance == 0
 
-    txn_transactable = swap_curve_disassembler.exit_2(percentage=50,
-                                                         exit_arguments=[{"token_in_address": token_in,
-                                                                         "max_slippage": 1,
-                                                                         "token_out_address": token_out}])
+    txn_transactable = swap_curve_disassembler.exit_2(
+        percentage=50,
+        exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
+    )
     send_it = swap_curve_disassembler.send(txn_transactable, private_key)
 
-    assert send_it   
+    assert send_it
 
     usdc_balance = usdc_contract.functions.balanceOf(avatar_safe_address).call()
     assert usdc_balance > 0
+
 
 preset_uniswapv3 = """{
   "version": "1.0",
@@ -252,7 +277,9 @@ preset_uniswapv3_v2 = """{
     }
   ]
 }"""
-#TODO: add tests for exit strategies
+
+
+# TODO: add tests for exit strategies
 @pytest.mark.skip(reason="Test is not implemented")
 def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
@@ -262,13 +289,22 @@ def test_integration_exit_3(local_node_eth, accounts):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(avatar_safe, roles_contract, json_data=preset_uniswapv3,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])])
-    
+    apply_presets(
+        avatar_safe,
+        roles_contract,
+        json_data=preset_uniswapv3,
+        replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
+    )
+
     blockchain = Chain.get_blockchain_from_web3(w3)
-    steal_token(w3=w3, token=EthereumSwapPools.UniV3_DAI_USDC.tokens[0], holder="0xfE175398f22f267Ea8f5718e5848ef1e0047bF32",
-                to=avatar_safe.address, amount=8_999_999_999_999_000_000)
-    
+    steal_token(
+        w3=w3,
+        token=EthereumSwapPools.UniV3_DAI_USDC.tokens[0],
+        holder="0xfE175398f22f267Ea8f5718e5848ef1e0047bF32",
+        to=avatar_safe.address,
+        amount=8_999_999_999_999_000_000,
+    )
+
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address
     private_key = accounts[4].key
@@ -279,11 +315,13 @@ def test_integration_exit_3(local_node_eth, accounts):
 
     amount_in = 1_000_000_000_000_000_000
 
-    swap_uniswapv3_disassembler = SwapDisassembler(w3=w3,
-                                                  avatar_safe_address=avatar_safe_address,
-                                                  roles_mod_address=roles_contract.address,
-                                                  role=role,
-                                                  signer_address=disassembler_address)
+    swap_uniswapv3_disassembler = SwapDisassembler(
+        w3=w3,
+        avatar_safe_address=avatar_safe_address,
+        roles_mod_address=roles_contract.address,
+        role=role,
+        signer_address=disassembler_address,
+    )
 
     dai_contract = w3.eth.contract(address=EthereumSwapPools.UniV3_DAI_USDC.tokens[0], abi=Abis.ERC20.abi)
     dai_balance = dai_contract.functions.balanceOf(avatar_safe_address).call()
@@ -293,13 +331,13 @@ def test_integration_exit_3(local_node_eth, accounts):
     usdc_balance = usdc_contract.functions.balanceOf(avatar_safe_address).call()
     assert usdc_balance == 0
 
-    txn_transactable = swap_uniswapv3_disassembler.exit_3(percentage=50,
-                                                         exit_arguments=[{"token_in_address": token_in,
-                                                                         "max_slippage": 1,
-                                                                         "token_out_address": token_out}])
+    txn_transactable = swap_uniswapv3_disassembler.exit_3(
+        percentage=50,
+        exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
+    )
     send_it = swap_uniswapv3_disassembler.send(txn_transactable, private_key)
 
-    assert send_it   
+    assert send_it
 
     usdc_balance = usdc_contract.functions.balanceOf(avatar_safe_address).call()
     assert usdc_balance > 0
