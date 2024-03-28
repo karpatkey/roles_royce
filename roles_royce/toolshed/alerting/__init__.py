@@ -1,1 +1,1 @@
-from .alerting import SlackMessenger, TelegramMessenger, Messenger, LoggingLevel
+from .alerting import LoggingLevel, Messenger, SlackMessenger, TelegramMessenger

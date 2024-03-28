@@ -1,6 +1,6 @@
-from dataclasses import dataclass, field
-import threading
 import json
+import threading
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -12,4 +12,3 @@ class Flags:
     def __str__(self):
         flags_dict = {attr: getattr(self, attr).is_set() for attr in self.__annotations__}
         return json.dumps(flags_dict, indent=4)
-

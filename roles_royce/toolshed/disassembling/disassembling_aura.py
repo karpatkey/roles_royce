@@ -1,12 +1,17 @@
 from decimal import Decimal
+
+from defabipedia.aura import Abis
 from typing_extensions import TypedDict
-from web3.types import ChecksumAddress
 from web3 import Web3
+from web3.types import ChecksumAddress
+
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.eth import aura
-from roles_royce.toolshed.disassembling import BalancerDisassembler
-from roles_royce.toolshed.disassembling import Disassembler, validate_percentage
-from defabipedia.aura import Abis
+from roles_royce.toolshed.disassembling.disassembling_balancer import (
+    BalancerDisassembler,
+    Disassembler,
+    validate_percentage,
+)
 
 
 class Exit1ArgumentElement(TypedDict):
@@ -25,10 +30,10 @@ class Exit22ArgumentElement(TypedDict):
 
 
 class AuraDisassembler(Disassembler):
-    def aura_contracts_helper(self, aura_rewards_address: ChecksumAddress, fraction: float | Decimal) -> \
-            (str, int):
-        aura_rewards_contract = self.w3.eth.contract(address=aura_rewards_address,
-                                                     abi=Abis[self.blockchain].BaseRewardPool.abi)
+    def aura_contracts_helper(self, aura_rewards_address: ChecksumAddress, fraction: float | Decimal) -> (str, int):
+        aura_rewards_contract = self.w3.eth.contract(
+            address=aura_rewards_address, abi=Abis[self.blockchain].BaseRewardPool.abi
+        )
         aura_token_amount = aura_rewards_contract.functions.balanceOf(self.avatar_safe_address).call()
         bpt_address = aura_rewards_contract.functions.asset().call()
 
@@ -57,14 +62,16 @@ class AuraDisassembler(Disassembler):
         txns = []
 
         for element in exit_arguments:
-            aura_rewards_address = Web3.to_checksum_address(element['rewards_address'])
+            aura_rewards_address = Web3.to_checksum_address(element["rewards_address"])
 
-            bpt_address, amount_to_redeem = self.aura_contracts_helper(aura_rewards_address=aura_rewards_address,
-                                                                       fraction=fraction)
+            bpt_address, amount_to_redeem = self.aura_contracts_helper(
+                aura_rewards_address=aura_rewards_address, fraction=fraction
+            )
             if amount_to_redeem == 0:
                 return []
-            withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_address,
-                                                             amount=amount_to_redeem)
+            withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(
+                reward_address=aura_rewards_address, amount=amount_to_redeem
+            )
             txns.append(withdraw_aura)
 
         return txns
@@ -92,28 +99,33 @@ class AuraDisassembler(Disassembler):
         txns = []
 
         for element in exit_arguments:
-            aura_rewards_address = Web3.to_checksum_address(element['rewards_address'])
-            max_slippage = element['max_slippage']
+            aura_rewards_address = Web3.to_checksum_address(element["rewards_address"])
+            max_slippage = element["max_slippage"]
 
-            bpt_address, amount_to_redeem = self.aura_contracts_helper(aura_rewards_address=aura_rewards_address,
-                                                                       fraction=fraction)
+            bpt_address, amount_to_redeem = self.aura_contracts_helper(
+                aura_rewards_address=aura_rewards_address, fraction=fraction
+            )
 
             if amount_to_redeem == 0:
                 return []
 
-            withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_address,
-                                                             amount=amount_to_redeem)
+            withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(
+                reward_address=aura_rewards_address, amount=amount_to_redeem
+            )
 
-            balancer_disassembler = BalancerDisassembler(w3=self.w3,
-                                                         avatar_safe_address=self.avatar_safe_address,
-                                                         roles_mod_address=self.roles_mod_address,
-                                                         role=self.role,
-                                                         signer_address=self.signer_address)
+            balancer_disassembler = BalancerDisassembler(
+                w3=self.w3,
+                avatar_safe_address=self.avatar_safe_address,
+                roles_mod_address=self.roles_mod_address,
+                role=self.role,
+                signer_address=self.signer_address,
+            )
 
-            withdraw_balancer = balancer_disassembler.exit_1_1(percentage=100,
-                                                               exit_arguments=[{"bpt_address": bpt_address,
-                                                                                "max_slippage": max_slippage}],
-                                                               amount_to_redeem=amount_to_redeem)
+            withdraw_balancer = balancer_disassembler.exit_1_1(
+                percentage=100,
+                exit_arguments=[{"bpt_address": bpt_address, "max_slippage": max_slippage}],
+                amount_to_redeem=amount_to_redeem,
+            )
 
             txns.append(withdraw_aura)
             for transactable in withdraw_balancer:
@@ -145,30 +157,36 @@ class AuraDisassembler(Disassembler):
         txns = []
 
         for element in exit_arguments:
-            aura_rewards_address = Web3.to_checksum_address(element['rewards_address'])
-            max_slippage = element['max_slippage']
-            token_out_address = Web3.to_checksum_address(element['token_out_address'])
+            aura_rewards_address = Web3.to_checksum_address(element["rewards_address"])
+            max_slippage = element["max_slippage"]
+            token_out_address = Web3.to_checksum_address(element["token_out_address"])
 
-            bpt_address, amount_to_redeem = self.aura_contracts_helper(aura_rewards_address=aura_rewards_address,
-                                                                       fraction=fraction)
+            bpt_address, amount_to_redeem = self.aura_contracts_helper(
+                aura_rewards_address=aura_rewards_address, fraction=fraction
+            )
 
             if amount_to_redeem == 0:
                 return []
 
-            withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_address,
-                                                             amount=amount_to_redeem)
+            withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(
+                reward_address=aura_rewards_address, amount=amount_to_redeem
+            )
 
-            balancer_disassembler = BalancerDisassembler(w3=self.w3,
-                                                         avatar_safe_address=self.avatar_safe_address,
-                                                         roles_mod_address=self.roles_mod_address,
-                                                         role=self.role,
-                                                         signer_address=self.signer_address)
+            balancer_disassembler = BalancerDisassembler(
+                w3=self.w3,
+                avatar_safe_address=self.avatar_safe_address,
+                roles_mod_address=self.roles_mod_address,
+                role=self.role,
+                signer_address=self.signer_address,
+            )
 
-            withdraw_balancer = balancer_disassembler.exit_1_2(percentage=100,
-                                                               exit_arguments=[{"bpt_address": bpt_address,
-                                                                                "max_slippage": max_slippage,
-                                                                                "token_out_address": token_out_address}],
-                                                               amount_to_redeem=amount_to_redeem)
+            withdraw_balancer = balancer_disassembler.exit_1_2(
+                percentage=100,
+                exit_arguments=[
+                    {"bpt_address": bpt_address, "max_slippage": max_slippage, "token_out_address": token_out_address}
+                ],
+                amount_to_redeem=amount_to_redeem,
+            )
 
             txns.append(withdraw_aura)
             for transactable in withdraw_balancer:
@@ -200,25 +218,28 @@ class AuraDisassembler(Disassembler):
         for element in exit_arguments:
             aura_rewards_address = Web3.to_checksum_address(element[0]["value"])
 
-            bpt_address, amount_to_redeem = self.aura_contracts_helper(aura_rewards_address=aura_rewards_address,
-                                                                       fraction=fraction)
+            bpt_address, amount_to_redeem = self.aura_contracts_helper(
+                aura_rewards_address=aura_rewards_address, fraction=fraction
+            )
 
             if amount_to_redeem == 0:
                 return []
 
-            withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_address,
-                                                             amount=amount_to_redeem)
+            withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(
+                reward_address=aura_rewards_address, amount=amount_to_redeem
+            )
 
-            balancer_disassembler = BalancerDisassembler(w3=self.w3,
-                                                         avatar_safe_address=self.avatar_safe_address,
-                                                         roles_mod_address=self.roles_mod_address,
-                                                         role=self.role,
-                                                         signer_address=self.signer_address)
+            balancer_disassembler = BalancerDisassembler(
+                w3=self.w3,
+                avatar_safe_address=self.avatar_safe_address,
+                roles_mod_address=self.roles_mod_address,
+                role=self.role,
+                signer_address=self.signer_address,
+            )
 
-            withdraw_balancer = balancer_disassembler.exit_1_3(percentage=100,
-                                                               exit_arguments=[
-                                                                   {"bpt_address": bpt_address}],
-                                                               amount_to_redeem=amount_to_redeem)
+            withdraw_balancer = balancer_disassembler.exit_1_3(
+                percentage=100, exit_arguments=[{"bpt_address": bpt_address}], amount_to_redeem=amount_to_redeem
+            )
 
             txns.append(withdraw_aura)
             for transactable in withdraw_balancer:

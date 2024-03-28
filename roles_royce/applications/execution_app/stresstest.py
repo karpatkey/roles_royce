@@ -46,7 +46,6 @@ def stresstest(
     for position in positions_dict["positions"]:
         protocol = position["protocol"]
         for exec_config in position["exec_config"]:
-
             logger.info(f"Running stresstest on DAO: {dao}, Blockchain: {blockchain}, Protocol: {protocol}")
             logger.info(f'Position: {exec_config["function_name"]}, description: {exec_config["description"]}')
 

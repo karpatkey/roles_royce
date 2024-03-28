@@ -1,20 +1,30 @@
-from web3 import Web3
-from gnosis.safe import addresses, Safe, SafeOperation
-from gnosis.eth import EthereumNetwork, EthereumClient
-from eth_account import Account
-from roles_royce.protocols.eth import aura
-from roles_royce.protocols import balancer
-from roles_royce import roles
-from defabipedia.types import Chain
-from roles_royce.evm_utils import roles_abi, roles_bytecode, dai_abi
-from roles_royce.utils import MULTISENDS
-from roles_royce.constants import ETHAddr
-from roles_royce.generic_method import TxData
-from .utils import (local_node_eth, accounts, ETH_LOCAL_NODE_URL, create_simple_safe, get_balance,
-                    steal_token, SimpleSafe)
-from .roles import setup_common_roles, deploy_roles, apply_presets
 import pytest
+from defabipedia.types import Chain
+from eth_account import Account
+from gnosis.eth import EthereumClient, EthereumNetwork
+from gnosis.safe import Safe, SafeOperation, addresses
+from web3 import Web3
+
+from roles_royce import roles
+from roles_royce.constants import ETHAddr
+from roles_royce.evm_utils import dai_abi, roles_abi, roles_bytecode
+from roles_royce.generic_method import TxData
+from roles_royce.protocols import balancer
+from roles_royce.protocols.eth import aura
 from roles_royce.roles_modifier import TransactionWouldBeReverted
+from roles_royce.utils import MULTISENDS
+
+from .roles import apply_presets, deploy_roles, setup_common_roles
+from .utils import (
+    ETH_LOCAL_NODE_URL,
+    SimpleSafe,
+    accounts,
+    create_simple_safe,
+    get_balance,
+    local_node_eth,
+    steal_token,
+)
+
 
 def test_safe_and_roles(local_node_eth):
     w3 = local_node_eth.w3
@@ -36,10 +46,14 @@ def test_safe_and_roles(local_node_eth):
 
     assert w3.eth.get_balance(test_account0_addr) == 10000000000000000000000
 
-    ethereum_tx_sent = Safe.create(ethereum_client, deployer_account=Account.from_key(test_account0_private_key),
-                                   master_copy_address=addresses.MASTER_COPIES[EthereumNetwork.MAINNET][0][0],
-                                   owners=[test_account0_addr], threshold=1,
-                                   proxy_factory_address="0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2")
+    ethereum_tx_sent = Safe.create(
+        ethereum_client,
+        deployer_account=Account.from_key(test_account0_private_key),
+        master_copy_address=addresses.MASTER_COPIES[EthereumNetwork.MAINNET][0][0],
+        owners=[test_account0_addr],
+        threshold=1,
+        proxy_factory_address="0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2",
+    )
 
     safe = SimpleSafe(ethereum_tx_sent.contract_address, ethereum_client, test_account0_private_key)
     safe.retrieve_all_info()
@@ -57,27 +71,35 @@ def test_safe_and_roles(local_node_eth):
 
     dai_ctract = w3.eth.contract(address=DAI, abi=DAI_ABI)
     dai_decimals = dai_ctract.functions.decimals().call()
-    dai_amount = 5 * (10 ** dai_decimals)
+    dai_amount = 5 * (10**dai_decimals)
 
     local_node_eth.unlock_account(ADDRESS_WITH_LOTS_OF_TOKENS)
     dai_ctract.functions.transfer(safe.address, dai_amount).transact({"from": ADDRESS_WITH_LOTS_OF_TOKENS})
-    assert dai_ctract.functions.balanceOf(safe.address).call() == 5 * (10 ** dai_decimals)
+    assert dai_ctract.functions.balanceOf(safe.address).call() == 5 * (10**dai_decimals)
 
     # send some DAIs from the safe to the test_address
-    transfer_dai = dai_ctract.functions.transfer(test_account0_addr, 2 * (10 ** dai_decimals)).build_transaction(
-        {"from": safe.address})[
-        'data']
-    tx = safe.build_multisig_tx(to=DAI, value=0, data=transfer_dai, operation=SafeOperation.CALL.value,
-                                safe_tx_gas=500000,
-                                base_gas=500000, gas_price=1, gas_token=ETHAddr.ZERO, refund_receiver=ETHAddr.ZERO)
+    transfer_dai = dai_ctract.functions.transfer(test_account0_addr, 2 * (10**dai_decimals)).build_transaction(
+        {"from": safe.address}
+    )["data"]
+    tx = safe.build_multisig_tx(
+        to=DAI,
+        value=0,
+        data=transfer_dai,
+        operation=SafeOperation.CALL.value,
+        safe_tx_gas=500000,
+        base_gas=500000,
+        gas_price=1,
+        gas_token=ETHAddr.ZERO,
+        refund_receiver=ETHAddr.ZERO,
+    )
     tx.sign(test_account0_private_key)
     tx.execute(test_account0_private_key)
-    assert dai_ctract.functions.balanceOf(test_account0_addr).call() == 2 * (10 ** dai_decimals)
-    assert dai_ctract.functions.balanceOf(safe.address).call() == 3 * (10 ** dai_decimals)
+    assert dai_ctract.functions.balanceOf(test_account0_addr).call() == 2 * (10**dai_decimals)
+    assert dai_ctract.functions.balanceOf(safe.address).call() == 3 * (10**dai_decimals)
 
     # Deploy a Roles contrat without using the ProxyFactory (to simplify things)
     role_constructor_bytes = "000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
-    bytecode_without_default_constructor = roles_bytecode[:-len(role_constructor_bytes)]
+    bytecode_without_default_constructor = roles_bytecode[: -len(role_constructor_bytes)]
 
     owner = avatar = target = w3.to_checksum_address(test_account0_addr)
     role_ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
@@ -99,56 +121,79 @@ def test_safe_and_roles(local_node_eth):
     assert role_ctract.functions.target().call() == safe.address
 
     # set roles_mod as module of safe
-    enable_module_roles = \
-    safe.contract.functions.enableModule(roles_ctract_address).build_transaction({"from": safe.address})['data']
+    enable_module_roles = safe.contract.functions.enableModule(roles_ctract_address).build_transaction(
+        {"from": safe.address}
+    )["data"]
     safe.send(txs=[TxData(contract_address=safe.address, data=enable_module_roles)])
     assert safe.contract.functions.isModuleEnabled(roles_ctract_address).call()
 
     # enable an EOA for setting as a manager role
     enable_module_1 = role_ctract.functions.enableModule(test_account1_addr).build_transaction({"from": safe.address})[
-        'data']
+        "data"
+    ]
     safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_1)])
     assert role_ctract.functions.isModuleEnabled(test_account1_addr).call()
 
     # assign the manager role to the test_account1_addr
-    assign_role_1 = \
-    role_ctract.functions.assignRoles(test_account1_addr, [1], [True]).build_transaction({"from": safe.address})['data']
+    assign_role_1 = role_ctract.functions.assignRoles(test_account1_addr, [1], [True]).build_transaction(
+        {"from": safe.address}
+    )["data"]
     safe.send(txs=[TxData(contract_address=roles_ctract_address, data=assign_role_1)])
 
     # enable an EOA for setting as a revoker role
     enable_module_2 = role_ctract.functions.enableModule(test_account2_addr).build_transaction({"from": safe.address})[
-        'data']
+        "data"
+    ]
     safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_2)])
     assert role_ctract.functions.isModuleEnabled(test_account2_addr).call()
 
     # assign the revoker role to the test_account2_addr
-    assign_role_2 = \
-    role_ctract.functions.assignRoles(test_account2_addr, [2], [True]).build_transaction({"from": safe.address})['data']
+    assign_role_2 = role_ctract.functions.assignRoles(test_account2_addr, [2], [True]).build_transaction(
+        {"from": safe.address}
+    )["data"]
     safe.send(txs=[TxData(contract_address=roles_ctract_address, data=assign_role_2)])
 
     # enable an EOA for setting as a harvester role and assign the role to the test_account3_addr
     enable_module_3 = role_ctract.functions.enableModule(test_account3_addr).build_transaction({"from": safe.address})[
-        'data']
-    assign_role_3 = \
-    role_ctract.functions.assignRoles(test_account3_addr, [3], [True]).build_transaction({"from": safe.address})['data']
-    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_3),
-                   TxData(contract_address=roles_ctract_address, data=assign_role_3)])
+        "data"
+    ]
+    assign_role_3 = role_ctract.functions.assignRoles(test_account3_addr, [3], [True]).build_transaction(
+        {"from": safe.address}
+    )["data"]
+    safe.send(
+        txs=[
+            TxData(contract_address=roles_ctract_address, data=enable_module_3),
+            TxData(contract_address=roles_ctract_address, data=assign_role_3),
+        ]
+    )
 
     # enable an EOA for setting as a disassembler role and assign the role to the test_account4_addr
     enable_module_4 = role_ctract.functions.enableModule(test_account4_addr).build_transaction({"from": safe.address})[
-        'data']
-    assign_role_4 = \
-    role_ctract.functions.assignRoles(test_account4_addr, [4], [True]).build_transaction({"from": safe.address})['data']
-    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_4),
-                   TxData(contract_address=roles_ctract_address, data=assign_role_4)])
+        "data"
+    ]
+    assign_role_4 = role_ctract.functions.assignRoles(test_account4_addr, [4], [True]).build_transaction(
+        {"from": safe.address}
+    )["data"]
+    safe.send(
+        txs=[
+            TxData(contract_address=roles_ctract_address, data=enable_module_4),
+            TxData(contract_address=roles_ctract_address, data=assign_role_4),
+        ]
+    )
 
     # enable an EOA for setting as a swapper role and assign the role to the test_account5_addr
     enable_module_5 = role_ctract.functions.enableModule(test_account5_addr).build_transaction({"from": safe.address})[
-        'data']
-    assign_role_5 = \
-    role_ctract.functions.assignRoles(test_account5_addr, [5], [True]).build_transaction({"from": safe.address})['data']
-    safe.send(txs=[TxData(contract_address=roles_ctract_address, data=enable_module_5),
-                   TxData(contract_address=roles_ctract_address, data=assign_role_5)])
+        "data"
+    ]
+    assign_role_5 = role_ctract.functions.assignRoles(test_account5_addr, [5], [True]).build_transaction(
+        {"from": safe.address}
+    )["data"]
+    safe.send(
+        txs=[
+            TxData(contract_address=roles_ctract_address, data=enable_module_5),
+            TxData(contract_address=roles_ctract_address, data=assign_role_5),
+        ]
+    )
 
 
 def test_balancer_aura_withdraw(local_node_eth, accounts):
@@ -172,42 +217,56 @@ def test_balancer_aura_withdraw(local_node_eth, accounts):
     {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x5e8266950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c8","value":"0"},
     {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x33a0480c0000000000000000000000000000000000000000000000000000000000000004000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c88bdb391300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000002032296969ef14eb0c6d29669c550d4a04491302300002000000000000000000800000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value":"0"}
     ]}"""
-    apply_presets(safe, roles_ctract, json_data=presets,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
+    apply_presets(
+        safe, roles_ctract, json_data=presets, replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])]
+    )
 
     # approve tokens in balancer and aura
-    approve_vault = balancer.ApproveForVault(token="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-                                             amount=1_000_000_000_000_000_000)
-    approve_aura_booster = aura.ApproveForBooster(token="0x32296969Ef14EB0c6d29669C550D4a0449130230",
-                                                  amount=1_000_000_000_000_000_000)
-    send_approve = roles.send([approve_vault, approve_aura_booster], role=2, private_key=accounts[2].key,
-                              roles_mod_address=roles_ctract.address,
-                              web3=w3)
+    approve_vault = balancer.ApproveForVault(
+        token="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", amount=1_000_000_000_000_000_000
+    )
+    approve_aura_booster = aura.ApproveForBooster(
+        token="0x32296969Ef14EB0c6d29669C550D4a0449130230", amount=1_000_000_000_000_000_000
+    )
+    send_approve = roles.send(
+        [approve_vault, approve_aura_booster],
+        role=2,
+        private_key=accounts[2].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
     assert send_approve
 
     # steal WETH
-    steal_token(w3, token=ETHAddr.WETH, holder="0x8EB8a3b98659Cce290402893d0123abb75E3ab28",
-                to=safe.address, amount=1_000_000_000)
+    steal_token(
+        w3,
+        token=ETHAddr.WETH,
+        holder="0x8EB8a3b98659Cce290402893d0123abb75E3ab28",
+        to=safe.address,
+        amount=1_000_000_000,
+    )
 
     # deposit tokens in balancer and stake in aura
-    deposit_balancer = balancer.ExactSingleTokenQueryJoin(w3=w3,
-                                                          pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
-                                                          token_in_address=ETHAddr.WETH,
-                                                          amount_in=1_000_000_000)
+    deposit_balancer = balancer.ExactSingleTokenQueryJoin(
+        w3=w3,
+        pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
+        token_in_address=ETHAddr.WETH,
+        amount_in=1_000_000_000,
+    )
 
     bpt_out, amounts_in = deposit_balancer.call(web3=w3)
 
-    deposit_balancer = balancer.ExactTokensJoin(w3=w3,
-                                                pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
-                                                avatar=safe.address,
-                                                amounts_in=[0, 1_000_000_000],
-                                                min_bpt_amount_out=int(bpt_out * 0.99))
+    deposit_balancer = balancer.ExactTokensJoin(
+        w3=w3,
+        pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
+        avatar=safe.address,
+        amounts_in=[0, 1_000_000_000],
+        min_bpt_amount_out=int(bpt_out * 0.99),
+    )
 
-    send_bpt_deposits = roles.send([deposit_balancer],
-                                   role=1,
-                                   private_key=accounts[1].key,
-                                   roles_mod_address=roles_ctract.address,
-                                   web3=w3)
+    send_bpt_deposits = roles.send(
+        [deposit_balancer], role=1, private_key=accounts[1].key, roles_mod_address=roles_ctract.address, web3=w3
+    )
     assert send_bpt_deposits
 
     # check that the BPTs are staked in AURA and are in the safe
@@ -216,11 +275,9 @@ def test_balancer_aura_withdraw(local_node_eth, accounts):
     assert bpt_amount == 965_271_834
 
     deposit_aura = aura.DepositBPT(pool_id=115, amount=bpt_amount)
-    send_aura_deposits = roles.send([deposit_aura],
-                                    role=1,
-                                    private_key=accounts[1].key,
-                                    roles_mod_address=roles_ctract.address,
-                                    web3=w3)
+    send_aura_deposits = roles.send(
+        [deposit_aura], role=1, private_key=accounts[1].key, roles_mod_address=roles_ctract.address, web3=w3
+    )
     assert send_aura_deposits
     assert get_balance(w3, token=bpt_wstETH_ETH, address=safe.address) == 0
 
@@ -230,27 +287,34 @@ def test_balancer_aura_withdraw(local_node_eth, accounts):
     assert aura_rewards_amount == bpt_amount
 
     # withdraw tokens from aura and balancer
-    withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(reward_address=aura_rewards_contract_address,
-                                                     amount=int(aura_rewards_amount * 1))
+    withdraw_aura = aura.WithdrawAndUndwrapStakedBPT(
+        reward_address=aura_rewards_contract_address, amount=int(aura_rewards_amount * 1)
+    )
 
-    withdraw_balancer = balancer.ExactBptSingleTokenQueryExit(w3=w3,
-                                                              pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
-                                                              bpt_amount_in=bpt_amount,
-                                                              token_out_address=ETHAddr.WETH)
+    withdraw_balancer = balancer.ExactBptSingleTokenQueryExit(
+        w3=w3,
+        pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
+        bpt_amount_in=bpt_amount,
+        token_out_address=ETHAddr.WETH,
+    )
 
     bpt_in, amounts_out = withdraw_balancer.call(web3=w3)
     amounts_out = [int(amount * 0.99) for amount in amounts_out]
-    withdraw_balancer = balancer.ExactBptSingleTokenExit(w3=w3,
-                                                         pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
-                                                         avatar=safe.address,
-                                                         bpt_amount_in=bpt_amount,
-                                                         token_out_address=ETHAddr.WETH,
-                                                         min_amount_out=amounts_out[1])
-    send_withdraw = roles.send([withdraw_aura, withdraw_balancer],
-                               role=4,
-                               private_key=accounts[4].key,
-                               roles_mod_address=roles_ctract.address,
-                               web3=w3)
+    withdraw_balancer = balancer.ExactBptSingleTokenExit(
+        w3=w3,
+        pool_id="0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",
+        avatar=safe.address,
+        bpt_amount_in=bpt_amount,
+        token_out_address=ETHAddr.WETH,
+        min_amount_out=amounts_out[1],
+    )
+    send_withdraw = roles.send(
+        [withdraw_aura, withdraw_balancer],
+        role=4,
+        private_key=accounts[4].key,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
 
     weth_balance = get_balance(w3, token=ETHAddr.WETH, address=safe.address)
     assert weth_balance == 999_487_904
@@ -288,24 +352,30 @@ def test_build_operation(local_node_eth, accounts):
     {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x5e8266950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c8","value":"0"},
     {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x33a0480c0000000000000000000000000000000000000000000000000000000000000004000000000000000000000000ba12222222228d8ba445958a75a0704d566bf2c88bdb391300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001800000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000002032296969ef14eb0c6d29669c550d4a04491302300002000000000000000000800000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e10000000000000000000000000000000000000000000000000000000000000020000000000000000000000000c01318bab7ee1f5ba734172bf7718b5dc6ec90e1","value":"0"}
     ]}"""
-    apply_presets(safe, roles_ctract, json_data=presets,
-                  replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])])
+    apply_presets(
+        safe, roles_ctract, json_data=presets, replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])]
+    )
 
     # approve tokens in balancer and aura
-    approve_vault = balancer.ApproveForVault(token="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-                                             amount=1_000_000_000_000_000_000)
-    approve_aura_booster = aura.ApproveForBooster(token="0x32296969Ef14EB0c6d29669C550D4a0449130230",
-                                                  amount=1_000_000_000_000_000_000)
-    approves = roles.build([approve_vault, approve_aura_booster],
-                           role=2,
-                           account=accounts[2].address,
-                           roles_mod_address=roles_ctract.address,
-                           web3=w3)
+    approve_vault = balancer.ApproveForVault(
+        token="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", amount=1_000_000_000_000_000_000
+    )
+    approve_aura_booster = aura.ApproveForBooster(
+        token="0x32296969Ef14EB0c6d29669C550D4a0449130230", amount=1_000_000_000_000_000_000
+    )
+    approves = roles.build(
+        [approve_vault, approve_aura_booster],
+        role=2,
+        account=accounts[2].address,
+        roles_mod_address=roles_ctract.address,
+        web3=w3,
+    )
 
     # here the transaction can be sent directly to the node, if it has the private key,
     #  or sign it first with web3.eth.account.sign_transaction(tx, private_key)
     #  and then use w3.eth.send_raw_transaction()
     w3.eth.send_transaction(approves)
+
 
 def test_roles_errors(local_node_eth, accounts):
     w3 = local_node_eth.w3
@@ -314,12 +384,18 @@ def test_roles_errors(local_node_eth, accounts):
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
 
-    approve_vault = balancer.ApproveForVault(token="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", amount=1_000_000_000_000_000_000)
+    approve_vault = balancer.ApproveForVault(
+        token="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", amount=1_000_000_000_000_000_000
+    )
 
     with pytest.raises(TransactionWouldBeReverted) as e:
-        roles.send([approve_vault], role=2, private_key=accounts[2].key, roles_mod_address=roles_ctract.address, web3=w3)
-    assert e.value.args[0] == 'TargetAddressNotAllowed()'
+        roles.send(
+            [approve_vault], role=2, private_key=accounts[2].key, roles_mod_address=roles_ctract.address, web3=w3
+        )
+    assert e.value.args[0] == "TargetAddressNotAllowed()"
 
     with pytest.raises(TransactionWouldBeReverted) as e:
-        roles.send([approve_vault], role=8, private_key=accounts[2].key, roles_mod_address=roles_ctract.address, web3=w3)
-    assert e.value.args[0] == 'NoMembership()'
+        roles.send(
+            [approve_vault], role=8, private_key=accounts[2].key, roles_mod_address=roles_ctract.address, web3=w3
+        )
+    assert e.value.args[0] == "NoMembership()"

@@ -15,7 +15,13 @@ from web3.types import Address
 from roles_royce.constants import StrEnum
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address, ContractMethod
-from roles_royce.toolshed.disassembling import AuraDisassembler, BalancerDisassembler, Disassembler, LidoDisassembler, SwapDisassembler
+from roles_royce.toolshed.disassembling import (
+    AuraDisassembler,
+    BalancerDisassembler,
+    Disassembler,
+    LidoDisassembler,
+    SwapDisassembler,
+)
 
 
 class Modes(StrEnum):
@@ -275,6 +281,7 @@ def fork_reset_state(w3: Web3, url: str, block: int | str = "latest"):
         if block > latest_block:
             raise ValueError(f"Block number {block} is greater than the latest block {latest_block}")
     return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
+
 
 # -----------------------------------------------------------------------------------------------------------------------
 

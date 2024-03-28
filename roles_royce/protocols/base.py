@@ -1,17 +1,21 @@
 import json
 from types import SimpleNamespace
-from roles_royce.roles_modifier import Operation
+
 from web3 import Web3
 
+from roles_royce.roles_modifier import Operation
 
 Address = str
+
 
 class SimpleRepr(type):
     def __repr__(cls):
         return cls.__name__
 
+
 class AvatarAddress(metaclass=SimpleRepr):
     pass
+
 
 class InvalidArgument(Exception):
     pass
@@ -106,10 +110,11 @@ class ContractMethod:
     def _abi_for(self, element):
         name, _type = element
         if type(_type) in (list, tuple):
-            value = {"name": name,
-                     "type": _type[1],  # tuple or tuple[]
-                     "components": [self._abi_for(e) for e in _type[0]]
-                     }
+            value = {
+                "name": name,
+                "type": _type[1],  # tuple or tuple[]
+                "components": [self._abi_for(e) for e in _type[0]],
+            }
         else:
             value = {"name": name, "type": _type}
         return value
@@ -129,6 +134,7 @@ class BaseApprove(ContractMethod):
 
     Specify the token using the token class attribute
     """
+
     name = "approve"
     in_signature = [("spender", "address"), ("amount", "uint256")]
     token = None

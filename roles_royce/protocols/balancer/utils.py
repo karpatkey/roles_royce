@@ -1,7 +1,8 @@
-from web3 import Web3
+from defabipedia.balancer import Abis, ContractSpecs
 from defabipedia.types import Chain
-from defabipedia.balancer import ContractSpecs, Abis
+from web3 import Web3
 from web3.exceptions import ContractLogicError
+
 from .types_and_enums import PoolKind
 
 
@@ -52,7 +53,6 @@ class Pool:
         if pool_kind != PoolKind.ComposableStablePool:
             raise ValueError("Pool is not a composable stable pool")
         else:
-
             return self.bpt_contract.functions.getBptIndex().call()
 
     def bpt_balance(self, address: str) -> int:
