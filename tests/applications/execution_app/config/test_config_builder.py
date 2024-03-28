@@ -2,6 +2,7 @@ import json
 import os
 from unittest.mock import mock_open, patch
 
+import pytest
 from defabipedia.types import Chain
 
 from roles_royce.applications.execution_app.config.config_builder import (

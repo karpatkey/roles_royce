@@ -22,6 +22,7 @@ from roles_royce.toolshed.disassembling import (
     LidoDisassembler,
     SwapDisassembler,
 )
+from roles_royce.utils import to_checksum_address
 
 
 class Modes(StrEnum):

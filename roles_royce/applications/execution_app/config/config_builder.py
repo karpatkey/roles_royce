@@ -155,7 +155,7 @@ class BalancerPosition:
     staked: bool
 
     def __post_init__(self):
-        self.bpt_address = to_checksum_address(self.bpt_address)
+        self.bpt_address = Web3.to_checksum_address(self.bpt_address)
 
     def position_id_tech(self, w3: Web3) -> Address:
         """Returns the address of the BPT if staked is False, otherwise the address of the BPT gauge token
@@ -202,7 +202,7 @@ class AuraPosition:
     bpt_address: Address
 
     def __post_init__(self):
-        self.bpt_address = to_checksum_address(self.bpt_address)
+        self.bpt_address = Web3.to_checksum_address(self.bpt_address)
 
     def position_id_tech(self, w3: Web3) -> Address:
         """Returns the address of the Aura gauge token"""
@@ -223,7 +223,7 @@ class LidoPosition:
     lido_address: Address
 
     def __post_init__(self):
-        self.lido_address = to_checksum_address(self.lido_address)
+        self.lido_address = Web3.to_checksum_address(self.lido_address)
 
     def position_id_tech(self) -> Address:
         """Returns either stETH or wstETH address"""
@@ -396,11 +396,13 @@ class DAOStrategiesBuilder:
 
     @staticmethod
     def build_aura_positions(w3: Web3, positions: list[AuraPosition]) -> list[dict]:
+
         with open(os.path.join(os.path.dirname(__file__), "templates", "aura_template.json"), "r") as f:
             aura_template = json.load(f)
 
         result = []
         for aura_position in positions:
+
             print("        Adding: ", aura_position)
             bpt_address = aura_position.bpt_address
             position = copy.deepcopy(aura_template)
@@ -425,6 +427,7 @@ class DAOStrategiesBuilder:
                 )
                 if all(token["symbol"] in whitelist_pairs for token in pool_tokens):
                     for token in pool_tokens:
+
                         position["exec_config"][2]["parameters"][2]["options"].append(
                             {"value": token["address"], "label": token["symbol"]}
                         )
@@ -445,11 +448,13 @@ class DAOStrategiesBuilder:
 
     @staticmethod
     def build_lido_positions(w3: Web3, positions: list[LidoPosition]) -> list[dict]:
+
         with open(os.path.join(os.path.dirname(__file__), "templates", "lido_template.json"), "r") as f:
             lido_template = json.load(f)
 
         result = []
         for lido_position in positions:
+
             print("        Adding: ", lido_position)
             position = copy.deepcopy(lido_template)
             blockchain = Chain.get_blockchain_from_web3(w3)
