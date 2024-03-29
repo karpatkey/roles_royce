@@ -1,24 +1,16 @@
-from decimal import Decimal
-from pytest import approx
-from karpatkit.constants import Address as GenAddr
-from roles_royce.protocols import uniswap_v3
-from roles_royce.protocols.uniswap_v3.types_and_enums import FeeAmount
-from roles_royce import roles
-from tests.utils import (
-    local_node_eth,
-    accounts,
-    get_balance,
-    steal_token,
-    create_simple_safe,
-    top_up_address,
-)
-from tests.roles import setup_common_roles, deploy_roles, apply_presets
 from defabipedia.tokens import EthereumTokenAddr as ETHAddr
+from karpatkit.constants import Address as GenAddr
+from pytest import approx
+
+from roles_royce import roles
+from roles_royce.protocols import uniswap_v3
+from tests.roles import apply_presets, deploy_roles, setup_common_roles
+from tests.utils import accounts, create_simple_safe, get_balance, local_node_eth, steal_token, top_up_address
 
 
 def test_integration(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    local_node_eth.set_block(19368932)
+    local_node_eth.set_block(19336793)
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -57,21 +49,16 @@ def test_integration(local_node_eth, accounts):
         amount=100_000_000_000,
     )
 
-    pool = uniswap_v3.utils.Pool(w3, ETHAddr.USDC, GenAddr.E, FeeAmount.MEDIUM)
-
-    token0_min_price = pool.price * Decimal(0.9)
-    token0_max_price = pool.price * Decimal(1.1)
-
     # mint nft
     mint_ntf_txns = uniswap_v3.mint_nft(
         w3=w3,
         avatar=safe.address,
         token0=ETHAddr.USDC,
         token1=GenAddr.E,
-        fee=FeeAmount.MEDIUM,
-        token0_min_price=token0_min_price,
-        token0_max_price=token0_max_price,
-        amount1_desired=int(1e18),
+        fee=3000,
+        token0_min_price_perc_dev=10,
+        token0_max_price_perc_dev=10,
+        amount1_desired=1,
     )
     mint_ntf_send = roles.send(
         mint_ntf_txns,
@@ -85,8 +72,7 @@ def test_integration(local_node_eth, accounts):
     nft_id = None
     for log in mint_ntf_send["logs"]:
         if (
-            log["topics"][0].hex()
-            == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f"
+            log["topics"][0].hex() == "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f"
         ):  # IncreaseLiquidity
             nft_id = int(log["topics"][1].hex(), 16)
             break
@@ -95,7 +81,7 @@ def test_integration(local_node_eth, accounts):
 
     # check nft
     nft = uniswap_v3.NFTPosition(w3, nft_id)
-    nft_balances = nft.get_balances()
+    nft_balances = nft.get_balances(nft.pool.ic, nft.pool.sqrt_price)
 
     assert nft_balances[1] / 10**18 == approx(1)
 
@@ -119,7 +105,7 @@ def test_integration(local_node_eth, accounts):
 
     # check nft
     nft = uniswap_v3.NFTPosition(w3, nft_id)
-    nft_balances = nft.get_balances()
+    nft_balances = nft.get_balances(nft.pool.ic, nft.pool.sqrt_price)
 
     assert nft_balances[1] / 10**18 == approx(2)
 
@@ -143,6 +129,6 @@ def test_integration(local_node_eth, accounts):
 
     # check nft
     nft = uniswap_v3.NFTPosition(w3, nft_id)
-    nft_balances = nft.get_balances()
+    nft_balances = nft.get_balances(nft.pool.ic, nft.pool.sqrt_price)
 
     assert nft_balances[1] / 10**18 == approx(1)

@@ -1,6 +1,7 @@
-from roles_royce.protocols.base import ContractMethod, AvatarAddress, Address
 from defabipedia.types import Blockchain
 from defabipedia.uniswap_v3 import ContractSpecs
+
+from roles_royce.protocols.base import Address, AvatarAddress, ContractMethod
 
 
 class ApproveForPositionsNFT(ContractMethod):

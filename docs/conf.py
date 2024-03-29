@@ -8,9 +8,9 @@ import sys
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Roles Royce'
-copyright = '2023, Karpatkey'
-author = 'Karpatkey'
+project = "Roles Royce"
+copyright = "2023, Karpatkey"
+author = "Karpatkey"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -24,33 +24,33 @@ extensions = [
     "sphinx_autodoc_typehints",
 ]
 
-autoclass_content = 'class'
-#autodoc_typehints = "signature"
-#autodoc_typehints_description_target = "documented_params"
-#autodoc_typehints_format = "short"
-#python_use_unqualified_type_names = True
-autodoc_member_order = 'bysource'
+autoclass_content = "class"
+# autodoc_typehints = "signature"
+# autodoc_typehints_description_target = "documented_params"
+# autodoc_typehints_format = "short"
+# python_use_unqualified_type_names = True
+autodoc_member_order = "bysource"
 add_module_names = True
 
-templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
-html_static_path = ['_static']
+html_theme = "alabaster"
+html_static_path = ["_static"]
 html_theme_options = {
-    'description': 'Execute transactions using Zodiac Roles Modifier contracts.',
-    'page_width': '1200px',
+    "description": "Execute transactions using Zodiac Roles Modifier contracts.",
+    "page_width": "1200px",
     #'canonical_url': ,
     "extra_nav_links": {
-        "Source code": 'https://github.com/KarpatkeyDAO/roles_royce/',
+        "Source code": "https://github.com/KarpatkeyDAO/roles_royce/",
         "Issue tracker": "https://github.com/KarpatkeyDAO/roles_royce/issues",
-        "Karpatkey": 'https://www.karpatkey.com/',
-    }
+        "Karpatkey": "https://www.karpatkey.com/",
+    },
 }
 
 autodoc_default_options = {
-    'member-order': 'bysource',
+    "member-order": "bysource",
 }

@@ -16,6 +16,7 @@ class PoolKind(IntEnum):
 # Refs
 # StablePool encoding https://github.com/balancer/balancer-v2-monorepo/blob/d2c47f13aa5f7db1b16e37f37c9631b9a38f25a4/pkg/balancer-js/src/pool-stable/encoder.ts
 
+
 # https://etherscan.io/address/0xff4ce5aaab5a627bf82f4a571ab1ce94aa365ea6#code
 class StablePoolExitKind(IntEnum):
     EXACT_BPT_IN_FOR_ONE_TOKEN_OUT = 0
@@ -35,6 +36,7 @@ class StablePoolv2ExitKind(IntEnum):
 
 # Weighted pools v1 uses the same exit kind enum as StablePoolExitKind, versions after v1 use StablePoolv2ExitKind, see StablePoolUserData
 # https://github.com/balancer/balancer-v2-monorepo/blob/fc3e5735a07438ab506931f56adf64dede1441b1/pkg/interfaces/contracts/pool-weighted/WeightedPoolUserData.sol
+
 
 # Composable stable pools use the same exit kind enum as StablePoolExitKind but with a different ordering, also they have a recovery mode
 # https://github.com/balancer/balancer-v2-monorepo/blob/fc3e5735a07438ab506931f56adf64dede1441b1/pkg/pool-stable/contracts/ComposableStablePool.sol#L53
