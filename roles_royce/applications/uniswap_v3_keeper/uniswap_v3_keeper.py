@@ -4,8 +4,8 @@ from roles_royce.toolshed.alerting import (
     TelegramMessenger,
     Messenger,
     LoggingLevel,
-    web3_connection_check,
 )
+from roles_royce.applications.utils import web3_connection_check
 from roles_royce.toolshed.alerting.utils import get_tx_receipt_message_with_transfers
 from prometheus_client import start_http_server as prometheus_start_http_server
 import logging
@@ -24,7 +24,6 @@ from utils import (
     MinimumPriceError,
     check_initial_data
 )
-from web3.middleware import geth_poa_middleware
 
 # -----------------------------------------------------------------------------------------------------------------------
 
