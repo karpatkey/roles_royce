@@ -42,7 +42,6 @@ def custom_config(variable, default, cast):
 class ENV:
     DAO: str
     BLOCKCHAIN: str
-    LOCAL_FORK_URL: str | None = None
 
     TENDERLY_ACCOUNT_ID: str = field(init=False)
     TENDERLY_PROJECT: str = field(init=False)
@@ -61,6 +60,7 @@ class ENV:
     MODE: Modes = field(init=False)
     LOCAL_FORK_PORT: int | None = field(init=False)
     LOCAL_FORK_HOST: str = field(init=False)
+    LOCAL_FORK_URL: str | None = field(init=False)
 
     SLACK_WEBHOOK_URL: str = field(init=False)
 
@@ -138,6 +138,8 @@ class ENV:
             default="localhost",
             cast=str,
         )
+
+        self.LOCAL_FORK_URL: str = config("LOCAL_FORK_URL", default=None)
 
         self.SLACK_WEBHOOK_URL: str = config("SLACK_WEBHOOK_URL", default="")
 
