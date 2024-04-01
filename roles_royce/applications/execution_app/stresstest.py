@@ -156,8 +156,8 @@ def stresstest(
             except Exception as e:
                 logger.error(f"Error in transaction builder. Error: {str(e)}")
 
-        # concurrency = config("STRESSTEST_CONCURRENCY", default=10, cast=int)
-        results = Parallel(n_jobs=4, backend="threading")(delayed(with_pulley)(*args) for args in executions)
+        concurrency = config("STRESSTEST_CONCURRENCY", default=10, cast=int)
+        results = Parallel(n_jobs=concurrency, backend="threading")(delayed(with_pulley)(*args) for args in executions)
         collections.deque(results, maxlen=0)
 
     return positions_dict
