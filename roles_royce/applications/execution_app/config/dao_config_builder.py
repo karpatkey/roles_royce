@@ -10,14 +10,6 @@ from roles_royce.applications.execution_app.config.config_builder import (
 )
 from roles_royce.applications.execution_app.pulley_fork import PulleyFork
 
-from roles_royce.applications.execution_app.config.config_builder import (
-    DAO,
-    AuraPosition,
-    BalancerPosition,
-    DAOStrategiesBuilder,
-    LidoPosition,
-    WalletPosition,
-)
 
 def main(
     dao: DAO,

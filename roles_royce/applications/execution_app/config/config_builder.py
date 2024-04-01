@@ -11,10 +11,6 @@ from web3 import Web3
 from web3.types import Address
 
 from roles_royce.constants import StrEnum
-
-from .utils import get_aura_gauge_from_bpt, get_gauge_address_from_bpt, get_tokens_from_bpt
-
-from roles_royce.constants import StrEnum
 from roles_royce.utils import to_checksum_address
 
 from .utils import get_aura_gauge_from_bpt, get_gauge_address_from_bpt, get_tokens_from_bpt
@@ -329,7 +325,6 @@ class DAOStrategiesBuilder:
 
         result = []
         for balancer_position in positions:
-
             print("        Adding: ", balancer_position)
 
             bpt_address = balancer_position.bpt_address
@@ -396,13 +391,11 @@ class DAOStrategiesBuilder:
 
     @staticmethod
     def build_aura_positions(w3: Web3, positions: list[AuraPosition]) -> list[dict]:
-
         with open(os.path.join(os.path.dirname(__file__), "templates", "aura_template.json"), "r") as f:
             aura_template = json.load(f)
 
         result = []
         for aura_position in positions:
-
             print("        Adding: ", aura_position)
             bpt_address = aura_position.bpt_address
             position = copy.deepcopy(aura_template)
@@ -427,7 +420,6 @@ class DAOStrategiesBuilder:
                 )
                 if all(token["symbol"] in whitelist_pairs for token in pool_tokens):
                     for token in pool_tokens:
-
                         position["exec_config"][2]["parameters"][2]["options"].append(
                             {"value": token["address"], "label": token["symbol"]}
                         )
@@ -448,13 +440,11 @@ class DAOStrategiesBuilder:
 
     @staticmethod
     def build_lido_positions(w3: Web3, positions: list[LidoPosition]) -> list[dict]:
-
         with open(os.path.join(os.path.dirname(__file__), "templates", "lido_template.json"), "r") as f:
             lido_template = json.load(f)
 
         result = []
         for lido_position in positions:
-
             print("        Adding: ", lido_position)
             position = copy.deepcopy(lido_template)
             blockchain = Chain.get_blockchain_from_web3(w3)
