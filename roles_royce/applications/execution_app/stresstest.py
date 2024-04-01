@@ -55,7 +55,8 @@ def single_stresstest(
                 exit_arguments_dict[item["name"]] = item["options"][0]["value"]
         exit_arguments = [exit_arguments_dict]
 
-        bc = Chain.get_blockchain_by_name(blockchain)
+        chain_id = {"ethereum": 1, "gnosis": 100}[blockchain.lower()]
+        bc = Chain.get_blockchain_by_chain_id(chain_id)
 
         if protocol == "Balancer" and (
             exec_config["function_name"] == "exit_1_1" or exec_config["function_name"] == "exit_1_3"
