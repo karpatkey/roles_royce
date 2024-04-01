@@ -91,13 +91,14 @@ def single_stresstest(
 
         logger.info(f"Exit arguments: {exit_arguments}")
 
-        env = ENV(DAO=dao or "", BLOCKCHAIN=blockchain, LOCAL_FORK_URL=fork.url())
+        env = ENV(DAO=dao or "", BLOCKCHAIN=blockchain)
         result = build_transaction_env(
             env=env,
             percentage=percentage,
             protocol=protocol,
             exit_strategy=exit_strategy,
             exit_arguments=exit_arguments,
+            web3=web3,
         )
         if result["status"] != 200:
             logger.error(f'Error in transaction builder. Error1: {result["message"]}')
@@ -107,7 +108,7 @@ def single_stresstest(
             tx = result["tx_data"]["transaction"]
 
             try:
-                result = execute_env(env=env, transaction=tx)
+                result = execute_env(env=env, transaction=tx, web3=web3)
                 if result["status"] != 200:
                     logger.error(f'Error in execution. Error: {result["message"]}')
                     exec_config["stresstest"] = f"false, with error: {result['message']}"

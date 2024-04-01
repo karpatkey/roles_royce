@@ -1,13 +1,19 @@
 import argparse
 import json
 
+from web3 import Web3
+
 from roles_royce.applications.execution_app.utils import ENV, fork_reset_state, start_the_engine
 from roles_royce.roles_modifier import GasStrategies, set_gas_strategy, update_gas_fees_parameters_and_nonce
 
 
-def execute_env(env, transaction):
+def execute_env(env, transaction, web3: Web3 | None = None):
     try:
-        w3, w3_MEV = start_the_engine(env)
+        if not web3:
+            w3, w3_MEV = start_the_engine(env)
+        else:
+            w3 = web3
+            w3_MEV = web3
 
         set_gas_strategy(GasStrategies.AGGRESIVE)
         tx = update_gas_fees_parameters_and_nonce(w3, transaction)
