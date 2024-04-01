@@ -33,9 +33,8 @@ class DAO:
     role: int
 
 
-# def single_stresstest(w3: Web3, percentage: int, dao, blockchain, protocol, exec_config, bc, max_slippage, percentage):
 def single_stresstest(
-    percentage: int, max_slippage: int, dao: str, blockchain: str, protocol: str, exec_config, bc, web3: Web3
+    percentage: int, max_slippage: int, dao: str, blockchain: str, protocol: str, exec_config, web3: Web3
 ):
     try:
         w3 = web3
@@ -56,9 +55,7 @@ def single_stresstest(
                 exit_arguments_dict[item["name"]] = item["options"][0]["value"]
         exit_arguments = [exit_arguments_dict]
 
-        # blockchain = Chain.get_blockchain_from_web3(w3)
-        chain_id = {"ethereum": 1, "gnosis": 100}.get(blockchain)
-        bc = Chain.get_blockchain_by_chain_id(chain_id)
+        bc = Chain.get_blockchain_by_name(blockchain)
 
         if protocol == "Balancer" and (
             exec_config["function_name"] == "exit_1_1" or exec_config["function_name"] == "exit_1_3"
@@ -135,14 +132,12 @@ def stresstest(
 ):
     dao = dao or positions_dict["dao"]
     blockchain = blockchain or positions_dict["blockchain"]
-    chain_id = {"ethereum": 1, "gnosis": 100}.get(blockchain)
-    bc = Chain.get_blockchain_by_chain_id(chain_id)
 
     executions = []
     for position in positions_dict["positions"]:
         protocol = position["protocol"]
         for exec_config in position["exec_config"]:
-            executions.append([percentage, max_slippage, dao, blockchain, protocol, exec_config, bc])
+            executions.append([percentage, max_slippage, dao, blockchain, protocol, exec_config])
 
     if w3:
         for args in executions:
