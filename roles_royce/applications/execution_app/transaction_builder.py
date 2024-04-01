@@ -61,18 +61,21 @@ def build_transaction_env(env: ENV, percentage, protocol, exit_strategy, exit_ar
 
 
 def build_transaction(percentage, dao, blockchain, protocol, exit_strategy, exit_arguments):
-    env = ENV(
-        DAO=dao,
-        BLOCKCHAIN=blockchain,
-    )
+    try:
+        env = ENV(
+            DAO=dao,
+            BLOCKCHAIN=blockchain,
+        )
 
-    return build_transaction_env(
-        env,
-        percentage=percentage,
-        protocol=protocol,
-        exit_strategy=exit_strategy,
-        exit_arguments=exit_arguments,
-    )
+        return build_transaction_env(
+            env,
+            percentage=percentage,
+            protocol=protocol,
+            exit_strategy=exit_strategy,
+            exit_arguments=exit_arguments,
+        )
+    except Exception as e:
+        return {"status": 500, "message": f"Error: {e}"}
 
 
 def main():
