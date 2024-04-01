@@ -204,7 +204,7 @@ class AaveV3CDPManager:
     def check_if_token_is_in_debts(
         self, aave_v3_cdp: AaveV3CDP, token_address: Address | ChecksumAddress | str
     ) -> dict:
-        token_address = self.w3.to_checksum_address(token_address)
+        token_address = to_checksum_address(token_address)
         balances_data = aave_v3_cdp.balances_data
 
         borrowed_amount_of_token_in_stable = 0
