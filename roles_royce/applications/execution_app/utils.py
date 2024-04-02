@@ -60,7 +60,9 @@ class ENV:
     MODE: Modes = field(init=False)
     LOCAL_FORK_PORT: int | None = field(init=False)
     LOCAL_FORK_HOST: str = field(init=False)
-    LOCAL_FORK_URL: str | None = field(init=False)
+
+    local_fork_url: str | None = field(init=True, default=None)
+    LOCAL_FORK_URL: str = field(init=False)
 
     SLACK_WEBHOOK_URL: str = field(init=False)
 
@@ -139,7 +141,7 @@ class ENV:
             cast=str,
         )
 
-        self.LOCAL_FORK_URL: str = config("LOCAL_FORK_URL", default=None)
+        self.LOCAL_FORK_URL: str = self.local_fork_url or config("LOCAL_FORK_URL", default=None, cast=str)
 
         self.SLACK_WEBHOOK_URL: str = config("SLACK_WEBHOOK_URL", default="")
 
@@ -160,7 +162,7 @@ class ExecConfig:
 # -----------------------------------------------------------------------------------------------------------------------
 
 
-def start_the_engine(env: ENV) -> (Web3, Web3):
+def start_the_engine(env: ENV) -> tuple[Web3, Web3]:
     if env.MODE == Modes.DEVELOPMENT:
         w3 = Web3(Web3.HTTPProvider(env.LOCAL_FORK_URL or f"http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}"))
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
