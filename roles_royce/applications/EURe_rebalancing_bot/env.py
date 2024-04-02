@@ -7,6 +7,7 @@ from web3.types import ChecksumAddress
 
 from roles_royce.applications.utils import check_env_endpoints, custom_config, to_dict
 from roles_royce.protocols.base import Address
+from roles_royce.utils import to_checksum_address
 
 
 @dataclass
@@ -48,8 +49,8 @@ class ENV:
 
         check_env_endpoints([(self.RPC_ENDPOINT, self.RPC_ENDPOINT_FALLBACK)])
 
-        self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(config("AVATAR_SAFE_ADDRESS", cast=str))
-        self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(config("ROLES_MOD_ADDRESS", cast=str))
+        self.AVATAR_SAFE_ADDRESS = to_checksum_address(config("AVATAR_SAFE_ADDRESS", cast=str))
+        self.ROLES_MOD_ADDRESS = to_checksum_address(config("ROLES_MOD_ADDRESS", cast=str))
         self.ROLE = config("ROLE", cast=int)
         self.PRIVATE_KEY = custom_config("PRIVATE_KEY", default="", cast=str)
         self.FIXER_API_ACCESS_KEY = custom_config("FIXER_API_ACCESS_KEY", default="", cast=str)

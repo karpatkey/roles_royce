@@ -12,7 +12,7 @@ from roles_royce.generic_method import TxData
 from roles_royce.protocols import balancer
 from roles_royce.protocols.eth import aura
 from roles_royce.roles_modifier import TransactionWouldBeReverted
-from roles_royce.utils import MULTISENDS
+from roles_royce.utils import MULTISENDS, to_checksum_address
 
 from .roles import apply_presets, deploy_roles, setup_common_roles
 from .utils import (
@@ -101,7 +101,7 @@ def test_safe_and_roles(local_node_eth):
     role_constructor_bytes = "000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
     bytecode_without_default_constructor = roles_bytecode[: -len(role_constructor_bytes)]
 
-    owner = avatar = target = w3.to_checksum_address(test_account0_addr)
+    owner = avatar = target = to_checksum_address(test_account0_addr)
     role_ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
 
     tx_hash = role_ctract.constructor(owner, avatar, target).transact({"from": test_account0_addr})  # deploy!

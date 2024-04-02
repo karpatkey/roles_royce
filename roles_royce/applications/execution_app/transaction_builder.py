@@ -1,22 +1,27 @@
 import argparse
 import json
 
+from web3 import Web3
+
 from roles_royce.applications.execution_app.utils import ENV, ExecConfig, decode_transaction, gear_up, start_the_engine
 from roles_royce.roles_modifier import ROLES_ERRORS, GasStrategies, set_gas_strategy
 
 
-def build_transaction(percentage, dao, blockchain, protocol, exit_strategy, exit_arguments):
+def build_transaction_env(env: ENV, percentage, protocol, exit_strategy, exit_arguments, web3: Web3 | None = None):
     exec_config = ExecConfig(
         percentage=percentage,
-        dao=dao,
-        blockchain=blockchain,
+        dao=env.DAO,
+        blockchain=env.BLOCKCHAIN,
         protocol=protocol,
         exit_strategy=exit_strategy,
         exit_arguments=exit_arguments,
     )
 
-    env = ENV(DAO=exec_config.dao, BLOCKCHAIN=exec_config.blockchain)
-    w3, w3_MEV = start_the_engine(env)
+    if not web3:
+        w3, _ = start_the_engine(env)
+    else:
+        w3 = web3
+
     set_gas_strategy(GasStrategies.AGGRESIVE)
     disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
     decoded_transaction = decode_transaction(txns=txn_transactables, env=env)
@@ -59,6 +64,24 @@ def build_transaction(percentage, dao, blockchain, protocol, exit_strategy, exit
                 "tx_data": {"decoded_transaction": decoded_transaction},
                 "message": f"Error: {e}",
             }
+
+
+def build_transaction(percentage, dao, blockchain, protocol, exit_strategy, exit_arguments):
+    try:
+        env = ENV(
+            DAO=dao,
+            BLOCKCHAIN=blockchain,
+        )
+
+        return build_transaction_env(
+            env,
+            percentage=percentage,
+            protocol=protocol,
+            exit_strategy=exit_strategy,
+            exit_arguments=exit_arguments,
+        )
+    except Exception as e:
+        return {"status": 500, "message": f"Error: {e}"}
 
 
 def main():

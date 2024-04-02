@@ -12,6 +12,7 @@ from roles_royce import roles
 from roles_royce.protocols.eth import aave_v3
 from roles_royce.protocols.eth.aave_v3 import InterestRateMode
 from roles_royce.toolshed.protocol_utils.aave_v3.utils import AaveV3Token, AaveV3Utils
+from roles_royce.utils import to_checksum_address
 
 
 class CDPData(Enum):
@@ -78,7 +79,7 @@ class AaveV3CDPManager:
             raise ValueError("'w3' must be filled.")
         if not self.owner_address:
             raise ValueError("'owner_address' must be filled.")
-        self.owner_address = Web3.to_checksum_address(self.owner_address)
+        self.owner_address = to_checksum_address(self.owner_address)
         self.blockchain = Chain.get_blockchain_from_web3(self.w3)
         if self.token_addresses_block == "latest":
             self.token_addresses_block = self.w3.eth.block_number
@@ -203,7 +204,7 @@ class AaveV3CDPManager:
     def check_if_token_is_in_debts(
         self, aave_v3_cdp: AaveV3CDP, token_address: Address | ChecksumAddress | str
     ) -> dict:
-        token_address = self.w3.to_checksum_address(token_address)
+        token_address = to_checksum_address(token_address)
         balances_data = aave_v3_cdp.balances_data
 
         borrowed_amount_of_token_in_stable = 0
@@ -230,7 +231,7 @@ class AaveV3CDPManager:
         block: int | str = "latest",
         tolerance: float = 0.01,
     ) -> int:
-        token_in_address = Web3.to_checksum_address(token_in_address)
+        token_in_address = to_checksum_address(token_in_address)
 
         if block == "latest":
             block = self.w3.eth.block_number
@@ -307,8 +308,8 @@ class AaveV3CDPManager:
         role: int,
         private_key: str,
     ) -> object:
-        token_in_address = Web3.to_checksum_address(token_in_address)
-        roles_mod_address = Web3.to_checksum_address(roles_mod_address)
+        token_in_address = to_checksum_address(token_in_address)
+        roles_mod_address = to_checksum_address(roles_mod_address)
 
         token_in_borrowed_status = self.check_if_token_is_in_debts(
             aave_v3_cdp=aave_v3_cdp, token_address=token_in_address

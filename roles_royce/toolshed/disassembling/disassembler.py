@@ -6,6 +6,7 @@ from web3.types import Address, ChecksumAddress, TxParams, TxReceipt
 
 from roles_royce import roles
 from roles_royce.generic_method import Transactable
+from roles_royce.utils import to_checksum_address
 
 
 @dataclass
@@ -18,8 +19,8 @@ class Disassembler:
     signer_address: Address | ChecksumAddress | str | None = None
 
     def __post_init__(self):
-        self.avatar_safe_address = Web3.to_checksum_address(self.avatar_safe_address)
-        self.roles_mod_address = Web3.to_checksum_address(self.roles_mod_address)
+        self.avatar_safe_address = to_checksum_address(self.avatar_safe_address)
+        self.roles_mod_address = to_checksum_address(self.roles_mod_address)
         self.blockchain = Chain.get_blockchain_from_web3(self.w3)
 
     def send(self, txns: list[Transactable], private_key: str, w3: Web3 = None) -> TxReceipt:

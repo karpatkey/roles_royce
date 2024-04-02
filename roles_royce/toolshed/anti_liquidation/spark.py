@@ -12,6 +12,7 @@ from roles_royce import roles
 from roles_royce.protocols.eth import spark
 from roles_royce.protocols.eth.spark import RateModel
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkToken, SparkUtils
+from roles_royce.utils import to_checksum_address
 
 
 class CDPData(Enum):
@@ -78,7 +79,7 @@ class SparkCDPManager:
             raise ValueError("'w3' must be filled.")
         if not self.owner_address:
             raise ValueError("'owner_address' must be filled.")
-        self.owner_address = Web3.to_checksum_address(self.owner_address)
+        self.owner_address = to_checksum_address(self.owner_address)
         self.blockchain = Chain.get_blockchain_from_web3(self.w3)
         if self.token_addresses_block == "latest":
             self.token_addresses_block = self.w3.eth.block_number
@@ -193,7 +194,7 @@ class SparkCDPManager:
         )
 
     def check_if_token_is_in_debts(self, spark_cdp: SparkCDP, token_address: Address | ChecksumAddress | str) -> dict:
-        token_address = self.w3.to_checksum_address(token_address)
+        token_address = to_checksum_address(token_address)
         balances_data = spark_cdp.balances_data
 
         borrowed_amount_of_token_in_stable = 0
@@ -220,7 +221,7 @@ class SparkCDPManager:
         block: int | str = "latest",
         tolerance: float = 0.01,
     ) -> int:
-        token_in_address = Web3.to_checksum_address(token_in_address)
+        token_in_address = to_checksum_address(token_in_address)
 
         if block == "latest":
             block = self.w3.eth.block_number
@@ -293,8 +294,8 @@ class SparkCDPManager:
         private_key: str,
         w3: Web3 = None,
     ) -> object:
-        token_in_address = Web3.to_checksum_address(token_in_address)
-        roles_mod_address = Web3.to_checksum_address(roles_mod_address)
+        token_in_address = to_checksum_address(token_in_address)
+        roles_mod_address = to_checksum_address(roles_mod_address)
 
         token_in_borrowed_status = self.check_if_token_is_in_debts(spark_cdp=spark_cdp, token_address=token_in_address)
 

@@ -11,6 +11,7 @@ from web3 import Web3
 from web3.types import Address
 
 from roles_royce.constants import StrEnum
+from roles_royce.utils import to_checksum_address
 
 from .utils import get_aura_gauge_from_bpt, get_gauge_address_from_bpt, get_tokens_from_bpt
 
@@ -150,7 +151,7 @@ class BalancerPosition:
     staked: bool
 
     def __post_init__(self):
-        self.bpt_address = Web3.to_checksum_address(self.bpt_address)
+        self.bpt_address = to_checksum_address(self.bpt_address)
 
     def position_id_tech(self, w3: Web3) -> Address:
         """Returns the address of the BPT if staked is False, otherwise the address of the BPT gauge token
@@ -197,7 +198,7 @@ class AuraPosition:
     bpt_address: Address
 
     def __post_init__(self):
-        self.bpt_address = Web3.to_checksum_address(self.bpt_address)
+        self.bpt_address = to_checksum_address(self.bpt_address)
 
     def position_id_tech(self, w3: Web3) -> Address:
         """Returns the address of the Aura gauge token"""
@@ -218,7 +219,7 @@ class LidoPosition:
     lido_address: Address
 
     def __post_init__(self):
-        self.lido_address = Web3.to_checksum_address(self.lido_address)
+        self.lido_address = to_checksum_address(self.lido_address)
 
     def position_id_tech(self) -> Address:
         """Returns either stETH or wstETH address"""
@@ -238,7 +239,7 @@ class WalletPosition:
     token_in_address: Address
 
     def __post_init__(self):
-        self.token_in_address = Web3.to_checksum_address(self.token_in_address)
+        self.token_in_address = to_checksum_address(self.token_in_address)
 
     def position_id_tech(self) -> Address:
         """The token address that will be swapped"""

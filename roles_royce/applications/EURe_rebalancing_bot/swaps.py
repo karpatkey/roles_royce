@@ -11,6 +11,7 @@ from web3.types import TxReceipt
 
 from roles_royce import roles
 from roles_royce.protocols.base import Address, ContractMethod
+from roles_royce.utils import to_checksum_address
 
 decimalsEURe = 18
 decimalsWXDAI = 18
@@ -136,8 +137,8 @@ class Swapper:
         max_slippage: float,
     ):
         self.w3 = w3
-        self.avatar_safe_address = Web3.to_checksum_address(avatar_safe_address)
-        self.roles_mod_address = Web3.to_checksum_address(roles_mod_address)
+        self.avatar_safe_address = to_checksum_address(avatar_safe_address)
+        self.roles_mod_address = to_checksum_address(roles_mod_address)
         self.role = role
         self.private_keys = private_keys
         self.max_slippage = max_slippage

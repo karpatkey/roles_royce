@@ -3,6 +3,7 @@ from defi_protocols.functions import get_contract, get_data, get_decimals
 from defi_protocols.Maker import get_vault_data, underlying
 from web3 import HTTPProvider, Web3
 
+from roles_royce.utils import to_checksum_address
 from tests.utils import LOCAL_NODE_PORT, fork_reset_state, fork_unlock_account
 
 VAT = "0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B"
@@ -38,7 +39,7 @@ def test_maker(wallet, gem_join, block="latest"):
     proxy_address = ZERO_ADDRESS
     for log in build_receipt["logs"]:
         if log["topics"][0].hex() == "0x259b30ca39885c6d801a0b5dbc988640f3c25e2f37531fe138c5c5af8955d41b":  # Created
-            proxy_address = web3.to_checksum_address("0x" + log["data"].hex()[26:66])
+            proxy_address = to_checksum_address("0x" + log["data"].hex()[26:66])
             break
 
     if proxy_address == ZERO_ADDRESS:
