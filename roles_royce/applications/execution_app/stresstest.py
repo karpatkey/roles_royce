@@ -14,7 +14,7 @@ from web3 import Web3
 from roles_royce.applications.execution_app.execute import execute_env
 from roles_royce.applications.execution_app.pulley_fork import PulleyFork
 from roles_royce.applications.execution_app.transaction_builder import build_transaction_env
-from roles_royce.applications.execution_app.utils import ENV, recovery_mode_balancer
+from roles_royce.applications.execution_app.utils import ENV, recovery_mode_balancer, start_the_engine
 
 logging.basicConfig(
     level=logging.INFO,
@@ -172,7 +172,9 @@ def stresstest(
         def with_pulley(*args):
             try:
                 with PulleyFork(blockchain) as fork:
-                    web3 = Web3(Web3.HTTPProvider(fork.url()))
+                    env = ENV(DAO=dao or "", BLOCKCHAIN=blockchain, local_fork_url=fork.url())
+                    web3, _ = start_the_engine(env)
+
                     return single_stresstest(*args, web3=web3)
             except Exception as e:
                 logger.error(f"CodeError in transaction builder. Error: {str(e)}")
