@@ -1,5 +1,7 @@
 import collections
 import logging
+import logging.handlers
+import threading
 from dataclasses import dataclass
 
 from decouple import config
@@ -20,8 +22,6 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-logger = logging.getLogger(__name__)
-
 
 @dataclass
 class DAO:
@@ -33,11 +33,29 @@ class DAO:
     role: int
 
 
+def initialize_logging(log_level, log_name="stresstest"):
+    logger = logging.getLogger(f"{log_name}-{threading.get_native_id()}")
+    logger.setLevel(log_level)
+
+    mh = logging.handlers.MemoryHandler(100000, 100000)
+    mh.setTarget(logging.StreamHandler())
+    logger.handlers.clear()
+    logger.addHandler(mh)
+
+    mh.setFormatter(logging.Formatter("%(asctime)s -  %(message)s", "%Y-%m-%d %H:%M:%S"))
+    logger.propagate = False
+    return logger, mh
+
+
 def single_stresstest(
     percentage: int, max_slippage: int, dao: str, blockchain: str, protocol: str, exec_config, web3: Web3
 ):
+    id = f"{dao}-{blockchain}-{protocol}-{exec_config['function_name']}"
+    logger, logger_handler = initialize_logging(logging.INFO, id)
+
     try:
         w3 = web3
+
         logger.info(f"Running stresstest on DAO: {dao}, Blockchain: {blockchain}, Protocol: {protocol}")
         logger.info(f'Position: {exec_config["function_name"]}, description: {exec_config["description"]}')
 
@@ -64,7 +82,8 @@ def single_stresstest(
             bpt_address = exit_arguments_dict["bpt_address"]
             test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"], blockchain=bc)
             if test:
-                return
+                raise ValueError("Skip recovery")
+
         elif protocol == "Balancer" and (
             exec_config["function_name"] == "exit_2_1" or exec_config["function_name"] == "exit_2_3"
         ):
@@ -73,7 +92,8 @@ def single_stresstest(
             bpt_address = gauge_contract.functions.lp_token().call()
             test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"], blockchain=bc)
             if test:
-                return
+                raise ValueError("Skip recovery")
+
         elif protocol == "Aura" and (
             exec_config["function_name"] == "exit_2_1" or exec_config["function_name"] == "exit_2_3"
         ):
@@ -85,7 +105,7 @@ def single_stresstest(
             bpt_address = aura_rewards_contract.functions.asset().call()
             test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"], blockchain=bc)
             if test:
-                return
+                raise ValueError("Skip recovery")
 
         logger.info(f"Exit arguments: {exit_arguments}")
 
@@ -99,7 +119,7 @@ def single_stresstest(
             web3=web3,
         )
         if result["status"] != 200:
-            logger.error(f'Error in transaction builder. Error1: {result["message"]}')
+            logger.info(f'Error in transaction builder. Error1: {result["message"]}')
             exec_config["stresstest"] = f"false, with error: {result['message']}"
         else:
             logger.info(f'Status of transaction builder: {result["status"]}')
@@ -108,19 +128,22 @@ def single_stresstest(
             try:
                 result = execute_env(env=env, transaction=tx, web3=web3)
                 if result["status"] != 200:
-                    logger.error(f'Error in execution. Error: {result["message"]}')
+                    logger.info(f'Error in execution. Error: {result["message"]}')
                     exec_config["stresstest"] = f"false, with error: {result['message']}"
                 else:
                     logger.info(f'Status of execution: {result["status"]}')
                     exec_config["stresstest"] = True
 
             except Exception as f:
-                logger.error(f"Exception in execution. Error: {f}")
+                logger.info(f"Exception in execution. Error: {f}")
                 exec_config["stresstest"] = f"false, with error: {str(f)}"
 
     except Exception as e:
-        logger.error(f"Error in transaction builder. Error: {str(e)}")
+        logger.info(f"Error in transaction builder. Error: {str(e)}")
         exec_config["stresstest"] = f"false, with error: {str(e)}"
+    finally:
+        print("")
+        logger_handler.flush()
 
 
 def stresstest(
@@ -133,6 +156,7 @@ def stresstest(
 ):
     dao = dao or positions_dict["dao"]
     blockchain = blockchain or positions_dict["blockchain"]
+    logger = logging.getLogger(__name__)
 
     executions = []
     for position in positions_dict["positions"]:
@@ -151,7 +175,7 @@ def stresstest(
                     web3 = Web3(Web3.HTTPProvider(fork.url()))
                     return single_stresstest(*args, web3=web3)
             except Exception as e:
-                logger.error(f"Error in transaction builder. Error: {str(e)}")
+                logger.error(f"CodeError in transaction builder. Error: {str(e)}")
 
         concurrency = config("STRESSTEST_CONCURRENCY", default=10, cast=int)
         results = Parallel(n_jobs=concurrency, backend="threading")(delayed(with_pulley)(*args) for args in executions)
