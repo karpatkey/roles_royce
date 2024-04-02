@@ -141,7 +141,7 @@ class ENV:
             cast=str,
         )
 
-        self.LOCAL_FORK_URL: str = self.local_fork_url or config("LOCAL_FORK_URL", default=None, cast=str)
+        self.LOCAL_FORK_URL = self.local_fork_url or config("LOCAL_FORK_URL", default="")
 
         self.SLACK_WEBHOOK_URL: str = config("SLACK_WEBHOOK_URL", default="")
 
