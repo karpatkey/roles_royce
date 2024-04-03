@@ -13,7 +13,7 @@ from web3.types import Address
 from roles_royce.constants import StrEnum
 from roles_royce.utils import to_checksum_address
 
-from .utils import get_aura_gauge_from_bpt, get_gauge_address_from_bpt, get_tokens_from_bpt
+from .utils import get_aura_gauge_from_bpt, get_gauge_address_from_bpt, get_tokens_from_bpt, get_bpt_from_aura_address
 
 # -----------------------------------------------------------------------------------------------------------------------
 blacklist_token = ["GNO", "ENS", "BAL", "AURA", "COW", "AGVE"]
@@ -39,10 +39,6 @@ wallet_tokens_swap = [
                     "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
                     "0x6B175474E89094C44Da98b954EedeAC495271d0F",
                 ],  # DAI
-            },
-            {
-                "token_in": ["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"],  # USDC
-                "token_out": ["0x6B175474E89094C44Da98b954EedeAC495271d0F"],  # DAI
             },
             {
                 "token_in": ["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"],  # USDC
@@ -195,14 +191,14 @@ class BalancerPosition:
 @dataclass
 class AuraPosition:
     position_id: str
-    bpt_address: Address
+    reward_address: Address
 
     def __post_init__(self):
-        self.bpt_address = to_checksum_address(self.bpt_address)
+        self.reward_address = to_checksum_address(self.reward_address)
 
     def position_id_tech(self, w3: Web3) -> Address:
         """Returns the address of the Aura gauge token"""
-        return get_aura_gauge_from_bpt(w3, self.bpt_address)
+        return self.reward_address
 
     def position_id_human_readable(self, w3: Web3, pool_tokens: list[dict] = None) -> str:
         if pool_tokens is None:
@@ -397,7 +393,7 @@ class DAOStrategiesBuilder:
         result = []
         for aura_position in positions:
             print("        Adding: ", aura_position)
-            bpt_address = aura_position.bpt_address
+            bpt_address = get_bpt_from_aura_address(w3, aura_position.reward_address)
             position = copy.deepcopy(aura_template)
             try:
                 aura_address = aura_position.position_id_tech(w3)
