@@ -23,9 +23,12 @@ class PulleyFork(object):
         requests.delete(self.url())
 
     def start(self):
-        response = requests.post(self.base_url + "/" + self.chain + "/forks")
-        self.response = response.json()
-        return self.response["id"]
+        try:
+            response = requests.post(self.base_url + "/" + self.chain + "/forks")
+            self.response = response.json()
+            return self.response["id"]
+        except requests.ConnectionError:
+            raise SystemError(f"Unable to connect with Pulley! {self.base_url}")
 
     def url(self):
         return self.base_url + "/forks/" + self.fork_id
