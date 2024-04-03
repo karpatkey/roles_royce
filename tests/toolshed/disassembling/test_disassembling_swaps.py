@@ -280,7 +280,7 @@ preset_uniswapv3_v2 = """{
 
 
 # TODO: add tests for exit strategies
-@pytest.mark.skip(reason="Test is not implemented")
+#@pytest.mark.skip(reason="Test is not implemented")
 def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
     block = w3.eth.default_block
@@ -292,7 +292,7 @@ def test_integration_exit_3(local_node_eth, accounts):
     apply_presets(
         avatar_safe,
         roles_contract,
-        json_data=preset_uniswapv3,
+        json_data=preset_uniswapv3_v2,
         replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
     )
 
