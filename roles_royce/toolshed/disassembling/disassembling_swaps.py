@@ -255,12 +255,11 @@ class SwapDisassembler(Disassembler):
                 token_in=token_in,
                 token_out=token_out,
                 avatar=self.avatar_safe_address,
-                deadline=int(int(time()) + 600),
                 amount_in=amount_to_redeem,
                 min_amount_out=amount_out_min_slippage,
                 fee=swap_pool.uni_fee,
             )
 
-            # txns.append(approve_uniswapV3)
+            txns.append(approve_uniswapV3)
             txns.append(swap_uniswapV3)
         return txns
