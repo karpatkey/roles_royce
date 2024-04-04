@@ -101,6 +101,6 @@ class WrapEther(ContractMethod):
     name = "deposit"
 
     def __init__(self, blockchain: Blockchain, eth_amount: int):
-        super().__init__()
+        super().__init__(value=eth_amount)
         self.target_address = ContractSpecs[blockchain].WETH.address
-        self.args.eth_amount = eth_amount
+
