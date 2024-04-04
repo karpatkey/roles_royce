@@ -293,7 +293,7 @@ def test_integration_exit_3(local_node_eth, accounts):
         "sellAmount": str(txn_transactable[0].args_list[0][3]),
         "buyAmount": str(txn_transactable[0].args_list[0][4]),
         "validTo": txn_transactable[0].args_list[0][5],
-        "feeAmount": 0,
+        "feeAmount": str(txn_transactable[0].args_list[0][7]),
         "kind": "sell",
         "partiallyFillable": False,
         "sellTokenBalance": "erc20",
