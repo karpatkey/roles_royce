@@ -96,3 +96,10 @@ def get_gauge_address_from_bpt(w3: Web3, bpt_address: Address) -> Address:
                 return gauge_address
 
     return gauge_address
+
+def get_pool_id_from_bpt(w3: Web3, bpt_address: Address) -> int:
+    bpt_contract = w3.eth.contract(
+        address=bpt_address, abi=balancer.Abis[Chain.get_blockchain_from_web3(w3)].UniversalBPT.abi
+    )
+    pool_id = bpt_contract.functions.getPoolId().call()
+    return pool_id

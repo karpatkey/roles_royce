@@ -13,11 +13,24 @@ from web3.types import Address
 from roles_royce.constants import StrEnum
 from roles_royce.utils import to_checksum_address
 
-from .utils import get_aura_gauge_from_bpt, get_gauge_address_from_bpt, get_tokens_from_bpt, get_bpt_from_aura_address
+from .utils import get_aura_gauge_from_bpt, get_gauge_address_from_bpt, get_tokens_from_bpt, get_bpt_from_aura_address, get_pool_id_from_bpt
 
 # -----------------------------------------------------------------------------------------------------------------------
 blacklist_token = ["GNO", "ENS", "BAL", "AURA", "COW", "AGVE"]
-whitelist_pairs = ["WETH", "stETH", "wstETH", "ETH", "WBTC", "USDC", "USDT", "DAI", "WXDAI", "rETH", "EURe"]
+whitelist_pairs = ["WETH", "stETH", "wstETH", "ETH", "WBTC", "USDC", "USDT", "DAI", "WXDAI", "rETH", "EURe, stEUR", "staBAL3"]
+whitelist_poolIDs = ["0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112", #rETH-WETH eth
+                     "0x93d199263632a4ef4bb438f1feb99e57b4b5f0bd0000000000000000000005c2", #wstETH-ETH eth
+                     "0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080", #wstETH-WETH eth
+                     "0x8353157092ed8be69a9df8f95af097bbf33cb2af0000000000000000000005d9", #GHO-USDC-USDT eth
+                     "0x49cbd67651fbabce12d1df18499896ec87bef46f00000000000000000000064a", #USDC-USDT-DAI-sDAI eth
+                     "0xbad20c15a773bf03ab973302f61fabcea5101f0a000000000000000000000034", #WETH-wstETH gc
+                     "0x7644fa5d0ea14fcf3e813fdf93ca9544f8567655000000000000000000000066", #USDT-sDAI-USDC gc
+                     "0xdd439304a77f54b1f7854751ac1169b279591ef7000000000000000000000064", #sDAI-EURe gc
+                     "0x2086f52651837600180de173b09470f54ef7491000000000000000000000004f", #USDT-USDC-WXDAI gc
+                     "0x06135a9ae830476d3a941bae9010b63732a055f4000000000000000000000065", #stERU-ERUe gc
+                     "0xc9f00c3a713008ddf69b768d90d4978549bfdf9400000000000000000000006d", #crvUSD-sDAI gc
+                     "0x0c1b9ce6bf6c01f587c2ee98b0ef4b20c6648753000000000000000000000050", #staBAL3-EURe gc
+                     ]
 wallet_tokens_swap = [
     {
         "ethereum": [
@@ -355,11 +368,12 @@ class DAOStrategiesBuilder:
 
             try:
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
+                pool_id = get_pool_id_from_bpt(w3, bpt_address)
                 position["position_id_tech"] = gauge_address if balancer_position.staked else bpt_address
                 position["position_id_human_readable"] = balancer_position.position_id_human_readable(
                     w3, pool_tokens=pool_tokens
                 )
-                if all(token["symbol"] in whitelist_pairs for token in pool_tokens):
+                if pool_id in whitelist_poolIDs:
                     for token in pool_tokens:
                         position["exec_config"][1]["parameters"][2]["options"].append(
                             {"value": token["address"], "label": token["symbol"]}
