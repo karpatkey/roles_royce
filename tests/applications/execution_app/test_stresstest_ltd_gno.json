@@ -24,6 +24,7 @@
                     "label": "Withdraw (proportional)",
                     "test": true,
                     "stresstest": false,
+                    "stresstest_error": "None",
                     "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
                     "parameters": [
                         {
@@ -47,6 +48,7 @@
                     "label": "Withdraw (proportional) (Recovery mode)",
                     "test": true,
                     "stresstest": false,
+                    "stresstest_error": "None",
                     "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
                     "parameters": [
                         {

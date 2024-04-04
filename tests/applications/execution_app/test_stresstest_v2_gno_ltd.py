@@ -35,7 +35,8 @@ stresstest_outcome = {
                     "function_name": "exit_1_1",
                     "label": "Withdraw (proportional)",
                     "test": True,
-                    "stresstest": "false, with error: Role permissions error: " "ParameterNotOneOfAllowed()",
+                    "stresstest": False,
+                    "stresstest_error": "error: Role permissions error: " "ParameterNotOneOfAllowed()",
                     "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
                     "parameters": [
                         {
@@ -55,7 +56,8 @@ stresstest_outcome = {
                     "function_name": "exit_1_3",
                     "label": "Withdraw (proportional) (Recovery mode)",
                     "test": True,
-                    "stresstest": "false, with error: Skip recovery",
+                    "stresstest": False,
+                    "stresstest_error": "error: Skip recovery",
                     "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
                     "parameters": [
                         {

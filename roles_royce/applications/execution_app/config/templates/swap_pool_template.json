@@ -9,6 +9,7 @@
             "label": "Exchange Wallet Token on Balancer",
             "test": true,
             "stresstest": false,
+            "stresstest_error": "None",
             "description": "Exchange a wallet token through Balancer",
             "parameters": [
               {
@@ -46,6 +47,7 @@
             "label": "Exchange Wallet Token on Curve",
             "test": true,
             "stresstest": false,
+            "stresstest_error": "None",
             "description": "Exchange a wallet token through Curve",
             "parameters": [
               {
@@ -82,6 +84,7 @@
             "label": "Exchange Wallet Token on UniswapV3",
             "test": true,
             "stresstest": false,
+            "stresstest_error": "None",
             "description": "Exchange a wallet token through UniswapV3",
             "parameters": [
               {

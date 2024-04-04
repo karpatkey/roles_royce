@@ -96,3 +96,11 @@ class ApproveUniswapV3(ContractMethod):
         self.target_address = token_address
         self.args.spender = ContractSpecs[blockchain].UniV3_SwapRouter.address
         self.args.amount = amount
+
+class WrapEther(ContractMethod):
+    name = "deposit"
+
+    def __init__(self, blockchain: Blockchain, eth_amount: int):
+        super().__init__()
+        self.target_address = ContractSpecs[blockchain].WETH.address
+        self.args.eth_amount = eth_amount
