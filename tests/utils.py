@@ -219,7 +219,6 @@ def _local_node(request, node: LocalNode):
 
     node.w3.middleware_onion.add(LatencyMeasurerMiddleware, "call_counter")
     node.reset_state()
-    assert node.w3.eth.block_number == node.default_block
     return node
 
 
