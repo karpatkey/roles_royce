@@ -13,6 +13,7 @@ from roles_royce.toolshed.disassembling import SwapDisassembler
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
 from tests.utils import accounts, create_simple_safe, local_node_eth, steal_token
 
+TEST_ETH_BLOCK = 19590108
 ROLE = 4
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
 ROLES_MOD = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
@@ -55,8 +56,7 @@ presets_balancer = """{
 
 def test_integration_exit_1(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = w3.eth.default_block
-    local_node_eth.set_block(block)
+    local_node_eth.set_block(TEST_ETH_BLOCK)
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -153,8 +153,7 @@ presets_curve = """{
 
 def test_integration_exit_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = w3.eth.default_block
-    local_node_eth.set_block(block)
+    local_node_eth.set_block(TEST_ETH_BLOCK)
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -283,8 +282,7 @@ preset_uniswapv3_v2 = """{
 #@pytest.mark.skip(reason="Test is not implemented")
 def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = w3.eth.default_block
-    local_node_eth.set_block(block)
+    local_node_eth.set_block(TEST_ETH_BLOCK)
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
