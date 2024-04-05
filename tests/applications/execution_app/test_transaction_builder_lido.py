@@ -9,6 +9,10 @@ import pytest
 from roles_royce.applications.execution_app.utils import ENV, ExecConfig
 from tests.utils import accounts, assign_role, local_node_eth
 
+TEST_ETH_BLOCK = 19590108
+TEST_GNOSIS_BLOCK = 33291126
+
+
 dao = "GnosisDAO"
 blockchain = "ETHEREUM"
 avatar_safe_address = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
@@ -190,9 +194,7 @@ expected_outputs = [
 # @pytest.mark.skip(reason="swap strategy does not work in the fork")
 @pytest.mark.parametrize("args, expected", zip(positions_mock[0]["exec_config"], expected_outputs))
 def test_transaction_builder_lido(local_node_eth, accounts, monkeypatch, args, expected):
-    w3 = local_node_eth.w3
-    block = w3.eth.default_block
-    local_node_eth.set_block(block)
+    local_node_eth.set_block(TEST_ETH_BLOCK)
     private_key = set_up_roles(local_node_eth, accounts)
     set_env(monkeypatch, private_key)
 
