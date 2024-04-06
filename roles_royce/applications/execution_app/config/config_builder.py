@@ -47,7 +47,7 @@ whitelist_poolIDs = [
     "0x7644fa5d0ea14fcf3e813fdf93ca9544f8567655000000000000000000000066",  # USDT-sDAI-USDC gc
     "0xdd439304a77f54b1f7854751ac1169b279591ef7000000000000000000000064",  # sDAI-EURe gc
     "0x2086f52651837600180de173b09470f54ef7491000000000000000000000004f",  # USDT-USDC-WXDAI gc
-    "0x06135a9ae830476d3a941bae9010b63732a055f4000000000000000000000065",  # stERU-ERUe gc
+    "0x06135a9ae830476d3a941bae9010b63732a055f4000000000000000000000065",  # stERU-EURe gc
     "0xc9f00c3a713008ddf69b768d90d4978549bfdf9400000000000000000000006d",  # crvUSD-sDAI gc
     "0x0c1b9ce6bf6c01f587c2ee98b0ef4b20c6648753000000000000000000000050",  # staBAL3-EURe gc
 ]
@@ -58,57 +58,57 @@ wallet_tokens_swap = [
                 "token_in": [
                     "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",  # stETH
                     "0xae78736Cd615f374D3085123A210448E74Fc6393",  # rETH
-                    "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
-                ],  # wstETH
+                    "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",  # wstETH
+                ],  
                 "token_out": [
                     "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  # ETH
-                    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
-                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-                ],  # DAI
+                    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",  # WETH
+
+                ],  
             },
             {
                 "token_in": [
                     "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  # ETH
-                    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-                ],  # WETH
+                    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",  # WETH
+                ],  
                 "token_out": [
-                    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
-                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-                ],  # DAI
+                    "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",  # stETH
+                    "0xae78736Cd615f374D3085123A210448E74Fc6393",  # rETH
+                ],  
             },
             {
                 "token_in": ["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"],  # USDC
                 "token_out": [
                     "0x6B175474E89094C44Da98b954EedeAC495271d0F",  # DAI
-                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-                ],  # USDT
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",  # USDT
+                ],  
             },
             {
                 "token_in": ["0xdAC17F958D2ee523a2206206994597C13D831ec7"],  # USDT
                 "token_out": [
                     "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
-                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-                ],  # DAI
+                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",  # DAI
+                ], 
             },
             {
                 "token_in": ["0x6B175474E89094C44Da98b954EedeAC495271d0F"],  # DAI
                 "token_out": [
                     "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
-                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-                ],  # USDT
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",  # USDT
+                ],  
             },
         ]
     },
     {
         "gnosis": [
             {
-                "token_in": ["0xcB444e90D8198415266c6a2724b7900fb12FC56E"],  # EURe
+                "token_in": ["0xcB444e90D8198415266c6a2724b7900fb12FC56E",], # EURe
                 "token_out": [
                     "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",  # USDC
                     "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",  # USDT
-                    "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                ],  # WXDAI
-            }
+                    "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",  # WXDAI
+                ],  
+            },
         ]
     },
 ]

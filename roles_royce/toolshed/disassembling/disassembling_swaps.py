@@ -133,6 +133,7 @@ class SwapDisassembler(Disassembler):
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
                 wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
                 txns.append(wrapETH)
+                token_in = Addresses[self.blockchain].WETH.address
             approve_vault = ApproveForVault(token=token_in, amount=amount_to_redeem)
             swap_balancer = SingleSwap(
                 blockchain=self.blockchain,
@@ -254,6 +255,8 @@ class SwapDisassembler(Disassembler):
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
                 wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
                 txns.append(wrapETH)
+                token_in = Addresses[self.blockchain].WETH.address
+                
             approve_uniswapV3 = ApproveUniswapV3(
                 blockchain=self.blockchain,
                 token_address=token_in,
