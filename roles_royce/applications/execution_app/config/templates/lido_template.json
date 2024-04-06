@@ -9,6 +9,7 @@
       "label": "Unstake stETH",
       "test": true,
       "stresstest": false,
+      "stresstest_error": "None",
       "description": "Unstake stETH for ETH",
       "parameters": []
     },
@@ -17,6 +18,7 @@
       "label": "Unstake wstETH",
       "test": true,
       "stresstest": false,
+      "stresstest_error": "None",
       "description": "Unstake wstETH for ETH",
       "parameters": []
     },
@@ -25,6 +27,7 @@
       "label": "Swap stETH",
       "test": true,
       "stresstest": false,
+      "stresstest_error": "None",
       "description": "Swap stETH for ETH",
       "parameters": [
         {
@@ -43,6 +46,7 @@
       "label": "Swap wstETH",
       "test": true,
       "stresstest": false,
+      "stresstest_error": "None",
       "description": "Swap wstETH for ETH",
       "parameters": [
         {

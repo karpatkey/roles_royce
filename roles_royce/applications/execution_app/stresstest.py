@@ -120,7 +120,8 @@ def single_stresstest(
         )
         if result["status"] != 200:
             logger.info(f'Error in transaction builder. Error1: {result["message"]}')
-            exec_config["stresstest"] = f"false, with error: {result['message']}"
+            exec_config["stresstest"] = False
+            exec_config["stresstest_error"] = f"error: {result['message']}"
         else:
             logger.info(f'Status of transaction builder: {result["status"]}')
             tx = result["tx_data"]["transaction"]
@@ -129,18 +130,21 @@ def single_stresstest(
                 result = execute_env(env=env, transaction=tx, web3=web3)
                 if result["status"] != 200:
                     logger.info(f'Error in execution. Error: {result["message"]}')
-                    exec_config["stresstest"] = f"false, with error: {result['message']}"
+                    exec_config["stresstest"] = False
+                    exec_config["stresstest_error"] = f"error: {result['message']}"
                 else:
                     logger.info(f'Status of execution: {result["status"]}')
                     exec_config["stresstest"] = True
 
             except Exception as f:
                 logger.info(f"Exception in execution. Error: {f}")
-                exec_config["stresstest"] = f"false, with error: {str(f)}"
+                exec_config["stresstest"] = False
+                exec_config["stresstest_error"] = f"error: {str(f)}"
 
     except Exception as e:
         logger.info(f"Error in transaction builder. Error: {str(e)}")
-        exec_config["stresstest"] = f"false, with error: {str(e)}"
+        exec_config["stresstest"] = False
+        exec_config["stresstest_error"] = f"error: {str(e)}"
     finally:
         print("")
         logger_handler.flush()
