@@ -448,10 +448,11 @@ class DAOStrategiesBuilder:
                         position["exec_config"][i]["label"],
                     )
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
+                pool_id = get_pool_id_from_bpt(w3, bpt_address)
                 position["position_id_human_readable"] = aura_position.position_id_human_readable(
                     w3, pool_tokens=pool_tokens
                 )
-                if all(token["symbol"] in whitelist_pairs for token in pool_tokens):
+                if pool_id in whitelist_poolIDs:
                     for token in pool_tokens:
                         position["exec_config"][2]["parameters"][2]["options"].append(
                             {"value": token["address"], "label": token["symbol"]}
