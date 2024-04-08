@@ -44,9 +44,9 @@ class SwapDisassembler(Disassembler):
             if isinstance(attr_value, SwapPools) and attr_value.protocol == protocol:
                 if protocol == "UniswapV3" or protocol == "Balancer":
                     if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                        token_in = Addresses[blockchain].WETH.address
+                        token_in = Addresses[blockchain].WETH
                     if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                        token_out = Addresses[blockchain].WETH.address
+                        token_out = Addresses[blockchain].WETH
                 # Check if both tokens are in the instance's tokens list
                 if token_in in attr_value.tokens and token_out in attr_value.tokens:
                     instances.append(attr_value)
@@ -68,11 +68,15 @@ class SwapDisassembler(Disassembler):
             return swap_pool, amount_out
 
         elif swap_pool.protocol == "UniswapV3":
+            if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                token_in = Addresses[self.blockchain].WETH            
             quote = QuoteUniswapV3(self.blockchain, token_in, token_out, amount_in, swap_pool.uni_fee)
             amount_out = quote.call(web3=self.w3)
             return swap_pool, amount_out[0]
 
         elif swap_pool.protocol == "Balancer":
+            if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                token_in = Addresses[self.blockchain].WETH
             pool_id = self.get_pool_id(swap_pool.address)
             quote = QuerySwap(
                 self.blockchain,
@@ -133,7 +137,7 @@ class SwapDisassembler(Disassembler):
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
                 wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
                 txns.append(wrapETH)
-                token_in = Addresses[self.blockchain].WETH.address
+                token_in = Addresses[self.blockchain].WETH
             approve_vault = ApproveForVault(token=token_in, amount=amount_to_redeem)
             swap_balancer = SingleSwap(
                 blockchain=self.blockchain,
@@ -196,6 +200,11 @@ class SwapDisassembler(Disassembler):
             approve_curve = ApproveCurve(
                 blockchain=self.blockchain, token_address=token_in, spender=swap_pool.address, amount=amount_to_redeem
             )
+            if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                eth_amount = amount_to_redeem
+            else:
+                eth_amount = 0
+                txns.append(approve_curve)
 
             swap_curve = SwapCurve(
                 blockchain=self.blockchain,
@@ -204,9 +213,9 @@ class SwapDisassembler(Disassembler):
                 token_y=swap_pool.tokens.index(token_out),
                 amount_x=amount_to_redeem,
                 min_amount_y=amount_out_min_slippage,
+                eth_amount=eth_amount
             )
 
-            txns.append(approve_curve)
             txns.append(swap_curve)
         return txns
 
@@ -255,7 +264,7 @@ class SwapDisassembler(Disassembler):
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
                 wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
                 txns.append(wrapETH)
-                token_in = Addresses[self.blockchain].WETH.address
+                token_in = Addresses[self.blockchain].WETH
                 
             approve_uniswapV3 = ApproveUniswapV3(
                 blockchain=self.blockchain,
