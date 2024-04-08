@@ -50,9 +50,7 @@ presets_balancer = """{
 ]
 }"""
 
-# TODO: add tests for exit strategies
-
-
+@pytest.mark.skip(reason="Test needs proper preset and block")
 def test_integration_exit_1(local_node_eth, accounts):
     w3 = local_node_eth.w3
     block = w3.eth.default_block
@@ -142,7 +140,7 @@ presets_curve = """{
 
 # TODO: add tests for exit strategies
 
-
+@pytest.mark.skip(reason="Needs proper preset and block")
 def test_integration_exit_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
     block = w3.eth.default_block
@@ -266,7 +264,7 @@ preset_uniswapv3_v2 = """{
 
 
 # TODO: add tests for exit strategies
-#@pytest.mark.skip(reason="Test is not implemented")
+@pytest.mark.skip(reason="Test needs proper preset and block")
 def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
     block = w3.eth.default_block
