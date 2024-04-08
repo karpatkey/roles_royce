@@ -62,8 +62,6 @@ def test_cowswap_signer_v1():
 @pytest.mark.skip(reason="FIXME: This has to be fixed with a mock")
 def test_cowswap_signer(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = w3.eth.default_block
-    local_node_eth.set_block(block)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     # steal_token(w3,"0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6", "0x4D8027E6e6e3E1Caa9AC23267D10Fb7d20f85A37", avatar_safe.address, 100)
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)

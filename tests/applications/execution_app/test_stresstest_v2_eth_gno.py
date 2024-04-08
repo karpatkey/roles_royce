@@ -17,6 +17,8 @@ from tests.utils import (
 
 PERCENTAGE = 20
 MAX_SLIPPAGE = 1
+TEST_ETH_BLOCK = 19590108
+TEST_GNOSIS_BLOCK = 33291126
 
 stresstest_outcome = {
     "dao": "GnosisDAO",
@@ -114,8 +116,7 @@ dao = DAO(
 
 def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
     if dao.blockchain == "ETHEREUM":
-        block = local_node_eth.w3.eth.default_block
-        local_node_eth.set_block(block)
+        local_node_eth.set_block(TEST_ETH_BLOCK)
         w3 = local_node_eth.w3
         disassembler_address = accounts[0].address
         private_key = accounts[0].key.hex()
@@ -127,8 +128,7 @@ def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
             asignee=disassembler_address,
         )
     elif dao.blockchain == "GNOSIS":
-        block = local_node_gc.w3.eth.default_block
-        local_node_gc.set_block(block)
+        local_node_gc.set_block(TEST_GNOSIS_BLOCK)
         w3 = local_node_gc.w3
         disassembler_address = accounts[0].address
         private_key = accounts[0].key.hex()
