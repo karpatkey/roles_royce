@@ -24,6 +24,7 @@
                     "label": "Unstake",
                     "test": true,
                     "stresstest": false,
+                    "stresstest_error": "None",
                     "description": "Unstake BPT from Aura gauge",
                     "parameters": [
                         {
@@ -38,6 +39,7 @@
                     "label": "Unstake + withdraw (proportional)",
                     "test": true,
                     "stresstest": false,
+                    "stresstest_error": "None",
                     "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
                     "parameters": [
                         {
@@ -61,6 +63,7 @@
                     "label": "Unstake + withdraw (proportional) (Recovery mode)",
                     "test": true,
                     "stresstest": false,
+                    "stresstest_error": "None",
                     "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
                     "parameters": [
                         {

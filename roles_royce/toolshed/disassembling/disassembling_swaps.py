@@ -4,7 +4,7 @@ from time import time
 
 from defabipedia.balancer import Abis as BalancerAbis
 from defabipedia.swap_pools import EthereumSwapPools, GnosisSwapPools, SwapPoolInstances
-from defabipedia.tokens import Abis
+from defabipedia.tokens import Abis, Addresses
 from defabipedia.types import Chain, SwapPools
 from defabipedia.uniswap_v3 import ContractSpecs as UniContracts
 from web3 import Web3
@@ -16,7 +16,7 @@ from roles_royce.protocols.balancer.methods_swap import ExactTokenInSingleSwap, 
 from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from roles_royce.protocols.base import Address
 from roles_royce.protocols.swap_pools.quote_methods import QuoteCurve, QuoteUniswapV3
-from roles_royce.protocols.swap_pools.swap_methods import ApproveCurve, ApproveUniswapV3, SwapCurve, SwapUniswapV3
+from roles_royce.protocols.swap_pools.swap_methods import ApproveCurve, ApproveUniswapV3, SwapCurve, SwapUniswapV3, WrapEther
 from roles_royce.toolshed.disassembling.disassembler import Disassembler, validate_percentage
 
 
@@ -42,6 +42,11 @@ class SwapDisassembler(Disassembler):
         for attr_name in dir(pools_class):
             attr_value = getattr(pools_class, attr_name)
             if isinstance(attr_value, SwapPools) and attr_value.protocol == protocol:
+                if protocol == "UniswapV3" or protocol == "Balancer":
+                    if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                        token_in = Addresses[blockchain].WETH.address
+                    if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                        token_out = Addresses[blockchain].WETH.address
                 # Check if both tokens are in the instance's tokens list
                 if token_in in attr_value.tokens and token_out in attr_value.tokens:
                     instances.append(attr_value)
@@ -86,7 +91,7 @@ class SwapDisassembler(Disassembler):
     def exit_1(
         self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
     ) -> list[Transactable]:
-        """Make a swap on Uniswap, Balancer or Curve with best amount out
+        """Make a swap on Balancer with best amount out
         Args:
             percentage (float): Percentage of token to remove.
             exit_arguments (list[dict], optional): List of dictionaries with the withdrawal parameters.
@@ -125,7 +130,10 @@ class SwapDisassembler(Disassembler):
             pool_id = self.get_pool_id(swap_pool.address)
             best_quote = max(quotes)
             amount_out_min_slippage = int(Decimal(best_quote) * Decimal(1 - max_slippage))
-
+            if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
+                txns.append(wrapETH)
+                token_in = Addresses[self.blockchain].WETH.address
             approve_vault = ApproveForVault(token=token_in, amount=amount_to_redeem)
             swap_balancer = SingleSwap(
                 blockchain=self.blockchain,
@@ -244,6 +252,11 @@ class SwapDisassembler(Disassembler):
             # get the best quote
             best_quote = max(quotes)
             amount_out_min_slippage = int(Decimal(best_quote) * Decimal(1 - max_slippage))
+            if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
+                txns.append(wrapETH)
+                token_in = Addresses[self.blockchain].WETH.address
+                
             approve_uniswapV3 = ApproveUniswapV3(
                 blockchain=self.blockchain,
                 token_address=token_in,
@@ -255,12 +268,11 @@ class SwapDisassembler(Disassembler):
                 token_in=token_in,
                 token_out=token_out,
                 avatar=self.avatar_safe_address,
-                deadline=int(int(time()) + 600),
                 amount_in=amount_to_redeem,
                 min_amount_out=amount_out_min_slippage,
                 fee=swap_pool.uni_fee,
             )
 
-            # txns.append(approve_uniswapV3)
+            txns.append(approve_uniswapV3)
             txns.append(swap_uniswapV3)
         return txns

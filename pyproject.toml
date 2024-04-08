@@ -23,7 +23,8 @@ dependencies = [
   "pydantic>=2.5.0,<3.0",
   "requests>=2.31.0,<3.0",
   "python-decouple>=3.8",
-  'karpatkit @ git+https://github.com/karpatkey/karpatkit.git@v0.0.20',
+  'karpatkit @ git+https://github.com/karpatkey/karpatkit.git@v0.0.22',
+  "joblib>=1.3.2",
 ]
 
 [project.urls]

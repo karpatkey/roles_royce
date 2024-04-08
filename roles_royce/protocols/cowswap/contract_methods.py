@@ -49,10 +49,12 @@ class SignOrder(ContractMethod):
     fixed_arguments = {
         "receiver": AvatarAddress,
         "app_data": Web3.keccak(text=json.dumps({"appCode": "santi_the_best"})),
+        "fee_amount": 0,
         "partially_fillable": False,
         "sell_token_balance": Web3.keccak(text="erc20"),
         "buy_token_balance": Web3.keccak(text="erc20"),
         "valid_duration": 1800,
+        "fee_amount_bp": 0
     }
 
     def __init__(
@@ -63,7 +65,6 @@ class SignOrder(ContractMethod):
         buy_token: Address,
         sell_amount: int,
         buy_amount: int,
-        fee_amount: int,
         valid_to: int,
         kind: str,
     ):
@@ -90,7 +91,6 @@ class SignOrder(ContractMethod):
         self.args.sell_amount = sell_amount
         self.args.buy_amount = buy_amount
         self.args.valid_to = valid_to
-        self.args.fee_amount = fee_amount
         self.args.kind = Web3.keccak(text=kind)
         self.args.order = [
             self.args.sell_token,
@@ -100,12 +100,11 @@ class SignOrder(ContractMethod):
             self.args.buy_amount,
             self.args.valid_to,
             self.fixed_arguments["app_data"],
-            self.args.fee_amount,
+            self.fixed_arguments["fee_amount"],
             self.args.kind,
             self.fixed_arguments["partially_fillable"],
             self.fixed_arguments["sell_token_balance"],
             self.fixed_arguments["buy_token_balance"],
         ]
         self.args.valid_duration = self.fixed_arguments["valid_duration"]
-        self.args.fee_amount_bp = math.ceil((self.args.fee_amount / self.args.sell_amount) * 10000)
         self.operation = Operation.DELEGATE_CALL

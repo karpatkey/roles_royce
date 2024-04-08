@@ -2,6 +2,7 @@ import json
 import os
 from unittest.mock import mock_open, patch
 
+import pytest
 from defabipedia.types import Chain
 
 from roles_royce.applications.execution_app.config.config_builder import (
@@ -25,18 +26,18 @@ test_data_str = json.dumps(test_data)
 @patch("builtins.open", mock_open(read_data=test_data_str))
 def test_build_aura_positions(local_node_gc):
     with patch(
-        "roles_royce.applications.execution_app.config.config_builder.get_aura_gauge_from_bpt"
-    ) as mock_get_aura_gauge_from_bpt, patch(
+        "roles_royce.applications.execution_app.config.config_builder.get_bpt_from_aura_address"
+    ) as mock_get_bpt_from_aura_address, patch(
         "roles_royce.applications.execution_app.config.config_builder.get_tokens_from_bpt"
     ) as mock_get_tokens_from_bpt:
         dao = DAO.GnosisDAO
         blockchain = Chain.GNOSIS
-        aura_position = AuraPosition(position_id="226", bpt_address="0xf48f01dcb2cbb3ee1f6aab0e742c2d3941039d56")
+        aura_position = AuraPosition(position_id="226", reward_address="0x750c5ED835d300d4ba5054cf2Fad946f0a0df0CD")
         w3 = local_node_gc.w3
         block = 32101684
         local_node_gc.set_block(block)
 
-        mock_get_aura_gauge_from_bpt.return_value = "0x750c5ED835d300d4ba5054cf2Fad946f0a0df0CD"
+        mock_get_bpt_from_aura_address.return_value = "0xF48f01DCB2CbB3ee1f6AaB0e742c2D3941039d56"
         mock_get_tokens_from_bpt.return_value = [
             {"address": "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1", "symbol": "WETH"},
             {"address": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6", "symbol": "wstETH"},
@@ -57,6 +58,7 @@ def test_build_aura_positions(local_node_gc):
                         "label": "Unstake",
                         "test": True,
                         "stresstest": False,
+                        "stresstest_error": "None",
                         "description": "Unstake BPT from Aura gauge",
                         "parameters": [
                             {
@@ -71,6 +73,7 @@ def test_build_aura_positions(local_node_gc):
                         "label": "Unstake + withdraw (proportional)",
                         "test": True,
                         "stresstest": False,
+                        "stresstest_error": "None",
                         "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
                         "parameters": [
                             {
@@ -91,6 +94,7 @@ def test_build_aura_positions(local_node_gc):
                         "label": "Unstake + Withdraw (Single Token)",
                         "test": True,
                         "stresstest": False,
+                        "stresstest_error": "None",
                         "description": "Unstake BPT from gauge and withdraw a single token (specified by the user) by redeeming the BPT",
                         "parameters": [
                             {
@@ -115,6 +119,7 @@ def test_build_aura_positions(local_node_gc):
                         "label": "Unstake + withdraw (proportional) (Recovery mode)",
                         "test": True,
                         "stresstest": False,
+                        "stresstest_error": "None",
                         "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
                         "parameters": [
                             {
@@ -148,7 +153,9 @@ test_data_str = json.dumps(test_data)
 def test_build_balancer_positions(local_node_gc):
     with patch(
         "roles_royce.applications.execution_app.config.config_builder.get_tokens_from_bpt"
-    ) as mock_get_tokens_from_bpt:
+    ) as mock_get_tokens_from_bpt, patch(
+        "roles_royce.applications.execution_app.config.config_builder.get_pool_id_from_bpt"
+    ) as mock_get_pool_id_from_bpt:
         dao = DAO.GnosisDAO
         blockchain = Chain.GNOSIS
         balancer_position = BalancerPosition(
@@ -160,6 +167,7 @@ def test_build_balancer_positions(local_node_gc):
             {"address": "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1", "symbol": "WETH"},
             {"address": "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6", "symbol": "wstETH"},
         ]
+        mock_get_pool_id_from_bpt.return_value = "0xbad20c15a773bf03ab973302f61fabcea5101f0a000000000000000000000034"
 
         builder = DAOStrategiesBuilder(dao, blockchain, balancer=[balancer_position])
         result = builder.build_balancer_positions(w3, [balancer_position])
@@ -179,6 +187,7 @@ def test_build_balancer_positions(local_node_gc):
                             "label": "Withdraw (proportional)",
                             "test": True,
                             "stresstest": False,
+                            "stresstest_error": "None",
                             "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
                             "parameters": [
                                 {
@@ -199,6 +208,7 @@ def test_build_balancer_positions(local_node_gc):
                             "label": "Withdraw (Single Token)",
                             "test": True,
                             "stresstest": False,
+                            "stresstest_error": "None",
                             "description": "Withdraw a single token (specified by the user) by redeeming the BPT",
                             "parameters": [
                                 {
@@ -228,6 +238,7 @@ def test_build_balancer_positions(local_node_gc):
                             "label": "Withdraw (proportional) (Recovery mode)",
                             "test": True,
                             "stresstest": False,
+                            "stresstest_error": "None",
                             "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
                             "parameters": [
                                 {
@@ -277,6 +288,7 @@ def test_build_swap_pool_positions(local_node_eth):
                     "label": "Exchange Wallet Token on Curve",
                     "test": True,
                     "stresstest": False,
+                    "stresstest_error": "None",
                     "description": "Exchange a wallet token through Curve",
                     "parameters": [
                         {

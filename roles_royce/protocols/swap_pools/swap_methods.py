@@ -47,7 +47,6 @@ class SwapUniswapV3(ContractMethod):
                     ("token_out", "address"),
                     ("fee", "uint24"),
                     ("recipient", "address"),
-                    ("deadline", "uint256"),
                     ("amount_in", "uint256"),
                     ("min_amount_out", "uint256"),
                     ("limit_price", "uint160"),
@@ -57,6 +56,7 @@ class SwapUniswapV3(ContractMethod):
         )
     ]
     fixed_arguments = {"recipient": AvatarAddress, "limit_price": 0}
+    out_signature = [("amount_out", "uint256")]
 
     def __init__(
         self,
@@ -64,7 +64,6 @@ class SwapUniswapV3(ContractMethod):
         token_in: Address,
         token_out: Address,
         avatar: Address,
-        deadline: int,
         amount_in: int,
         min_amount_out: int,
         fee: int = 100,
@@ -73,7 +72,6 @@ class SwapUniswapV3(ContractMethod):
         super().__init__(avatar=avatar)
         self.args.token_in = token_in
         self.args.token_out = token_out
-        self.args.deadline = deadline
         self.args.amount_in = amount_in
         self.args.min_amount_out = min_amount_out
         self.args.fee = fee
@@ -83,7 +81,6 @@ class SwapUniswapV3(ContractMethod):
             self.args.token_out,
             self.args.fee,
             self.args.receiver,
-            self.args.deadline,
             self.args.amount_in,
             self.args.min_amount_out,
             self.fixed_arguments["limit_price"],
@@ -99,3 +96,11 @@ class ApproveUniswapV3(ContractMethod):
         self.target_address = token_address
         self.args.spender = ContractSpecs[blockchain].UniV3_SwapRouter.address
         self.args.amount = amount
+
+class WrapEther(ContractMethod):
+    name = "deposit"
+
+    def __init__(self, blockchain: Blockchain, eth_amount: int):
+        super().__init__(value=eth_amount)
+        self.target_address = ContractSpecs[blockchain].WETH.address
+

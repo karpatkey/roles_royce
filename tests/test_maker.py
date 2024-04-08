@@ -8,6 +8,7 @@ from pytest import approx
 from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import maker
+from roles_royce.utils import to_checksum_address
 
 from .roles import apply_presets, deploy_roles, setup_common_roles
 from .utils import accounts, create_simple_safe, get_balance, local_node_eth, steal_token, top_up_address
@@ -312,7 +313,7 @@ def test_integration_maker_cdp_module_proxy(local_node_eth, accounts):
     build_receipt = safe.send([maker.Build()]).receipt
     for log in build_receipt["logs"]:
         if log["topics"][0].hex() == "0x259b30ca39885c6d801a0b5dbc988640f3c25e2f37531fe138c5c5af8955d41b":  # Created
-            proxy_address = w3.to_checksum_address("0x" + log["data"].hex()[26:66])
+            proxy_address = to_checksum_address("0x" + log["data"].hex()[26:66])
             break
 
     gem_join_contract = w3.eth.contract(address=JOIN_WSTETH_A, abi=Abis[Chain.ETHEREUM].GemJoin.abi)
@@ -420,7 +421,7 @@ def test_integration_maker_cdp_module_proxy_bulk(local_node_eth, accounts):
     build_receipt = safe.send([maker.Build()]).receipt
     for log in build_receipt["logs"]:
         if log["topics"][0].hex() == "0x259b30ca39885c6d801a0b5dbc988640f3c25e2f37531fe138c5c5af8955d41b":  # Created
-            proxy_address = w3.to_checksum_address("0x" + log["data"].hex()[26:66])
+            proxy_address = to_checksum_address("0x" + log["data"].hex()[26:66])
             break
 
     eth_join_contract = w3.eth.contract(address=JOIN_ETH_A, abi=Abis[Chain.ETHEREUM].GemJoin.abi)
@@ -719,7 +720,7 @@ def test_integration_maker_dsr_module_proxy(local_node_eth, accounts):
     build_receipt = safe.send([maker.Build()]).receipt
     for log in build_receipt["logs"]:
         if log["topics"][0].hex() == "0x259b30ca39885c6d801a0b5dbc988640f3c25e2f37531fe138c5c5af8955d41b":  # Created
-            proxy_address = w3.to_checksum_address("0x" + log["data"].hex()[26:66])
+            proxy_address = to_checksum_address("0x" + log["data"].hex()[26:66])
             break
 
     presets = """{"version": "1.0","chainId": "1","meta":{ "description": "","txBuilderVersion": "1.8.0"},"createdAt": 1695904723785,"transactions": [

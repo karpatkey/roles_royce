@@ -1,3 +1,4 @@
+import functools
 import logging
 from typing import List
 
@@ -15,8 +16,14 @@ TENDERLY_DASHBOARD_URL = "https://dashboard.tenderly.co/"
 logger = logging.getLogger(__name__)
 
 
+@functools.lru_cache(maxsize=1000)
 def to_selector(short_signature):
     return Web3.keccak(text=short_signature).hex()[:10]
+
+
+@functools.lru_cache(maxsize=1000)
+def to_checksum_address(address):
+    return Web3.to_checksum_address(address)
 
 
 def to_data_input(name, signature, args):

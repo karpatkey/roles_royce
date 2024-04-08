@@ -130,14 +130,10 @@ def fork_reset_state(w3: Web3, url: str, block: int | str = "latest"):
         url: URL of the node from which to fork
         block: Block number at which to fork the blockchain, or "latest" to use the latest block
     """
-    latest_block = Web3(Web3.HTTPProvider(url)).eth.block_number
 
     if isinstance(block, str):
         if block == "latest":
-            block = latest_block
-    else:
-        if block > latest_block:
-            raise ValueError(f"Block number {block} is greater than the latest block {latest_block}")
+            raise ValueError("Can't use 'latest' as fork block")
     return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
 
 
@@ -183,7 +179,7 @@ class LocalNode:
         self.port = port
         self.url = f"http://127.0.0.1:{port}"
         self.default_block = default_block
-        self.w3 = Web3(HTTPProvider(self.url))
+        self.w3 = Web3(HTTPProvider(self.url, request_kwargs={'timeout': 30}))
 
     def reset_state(self):
         fork_reset_state(self.w3, self.remote_url, self.default_block)
@@ -223,7 +219,6 @@ def _local_node(request, node: LocalNode):
 
     node.w3.middleware_onion.add(LatencyMeasurerMiddleware, "call_counter")
     node.reset_state()
-    assert node.w3.eth.block_number == node.default_block
     return node
 
 

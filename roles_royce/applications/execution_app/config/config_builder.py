@@ -11,12 +11,46 @@ from web3 import Web3
 from web3.types import Address
 
 from roles_royce.constants import StrEnum
+from roles_royce.utils import to_checksum_address
 
-from .utils import get_aura_gauge_from_bpt, get_gauge_address_from_bpt, get_tokens_from_bpt
+from .utils import (
+    get_aura_gauge_from_bpt,
+    get_bpt_from_aura_address,
+    get_gauge_address_from_bpt,
+    get_pool_id_from_bpt,
+    get_tokens_from_bpt,
+)
 
 # -----------------------------------------------------------------------------------------------------------------------
 blacklist_token = ["GNO", "ENS", "BAL", "AURA", "COW", "AGVE"]
-whitelist_pairs = ["WETH", "stETH", "wstETH", "ETH", "WBTC", "USDC", "USDT", "DAI", "WXDAI", "rETH", "EURe"]
+whitelist_pairs = [
+    "WETH",
+    "stETH",
+    "wstETH",
+    "ETH",
+    "WBTC",
+    "USDC",
+    "USDT",
+    "DAI",
+    "WXDAI",
+    "rETH",
+    "EURe, stEUR",
+    "staBAL3",
+]
+whitelist_poolIDs = [
+    "0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112",  # rETH-WETH eth
+    "0x93d199263632a4ef4bb438f1feb99e57b4b5f0bd0000000000000000000005c2",  # wstETH-ETH eth
+    "0x32296969ef14eb0c6d29669c550d4a0449130230000200000000000000000080",  # wstETH-WETH eth
+    "0x8353157092ed8be69a9df8f95af097bbf33cb2af0000000000000000000005d9",  # GHO-USDC-USDT eth
+    "0x49cbd67651fbabce12d1df18499896ec87bef46f00000000000000000000064a",  # USDC-USDT-DAI-sDAI eth
+    "0xbad20c15a773bf03ab973302f61fabcea5101f0a000000000000000000000034",  # WETH-wstETH gc
+    "0x7644fa5d0ea14fcf3e813fdf93ca9544f8567655000000000000000000000066",  # USDT-sDAI-USDC gc
+    "0xdd439304a77f54b1f7854751ac1169b279591ef7000000000000000000000064",  # sDAI-EURe gc
+    "0x2086f52651837600180de173b09470f54ef7491000000000000000000000004f",  # USDT-USDC-WXDAI gc
+    "0x06135a9ae830476d3a941bae9010b63732a055f4000000000000000000000065",  # stERU-EURe gc
+    "0xc9f00c3a713008ddf69b768d90d4978549bfdf9400000000000000000000006d",  # crvUSD-sDAI gc
+    "0x0c1b9ce6bf6c01f587c2ee98b0ef4b20c6648753000000000000000000000050",  # staBAL3-EURe gc
+]
 wallet_tokens_swap = [
     {
         "ethereum": [
@@ -24,58 +58,57 @@ wallet_tokens_swap = [
                 "token_in": [
                     "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",  # stETH
                     "0xae78736Cd615f374D3085123A210448E74Fc6393",  # rETH
-                    "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
-                ],  # wstETH
+                    "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",  # wstETH
+                ],  
                 "token_out": [
                     "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  # ETH
-                    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
-                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-                ],  # DAI
+                    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",  # WETH
+
+                ],  
             },
             {
-                "token_in": ["0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"],  # ETH
+                "token_in": [
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  # ETH
+                    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",  # WETH
+                ],  
                 "token_out": [
-                    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
-                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-                ],  # DAI
-            },
-            {
-                "token_in": ["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"],  # USDC
-                "token_out": ["0x6B175474E89094C44Da98b954EedeAC495271d0F"],  # DAI
+                    "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",  # stETH
+                    "0xae78736Cd615f374D3085123A210448E74Fc6393",  # rETH
+                ],  
             },
             {
                 "token_in": ["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"],  # USDC
                 "token_out": [
                     "0x6B175474E89094C44Da98b954EedeAC495271d0F",  # DAI
-                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-                ],  # USDT
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",  # USDT
+                ],  
             },
             {
                 "token_in": ["0xdAC17F958D2ee523a2206206994597C13D831ec7"],  # USDT
                 "token_out": [
                     "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
-                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-                ],  # DAI
+                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",  # DAI
+                ], 
             },
             {
                 "token_in": ["0x6B175474E89094C44Da98b954EedeAC495271d0F"],  # DAI
                 "token_out": [
                     "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
-                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-                ],  # USDT
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",  # USDT
+                ],  
             },
         ]
     },
     {
         "gnosis": [
             {
-                "token_in": ["0xcB444e90D8198415266c6a2724b7900fb12FC56E"],  # EURe
+                "token_in": ["0xcB444e90D8198415266c6a2724b7900fb12FC56E",], # EURe
                 "token_out": [
                     "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",  # USDC
                     "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",  # USDT
-                    "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-                ],  # WXDAI
-            }
+                    "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",  # WXDAI
+                ],  
+            },
         ]
     },
 ]
@@ -150,7 +183,7 @@ class BalancerPosition:
     staked: bool
 
     def __post_init__(self):
-        self.bpt_address = Web3.to_checksum_address(self.bpt_address)
+        self.bpt_address = to_checksum_address(self.bpt_address)
 
     def position_id_tech(self, w3: Web3) -> Address:
         """Returns the address of the BPT if staked is False, otherwise the address of the BPT gauge token
@@ -194,14 +227,14 @@ class BalancerPosition:
 @dataclass
 class AuraPosition:
     position_id: str
-    bpt_address: Address
+    reward_address: Address
 
     def __post_init__(self):
-        self.bpt_address = Web3.to_checksum_address(self.bpt_address)
+        self.reward_address = to_checksum_address(self.reward_address)
 
     def position_id_tech(self, w3: Web3) -> Address:
         """Returns the address of the Aura gauge token"""
-        return get_aura_gauge_from_bpt(w3, self.bpt_address)
+        return self.reward_address
 
     def position_id_human_readable(self, w3: Web3, pool_tokens: list[dict] = None) -> str:
         if pool_tokens is None:
@@ -218,7 +251,7 @@ class LidoPosition:
     lido_address: Address
 
     def __post_init__(self):
-        self.lido_address = Web3.to_checksum_address(self.lido_address)
+        self.lido_address = to_checksum_address(self.lido_address)
 
     def position_id_tech(self) -> Address:
         """Returns either stETH or wstETH address"""
@@ -238,7 +271,7 @@ class WalletPosition:
     token_in_address: Address
 
     def __post_init__(self):
-        self.token_in_address = Web3.to_checksum_address(self.token_in_address)
+        self.token_in_address = to_checksum_address(self.token_in_address)
 
     def position_id_tech(self) -> Address:
         """The token address that will be swapped"""
@@ -358,11 +391,12 @@ class DAOStrategiesBuilder:
 
             try:
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
+                pool_id = get_pool_id_from_bpt(w3, bpt_address)
                 position["position_id_tech"] = gauge_address if balancer_position.staked else bpt_address
                 position["position_id_human_readable"] = balancer_position.position_id_human_readable(
                     w3, pool_tokens=pool_tokens
                 )
-                if all(token["symbol"] in whitelist_pairs for token in pool_tokens):
+                if pool_id in whitelist_poolIDs:
                     for token in pool_tokens:
                         position["exec_config"][1]["parameters"][2]["options"].append(
                             {"value": token["address"], "label": token["symbol"]}
@@ -396,7 +430,7 @@ class DAOStrategiesBuilder:
         result = []
         for aura_position in positions:
             print("        Adding: ", aura_position)
-            bpt_address = aura_position.bpt_address
+            bpt_address = get_bpt_from_aura_address(w3, aura_position.reward_address)
             position = copy.deepcopy(aura_template)
             try:
                 aura_address = aura_position.position_id_tech(w3)
@@ -508,10 +542,17 @@ class DAOStrategiesBuilder:
                             for token_pair in token_pairs:
                                 token_in = token_pair[0]
                                 token_out = token_pair[1]
-
                                 for attr_name in dir(pools_class):
                                     attr_value = getattr(pools_class, attr_name)
                                     if isinstance(attr_value, SwapPools):
+                                        if (
+                                            attr_value.protocol == "Balancer" or attr_value.protocol == "UniswapV3"
+                                        ) and (token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"):
+                                            if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                                                token_in = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+                                            if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                                                token_out = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+
                                         if token_in in attr_value.tokens and token_out in attr_value.tokens:
                                             instances.append({"pair": token_pair, "pool": attr_value})
 
