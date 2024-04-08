@@ -9,6 +9,7 @@
       "label": "Withdraw (proportional)",
       "test": true,
       "stresstest": false,
+      "stresstest_error": "None",
       "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
       "parameters": [
         {
@@ -32,6 +33,7 @@
       "label": "Withdraw (Single Token)",
       "test": true,
       "stresstest": false,
+      "stresstest_error": "None",
       "description": "Withdraw a single token (specified by the user) by redeeming the BPT",
       "parameters": [
         {
@@ -63,6 +65,7 @@
       "label": "Withdraw (proportional) (Recovery mode)",
       "test": true,
       "stresstest": false,
+      "stresstest_error": "None",
       "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
       "parameters": [
         {
@@ -86,6 +89,7 @@
       "label": "Unstake + withdraw (proportional)",
       "test": true,
       "stresstest": false,
+      "stresstest_error": "None",
       "description": "Unstake the BPT from the Balancer gauge and exit pool with proportional exit. (Not for recovery mode)",
       "parameters": [
         {
@@ -109,6 +113,7 @@
       "label": "Unstake from gauge and withdraw (Single Token)",
       "test": true,
       "stresstest": false,
+      "stresstest_error": "None",
       "description": "Unstake BPT from gauge and withdraw a single token (specified by the user) by redeeming the BPT",
       "parameters": [
         {
@@ -140,6 +145,7 @@
       "label": "Unstake + withdraw (proportional) (Recovery mode)",
       "test": true,
       "stresstest": false,
+      "stresstest_error": "None",
       "description": "Unstake the BPT from the Balancer gauge and exit pool with proportional exit. (Recovery mode)",
       "parameters": [
         {

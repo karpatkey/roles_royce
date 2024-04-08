@@ -10,12 +10,13 @@ from web3.types import Address
 from roles_royce.protocols.balancer.utils import Pool, PoolKind
 from roles_royce.utils import to_checksum_address
 
+
 def get_bpt_from_aura_address(w3: Web3, aura_address: Address) -> Address:
     blockchain = Chain.get_blockchain_from_web3(w3)
-    aura_contract = w3.eth.contract(
-        address=aura_address, abi=aura.Abis[blockchain].BaseRewardPool.abi)
+    aura_contract = w3.eth.contract(address=aura_address, abi=aura.Abis[blockchain].BaseRewardPool.abi)
     bpt_address = aura_contract.functions.asset().call()
     return bpt_address
+
 
 def get_aura_gauge_from_bpt(w3: Web3, bpt_address: Address) -> Address:
     """
@@ -96,3 +97,11 @@ def get_gauge_address_from_bpt(w3: Web3, bpt_address: Address) -> Address:
                 return gauge_address
 
     return gauge_address
+
+
+def get_pool_id_from_bpt(w3: Web3, bpt_address: Address) -> int:
+    bpt_contract = w3.eth.contract(
+        address=bpt_address, abi=balancer.Abis[Chain.get_blockchain_from_web3(w3)].UniversalBPT.abi
+    )
+    pool_id = bpt_contract.functions.getPoolId().call()
+    return pool_id

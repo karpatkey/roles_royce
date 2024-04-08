@@ -17,74 +17,57 @@ from tests.utils import (
 
 PERCENTAGE = 20
 MAX_SLIPPAGE = 1
-TEST_ETH_BLOCK = 19590108
-TEST_GNOSIS_BLOCK = 33291126
 
 stresstest_outcome = {
     "dao": "GnosisDAO",
-    "blockchain": "ethereum",
+    "blockchain": "gnosis",
     "general_parameters": [
         {"name": "percentage", "label": "Percentage", "type": "input", "rules": {"min": 0.001, "max": 100}}
     ],
     "positions": [
         {
-            "position_id": "33",
-            "position_id_tech": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
-            "position_id_human_readable": "ethereum_Aura_rETH_WETH",
-            "protocol": "Aura",
+            "protocol": "Balancer",
+            "position_id": "107",
+            "position_id_tech": "0xa99FD9950B5D5dCeEaf4939E221dcA8cA9B938aB",
+            "position_id_human_readable": "gnosis_Balancer_WETH_BAL_GNO_WXDAI",
             "exec_config": [
                 {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
+                    "function_name": "exit_1_1",
+                    "label": "Withdraw (proportional)",
                     "test": True,
                     "stresstest": True,
                     "stresstest_error": "None",
-                    "description": "Unstake BPT from Aura gauge",
+                    "description": "Exit pool on Balancer with proportional exit. (Not for recovery mode)",
                     "parameters": [
                         {
-                            "name": "rewards_address",
+                            "name": "bpt_address",
                             "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
-                        }
-                    ],
-                },
-                {
-                    "function_name": "exit_2_1",
-                    "label": "Unstake + withdraw (proportional)",
-                    "test": True,
-                    "stresstest": True,
-                    "stresstest_error": "None",
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
+                            "value": "0xa99FD9950B5D5dCeEaf4939E221dcA8cA9B938aB",
                         },
                         {
                             "name": "max_slippage",
-                            "label": "Max Slippage",
+                            "label": "Max slippage",
                             "type": "input",
                             "rules": {"min": 0.001, "max": 100},
                         },
                     ],
                 },
                 {
-                    "function_name": "exit_2_3",
-                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
+                    "function_name": "exit_1_3",
+                    "label": "Withdraw (proportional) (Recovery mode)",
                     "test": True,
                     "stresstest": False,
                     "stresstest_error": "error: Skip recovery",
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
+                    "description": "Exit pool on Balancer with proportional exit. (Recovery Mode)",
                     "parameters": [
                         {
-                            "name": "rewards_address",
+                            "name": "bpt_address",
                             "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
+                            "value": "0xa99FD9950B5D5dCeEaf4939E221dcA8cA9B938aB",
                         },
                         {
                             "name": "max_slippage",
-                            "label": "Max Slippage",
+                            "label": "Max slippage",
                             "type": "input",
                             "rules": {"min": 0.001, "max": 100},
                         },
@@ -107,16 +90,17 @@ class DAO:
 
 dao = DAO(
     name="GnosisDAO",
-    blockchain="ETHEREUM",
-    avatar_safe_address="0x849D52316331967b6fF1198e5E32A0eB168D039d",
-    roles_mod_address="0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc",
+    blockchain="GNOSIS",
+    avatar_safe_address="0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f",
+    roles_mod_address="0x10785356E66b93432e9E8D6F9e532Fa55e4fc058",
     role=4,
 )
 
 
 def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
     if dao.blockchain == "ETHEREUM":
-        local_node_eth.set_block(TEST_ETH_BLOCK)
+        block = local_node_eth.w3.eth.default_block
+        local_node_eth.set_block(block)
         w3 = local_node_eth.w3
         disassembler_address = accounts[0].address
         private_key = accounts[0].key.hex()
@@ -128,7 +112,8 @@ def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
             asignee=disassembler_address,
         )
     elif dao.blockchain == "GNOSIS":
-        local_node_gc.set_block(TEST_GNOSIS_BLOCK)
+        block = local_node_gc.w3.eth.default_block
+        local_node_gc.set_block(block)
         w3 = local_node_gc.w3
         disassembler_address = accounts[0].address
         private_key = accounts[0].key.hex()
@@ -157,7 +142,7 @@ def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch):
     w3, private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
-    with open(os.path.join(os.path.dirname(__file__), "test_stresstest_v2_eth_gno.json"), "r") as f:
+    with open(os.path.join(os.path.dirname(__file__), "test_stresstest_gno_gno.json"), "r") as f:
         test_data = json.load(f)
 
     stresstest_tester = stresstest(

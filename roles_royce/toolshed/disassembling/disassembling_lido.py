@@ -143,6 +143,7 @@ class LidoDisassembler(Disassembler):
 
             buy_amount = quote.buy_amount
             fee_amount = quote.fee_amount
+            sell_amount = quote.sell_amount
 
             buy_amount_min_slippage = int(Decimal(buy_amount) * Decimal(1 - max_slippage))
             set_allowance = lido.ApproveRelayerStETH(amount=amount_to_redeem)
@@ -151,9 +152,8 @@ class LidoDisassembler(Disassembler):
                 avatar=self.avatar_safe_address,
                 sell_token=address,
                 buy_token=ETHAddr.ETH,
-                sell_amount=amount_to_redeem,
+                sell_amount=sell_amount+fee_amount,
                 buy_amount=buy_amount_min_slippage,
-                fee_amount=fee_amount,
                 valid_to=int(int(time()) + 600),
                 kind="sell",
             )
@@ -198,6 +198,7 @@ class LidoDisassembler(Disassembler):
 
             buy_amount = quote.buy_amount
             fee_amount = quote.fee_amount
+            sell_amount = quote.sell_amount
 
             buy_amount_min_slippage = int(Decimal(buy_amount) * Decimal(1 - max_slippage))
             set_allowance = lido.ApproveRelayerWstETH(amount=amount_to_redeem)
@@ -206,9 +207,8 @@ class LidoDisassembler(Disassembler):
                 avatar=self.avatar_safe_address,
                 sell_token=address,
                 buy_token=ETHAddr.ETH,
-                sell_amount=amount_to_redeem,
+                sell_amount=sell_amount+fee_amount,
                 buy_amount=buy_amount_min_slippage,
-                fee_amount=fee_amount,
                 valid_to=int(int(time()) + 600),
                 kind="sell",
             )
