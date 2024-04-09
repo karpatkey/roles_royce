@@ -26,17 +26,17 @@ def custom_config(variable: str, default: Any, cast: type):
     return default if (value == "" or value is None) else config(variable, default=default, cast=cast)
 
 
-def to_dict(obj: Any, exclude_key: str = None) -> dict:
+def to_dict(obj: Any, exclude_key: str = None) -> dict | list[dict]:
     """
     This function converts an object to a dictionary. It is used to log the initial data of the bot. It removes key
     and value at any level of the dictionary if exclude_key is provided.
 
     Args:
         obj (Any): The object to be converted to a dictionary
-        exclude_key (str): The key to be excluded from the dictionary at any lebel of the dictionary.
+        exclude_key (str): The key to be excluded from the dictionary at any level of the dictionary.
 
     Returns:
-        dict: The dictionary representation of the object.
+        dict | list[dict]: The dictionary representation of the object
     """
     if hasattr(obj, "__dict__"):
         return {key: to_dict(value, exclude_key) for key, value in obj.__dict__.items() if key != exclude_key}

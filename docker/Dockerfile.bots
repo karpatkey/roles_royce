@@ -37,6 +37,7 @@ ENV PYTHONPATH=.
 # * BOT_NAME=bridge_keeper
 # * BOT_NAME=EURe_rebalancing
 # * BOT_NAME=spark_anti_liquidation
+# * BOT_NAME=uniswap_v3_keeper
 #
 # In doubt check roles_royce/applications/run_bot.sh
 

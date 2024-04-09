@@ -2,3 +2,4 @@
 -r EURe_rebalancing_bot/requirements.txt
 -r bridge_keeper/requirements.txt
 -r GBPe_rebalancing_bot/requirements.txt
+-r uniswap_v3_keeper/requirements.txt

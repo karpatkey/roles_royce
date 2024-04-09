@@ -79,7 +79,7 @@ def test_decrease_liquidity():
 def test_collect():
     method = uniswap_v3.Collect(
         blockchain=Chain.ETHEREUM,
-        recipient=AVATAR,
+        avatar=AVATAR,
         token_id=670912,
         amount0_max=340282366920938463463374607431768211455,
         amount1_max=340282366920938463463374607431768211455,
@@ -270,7 +270,7 @@ def test_integration_eth(local_node_eth, accounts):
     # collect
     collect = uniswap_v3.Collect(
         blockchain=Chain.ETHEREUM,
-        recipient=ETHAddr.ZERO,
+        avatar=ETHAddr.ZERO,
         token_id=nft_id,
         amount0_max=340282366920938463463374607431768211455,
         amount1_max=340282366920938463463374607431768211455,
@@ -476,7 +476,7 @@ def test_integration_no_eth(local_node_eth, accounts):
     # collect
     collect = uniswap_v3.Collect(
         blockchain=Chain.ETHEREUM,
-        recipient=safe.address,
+        avatar=safe.address,
         token_id=nft_id,
         amount0_max=340282366920938463463374607431768211455,
         amount1_max=340282366920938463463374607431768211455,
