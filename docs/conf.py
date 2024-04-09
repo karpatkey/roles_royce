@@ -38,18 +38,33 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "alabaster"
+html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 html_theme_options = {
     "description": "Execute transactions using Zodiac Roles Modifier contracts.",
     "page_width": "1200px",
     #'canonical_url': ,
     "extra_nav_links": {
-        "Source code": "https://github.com/KarpatkeyDAO/roles_royce/",
-        "Issue tracker": "https://github.com/KarpatkeyDAO/roles_royce/issues",
-        "Karpatkey": "https://www.karpatkey.com/",
+        "Source code": "https://github.com/karpatkey/roles_royce/",
+        "Issue tracker": "https://github.com/karpatkey/roles_royce/issues",
+        "Karpatkey": "https://karpatkey.com/",
     },
+    "logo_only": False,
+    "style_nav_header_background": "black",
+    "includehidden": True,
 }
+
+html_context = {
+    "display_github": True,  # Integrate GitHub
+    "github_user": "karpatkey",  # Username
+    "github_repo": "roles_royce",  # Repo name
+    "github_version": "main",  # Version
+    "conf_py_path": "/docs/",  # Path in the checkout to the docs root
+}
+
+html_css_files = [
+    "css/custom.css",
+]
 
 autodoc_default_options = {
     "member-order": "bysource",

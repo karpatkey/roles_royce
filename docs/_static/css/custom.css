@@ -1,0 +1,110 @@
+div.warning {
+  background-color: #f4a1351f;
+  border: 1px solid #eabe694d;
+}
+
+:root {
+  --black: #333333;
+  --white: #fefefe;
+
+  --color-success: #54b9a1;
+  --color-info: #bdbdbd;
+  --color-warning: #f0b065;
+  --color-danger: #df5c64;
+
+  --color-primary: #666786;
+  --color-primary-dark: #5c5d79;
+  --color-primary-darker: #575872;
+  --color-primary-darkest: #47485e;
+  --color-primary-light: #717293;
+  --color-primary-lighter: #787998;
+  --color-primary-lightest: #8c8ca7;
+
+  --background-color: #eeeded;
+  --color-emphasis-0: #eeeded;
+
+  --font-family-base: IBM Plex Sans, sans-serif, system-ui, -apple-system,
+    Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif,
+    BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+  --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+* {
+  color: var(--black);
+  font-family: var(--font-family-base) !important;
+}
+
+a {
+  color: var(--color-primary-dark) !important;
+}
+
+a:visited {
+  color: var(--color-primary-darkest) !important;
+}
+
+a:hover {
+  color: var(--color-primary-dark) !important;
+  background-color: var(--white) !important;
+}
+
+.wy-side-nav-search,
+.wy-nav-content-wrap,
+.wy-body-for-nav,
+.wy-nav-content,
+.wy-side-scroll,
+.wy-nav-side {
+  background-color: var(--background-color) !important;
+}
+
+.admonition.warning .admonition-title {
+  background-color: var(--color-warning) !important;
+}
+
+html.writer-html4 .rst-content dl:not(.docutils) > dt,
+html.writer-html5
+  .rst-content
+  dl[class]:not(.option-list):not(.field-list):not(.footnote):not(
+    .citation
+  ):not(.glossary):not(.simple)
+  > dt {
+  color: var(--white) !important;
+  border-top: 3px solid var(--color-primary-lightest);
+  background: var(--color-primary-darkest);
+  font-family: var(--font-family-monospace) !important;
+}
+
+.sig.sig-object.py > *,
+.sig.sig-object.py * {
+  color: var(--white) !important;
+}
+
+html.writer-html4
+  .rst-content
+  dl:not(.docutils)
+  dl:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(
+    .glossary
+  ):not(.simple)
+  > dt,
+html.writer-html5
+  .rst-content
+  dl[class]:not(.option-list):not(.field-list):not(.footnote):not(
+    .citation
+  ):not(.glossary):not(.simple)
+  dl:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(
+    .glossary
+  ):not(.simple)
+  > dt {
+  color: var(--white) !important;
+  border-left: 3px solid var(--color-primary-lightest);
+  background: var(--color-primary-dark);
+  font-family: var(--font-family-monospace) !important;
+}
+
+.rst-content code,
+.rst-content tt {
+  border: none !important;
+  background: var(--color-primary-lightest) !important;
+}

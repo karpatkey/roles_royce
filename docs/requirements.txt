@@ -1,0 +1,5 @@
+sphinx==7.2.6
+sphinx_autodoc_typehints
+insegel
+sphinx-rtd-theme
+

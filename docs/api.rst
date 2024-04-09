@@ -42,8 +42,8 @@ Simulation
 
 Transactions can be simulated using Tenderly.
 
-.. autofunction:: roles_royce.utils.simulate_tx
+.. autofunction:: roles_royce.toolshed.simulation.simulate_tx
 
-.. autofunction:: roles_royce.utils.tenderly_simulate
+.. autofunction:: roles_royce.toolshed.simulation.tenderly_simulate
 
-.. autofunction:: roles_royce.utils.tenderly_share_simulation
+.. autofunction:: roles_royce.toolshed.simulation.tenderly_share_simulation
