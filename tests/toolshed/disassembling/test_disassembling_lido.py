@@ -246,8 +246,7 @@ preset_cowswap_easy = """{
 @pytest.mark.skip(reason="FIXME: This has to be fixed with a mock")
 def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = w3.eth.default_block
-    local_node_eth.set_block(block)
+    local_node_eth.set_block(18710862)
     set_gas_strategy(GasStrategies.AGGRESIVE)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -313,8 +312,7 @@ def test_integration_exit_3(local_node_eth, accounts):
 @pytest.mark.skip(reason="FIXME: This has to be fixed with a mock")
 def test_integration_exit_4(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = w3.eth.default_block
-    local_node_eth.set_block(block)
+    local_node_eth.set_block(18710862)
     set_gas_strategy(GasStrategies.AGGRESIVE)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
