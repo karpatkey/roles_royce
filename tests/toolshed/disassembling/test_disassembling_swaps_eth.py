@@ -16,6 +16,7 @@ from tests.utils import accounts, create_simple_safe, local_node_eth, steal_toke
 ROLE = 4
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
 ROLES_MOD = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
+BLOCK = 19620486
 
 presets_balancer = """{
   "version": "1.0",
@@ -34,7 +35,17 @@ presets_balancer = """{
     },
     {
     "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
-    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2d0e30db0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2095ea7b3000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "value": "0"
+    },
+    {
+    "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+    "data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "value": "0"
+    },
+    {
+    "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2d0e30db0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
     "value": "0"
     },
     {
@@ -50,11 +61,9 @@ presets_balancer = """{
 ]
 }"""
 
-@pytest.mark.skip(reason="Test needs proper preset and block")
 def test_integration_exit_1(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = w3.eth.default_block
-    local_node_eth.set_block(block)
+    local_node_eth.set_block(BLOCK)
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -95,14 +104,19 @@ def test_integration_exit_1(local_node_eth, accounts):
 
     txn_transactable = swap_balancer_disassembler.exit_1(
         percentage=50,
-        exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],amount_to_redeem=amount_in,
+        exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
+        amount_to_redeem=amount_in,
     )
     send_it = swap_balancer_disassembler.send(txn_transactable, private_key)
 
     assert send_it
 
     weth_balance = weth_contract.functions.balanceOf(avatar_safe_address).call()
-    assert weth_balance > 0
+    assert weth_balance == 0
+
+    reth_contract = ContractSpecs[blockchain].rETH.contract(w3)
+    reth_balance = reth_contract.functions.balanceOf(avatar_safe_address).call()
+    assert reth_balance > 0
 
 
 presets_curve = """{
@@ -122,7 +136,7 @@ presets_curve = """{
     },
     {
     "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
-    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000dc24316b9ae028f1497c275eb9192a3ea0f670223df02124000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000dc24316b9ae028f1497c275eb9192a3ea0f670223df02124000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
     "value": "0"
     },
         {
@@ -132,19 +146,15 @@ presets_curve = """{
     },
     {
     "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
-    "data": "0x2fcf52d1000000000000000000000000000000000000000000000000000000000000000400000000000000000000000021E27a5E5513D6e65C4f830167390997aA84843a3df02124000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "data": "0x2fcf52d1000000000000000000000000000000000000000000000000000000000000000400000000000000000000000021E27a5E5513D6e65C4f830167390997aA84843a3df02124000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
     "value": "0"
     }
 ]
 }"""
 
-# TODO: add tests for exit strategies
-
-@pytest.mark.skip(reason="Needs proper preset and block")
 def test_integration_exit_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = w3.eth.default_block
-    local_node_eth.set_block(block)
+    local_node_eth.set_block(BLOCK)
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -164,7 +174,7 @@ def test_integration_exit_2(local_node_eth, accounts):
     role = 4
 
     token_in = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
-    token_out = EthereumSwapPools.Curve_stETH_ETH.tokens[0]
+    token_out = EthereumSwapPools.Curve_stETH_ETH.tokens[1]
 
     amount_in = 500_000_000_000_000_000
 
@@ -179,7 +189,7 @@ def test_integration_exit_2(local_node_eth, accounts):
     eth_balance = w3.eth.get_balance(avatar_safe_address)
     assert eth_balance >0
 
-    steth_contract = w3.eth.contract(address=EthereumSwapPools.Curve_stETH_ETH.tokens[0], abi=Abis.ERC20.abi)
+    steth_contract = w3.eth.contract(address=EthereumSwapPools.Curve_stETH_ETH.tokens[1], abi=Abis.ERC20.abi)
     steth_balance = steth_contract.functions.balanceOf(avatar_safe_address).call()
     assert steth_balance == 0
 
@@ -192,7 +202,7 @@ def test_integration_exit_2(local_node_eth, accounts):
 
     assert send_it
 
-    steth_contract = w3.eth.contract(address=EthereumSwapPools.Curve_stETH_ETH.tokens[0], abi=Abis.ERC20.abi)
+    steth_contract = w3.eth.contract(address=EthereumSwapPools.Curve_stETH_ETH.tokens[1], abi=Abis.ERC20.abi)
     steth_balance = steth_contract.functions.balanceOf(avatar_safe_address).call()
     assert steth_balance > 0
 
@@ -205,7 +215,7 @@ preset_uniswapv3 = """{
     "description": "",
     "txBuilderVersion": "1.8.0"
   },
-  "createdAt": 1701637793776,
+  "createdAt": 1710944277151,
   "transactions": [
     {
     "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
@@ -214,20 +224,30 @@ preset_uniswapv3 = """{
     },
     {
     "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
-    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2d0e30db0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2095ea7b3000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
     "value": "0"
     },
     {
     "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
-    "data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000109830a1AAaD605BbF02a9dFA7B0B92EC2FB7dAa",
+    "data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "value": "0"
     },
     {
     "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
-    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000109830a1AAaD605BbF02a9dFA7B0B92EC2FB7dAa414bf389000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
+    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2d0e30db0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
     "value": "0"
+    },
+    {
+      "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+      "data": "0x5e826695000000000000000000000000000000000000000000000000000000000000000400000000000000000000000068b3465833fb72a70ecdf485e0e4c7bd8665fc45",
+      "value": "0"
+    },
+    {
+      "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+      "data": "0x2fcf52d1000000000000000000000000000000000000000000000000000000000000000400000000000000000000000068b3465833fb72a70ecdf485e0e4c7bd8665fc4504e45aaf000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "value": "0"
     }
-]
+  ]
 }"""
 preset_uniswapv3_v2 = """{
   "version": "1.0",
@@ -246,7 +266,17 @@ preset_uniswapv3_v2 = """{
     },
     {
     "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
-    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2d0e30db0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2095ea7b3000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "value": "0"
+    },
+    {
+    "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+    "data": "0x5e8266950000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "value": "0"
+    },
+    {
+    "to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86",
+    "data": "0x2fcf52d10000000000000000000000000000000000000000000000000000000000000004000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2d0e30db0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
     "value": "0"
     },
     {
@@ -263,12 +293,9 @@ preset_uniswapv3_v2 = """{
 }"""
 
 
-# TODO: add tests for exit strategies
-@pytest.mark.skip(reason="Test needs proper preset and block")
 def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    block = w3.eth.default_block
-    local_node_eth.set_block(block)
+    local_node_eth.set_block(BLOCK)
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -276,7 +303,7 @@ def test_integration_exit_3(local_node_eth, accounts):
     apply_presets(
         avatar_safe,
         roles_contract,
-        json_data=preset_uniswapv3_v2,
+        json_data=preset_uniswapv3,
         replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
     )
 

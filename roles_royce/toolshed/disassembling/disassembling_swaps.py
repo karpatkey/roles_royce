@@ -197,13 +197,14 @@ class SwapDisassembler(Disassembler):
             # get the best quote
             best_quote = max(quotes)
             amount_out_min_slippage = int(Decimal(best_quote) * Decimal(1 - max_slippage))
-            approve_curve = ApproveCurve(
-                blockchain=self.blockchain, token_address=token_in, spender=swap_pool.address, amount=amount_to_redeem
-            )
+
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
                 eth_amount = amount_to_redeem
             else:
                 eth_amount = 0
+                approve_curve = ApproveCurve(
+                blockchain=self.blockchain, token_address=token_in, spender=swap_pool.address, amount=amount_to_redeem
+                )
                 txns.append(approve_curve)
 
             swap_curve = SwapCurve(
