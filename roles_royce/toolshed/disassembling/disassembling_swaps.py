@@ -30,9 +30,11 @@ class SwapDisassembler(Disassembler):
         )
 
     def get_amount_to_redeem(self, token_in_address: Address, fraction: float | Decimal) -> int:
-        token_in_contract = self.w3.eth.contract(address=token_in_address, abi=Abis.ERC20.abi)
-
-        return int(Decimal(token_in_contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
+        if token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+            return int(Decimal(self.w3.eth.get_balance(self.avatar_safe_address) * Decimal(fraction))) 
+        else:
+            token_in_contract = self.w3.eth.contract(address=token_in_address, abi=Abis.ERC20.abi)
+            return int(Decimal(token_in_contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
 
     def get_swap_pools(self, blockchain, protocol, token_in, token_out):
         """Returns all instances of SwapPools within the specified blockchain's SwapPools class, filtered by protocol and tokens."""
