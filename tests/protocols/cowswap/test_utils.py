@@ -1,5 +1,6 @@
 from defabipedia.types import Chain
 from roles_royce.protocols.cowswap.utils import SwapKind, create_order_api, quote_order_api, Order
+import json
 
 
 def test_order():
@@ -9,7 +10,7 @@ def test_order():
                   from_address='0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f',
                   sell_amount=985693283370526960312,
                   buy_amount=2731745328645699409,
-                  fee_amount=14055839235847026688,
+                  fee_amount=0,
                   valid_to=1712697525,
                   kind=SwapKind.SELL,
                   partially_fillable=False, sell_token_balance='erc20', buy_token_balance='erc20')
@@ -24,7 +25,7 @@ def test_order():
                                       'kind': "sell",
                                       'partiallyFillable': False,
                                       'receiver': '0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f',
-                                      'sellAmount': '98569328337052696031214055839235847026688',
+                                      'sellAmount': '9856932833705269603120',
                                       'sellToken': '0x6B175474E89094C44Da98b954EedeAC495271d0F',
                                       'sellTokenBalance': 'erc20',
                                       'signature': '0x',
@@ -40,7 +41,7 @@ def test_quote_order_sell_buy(requests_mock):
 
     requests_mock.real_http = True
     requests_mock.post("https://api.cow.fi/mainnet/api/v1/quote",
-                       text='{"quote":{"sellToken":"0x6b175474e89094c44da98b954eedeac495271d0f","buyToken":"0x6810e776880c02933d47db1b9fc05908e5386b96","receiver":"0x458cd345b4c05e8df39d0a07220feb4ec19f5e6f","sellAmount":"974248253160846377656","buyAmount":"2675007315318953013","validTo":1712692393,"appData":"{\\"appCode\\":\\"karpatkey_swap\\"}","appDataHash":"0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26","feeAmount":"25500869445527609344","kind":"sell","partiallyFillable":false,"sellTokenBalance":"erc20","buyTokenBalance":"erc20","signingScheme":"eip712"},"from":"0x458cd345b4c05e8df39d0a07220feb4ec19f5e6f","expiration":"2024-04-09T19:25:13.178481047Z","id":480076131,"verified":false}',
+                       text=json.dumps({"quote": {"sellToken": "0x6b175474e89094c44da98b954eedeac495271d0f", "buyToken": "0x6810e776880c02933d47db1b9fc05908e5386b96", "receiver": "0x458cd345b4c05e8df39d0a07220feb4ec19f5e6f", "sellAmount": "986076688216997817016", "buyAmount": "2715461014656166690", "validTo": 1712725390, "appData": "{\"appCode\":\"karpatkey_swap\"}", "appDataHash": "0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26", "feeAmount": "13672434389376169984", "kind": "sell", "partiallyFillable": False, "sellTokenBalance": "erc20", "buyTokenBalance": "erc20", "signingScheme": "presign"}, "from": "0x458cd345b4c05e8df39d0a07220feb4ec19f5e6f", "expiration": "2024-04-10T04:35:10.557295381Z", "id": 480554155, "verified": False}),
                        status_code=200)
 
     order = quote_order_api(
@@ -52,8 +53,8 @@ def test_quote_order_sell_buy(requests_mock):
         kind=SwapKind.SELL,
         amount=sell_amount,
     )
-    assert order.buy_amount == 2675007315318953013
-    assert order.fee_amount == 25500869445527609344
+    assert order.buy_amount == 2715461014656166690
+    assert order.sell_amount == 999749122606373987000
     assert requests_mock.request_history[
                0].text == ('{"sellToken": "0x6B175474E89094C44Da98b954EedeAC495271d0F", "buyToken": '
                            '"0x6810e776880C02933D47DB1b9fc05908e5386b96", "receiver": '
@@ -86,8 +87,7 @@ def test_quote_order_api_buy(requests_mock):
         kind=SwapKind.BUY,
         amount=buy_amount,
     )
-    assert order.sell_amount == 392983913649705259647909
-    assert order.fee_amount == 54546202693328093184
+    assert order.sell_amount == 393038459852398587741093
     assert requests_mock.request_history[
                0].text == ('{"sellToken": "0x6B175474E89094C44Da98b954EedeAC495271d0F", "buyToken": '
                            '"0x6810e776880C02933D47DB1b9fc05908e5386b96", "receiver": '
