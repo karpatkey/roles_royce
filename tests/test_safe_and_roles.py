@@ -1,7 +1,7 @@
 import pytest
 from defabipedia.types import Chain
 from eth_account import Account
-from gnosis.eth import EthereumClient, EthereumNetwork
+from gnosis.eth import EthereumNetwork
 from gnosis.safe import Safe, SafeOperation, addresses
 from web3 import Web3
 
@@ -17,18 +17,19 @@ from roles_royce.utils import MULTISENDS, to_checksum_address
 from .roles import apply_presets, deploy_roles, setup_common_roles
 from .utils import (
     ETH_LOCAL_NODE_URL,
-    SimpleSafe,
-    accounts,
     create_simple_safe,
     get_balance,
-    local_node_eth,
     steal_token,
 )
+from .safe import SimpleEthereumClient, SimpleSafe
+from tests.fork_fixtures import accounts
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
+
 
 
 def test_safe_and_roles(local_node_eth):
     w3 = local_node_eth.w3
-    ethereum_client = EthereumClient(ETH_LOCAL_NODE_URL)
+    ethereum_client = SimpleEthereumClient(w3)
 
     # test accounts are generated using the Mnemonic: "test test test test test test test test test test test junk"
     test_account0_addr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
@@ -105,7 +106,7 @@ def test_safe_and_roles(local_node_eth):
     role_ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
 
     tx_hash = role_ctract.constructor(owner, avatar, target).transact({"from": test_account0_addr})  # deploy!
-    roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5).contractAddress
+    roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)['contractAddress']
 
     role_ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
     assert role_ctract.functions.avatar().call() == avatar

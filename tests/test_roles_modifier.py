@@ -12,7 +12,7 @@ from roles_royce.roles_modifier import (
     set_gas_strategy,
 )
 
-from .utils import local_node_gc
+from .fork_fixtures import local_node_gc_replay as local_node_gc
 
 ROLE = 2
 ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"

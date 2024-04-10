@@ -5,7 +5,9 @@ from defabipedia.types import Chain
 
 from roles_royce.constants import ETHAddr
 from roles_royce.toolshed.disassembling import AuraDisassembler
-from tests.utils import fork_unlock_account, get_balance, local_node_eth, top_up_address
+from tests.utils import fork_unlock_account, get_balance, top_up_address
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
+
 
 # TODO: build an adequate preset to execute the transactions with roles.send
 

@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+import pytest
+
 from defabipedia.maker import Abis, ContractSpecs
 from defabipedia.tokens import erc20_contract
 from defabipedia.types import Chain
@@ -11,7 +13,9 @@ from roles_royce.protocols.eth import maker
 from roles_royce.utils import to_checksum_address
 
 from .roles import apply_presets, deploy_roles, setup_common_roles
-from .utils import accounts, create_simple_safe, get_balance, local_node_eth, steal_token, top_up_address
+from .utils import create_simple_safe, get_balance, steal_token, top_up_address
+from tests.fork_fixtures import accounts
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 JOIN_WSTETH_A = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH-A
 JOIN_ETH_A = "0x2F0b23f53734252Bda2277357e97e1517d6B042A"  # ETHJoin ETH-A
