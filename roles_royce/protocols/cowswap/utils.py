@@ -5,7 +5,6 @@ from web3.types import Address
 import requests
 from defabipedia.types import Blockchain, Chain
 from web3 import Web3
-import time
 
 
 class SwapKind(StrEnum):
@@ -143,7 +142,6 @@ def create_order_api(blockchain: Blockchain,
 
     response = requests.post(COW_ORDER_API_URL[blockchain], data=json.dumps(order.get_order_dict()))
     if response.status_code != 201:
-        return {"order": order, "response": response, "UID": None}
+        return {"order": order, "UID": None}
     else:
-        return {"order": order, "response": response,
-                "UID": response.text[1:len(response.text) - 1]}
+        return {"order": order, "UID": response.json()}

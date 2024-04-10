@@ -15,17 +15,16 @@ def test_order():
                   kind=SwapKind.SELL,
                   partially_fillable=False, sell_token_balance='erc20', buy_token_balance='erc20')
 
-    assert order.get_order_dict() == {'appData': '{"appCode":"karpatkey_swap"}',
-                                      'appDataHash': '0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26',
+    assert order.get_order_dict() == {'appData': '0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26',
                                       'buyAmount': '2731745328645699409',
                                       'buyToken': '0x6810e776880C02933D47DB1b9fc05908e5386b96',
                                       'buyTokenBalance': 'erc20',
                                       'feeAmount': '0',
                                       'from': '0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f',
-                                      'kind': "sell",
+                                      'kind': 'sell',
                                       'partiallyFillable': False,
                                       'receiver': '0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f',
-                                      'sellAmount': '9856932833705269603120',
+                                      'sellAmount': '985693283370526960312',
                                       'sellToken': '0x6B175474E89094C44Da98b954EedeAC495271d0F',
                                       'sellTokenBalance': 'erc20',
                                       'signature': '0x',
@@ -41,7 +40,19 @@ def test_quote_order_sell_buy(requests_mock):
 
     requests_mock.real_http = True
     requests_mock.post("https://api.cow.fi/mainnet/api/v1/quote",
-                       text=json.dumps({"quote": {"sellToken": "0x6b175474e89094c44da98b954eedeac495271d0f", "buyToken": "0x6810e776880c02933d47db1b9fc05908e5386b96", "receiver": "0x458cd345b4c05e8df39d0a07220feb4ec19f5e6f", "sellAmount": "986076688216997817016", "buyAmount": "2715461014656166690", "validTo": 1712725390, "appData": "{\"appCode\":\"karpatkey_swap\"}", "appDataHash": "0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26", "feeAmount": "13672434389376169984", "kind": "sell", "partiallyFillable": False, "sellTokenBalance": "erc20", "buyTokenBalance": "erc20", "signingScheme": "presign"}, "from": "0x458cd345b4c05e8df39d0a07220feb4ec19f5e6f", "expiration": "2024-04-10T04:35:10.557295381Z", "id": 480554155, "verified": False}),
+                       text=json.dumps({"quote": {"sellToken": "0x6b175474e89094c44da98b954eedeac495271d0f",
+                                                  "buyToken": "0x6810e776880c02933d47db1b9fc05908e5386b96",
+                                                  "receiver": "0x458cd345b4c05e8df39d0a07220feb4ec19f5e6f",
+                                                  "sellAmount": "986076688216997817016",
+                                                  "buyAmount": "2715461014656166690", "validTo": 1712725390,
+                                                  "appData": "{\"appCode\":\"karpatkey_swap\"}",
+                                                  "appDataHash": "0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26",
+                                                  "feeAmount": "13672434389376169984", "kind": "sell",
+                                                  "partiallyFillable": False, "sellTokenBalance": "erc20",
+                                                  "buyTokenBalance": "erc20", "signingScheme": "presign"},
+                                        "from": "0x458cd345b4c05e8df39d0a07220feb4ec19f5e6f",
+                                        "expiration": "2024-04-10T04:35:10.557295381Z", "id": 480554155,
+                                        "verified": False}),
                        status_code=200)
 
     order = quote_order_api(
@@ -118,7 +129,8 @@ def test_create_order_api(requests_mock):
                                 amount=sell_amount,
                                 valid_to=1712696625 + 60 * 15)
 
-    assert response["UID"] == '0x1121a6e7fb9f3c50f962a996db730930d76b2c47af87c8c67dfde0ddb1ac5381458cd345b4c05e8df39d0a07220feb4ec19f5e6f6615c043'
+    assert response[
+               "UID"] == '0x1121a6e7fb9f3c50f962a996db730930d76b2c47af87c8c67dfde0ddb1ac5381458cd345b4c05e8df39d0a07220feb4ec19f5e6f6615c043'
     assert requests_mock.request_history[
                0].text == ('{"sellToken": "0x6B175474E89094C44Da98b954EedeAC495271d0F", "buyToken": '
                            '"0x6810e776880C02933D47DB1b9fc05908e5386b96", "receiver": '
@@ -151,7 +163,8 @@ def test_create_order_api(requests_mock):
                                 valid_to=1712696625 + 60 * 15,
                                 order=order)
 
-    assert response["UID"] == '0x1121a6e7fb9f3c50f962a996db730930d76b2c47af87c8c67dfde0ddb1ac5381458cd345b4c05e8df39d0a07220feb4ec19f5e6f6615c043'
+    assert response[
+               "UID"] == '0x1121a6e7fb9f3c50f962a996db730930d76b2c47af87c8c67dfde0ddb1ac5381458cd345b4c05e8df39d0a07220feb4ec19f5e6f6615c043'
     assert requests_mock.request_history[
                0].text == ('{"sellToken": "0x6B175474E89094C44Da98b954EedeAC495271d0F", "buyToken": '
                            '"0x6810e776880C02933D47DB1b9fc05908e5386b96", "receiver": '
