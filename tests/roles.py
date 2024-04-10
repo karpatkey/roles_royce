@@ -19,7 +19,7 @@ def deploy_roles(w3: Web3, avatar):
 
     owner = avatar = target = to_checksum_address(avatar)
     tx_hash = ctract.constructor(owner, avatar, target).transact({"from": avatar})  # deploy!
-    roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5).contractAddress
+    roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)["contractAddress"]
 
     ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
     ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact({"from": avatar})

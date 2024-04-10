@@ -4,7 +4,9 @@ from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import spark
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
 
-from .utils import accounts, create_simple_safe, get_balance, local_node_eth, steal_token
+from .utils import create_simple_safe, get_balance, steal_token
+from .fork_fixtures import accounts
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 
 def test_integration(local_node_eth, accounts):

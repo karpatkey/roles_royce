@@ -8,16 +8,15 @@ from roles_royce.protocols.eth import spark
 from roles_royce.toolshed.anti_liquidation.spark import CDPData, SparkCDPManager
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkToken, SparkUtils
 from tests.utils import (
-    accounts,
     assign_role,
     create_simple_safe,
     get_allowance,
     get_balance,
-    local_node_eth,
     steal_token,
     top_up_address,
 )
-
+from tests.fork_fixtures import accounts
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 def test_spark_cdp_manager_token_addresses(local_node_eth):
     w3 = local_node_eth.w3

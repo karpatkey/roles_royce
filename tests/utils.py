@@ -217,40 +217,9 @@ def _local_node(request, node: LocalNode):
             logger.debug("Web3 time spent in %s: %f seconds", method, time.monotonic() - start_time)
             return response
 
-    node.w3.middleware_onion.add(LatencyMeasurerMiddleware, "call_counter")
+    node.w3.middleware_onion.add(LatencyMeasurerMiddleware, "latency_middleware")
     node.reset_state()
     return node
-
-
-@pytest.fixture(scope="session")
-def local_node_eth(request) -> LocalNode:
-    node = LocalNode(ETH_FORK_NODE_URL, ETH_LOCAL_NODE_PORT, ETH_LOCAL_NODE_DEFAULT_BLOCK)
-    _local_node(request, node)
-    return node
-
-
-@pytest.fixture(scope="session")
-def local_node_gc(request) -> LocalNode:
-    node = LocalNode(GC_FORK_NODE_URL, GC_LOCAL_NODE_PORT, GC_LOCAL_NODE_DEFAULT_BLOCK)
-    _local_node(request, node)
-    return node
-
-
-@pytest.fixture(autouse=True)
-def local_node_eth_reset(local_node_eth):
-    """Reset the local node state after each test"""
-    local_node_eth.reset_state()
-
-
-@pytest.fixture(autouse=True)
-def local_node_gc_reset(local_node_gc):
-    """Reset the local node state after each test"""
-    local_node_gc.reset_state()
-
-
-@pytest.fixture(scope="session")
-def accounts() -> list[LocalAccount]:
-    return TEST_ACCOUNTS
 
 
 def steal_token(w3, token, holder, to, amount):
@@ -280,7 +249,7 @@ def get_allowance(w3, token, owner_address, spender_address):
 def create_simple_safe(w3: Web3, owner: LocalAccount) -> SimpleSafe:
     """Create a Safe with one owner and 1 ETH in balance"""
 
-    safe = SimpleSafe.build(owner, w3.provider.endpoint_uri)
+    safe = SimpleSafe.build(owner, w3)
     top_up_address(w3=w3, address=safe.address, amount=1)
     fork_unlock_account(w3, safe.address)
     return safe

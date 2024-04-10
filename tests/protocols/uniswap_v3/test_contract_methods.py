@@ -6,7 +6,9 @@ from pytest import approx
 from roles_royce import roles
 from roles_royce.protocols import uniswap_v3
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import accounts, create_simple_safe, get_balance, local_node_eth, steal_token, top_up_address
+from tests.utils import create_simple_safe, get_balance, steal_token, top_up_address
+from tests.fork_fixtures import accounts
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
 
