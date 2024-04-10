@@ -130,7 +130,7 @@ class ContractMethod:
 
 
 class BaseApprove(ContractMethod):
-    """Inherit from this class to define an approval that the token is fixed.
+    """Inherit from this class to define an approval where the token is fixed.
 
     Specify the token using the token class attribute
     """
@@ -157,3 +157,11 @@ class BaseApproveForToken(BaseApprove):
     def __init__(self, token: Address, amount: int):
         self.token = token
         super().__init__(amount)
+
+
+class ApproveForToken(BaseApproveForToken):
+    """Approve a token for a specific spender."""
+    def __init__(self, token: Address, spender: Address, amount: int):
+        self.token = token
+        self.fixed_arguments = {"spender": spender}
+        super().__init__(token, amount)
