@@ -8,8 +8,17 @@ import pytest
 from eth_account.signers.local import LocalAccount
 from web3._utils.encoding import Web3JsonEncoder
 
-from tests.utils import LocalNode, ETH_FORK_NODE_URL, ETH_LOCAL_NODE_PORT, ETH_LOCAL_NODE_DEFAULT_BLOCK, _local_node, GC_FORK_NODE_URL, \
-    GC_LOCAL_NODE_PORT, GC_LOCAL_NODE_DEFAULT_BLOCK, TEST_ACCOUNTS
+from tests.utils import (
+    LocalNode,
+    ETH_FORK_NODE_URL,
+    ETH_LOCAL_NODE_PORT,
+    ETH_LOCAL_NODE_DEFAULT_BLOCK,
+    _local_node,
+    GC_FORK_NODE_URL,
+    GC_LOCAL_NODE_PORT,
+    GC_LOCAL_NODE_DEFAULT_BLOCK,
+    TEST_ACCOUNTS,
+)
 
 
 @pytest.fixture(scope="session")
@@ -116,6 +125,7 @@ class FakeLocalNode:
 
     def set_block(self, block):
         pass
+
 
 def _local_node_replay(local_node, request, chain_name):
     if "record" not in local_node.w3.middleware_onion:
