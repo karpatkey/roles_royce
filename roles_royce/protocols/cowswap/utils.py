@@ -44,10 +44,10 @@ class Order:
             "sellToken": self.sell_token,
             "buyToken": self.buy_token,
             "receiver": self.receiver,
-            "sellAmount": str(self.sell_amount) + str(self.fee_amount),
+            "sellAmount": str(self.sell_amount),
             "buyAmount": str(self.buy_amount),
             "validTo": self.valid_to,
-            "feeAmount": str(0),
+            "feeAmount": str(self.fee_amount),
             "kind": self.kind,
             "partiallyFillable": False,
             "sellTokenBalance": "erc20",
@@ -55,8 +55,7 @@ class Order:
             "signingScheme": "presign",
             "signature": "0x",
             "from": self.from_address,
-            "appData": json.dumps({"appCode": "karpatkey_swap"}, separators=(',', ':')),
-            "appDataHash": Web3.keccak(text=json.dumps({"appCode": "karpatkey_swap"}, separators=(',', ':'))).hex(),
+            "appData": Web3.keccak(text=json.dumps({"appCode": "karpatkey_swap"}, separators=(',', ':'))).hex(),
         }
 
 def quote_order_api(blockchain: Blockchain,
@@ -140,9 +139,9 @@ def create_order_api(blockchain: Blockchain,
             kind=kind,
             amount=amount,
         )
-        order.valid_to = valid_to
+    order.valid_to = valid_to
 
-    response = requests.post(COW_ORDER_API_URL[blockchain], json=order.get_order_dict())
+    response = requests.post(COW_ORDER_API_URL[blockchain], data=json.dumps(order.get_order_dict()))
     if response.status_code != 201:
         return {"order": order, "response": response, "UID": None}
     else:

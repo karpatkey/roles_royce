@@ -36,9 +36,75 @@ def test_sign_order():
     )
 
 
+def test_integration_uid_match(local_node_eth, accounts):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(19623340)
+
+    blockchain = Chain.get_blockchain_from_web3(w3)
+
+    avatar_safe_address = '0x58e6c7ab55Aa9012eAccA16d1ED4c15795669E1C'
+    private_key = '0x9d368dded1516fcb44407a0669d8645a7bfd0a1cfcc570c492be6d02fbdc205f'
+    role = 1
+
+    sell_token = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+    buy_token = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+    sell_amount = 784999999999994999997
+    kind = "sell"
+
+    order = quote_order_api(
+        blockchain=blockchain,
+        sell_token=sell_token,
+        buy_token=buy_token,
+        receiver=avatar_safe_address,
+        from_address=avatar_safe_address,
+        kind=kind,
+        amount=sell_amount,
+    )
+
+    valid_duration = 10 * 60 * 60
+    # require(block.timestamp + validDuration > order.validTo,"Dishonest valid duration");
+    valid_to = w3.eth.get_block('latest').timestamp + valid_duration - 1000
+
+    response_create_order = create_order_api(
+        blockchain=blockchain,
+        sell_token=order.sell_token,
+        buy_token=order.buy_token,
+        receiver=order.receiver,
+        from_address=order.from_address,
+        kind=order.kind,
+        amount=order.sell_amount,
+        valid_to=valid_to,
+        order=order)
+
+    sign_order_transactable = SignOrder(
+        blockchain=blockchain,
+        avatar=avatar_safe_address,
+        sell_token=sell_token,
+        buy_token=buy_token,
+        sell_amount=sell_amount,
+        buy_amount=order.buy_amount,
+        fee_amount=0,
+        valid_to=valid_to,
+        valid_duration=valid_duration,
+        kind=kind,
+    )
+    tx_receipt = roles.send(
+        [sign_order_transactable], role=role, private_key=private_key,
+        roles_mod_address='0x8C33ee6E439C874713a9912f3D3debfF1Efb90Da', web3=w3
+    )
+
+    assert tx_receipt.status == 1
+    for log in tx_receipt.logs:
+        if log.address == '0x9008D19f58AAbD9eD0D60971565AA8510560ab41':
+            uid_from_tx_log = '0x' + log.data.hex()[194:len(log.data.hex()) - 16]
+            break
+
+    assert uid_from_tx_log == response_create_order["UID"]
+
+
 def test_integration_sign_order(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    local_node_eth.set_block(19622768)
+    local_node_eth.set_block(19624093)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
@@ -102,9 +168,9 @@ def test_integration_sign_order(local_node_eth, accounts):
         amount=sell_amount,
     )
 
-    valid_duration = 1 * 60 * 60
+    valid_duration = 10 * 60 * 60
     # require(block.timestamp + validDuration > order.validTo,"Dishonest valid duration");
-    valid_to = w3.eth.get_block('latest').timestamp + valid_duration - 1
+    valid_to = w3.eth.get_block('latest').timestamp + valid_duration - 1000
 
     response_create_order = create_order_api(
         blockchain=blockchain,
@@ -123,19 +189,19 @@ def test_integration_sign_order(local_node_eth, accounts):
         buy_token=buy_token,
         sell_amount=sell_amount,
         buy_amount=order.buy_amount,
-        fee_amount=order.fee_amount,
+        fee_amount=0,
         valid_to=valid_to,
         valid_duration=valid_duration,
         kind=kind,
     )
-
     tx_receipt = roles.send(
         [sign_order_transactable], role=role, private_key=private_key, roles_mod_address=roles_contract.address, web3=w3
     )
 
     assert tx_receipt.status == 1
-    uid_from_tx_log = '0x' + tx_receipt.logs[1].data.hex()[192:len(tx_receipt.logs[1].data.hex())-16]
+    for log in tx_receipt.logs:
+        if log.address == '0x9008D19f58AAbD9eD0D60971565AA8510560ab41':
+            uid_from_tx_log = '0x' + log.data.hex()[194:len(log.data.hex()) - 16]
+            break
 
     assert uid_from_tx_log == response_create_order["UID"]
-
-    1 + 1
