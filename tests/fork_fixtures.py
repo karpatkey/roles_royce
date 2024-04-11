@@ -1,3 +1,4 @@
+import gzip
 import json
 import os
 from functools import wraps
@@ -136,7 +137,7 @@ def _local_node_replay(local_node, request, chain_name):
     test_file_path = Path(request.node.path)
     directory = test_file_path.parent.resolve()
     test_name = request.node.name
-    filename = f"{test_file_path.name}::{test_name}::{chain_name}.json"
+    filename = f"{test_file_path.name}::{test_name}::{chain_name}.json.gz"
     web3_test_data_file = directory / "test_data" / filename
 
     if os.path.exists(web3_test_data_file):
@@ -153,7 +154,7 @@ def _local_node_replay(local_node, request, chain_name):
     else:
         ReplayAndAssertMiddleware.activate(True)
 
-        with open(web3_test_data_file, "r") as f:
+        with gzip.open(web3_test_data_file, mode='rt') as f:
             ReplayAndAssertMiddleware.set_interactions(json.load(f))
 
     if mode == "replay_and_assert":
@@ -165,7 +166,7 @@ def _local_node_replay(local_node, request, chain_name):
     ReplayAndAssertMiddleware.activate(False)
     if mode == "record":
         data = json.dumps(RecordMiddleware.interactions, indent=2, cls=Web3JsonEncoder)
-        with open(web3_test_data_file, "w") as f:
+        with gzip.open(web3_test_data_file, mode='wt') as f:
             f.write(data)
 
 
