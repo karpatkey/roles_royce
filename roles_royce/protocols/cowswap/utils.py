@@ -78,6 +78,23 @@ def create_order(sell_token: Address,
                  from_address: Address,
                  kind: SwapKind,
                  valid_to: int) -> Order:
+    """
+    Creates an Order object.
+
+    Args:
+        sell_token (Address): The token to sell
+        buy_token (Address): The token to buy
+        receiver (Address): The address of the receiver
+        sell_amount (int): The amount to sell
+        buy_amount (int): The amount to buy
+        from_address (Address): The address of the sender
+        kind (SwapKind): The kind of the order ("buy" or "sell")
+        valid_to (int): The expiration time of the order in unix timestamp in seconds
+
+    Returns:
+        Order: The Order object
+    """
+
     return Order(sell_token=sell_token,
                  buy_token=buy_token,
                  receiver=receiver,
@@ -100,6 +117,24 @@ def quote_order_api(blockchain: Blockchain,
                     kind: SwapKind,
                     amount: int,
                     valid_to: int | None = None) -> Order:
+    """
+    Quotes an order using the Cow API and returns the corresponding Order object
+
+    Args:
+        blockchain (Blockchain): The blockchain to use
+        sell_token (Address): The token to sell
+        buy_token (Address): The token to buy
+        receiver (Address): The address of the receiver
+        from_address (Address): The address of the sender
+        kind (SwapKind): The kind of the order ("buy" or "sell")
+        amount (int): The amount to sell or buy
+        valid_to (int, optional): The expiration time of the order in unix timestamp in seconds. Defaults to None. If
+            None, the order object returned has valid_to=0
+
+    Returns:
+        Order: The corresponding Order object
+    """
+
     quote_order = {
         "sellToken": sell_token,
         "buyToken": buy_token,
@@ -148,7 +183,7 @@ def create_order_api(blockchain: Blockchain,
                      valid_to: int,
                      order: Order | None = None) -> dict:
     """
-    Creates an order in the COW API.
+    Creates an order using the Cow API.
 
     Args:
         blockchain (Blockchain): The blockchain to use
@@ -162,8 +197,9 @@ def create_order_api(blockchain: Blockchain,
         order (Order): The order to create. If None, it will be created from the other arguments
 
     Returns:
-        dict: A dictionary with the order, the response and the UID
+        dict: A dictionary with the order  and the UID
     """
+
     if order is None:
         order = quote_order_api(
             blockchain=blockchain,
@@ -176,7 +212,7 @@ def create_order_api(blockchain: Blockchain,
             valid_to=valid_to,
         )
     else:
-        order.valid_to = valid_to  # In case the order was already created with valid_to=0
+        order.valid_to = valid_to  # In case the order was already created with valid_to=0 with quote_order_api
 
     response = requests.post(COW_ORDER_API_URL[blockchain], data=json.dumps(order.get_order_dict()))
     if response.status_code != 201:
