@@ -241,9 +241,7 @@ preset_cowswap_easy = """{
             ]
             }"""
 
-
-# FIXME: This has to be fixed with a mock"
-@pytest.mark.skip(reason="FIXME: This has to be fixed with a mock")
+@pytest.mark.skip(reason="WIP")
 def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
     local_node_eth.set_block(18710862)
@@ -280,36 +278,19 @@ def test_integration_exit_3(local_node_eth, accounts):
         signer_address=disassembler_address,
     )
 
-    txn_transactable = lido_disassembler.exit_3(percentage=50, exit_arguments=[{"max_slippage": 1}])
+    txn_transactable = lido_disassembler.exit_3(percentage=50, exit_arguments=[{
+                        'buy_amount': 2731745328645699409,
+                        'sell_amount': 2631745328645699409,
+                        'valid_to': w3.eth.get_block('latest').timestamp + 1000,
+                    }])
     send_it = lido_disassembler.send(txn_transactable, private_key=private_key)
     assert send_it
 
-    cow_api_address = "https://api.cow.fi/mainnet/api/v1/orders"
-    send_order_api = {
-        "sellToken": txn_transactable[0].args_list[0][0],
-        "buyToken": txn_transactable[0].args_list[0][1],
-        "receiver": txn_transactable[0].args_list[0][2],
-        "sellAmount": str(txn_transactable[0].args_list[0][3]),
-        "buyAmount": str(txn_transactable[0].args_list[0][4]),
-        "validTo": txn_transactable[0].args_list[0][5],
-        "feeAmount": str(txn_transactable[0].args_list[0][7]),
-        "kind": "sell",
-        "partiallyFillable": False,
-        "sellTokenBalance": "erc20",
-        "buyTokenBalance": "erc20",
-        "signingScheme": "presign",
-        "signature": "0x",
-        "from": txn_transactable[0].args_list[0][2],
-        "appData": json.dumps({"appCode": "santi_the_best"}),
-        "appDataHash": "0x970eb15ab11f171c843c2d1fa326b7f8f6bf06ac7f84bb1affcc86511c783f12",
-    }
 
-    send_order = requests.post(cow_api_address, json=send_order_api)
-    assert send_order.status_code == 201
 
 
 # FIXME: This has to be fixed with a mock"
-@pytest.mark.skip(reason="FIXME: This has to be fixed with a mock")
+@pytest.mark.skip(reason="WIP")
 def test_integration_exit_4(local_node_eth, accounts):
     w3 = local_node_eth.w3
     local_node_eth.set_block(18710862)

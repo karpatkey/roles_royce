@@ -1,16 +1,10 @@
 from dataclasses import dataclass
 from decimal import Decimal
-from time import time
-
 from defabipedia.lido import ContractSpecs
-from web3 import Web3
-from web3.exceptions import ContractLogicError
-
-from roles_royce.constants import ETHAddr
+from defabipedia.tokens import EthereumTokenAddr
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address
-from roles_royce.protocols.cowswap.contract_methods import SignOrder
-from roles_royce.protocols.cowswap.utils import QuoteOrderCowSwap
+from roles_royce.protocols import cowswap
 from roles_royce.protocols.eth import lido
 
 from .disassembler import Disassembler, validate_percentage
@@ -27,7 +21,7 @@ class LidoDisassembler(Disassembler):
         return int(Decimal(contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
 
     def exit_1(
-        self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
+            self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
     ) -> list[Transactable]:
         """Unstake stETH from Lido
         Args:
@@ -68,7 +62,7 @@ class LidoDisassembler(Disassembler):
         return txns
 
     def exit_2(
-        self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
+            self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
     ) -> list[Transactable]:
         """Unwrap wstETH and unstake for ETH on Lido
         Args:
@@ -111,108 +105,51 @@ class LidoDisassembler(Disassembler):
     def exit_3(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
         """Swap stETH for ETH
         Args:
-            percentage (float): Percentage of token to remove.
-            exit_arguments (list[dict]):  List of dictionaries with the withdrawal parameters.
+            exit_arguments (list[dict]):  List with one single dictionary with the order parameters from an already
+             created order:
                 arg_dicts = [
                     {
-                        "max_slippage": 0.01
+                        'buy_amount': 2731745328645699409,
+                        'sell_amount': 985693283370526960312,
+                        'valid_to': 1712697525
                     }
                 ]
-            amount_to_redeem (int, optional): Amount of stETH to redeem. Defaults to None. If None, the 'percentage' of the balance of stETH will be redeemed.
         Returns:
-            list[ Transactable]: List of transactions to execute.
+            list[ Transactable]: List of transactions to execute
         """
-        for element in exit_arguments:
-            max_slippage = element["max_slippage"] / 100
-            fraction = validate_percentage(percentage)
+        order = cowswap.create_order(sell_token=EthereumTokenAddr.stETH,
+                                     buy_token=EthereumTokenAddr.E,
+                                     receiver=self.avatar_safe_address,
+                                     from_address=self.avatar_safe_address,
+                                     sell_amount=exit_arguments[0]["sell_amount"],
+                                     buy_amount=exit_arguments[0]["buy_amount"],
+                                     valid_to=exit_arguments[0]["valid_to"],
+                                     kind=cowswap.SwapKind.SELL)
 
-            txns = []
-            address = ContractSpecs[self.blockchain].stETH.address
-
-            if amount_to_redeem is None:
-                amount_to_redeem = self.get_amount_to_redeem(address, fraction)
-
-            quote = QuoteOrderCowSwap(
-                blockchain=self.blockchain,
-                sell_token=address,
-                buy_token=ETHAddr.ETH,
-                receiver=self.avatar_safe_address,
-                kind="sell",
-                sell_amount=amount_to_redeem,
-            )
-
-            buy_amount = quote.buy_amount
-            fee_amount = quote.fee_amount
-            sell_amount = quote.sell_amount
-
-            buy_amount_min_slippage = int(Decimal(buy_amount) * Decimal(1 - max_slippage))
-            set_allowance = lido.ApproveRelayerStETH(amount=amount_to_redeem)
-            moooooo = SignOrder(
-                blockchain=self.blockchain,
-                avatar=self.avatar_safe_address,
-                sell_token=address,
-                buy_token=ETHAddr.ETH,
-                sell_amount=sell_amount+fee_amount,
-                buy_amount=buy_amount_min_slippage,
-                valid_to=int(int(time()) + 600),
-                kind="sell",
-            )
-
-            # txns.append(set_allowance)
-            txns.append(moooooo)
-        return txns
+        return cowswap.approve_and_sign(w3=self.w3, order=order)
 
     def exit_4(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
         """Swap wstETH for ETH
         Args:
-            percentage (float): Percentage of token to remove.
-            exit_arguments (list[dict]):  List of dictionaries with the withdrawal parameters.
+            exit_arguments (list[dict]):  List with one single dictionary with the order parameters from an already
+             created order:
                 arg_dicts = [
                     {
-                        "max_slippage": 0.01
+                        'buy_amount': '2731745328645699409',
+                        'sell_amount': '985693283370526960312',
+                        'valid_to': 1712697525
                     }
                 ]
-            amount_to_redeem (int, optional): Amount of wstETH to redeem. Defaults to None. If None, the 'percentage' of the balance of wstETH will be redeemed.
         Returns:
             list[ Transactable]: List of transactions to execute.
         """
+        order = cowswap.create_order(sell_token=EthereumTokenAddr.wstETH,
+                                     buy_token=EthereumTokenAddr.E,
+                                     receiver=self.avatar_safe_address,
+                                     from_address=self.avatar_safe_address,
+                                     sell_amount=exit_arguments[0]["sell_amount"],
+                                     buy_amount=exit_arguments[0]["buy_amount"],
+                                     valid_to=exit_arguments[0]["valid_to"],
+                                     kind=cowswap.SwapKind.SELL)
 
-        for element in exit_arguments:
-            max_slippage = element["max_slippage"] / 100
-            fraction = validate_percentage(percentage)
-
-            txns = []
-            address = ContractSpecs[self.blockchain].wstETH.address
-
-            if amount_to_redeem is None:
-                amount_to_redeem = self.get_amount_to_redeem(address, fraction)
-
-            quote = QuoteOrderCowSwap(
-                blockchain=self.blockchain,
-                sell_token=address,
-                buy_token=ETHAddr.ETH,
-                receiver=self.avatar_safe_address,
-                kind="sell",
-                sell_amount=amount_to_redeem,
-            )
-
-            buy_amount = quote.buy_amount
-            fee_amount = quote.fee_amount
-            sell_amount = quote.sell_amount
-
-            buy_amount_min_slippage = int(Decimal(buy_amount) * Decimal(1 - max_slippage))
-            set_allowance = lido.ApproveRelayerWstETH(amount=amount_to_redeem)
-            moooooo = SignOrder(
-                blockchain=self.blockchain,
-                avatar=self.avatar_safe_address,
-                sell_token=address,
-                buy_token=ETHAddr.ETH,
-                sell_amount=sell_amount+fee_amount,
-                buy_amount=buy_amount_min_slippage,
-                valid_to=int(int(time()) + 600),
-                kind="sell",
-            )
-
-            # txns.append(set_allowance)
-            txns.append(moooooo)
-        return txns
+        return cowswap.approve_and_sign(w3=self.w3, order=order)
