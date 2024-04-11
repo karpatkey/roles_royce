@@ -22,6 +22,18 @@ COW_QUOTE_API_URL = {
 }
 
 
+class CONSTANTS(StrEnum):
+    APP_DATA = json.dumps({"appCode": "karpatkey_swap"}, separators=(',', ':'))
+    APP_DATA_HASH = Web3.keccak(text=json.dumps({"appCode": "karpatkey_swap"}, separators=(',', ':'))).hex()
+    # APP_DATA_HASH is '0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26'
+    ERC20_HASH = Web3.keccak(text="erc20").hex()
+    # ERC20_HASH is '0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9'
+    SELL_HASH = Web3.keccak(text="sell").hex()
+    # SELL_HASH is '0xf3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee346775'
+    BUY_HASH = Web3.keccak(text="buy").hex()
+    # BUY_HASH is '0x6ed88e868af0a1983e3886d5f3e95a2fafbd6c3450bc229e27342283dc429ccc'
+
+
 @dataclass
 class Order:
     sell_token: Address
@@ -54,8 +66,31 @@ class Order:
             "signingScheme": "presign",
             "signature": "0x",
             "from": self.from_address,
-            "appData": Web3.keccak(text=json.dumps({"appCode": "karpatkey_swap"}, separators=(',', ':'))).hex(),
+            "appData": CONSTANTS.APP_DATA_HASH,
         }
+
+
+def create_order(sell_token: Address,
+                 buy_token: Address,
+                 receiver: Address,
+                 sell_amount: int,
+                 buy_amount: int,
+                 from_address: Address,
+                 kind: SwapKind,
+                 valid_to: int) -> Order:
+    return Order(sell_token=sell_token,
+                 buy_token=buy_token,
+                 receiver=receiver,
+                 sell_amount=sell_amount,
+                 buy_amount=buy_amount,
+                 fee_amount=0,
+                 valid_to=valid_to,
+                 kind=kind,
+                 partially_fillable=False,
+                 sell_token_balance="erc20",
+                 buy_token_balance="erc20",
+                 from_address=from_address)
+
 
 def quote_order_api(blockchain: Blockchain,
                     sell_token: Address,
@@ -63,13 +98,14 @@ def quote_order_api(blockchain: Blockchain,
                     receiver: Address,
                     from_address: Address,
                     kind: SwapKind,
-                    amount: int) -> Order:
+                    amount: int,
+                    valid_to: int | None = None) -> Order:
     quote_order = {
         "sellToken": sell_token,
         "buyToken": buy_token,
         "receiver": receiver,
-        "appData": json.dumps({"appCode": "karpatkey_swap"}, separators=(',', ':')),
-        "appDataHash": Web3.keccak(text=json.dumps({"appCode": "karpatkey_swap"}, separators=(',', ':'))).hex(),
+        "appData": CONSTANTS.APP_DATA,
+        "appDataHash": CONSTANTS.APP_DATA_HASH,
         "partiallyFillable": False,
         "sellTokenBalance": "erc20",
         "buyTokenBalance": "erc20",
@@ -94,7 +130,7 @@ def quote_order_api(blockchain: Blockchain,
                  sell_amount=int(response["quote"]["sellAmount"]) + int(response["quote"]["feeAmount"]),
                  buy_amount=int(response["quote"]["buyAmount"]),
                  fee_amount=0,
-                 valid_to=0,
+                 valid_to=0 if valid_to is None else valid_to,
                  kind=kind,
                  partially_fillable=False,
                  sell_token_balance="erc20",
@@ -137,8 +173,10 @@ def create_order_api(blockchain: Blockchain,
             from_address=from_address,
             kind=kind,
             amount=amount,
+            valid_to=valid_to,
         )
-    order.valid_to = valid_to
+    else:
+        order.valid_to = valid_to  # In case the order was already created with valid_to=0
 
     response = requests.post(COW_ORDER_API_URL[blockchain], data=json.dumps(order.get_order_dict()))
     if response.status_code != 201:

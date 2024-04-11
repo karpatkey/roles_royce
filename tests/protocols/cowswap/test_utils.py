@@ -1,5 +1,5 @@
 from defabipedia.types import Chain
-from roles_royce.protocols.cowswap.utils import SwapKind, create_order_api, quote_order_api, Order
+from roles_royce.protocols.cowswap.utils import SwapKind, create_order_api, quote_order_api, Order, create_order
 import json
 
 
@@ -30,6 +30,27 @@ def test_order():
                                       'signature': '0x',
                                       'signingScheme': 'presign',
                                       'validTo': 1712697525}
+
+
+def test_create_order():
+    order = create_order(sell_token='0x6B175474E89094C44Da98b954EedeAC495271d0F',
+                         buy_token='0x6810e776880C02933D47DB1b9fc05908e5386b96',
+                         receiver='0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f',
+                         from_address='0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f',
+                         sell_amount=985693283370526960312,
+                         buy_amount=2731745328645699409,
+                         valid_to=1712697525,
+                         kind=SwapKind.SELL)
+    assert order == Order(sell_token='0x6B175474E89094C44Da98b954EedeAC495271d0F',
+                          buy_token='0x6810e776880C02933D47DB1b9fc05908e5386b96',
+                          receiver='0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f',
+                          from_address='0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f',
+                          sell_amount=985693283370526960312,
+                          buy_amount=2731745328645699409,
+                          fee_amount=0,
+                          valid_to=1712697525,
+                          kind=SwapKind.SELL,
+                          partially_fillable=False, sell_token_balance='erc20', buy_token_balance='erc20')
 
 
 def test_quote_order_sell_buy(requests_mock):

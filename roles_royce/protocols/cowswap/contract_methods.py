@@ -1,11 +1,10 @@
-import json
 from defabipedia.cowswap_signer import ContractSpecs
 from defabipedia.types import Blockchain
 from web3 import Web3
 from web3.types import Address
 from roles_royce.protocols.base import AvatarAddress, ContractMethod
 from roles_royce.roles_modifier import Operation
-import time
+from roles_royce.protocols.cowswap.utils import CONSTANTS
 
 
 class SignOrder(ContractMethod):
@@ -42,18 +41,18 @@ class SignOrder(ContractMethod):
     )
     fixed_arguments = {
         "receiver": AvatarAddress,
-        "app_data": Web3.keccak(text=json.dumps({"appCode": "karpatkey_swap"}, separators=(',', ':'))).hex(),
+        "app_data": CONSTANTS.APP_DATA_HASH,
         "fee_amount": 0,
         "partially_fillable": False,
-        "sell_token_balance": Web3.keccak(text="erc20").hex(),
-        "buy_token_balance": Web3.keccak(text="erc20").hex(),
+        "sell_token_balance": CONSTANTS.ERC20_HASH,
+        "buy_token_balance": CONSTANTS.ERC20_HASH,
         "fee_amount_bp": 0
     }
 
     def __init__(
         self,
         blockchain: Blockchain,
-        avatar: Address,
+        avatar: AvatarAddress,
         sell_token: Address,
         buy_token: Address,
         sell_amount: int,

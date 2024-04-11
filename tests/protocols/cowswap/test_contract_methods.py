@@ -83,7 +83,6 @@ def test_integration_uid_match(local_node_eth, accounts, requests_mock):
     # In the order signer contract: require(block.timestamp + validDuration > order.validTo,"Dishonest valid duration");
     # and w3.eth.get_block('latest').timestamp is approximately 1712782991 (sometimes it is 1712782992, etc.)
     valid_to = 1712782991 + valid_duration - 1000
-    a = w3.eth.get_block('latest').timestamp
 
     requests_mock.post("https://api.cow.fi/mainnet/api/v1/orders",
                        text='"0x529ed6e1ec9ba395c58fca9f20eb2e0a16a4e484082b8a7b824a901142c5d94258e6c7ab55aa9012eacca16d1ed4c15795669e1c66178747"',
@@ -202,7 +201,7 @@ def test_integration_sign_order(local_node_eth, accounts, requests_mock):
     # In the order signer contract: require(block.timestamp + validDuration > order.validTo,"Dishonest valid duration");
     # and w3.eth.get_block('latest').timestamp is approximately 1712784730 (sometimes it is 1712784731, etc.)
     valid_to = 1712784730 + valid_duration - 1000
-    a = w3.eth.get_block('latest').timestamp
+
     requests_mock.post("https://api.cow.fi/mainnet/api/v1/orders",
                         text='"0x6c9fbbe347d133956af1e2fcf0b1adede666faec6198cfecb96d9f292de2e60e01b1214ecf83ff63b12e18b05b3db84cae37563566178e12"',
                         status_code=201)
