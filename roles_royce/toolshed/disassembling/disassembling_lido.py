@@ -13,22 +13,38 @@ from .disassembler import Disassembler, validate_percentage
 @dataclass
 class LidoDisassembler(Disassembler):
     def get_amount_to_redeem(self, address: Address, fraction: float | Decimal) -> int:
+        """
+        Calculates the amount of tokens to redeem based on the percentage of the total holdings.
+
+        Args:
+            address (Address): Token address; can be stETH or wstETH.
+            fraction (float): Percentage of the total holdings to redeem.
+
+        Returns:
+            int: Amount of tokens to redeem.
+        """
         if address == ContractSpecs[self.blockchain].wstETH.address:
             contract = ContractSpecs[self.blockchain].wstETH.contract(self.w3)
-        else:
+        elif address == ContractSpecs[self.blockchain].stETH.address:
             contract = ContractSpecs[self.blockchain].stETH.contract(self.w3)
+        else:
+            raise ValueError("Invalid token address")
 
         return int(Decimal(contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
 
     def exit_1(
             self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
     ) -> list[Transactable]:
-        """Unstake stETH from Lido
+        """
+        Unstakes stETH from Lido
+
         Args:
-            percentage (float): Percentage of token to remove.
-            amount_to_redeem (int, optional):Amount of stETH to redeem. Defaults to None. If None, the 'percentage' of the balance of stETH will be redeemed.
+            percentage (float): Percentage of the total stETH holdings to redeem.
+            amount_to_redeem (int, optional):Amount of stETH to redeem. Defaults to None. If None, the 'percentage' of
+                the balance of stETH will be redeemed.
+
         Returns:
-            list[ Transactable]: List of transactions to execute.
+            list[Transactable]: List of transactions to execute.
         """
 
         fraction = validate_percentage(percentage)
@@ -64,12 +80,16 @@ class LidoDisassembler(Disassembler):
     def exit_2(
             self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
     ) -> list[Transactable]:
-        """Unwrap wstETH and unstake for ETH on Lido
+
+        """
+        Unwraps wstETH and unstakes for ETH on Lido
+
         Args:
-            percentage (float): Percentage of token to remove.
+            percentage (float): Percentage of the total wstETH holdings to redeem.
             amount_to_redeem (int, optional): Amount of wstETH to redeem. Defaults to None. If None, the 'percentage' of the balance of stETH will be redeemed.
+
         Returns:
-            list[ Transactable]: List of transactions to execute.
+            list[Transactable]: List of transactions to execute.
         """
 
         fraction = validate_percentage(percentage)
@@ -103,34 +123,48 @@ class LidoDisassembler(Disassembler):
         return txns
 
     def exit_3(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
-        """Swap stETH for ETH
+        """
+        Swaps stETH for ETH. Approves the Cowswap relayer to spend the stETH if needed, then creates the order using the
+        Cow's order API and creates the sign_order transaction.
         Args:
+            percentage (float): Percentage of the total stETH holdings to swap.
             exit_arguments (list[dict]):  List with one single dictionary with the order parameters from an already
              created order:
                 arg_dicts = [
                     {
-                        'buy_amount': 2731745328645699409,
-                        'sell_amount': 985693283370526960312,
-                        'valid_to': 1712697525
+                        "max_slippage": 11.25
                     }
                 ]
+            amount_to_redeem (int, optional): Amount of stETH to swap. Defaults to None. If None, the 'percentage' of
+                the total stETH holdings are swapped
         Returns:
             list[ Transactable]: List of transactions to execute
         """
-        order = cowswap.create_order(sell_token=EthereumTokenAddr.stETH,
-                                     buy_token=EthereumTokenAddr.E,
-                                     receiver=self.avatar_safe_address,
-                                     from_address=self.avatar_safe_address,
-                                     sell_amount=exit_arguments[0]["sell_amount"],
-                                     buy_amount=exit_arguments[0]["buy_amount"],
-                                     valid_to=exit_arguments[0]["valid_to"],
-                                     kind=cowswap.SwapKind.SELL)
 
-        return cowswap.approve_and_sign(w3=self.w3, order=order)
+        max_slippage = exit_arguments[0]["max_slippage"] / 100
+        fraction = validate_percentage(percentage)
+
+        if amount_to_redeem is None:
+            amount_to_redeem = self.get_amount_to_redeem(EthereumTokenAddr.stETH, fraction)
+
+        if amount_to_redeem == 0:
+            return []
+
+        return cowswap.create_order_and_swap(w3=self.w3,
+                                             avatar=self.avatar_safe_address,
+                                             sell_token=EthereumTokenAddr.stETH,
+                                             buy_token=EthereumTokenAddr.E,
+                                             amount=amount_to_redeem,
+                                             kind=cowswap.SwapKind.SELL,
+                                             max_slippage=max_slippage,
+                                             valid_duration=20 * 60)
 
     def exit_4(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
-        """Swap wstETH for ETH
+        """
+        Swaps wstETH for ETH. Approves the Cowswap relayer to spend the wstETH if needed, then creates the order using
+        the Cow's order API and creates the sign_order transaction.
         Args:
+            percentage (float): Percentage of the total wstETH holdings to swap.
             exit_arguments (list[dict]):  List with one single dictionary with the order parameters from an already
              created order:
                 arg_dicts = [
@@ -140,16 +174,26 @@ class LidoDisassembler(Disassembler):
                         'valid_to': 1712697525
                     }
                 ]
+            amount_to_redeem (int, optional): Amount of wstETH to swap. Defaults to None. If None, the 'percentage' of
+                the total stETH holdings are swapped
         Returns:
             list[ Transactable]: List of transactions to execute.
         """
-        order = cowswap.create_order(sell_token=EthereumTokenAddr.wstETH,
-                                     buy_token=EthereumTokenAddr.E,
-                                     receiver=self.avatar_safe_address,
-                                     from_address=self.avatar_safe_address,
-                                     sell_amount=exit_arguments[0]["sell_amount"],
-                                     buy_amount=exit_arguments[0]["buy_amount"],
-                                     valid_to=exit_arguments[0]["valid_to"],
-                                     kind=cowswap.SwapKind.SELL)
 
-        return cowswap.approve_and_sign(w3=self.w3, order=order)
+        max_slippage = exit_arguments[0]["max_slippage"] / 100
+        fraction = validate_percentage(percentage)
+
+        if amount_to_redeem is None:
+            amount_to_redeem = self.get_amount_to_redeem(EthereumTokenAddr.wstETH, fraction)
+
+        if amount_to_redeem == 0:
+            return []
+
+        return cowswap.create_order_and_swap(w3=self.w3,
+                                             avatar=self.avatar_safe_address,
+                                             sell_token=EthereumTokenAddr.wstETH,
+                                             buy_token=EthereumTokenAddr.E,
+                                             amount=amount_to_redeem,
+                                             kind=cowswap.SwapKind.SELL,
+                                             max_slippage=max_slippage,
+                                             valid_duration=20 * 60)
