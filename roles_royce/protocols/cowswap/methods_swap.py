@@ -32,6 +32,9 @@ def create_order_and_swap(w3: Web3,
 
     Returns:
         list[Transactable]: A list with one single Transactable element.
+
+    Raises:
+        ValueError: If the order creation using the API fails
     """
 
     order = quote_order_api(
