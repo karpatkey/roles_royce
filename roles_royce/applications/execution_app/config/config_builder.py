@@ -103,10 +103,7 @@ wallet_tokens_swap = [
         "gnosis": [
             {
                 "token_in": ["0xcB444e90D8198415266c6a2724b7900fb12FC56E",], # EURe
-                "token_out": [
-                    "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",  # USDC
-                    "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",  # USDT
-                    "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",  # WXDAI
+                "token_out": ["0x0ca1c1ec4ebf3cc67a9f545ff90a3795b318ca4a"  # 3CRV
                 ],  
             },
         ]
@@ -448,10 +445,11 @@ class DAOStrategiesBuilder:
                         position["exec_config"][i]["label"],
                     )
                 pool_tokens = get_tokens_from_bpt(w3, bpt_address)
+                pool_id = get_pool_id_from_bpt(w3, bpt_address)
                 position["position_id_human_readable"] = aura_position.position_id_human_readable(
                     w3, pool_tokens=pool_tokens
                 )
-                if all(token["symbol"] in whitelist_pairs for token in pool_tokens):
+                if pool_id in whitelist_poolIDs:
                     for token in pool_tokens:
                         position["exec_config"][2]["parameters"][2]["options"].append(
                             {"value": token["address"], "label": token["symbol"]}
@@ -592,6 +590,7 @@ class DAOStrategiesBuilder:
                                     position["exec_config"][i]["parameters"][2]["options"].append(
                                         {"value": instance["pair"][1], "label": token_out_symbol}
                                     )
+                                    position["position_id_human_readable"] += f"_to_{token_out_symbol}_in_{instance['pool'].protocol}"
                                 else:
                                     if not any(
                                         option["value"] == instance["pair"][1]
@@ -609,11 +608,11 @@ class DAOStrategiesBuilder:
 
                             if len(position["exec_config"]) > 0:
                                 result.append(position)
-                            print(
-                                f"        Done adding: Wallet position",
-                                position["position_id"],
-                                position["position_id_human_readable"],
-                            )
-                else:
-                    print("        Not adding: ", wallet_position)
+                                print(
+                                    f"        Done adding: Wallet position",
+                                    position["position_id"],
+                                    position["position_id_human_readable"],
+                                )
+                            else:
+                                print("        Not adding: ", wallet_position)
         return result
