@@ -169,9 +169,7 @@ class LidoDisassembler(Disassembler):
              created order:
                 arg_dicts = [
                     {
-                        'buy_amount': '2731745328645699409',
-                        'sell_amount': '985693283370526960312',
-                        'valid_to': 1712697525
+                        "max_slippage": 11.25
                     }
                 ]
             amount_to_redeem (int, optional): Amount of wstETH to swap. Defaults to None. If None, the 'percentage' of
