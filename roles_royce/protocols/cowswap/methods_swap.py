@@ -17,6 +17,23 @@ def create_order_and_swap(w3: Web3,
                           kind: SwapKind,
                           max_slippage: float,
                           valid_duration: int = 10 * 60) -> list[Transactable]:
+    """
+    Creates a swap order using the Cow API and returns the sign_order Transactable to execute to sign the order on-chain.
+
+    Args:
+        w3 (Web3): The web3 object
+        avatar (AvatarAddress): The address of the avatar safe
+        sell_token (Address): The token to sell
+        buy_token (Address): The token to buy
+        amount (int): The amount to sell
+        kind (SwapKind): The kind of the order ("buy" or "sell")
+        max_slippage (float): The maximum slippage allowed
+        valid_duration (int): The duration the order is valid in seconds
+
+    Returns:
+        list[Transactable]: A list with one single Transactable element.
+    """
+
     order = quote_order_api(
         blockchain=Chain.get_blockchain_from_web3(w3),
         sell_token=sell_token,
@@ -75,6 +92,22 @@ def create_order_and_swap(w3: Web3,
 
 
 def swap(w3: Web3, order: Order, valid_duration: int = 10 * 60) -> list[Transactable]:
+    """
+    Receives a swap Order object and returns the sign_order Transactable to execute to sign the order on-chain.
+
+    Args:
+        w3 (Web3): The web3 object
+        order (Order): The order object
+        valid_duration (int): The duration the order is valid in seconds
+
+    Returns:
+        list[Transactable]: A list with one single Transactable element.
+
+    Raises:
+        ValueError: If the receiver and the from address in the order are both not the same address.
+        ValueError: If current timestamp + valid_duration is not greater than the parameter valid_to in the order.
+    """
+
     if order.receiver != order.from_address:
         raise ValueError("Both the receiver and the from_address must be the avatar safe.")
 
