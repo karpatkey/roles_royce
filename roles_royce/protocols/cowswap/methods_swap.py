@@ -9,14 +9,14 @@ from defabipedia.cowswap_signer import ContractSpecs
 from web3.types import Address
 
 
-def create_approve_sign(w3: Web3,
-                        avatar: AvatarAddress,
-                        sell_token: Address,
-                        buy_token: Address,
-                        amount: int,
-                        kind: SwapKind,
-                        max_slippage: float,
-                        valid_duration: int = 10 * 60) -> list[Transactable]:
+def create_order_and_swap(w3: Web3,
+                          avatar: AvatarAddress,
+                          sell_token: Address,
+                          buy_token: Address,
+                          amount: int,
+                          kind: SwapKind,
+                          max_slippage: float,
+                          valid_duration: int = 10 * 60) -> list[Transactable]:
     order = quote_order_api(
         blockchain=Chain.get_blockchain_from_web3(w3),
         sell_token=sell_token,
@@ -39,7 +39,8 @@ def create_approve_sign(w3: Web3,
         from_address=order.from_address,
         kind=order.kind,
         amount=order.sell_amount,
-        valid_to=order.valid_to)
+        valid_to=order.valid_to,
+        order=order)
 
     if not response_create_order["UID"]:
         raise ValueError("Order creation failed")
@@ -63,16 +64,22 @@ def create_approve_sign(w3: Web3,
         buy_amount=order.buy_amount,
         fee_amount=order.fee_amount,
         valid_to=order.valid_to,
-        valid_duration=valid_duration,
+        valid_duration=valid_duration + 10 * 60,
+        # In the order signer contract:
+        # require(block.timestamp + validDuration > order.validTo,"Dishonest valid duration");
+        # 'valid_duration' is here both an argument SignOrderand and create_order_and_swap but they mean different things
         kind=order.kind,
     )
     result.append(sign_order_transactable)
     return result
 
 
-def approve_and_sign(w3: Web3, order: Order, valid_duration: int = 10 * 60) -> list[Transactable]:
+def swap(w3: Web3, order: Order, valid_duration: int = 10 * 60) -> list[Transactable]:
     if order.receiver != order.from_address:
         raise ValueError("Both the receiver and the from_address must be the avatar safe.")
+
+    if order.valid_to >= w3.eth.get_block('latest').timestamp + valid_duration:
+        raise ValueError("Invalid valid_duration: timestamp + valid_duration must be greater than valid_to")
 
     result = []
     approve_transactable = check_allowance_and_approve(w3=w3,

@@ -197,7 +197,7 @@ def create_order_api(blockchain: Blockchain,
         order (Order): The order to create. If None, it will be created from the other arguments
 
     Returns:
-        dict: A dictionary with the order  and the UID
+        dict: A dictionary with the order and the UID
     """
 
     if order is None:
