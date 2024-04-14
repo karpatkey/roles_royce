@@ -1,10 +1,16 @@
 FROM python:3.11-alpine3.19 AS base
 
+RUN apk --no-cache add  git 
+ENV PATH="/opt/venv/bin:$PATH"
+RUN python -m venv /opt/venv
+
+FROM base AS builder
+
 WORKDIR /build
 
 # Install Python dependencies and build Python packages in the builder stage
 RUN apk --no-cache add \
-    python3-dev musl-dev gcc git g++ libffi libffi-dev && \
+    python3-dev musl-dev gcc g++ libffi libffi-dev && \
     python -m pip install hatch
 
 COPY pyproject.toml .
@@ -12,7 +18,11 @@ COPY pyproject.toml .
 RUN hatch dep show requirements > ./requirements.txt && \
     python -m pip install -r ./requirements.txt
 
+FROM base AS runner
+
 COPY . .
+
+COPY --from=builder /opt/venv /opt/venv
 
 RUN python -m pip install -e .
 
