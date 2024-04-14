@@ -1,4 +1,3 @@
-import uvicorn
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 
@@ -65,45 +64,3 @@ async def sumilate(params: SimulateParams, response: Response):
     )
     response.status_code = res["status"]
     return res
-
-
-if __name__ == "__main__":
-
-    # TODO: in depth review of the logging config
-    log_cfg = {
-        "version": 1,
-        "disable_existing_loggers": True,
-        "formatters": {
-            "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
-        },
-        "handlers": {
-            "default": {
-                "level": "INFO",
-                "formatter": "standard",
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stdout",
-            },
-        },
-        "loggers": {
-            "": {
-                "level": "INFO",
-                "handlers": [],
-                "propagate": True,
-            },
-            "proxy": {
-                "level": "INFO",
-                "handlers": ["default"],
-                "propagate": False,
-            },
-            "uvicorn.error": {
-                "level": "DEBUG",
-                "handlers": ["default"],
-                "propagate": False,
-            },
-            "uvicorn.access": {
-                "level": "DEBUG",
-                "handlers": ["default"],
-            },
-        },
-    }
-    uvicorn.run(app, host="0.0.0.0", port=8080, log_level="info", log_config=log_cfg)
