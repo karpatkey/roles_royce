@@ -16,7 +16,8 @@ def create_order_and_swap(w3: Web3,
                           amount: int,
                           kind: SwapKind,
                           max_slippage: float,
-                          valid_duration: int = 10 * 60) -> list[Transactable]:
+                          valid_duration: int = 10 * 60,
+                          fork: bool = False) -> list[Transactable]:
     """
     Creates a swap order using the Cow API and returns the sign_order Transactable to execute to sign the order on-chain.
 
@@ -29,6 +30,7 @@ def create_order_and_swap(w3: Web3,
         kind (SwapKind): The kind of the order ("buy" or "sell")
         max_slippage (float): The maximum slippage allowed
         valid_duration (int): The duration the order is valid in seconds
+        fork (bool): When on fork, no API call
 
     Returns:
         list[Transactable]: A list with one single Transactable element.
@@ -62,8 +64,12 @@ def create_order_and_swap(w3: Web3,
         valid_to=order.valid_to,
         order=order)
 
-    if not response_create_order["UID"]:
-        raise ValueError("Order creation failed")
+    if fork:
+        message = "Order not send to API on forked blockchain"
+        print(message)
+    else:
+        if not response_create_order["UID"]:
+            raise ValueError(f"Order creation failed: {response_create_order['error']}")
 
     result = []
     approve_transactable = check_allowance_and_approve(w3=w3,

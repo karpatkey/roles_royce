@@ -181,7 +181,8 @@ def create_order_api(blockchain: Blockchain,
                      kind: SwapKind,
                      amount: int,
                      valid_to: int,
-                     order: Order | None = None) -> dict:
+                     order: Order | None = None,
+                     fork: bool = False) -> dict:
     """
     Creates an order using the Cow API.
 
@@ -216,6 +217,6 @@ def create_order_api(blockchain: Blockchain,
 
     response = requests.post(COW_ORDER_API_URL[blockchain], data=json.dumps(order.get_order_dict()))
     if response.status_code != 201:
-        return {"order": order, "UID": None}
+        return {"order": order, "UID": None, "error": response.text}
     else:
         return {"order": order, "UID": response.json()}
