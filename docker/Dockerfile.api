@@ -1,0 +1,19 @@
+FROM python:3.11-alpine3.19 AS base
+
+WORKDIR /build
+
+# Install Python dependencies and build Python packages in the builder stage
+RUN apk --no-cache add \
+    python3-dev musl-dev gcc git g++ libffi libffi-dev && \
+    python -m pip install hatch
+
+COPY pyproject.toml .
+
+RUN hatch dep show requirements > ./requirements.txt && \
+    python -m pip install -r ./requirements.txt
+
+COPY . .
+
+RUN python -m pip install -e .
+
+ENTRYPOINT ["uvicorn", "roles_royce.applications.execution_app.http_server:app", "--host", "0.0.0.0", "--port", "80"]
