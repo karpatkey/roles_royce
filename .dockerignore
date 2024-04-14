@@ -1,0 +1,8 @@
+.env
+.github
+.pytest_cache
+.venv
+docker
+docs
+__pycache__
+.DS_Store
