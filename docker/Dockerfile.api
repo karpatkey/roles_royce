@@ -1,29 +1,32 @@
 FROM python:3.11-alpine3.19 AS base
 
-RUN apk --no-cache add  git 
-ENV PATH="/opt/venv/bin:$PATH"
-RUN python -m venv /opt/venv
-
 FROM base AS builder
 
 WORKDIR /build
 
 # Install Python dependencies and build Python packages in the builder stage
-RUN apk --no-cache add \
-    python3-dev musl-dev gcc g++ libffi libffi-dev && \
-    python -m pip install hatch
+RUN apk --no-cache add git gcc musl-dev libffi-dev
 
 COPY pyproject.toml .
 
-RUN hatch dep show requirements > ./requirements.txt && \
-    python -m pip install -r ./requirements.txt
-
-FROM base AS runner
+RUN pip install hatch && \
+    pip freeze > ./build-requirements.txt && \
+    hatch dep show requirements > ./requirements.txt && \
+    pip uninstall -y -r ./build-requirements.txt && \
+    pip install -r ./requirements.txt
 
 COPY . .
 
-COPY --from=builder /opt/venv /opt/venv
+RUN pip install -e .
 
-RUN python -m pip install -e .
+FROM base AS runner
+
+WORKDIR /app
+
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /build/pyproject.toml ./pyproject.toml
+COPY --from=builder /build/roles_royce ./roles_royce
+
 
 ENTRYPOINT ["uvicorn", "roles_royce.applications.execution_app.http_server:app", "--host", "0.0.0.0", "--port", "80"]
