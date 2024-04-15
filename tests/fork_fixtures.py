@@ -1,13 +1,12 @@
 import gzip
 import json
 import os
-from functools import wraps
 from pathlib import Path
-from unittest.mock import patch
-
 import pytest
 from eth_account.signers.local import LocalAccount
 from web3._utils.encoding import Web3JsonEncoder
+from web3 import Web3
+from web3.providers.base import BaseProvider
 
 from tests.utils import (
     LocalNode,
@@ -41,43 +40,32 @@ def accounts() -> list[LocalAccount]:
     return TEST_ACCOUNTS
 
 
-def mark_reentrant(func):
-    func._is_running = False
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if func._is_running:
-            return func(*args, **kwargs, reentrant=True)
-        try:
-            func._is_running = True
-
-            return func(*args, **kwargs)
-        finally:
-            func._is_running = False
-
-    return wrapper
-
-
 class RecordMiddleware:
     interactions = []
+    active = False
 
     def __init__(self, make_request, w3):
         self.w3 = w3
         self.make_request = make_request
 
     @classmethod
+    def activate(cls, value: bool):
+        cls.active = value
+
+    @classmethod
     def clear_interactions(cls):
         cls.interactions = []
 
-    @mark_reentrant
     def __call__(self, method, params, reentrant=False):
-        if not reentrant:
-            self.interactions.append({"request": {"method": method, "params": list(params)}})
+        if not self.active:
+            return self.make_request(method, params)
 
+        self.interactions.append({"request": {"method": method, "params": list(params)}})
         response = self.make_request(method, params)
 
-        if not reentrant:
-            self.interactions.append({"response": response})
+        del response["jsonrpc"]
+        del response["id"]
+        self.interactions.append({"response": response})
         return response
 
 
@@ -106,17 +94,25 @@ class ReplayAndAssertMiddleware:
         assert "request" in recorded_request
         assert method == recorded_request["request"]["method"]
 
-        # TODO: some tests do not provide exactly the same params every time
-        # assert list(params) == recorded_request["request"]["params"]
-
         recorded_response = self.interactions.pop()
         assert "response" in recorded_response
+        recorded_response["response"]["jsonrpc"] = "2.0"
+        recorded_response["response"]["id"] = 69
         return recorded_response["response"]
 
 
+class DoNothingWeb3Provider(BaseProvider):
+    def __init__(self, chain_id):
+        self.chain_id = chain_id
+
+    def make_request(self, method, params):
+        if method == "eth_chainId":
+            return {"jsonrpc": "2.0", "id": 1, "result": hex(self.chain_id)}
+
+
 class FakeLocalNode:
-    def __init__(self, origintal_local_node: LocalNode):
-        self.w3 = origintal_local_node.w3
+    def __init__(self, chain_id):
+        self.w3 = Web3(DoNothingWeb3Provider(chain_id))
 
     def reset_state(self):
         pass
@@ -128,11 +124,9 @@ class FakeLocalNode:
         pass
 
 
-def _local_node_replay(local_node, request, chain_name):
+def _local_node_replay(local_node, request, chain_name, chain_id):
     if "record" not in local_node.w3.middleware_onion:
-        local_node.w3.middleware_onion.add(RecordMiddleware, "record")
-    if "replay_and_assert" not in local_node.w3.middleware_onion:
-        local_node.w3.middleware_onion.add(ReplayAndAssertMiddleware, "replay_and_assert")
+        local_node.w3.middleware_onion.inject(RecordMiddleware, "record", layer=0)
 
     test_file_path = Path(request.node.path)
     directory = test_file_path.parent.resolve()
@@ -150,21 +144,28 @@ def _local_node_replay(local_node, request, chain_name):
 
     if mode == "record":
         RecordMiddleware.clear_interactions()
+        RecordMiddleware.activate(True)
         ReplayAndAssertMiddleware.activate(False)
     else:
+        RecordMiddleware.activate(False)
         ReplayAndAssertMiddleware.activate(True)
 
         with gzip.open(web3_test_data_file, mode='rt') as f:
             ReplayAndAssertMiddleware.set_interactions(json.load(f))
 
     if mode == "replay_and_assert":
-        with patch.object(local_node.w3.provider, "make_request", lambda *args: None):
-            yield FakeLocalNode(local_node)
+        fake_local_node = FakeLocalNode(chain_id)
+        fake_local_node.w3.middleware_onion.inject(ReplayAndAssertMiddleware, "replay_and_assert", layer=0)
+        yield fake_local_node
     else:
         yield local_node
 
     ReplayAndAssertMiddleware.activate(False)
+    RecordMiddleware.activate(False)
+
     if mode == "record":
+        # TODO: don't write the file if the test failed
+        # https://docs.pytest.org/en/latest/example/simple.html#making-test-result-information-available-in-fixtures
         data = json.dumps(RecordMiddleware.interactions, indent=2, cls=Web3JsonEncoder)
         with gzip.open(web3_test_data_file, mode='wt') as f:
             f.write(data)
@@ -176,9 +177,9 @@ def local_node_eth_replay(local_node_eth, request) -> LocalNode:
     if marker is not None:
         yield local_node_eth
     else:
-        yield from _local_node_replay(local_node_eth, request, "ethereum")
+        yield from _local_node_replay(local_node_eth, request, "ethereum", chain_id=0x1)
 
 
 @pytest.fixture()
 def local_node_gc_replay(local_node_gc, request) -> LocalNode:
-    yield from _local_node_replay(local_node_gc, request, "gnosis")
+    yield from _local_node_replay(local_node_gc, request, "gnosis", chain_id=0x64)

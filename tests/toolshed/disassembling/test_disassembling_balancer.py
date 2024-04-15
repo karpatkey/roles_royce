@@ -9,7 +9,7 @@ from roles_royce.evm_utils import erc20_abi
 from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
 from roles_royce.toolshed.disassembling import BalancerDisassembler
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import create_simple_safe, fork_unlock_account, steal_token, top_up_address
+from tests.utils import create_simple_safe, steal_token, top_up_address
 from tests.fork_fixtures import accounts
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
@@ -204,7 +204,7 @@ def test_integration_exit_1_2(local_node_eth, accounts):
     private_key = accounts[1].key
     role = 1
 
-    fork_unlock_account(w3, disassembler_address)
+    local_node_eth.unlock_account(disassembler_address)
 
     balancer_disassembler = BalancerDisassembler(
         w3=w3,
@@ -410,7 +410,7 @@ def test_integration_exit_1_3(local_node_eth, accounts):
     emergency = "0xA29F61256e948F3FB707b4b3B138C5cCb9EF9888"
 
     top_up_address(w3, emergency, 100)
-    fork_unlock_account(w3, emergency)
+    local_node_eth.unlock_account(emergency)
 
     balancer_disassembler = BalancerDisassembler(
         w3=w3,

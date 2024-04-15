@@ -111,6 +111,7 @@ def test_claim_withdrawal():
 
 def test_integration(local_node_eth, accounts):
     w3 = local_node_eth.w3
+    local_node_eth.set_block(17565000)
     safe = create_simple_safe(w3, accounts[0])
     safe.send([lido.Deposit(eth_amount=1_000_000)])
     steth_balance = get_balance(w3, ETHAddr.stETH, safe.address)

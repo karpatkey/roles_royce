@@ -4,8 +4,9 @@ from roles_royce import roles
 from roles_royce.protocols.cowswap.methods_swap import create_order_and_swap, swap
 from roles_royce.protocols.cowswap.utils import SwapKind, Order, quote_order_api
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import accounts, create_simple_safe, local_node_eth
-
+from tests.utils import create_simple_safe
+from tests.fork_fixtures import accounts
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 def test_create_order_and_swap(local_node_eth, requests_mock):
     requests_mock.real_http = True

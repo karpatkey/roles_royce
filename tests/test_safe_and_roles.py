@@ -29,6 +29,7 @@ from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 def test_safe_and_roles(local_node_eth):
     w3 = local_node_eth.w3
+    local_node_eth.set_block(17565000)
     ethereum_client = SimpleEthereumClient(w3)
 
     # test accounts are generated using the Mnemonic: "test test test test test test test test test test test junk"
