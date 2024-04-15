@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from defabipedia.lido import ContractSpecs
 from defabipedia.swap_pools import SwapPoolInstances
-from defabipedia.tokens import erc20_contract
+from defabipedia.tokens import erc20_contract, EthereumTokenAddr
 from defabipedia.types import Blockchain, Chain, SwapPools
 from web3 import Web3
 from web3.types import Address
@@ -479,6 +479,40 @@ class DAOStrategiesBuilder:
             print("        Adding: ", lido_position)
             position = copy.deepcopy(lido_template)
             blockchain = Chain.get_blockchain_from_web3(w3)
+            position["position_id"] = lido_position.position_id
+            position["position_id_tech"] = lido_position.position_id_tech()
+            position["position_id_human_readable"] = lido_position.position_id_human_readable(w3)
+
+            protocol_list = []
+            pools_class = SwapPoolInstances[blockchain]
+            bla = ContractSpecs[blockchain].wstETH.address
+            blad = ContractSpecs[blockchain].stETH.address
+            for attr_name in dir(pools_class):
+                attr_value = getattr(pools_class, attr_name)
+                if isinstance(attr_value, SwapPools):
+                    if lido_position.lido_address in attr_value.tokens and EthereumTokenAddr.E in attr_value.tokens:
+                        protocol_list.append(attr_value.protocol)
+            if lido_position.lido_address == ContractSpecs[blockchain].wstETH.address:
+                if "UniswapV3" not in protocol_list:
+                    del position["exec_config"][9]
+                elif "Balancer" not in protocol_list:
+                    del position["exec_config"][8]
+                elif "Curve" not in protocol_list:
+                    del position["exec_config"][7]
+                del position["exec_config"][6]
+                del position["exec_config"][5]
+                del position["exec_config"][4]
+            elif lido_position.lido_address == ContractSpecs[blockchain].stETH.address:
+                del position["exec_config"][9]
+                del position["exec_config"][8]
+                del position["exec_config"][7]
+                if "UniswapV3" not in protocol_list:
+                    del position["exec_config"][6]
+                elif "Balancer" not in protocol_list:
+                    del position["exec_config"][5]
+                elif "Curve" not in protocol_list:
+                    del position["exec_config"][4]
+               
             if lido_position.lido_address == ContractSpecs[blockchain].wstETH.address:
                 if blockchain == Chain.GNOSIS:
                     position["exec_config"] = list(
@@ -494,9 +528,9 @@ class DAOStrategiesBuilder:
                 position["exec_config"] = list(
                     filter(lambda x: x["function_name"] not in ["exit_2", "exit_4"], position["exec_config"])
                 )
-            position["position_id"] = lido_position.position_id
-            position["position_id_tech"] = lido_position.position_id_tech()
-            position["position_id_human_readable"] = lido_position.position_id_human_readable(w3)
+
+
+
             for i in range(len(position["exec_config"])):
                 print(
                     "                Adding: ",

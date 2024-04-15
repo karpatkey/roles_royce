@@ -192,6 +192,11 @@ class LidoDisassembler(Disassembler):
 
         if amount_to_redeem == 0:
             return []
+        
+        if 'anvil' in self.w3.client_version:
+            fork = True
+        else:
+            fork = False
 
         return cowswap.create_order_and_swap(w3=self.w3,
                                              avatar=self.avatar_safe_address,
@@ -200,4 +205,5 @@ class LidoDisassembler(Disassembler):
                                              amount=amount_to_redeem,
                                              kind=cowswap.SwapKind.SELL,
                                              max_slippage=max_slippage,
-                                             valid_duration=20 * 60)
+                                             valid_duration=20 * 60,
+                                             fork=fork)

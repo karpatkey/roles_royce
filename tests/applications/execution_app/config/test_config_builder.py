@@ -11,6 +11,7 @@ from roles_royce.applications.execution_app.config.config_builder import (
     BalancerPosition,
     DAOStrategiesBuilder,
     WalletPosition,
+    LidoPosition
 )
 from tests.utils import local_node_eth, local_node_gc
 
@@ -233,6 +234,145 @@ def test_build_balancer_positions(local_node_gc):
             }
         ]
 
+with open(os.path.join(os.path.dirname(__file__), "test_lido_template.json"), "r") as f:
+    test_data = json.load(f)
+
+test_data_str = json.dumps(test_data)
+
+
+@patch("builtins.open", mock_open(read_data=test_data_str))
+def test_build_lido_positions(local_node_eth):
+    dao = DAO.GnosisDAO
+    blockchain = Chain.ETHEREUM
+
+    lido_position = LidoPosition(position_id="226", lido_address="0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84")
+    w3 = local_node_eth.w3
+    block = 19663216
+    local_node_eth.set_block(block)
+
+    builder = DAOStrategiesBuilder(dao, blockchain, lido=[lido_position])
+    result = builder.build_lido_positions(w3, [lido_position])
+
+    assert result == [{
+    "protocol": "Lido",
+    "position_id": "226",
+    "position_id_tech": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+    "position_id_human_readable": "ethereum_Lido_stETH",
+    "exec_config": [
+      {
+        "function_name": "exit_1",
+        "label": "Unstake stETH",
+        "test": True,
+        "stresstest": False,
+        "stresstest_error": "None",
+        "description": "Unstake stETH for ETH",
+        "parameters": []
+      },
+      {
+        "function_name": "exit_3",
+        "label": "Swap stETH",
+        "test": True,
+        "stresstest": False,
+        "stresstest_error": "None",
+        "description": "Swap stETH for ETH",
+        "parameters": [
+          {
+            "name": "max_slippage",
+            "type": "input",
+            "label": "Max slippage",
+            "rules": {
+              "min": 0.001,
+              "max": 100
+            }
+          }
+        ]
+      },
+      {
+        "function_name": "exit_5",
+        "label": "Exchange Wallet Token on Balancer",
+        "test": True,
+        "stresstest": False,
+        "stresstest_error": "None",
+        "description": "Exchange a wallet token through Balancer",
+        "parameters": [
+          {
+            "name": "token_in_address",
+            "label": "Token in",
+            "type": "input",
+            "options": [
+              {
+                "value": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+                "label": "stETH"
+              }
+            ]
+          },
+          {
+            "name": "max_slippage",
+            "label": "Max slippage",
+            "type": "input",
+            "rules": {
+              "min": 0.001,
+              "max": 100
+            }
+          },
+          {
+            "name": "token_out_address",
+            "label": "Token out",
+            "type": "input",
+            "options": [
+              {
+                "value": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                "label": "ETH"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "function_name": "exit_6",
+        "label": "Exchange Wallet Token on Curve",
+        "test": True,
+        "stresstest": False,
+        "stresstest_error": "None",
+        "description": "Exchange a wallet token through Curve",
+        "parameters": [
+          {
+            "name": "token_in_address",
+            "label": "Token in",
+            "type": "input",
+            "options": [
+              {
+                "value": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+                "label": "stETH"
+              }
+            ]
+          },
+          {
+            "name": "max_slippage",
+            "label": "Max slippage",
+            "type": "input",
+            "rules": {
+              "min": 0.001,
+              "max": 100
+            }
+          },
+          {
+            "name": "token_out_address",
+            "label": "Token out",
+            "type": "input",
+            "options": [
+              {
+                "value": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                "label": "ETH"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
+
 
 with open(os.path.join(os.path.dirname(__file__), "test_swap_pool_template.json"), "r") as f:
     test_data = json.load(f)
@@ -246,6 +386,8 @@ def test_build_swap_pool_positions(local_node_eth):
     blockchain = Chain.ETHEREUM
     wallet_position = WalletPosition(position_id="226", token_in_address="0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84")
     w3 = local_node_eth.w3
+    block = 19663216
+    local_node_eth.set_block(block)
 
     builder = DAOStrategiesBuilder(dao, blockchain, wallet_tokens=[wallet_position])
     result = builder.build_wallet_positions(w3, [wallet_position])
