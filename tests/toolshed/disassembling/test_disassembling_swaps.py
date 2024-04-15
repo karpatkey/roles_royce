@@ -13,7 +13,7 @@ from roles_royce.toolshed.disassembling import SwapDisassembler
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
 from tests.utils import create_simple_safe, steal_token
 from tests.fork_fixtures import accounts
-from tests.fork_fixtures import local_node_eth
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 TEST_ETH_BLOCK = 19590108
 ROLE = 4
