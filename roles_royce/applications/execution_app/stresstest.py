@@ -92,7 +92,10 @@ def single_stresstest(
             bpt_address = gauge_contract.functions.lp_token().call()
             test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"], blockchain=bc)
             if test:
-                raise ValueError("Skip recovery")
+                if exec_config["function_name"] == "exit_2_1":
+                    raise ValueError("Skip non-recovery")
+                else:
+                    raise ValueError("Skip recovery")
 
         elif protocol == "Aura" and (
             exec_config["function_name"] == "exit_2_1" or exec_config["function_name"] == "exit_2_3"
@@ -105,7 +108,10 @@ def single_stresstest(
             bpt_address = aura_rewards_contract.functions.asset().call()
             test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"], blockchain=bc)
             if test:
-                raise ValueError("Skip recovery")
+                if exec_config["function_name"] == "exit_2_1":
+                    raise ValueError("Skip non-recovery")
+                else:
+                    raise ValueError("Skip recovery")
 
         logger.info(f"Exit arguments: {exit_arguments}")
 
