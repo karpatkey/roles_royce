@@ -42,24 +42,16 @@ def accounts() -> list[LocalAccount]:
 
 class RecordMiddleware:
     interactions = []
-    active = False
 
     def __init__(self, make_request, w3):
         self.w3 = w3
         self.make_request = make_request
 
     @classmethod
-    def activate(cls, value: bool):
-        cls.active = value
-
-    @classmethod
     def clear_interactions(cls):
         cls.interactions = []
 
     def __call__(self, method, params, reentrant=False):
-        if not self.active:
-            return self.make_request(method, params)
-
         self.interactions.append({"request": {"method": method, "params": list(params)}})
         response = self.make_request(method, params)
 
@@ -71,11 +63,6 @@ class RecordMiddleware:
 
 class ReplayAndAssertMiddleware:
     interactions = None
-    active = False
-
-    @classmethod
-    def activate(cls, value: bool):
-        cls.active = value
 
     @classmethod
     def set_interactions(cls, interactions: list):
@@ -87,9 +74,6 @@ class ReplayAndAssertMiddleware:
         self.make_request = make_request
 
     def __call__(self, method, params):
-        if not self.active:
-            return self.make_request(method, params)
-
         recorded_request = self.interactions.pop()
         assert "request" in recorded_request
         assert method == recorded_request["request"]["method"]
@@ -110,7 +94,7 @@ class DoNothingWeb3Provider(BaseProvider):
             return {"jsonrpc": "2.0", "id": 1, "result": hex(self.chain_id)}
 
 
-class FakeLocalNode:
+class DoNothingLocalNode:
     def __init__(self, chain_id):
         self.w3 = Web3(DoNothingWeb3Provider(chain_id))
 
@@ -142,26 +126,18 @@ def _local_node_replay(local_node, request, chain_name, chain_id):
     if not web3_test_data_file.parent.exists():
         os.makedirs(web3_test_data_file.parent)
 
-    if mode == "record":
-        RecordMiddleware.clear_interactions()
-        RecordMiddleware.activate(True)
-        ReplayAndAssertMiddleware.activate(False)
-    else:
-        RecordMiddleware.activate(False)
-        ReplayAndAssertMiddleware.activate(True)
-
-        with gzip.open(web3_test_data_file, mode='rt') as f:
-            ReplayAndAssertMiddleware.set_interactions(json.load(f))
+    RecordMiddleware.clear_interactions()
 
     if mode == "replay_and_assert":
-        fake_local_node = FakeLocalNode(chain_id)
+        with gzip.open(web3_test_data_file, mode='rt') as f:
+            ReplayAndAssertMiddleware.set_interactions(json.load(f))
+        fake_local_node = DoNothingLocalNode(chain_id)
         fake_local_node.w3.middleware_onion.inject(ReplayAndAssertMiddleware, "replay_and_assert", layer=0)
         yield fake_local_node
     else:
         yield local_node
 
-    ReplayAndAssertMiddleware.activate(False)
-    RecordMiddleware.activate(False)
+    local_node.w3.middleware_onion.remove("record")
 
     if mode == "record":
         # TODO: don't write the file if the test failed
