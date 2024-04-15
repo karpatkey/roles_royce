@@ -5,8 +5,8 @@ from roles_royce.toolshed.alerting.utils import (
     get_tx_executed_msg,
     get_tx_receipt_message_with_transfers,
 )
-from tests.utils import local_node_eth, local_node_gc, web3_gnosis
-
+from tests.utils import web3_gnosis
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 # FIXME: the following should use local_node_gc instead of web3_gnosis, but for some reason it's not working
 def test_get_token_transfers(local_node_eth, web3_gnosis):

@@ -5,7 +5,9 @@ from defabipedia.types import Chain
 
 from roles_royce.constants import ETHAddr
 from roles_royce.toolshed.disassembling import AuraDisassembler
-from tests.utils import fork_unlock_account, get_balance, local_node_eth, top_up_address
+from tests.utils import get_balance, top_up_address
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
+
 
 # TODO: build an adequate preset to execute the transactions with roles.send
 
@@ -22,8 +24,7 @@ def test_integration_exit_1(local_node_eth):
     disassembler_address = "0xb11ea45e2d787323dFCF50cb52b4B3126b94810d"
     # Role 4 already has the correct preset applied
     role = 4
-
-    fork_unlock_account(w3, disassembler_address)
+    local_node_eth.unlock_account(disassembler_address)
     top_up_address(w3, disassembler_address, 100)
 
     aura_disassembler = AuraDisassembler(
@@ -67,7 +68,7 @@ def test_integration_exit_2_1(local_node_eth):
     # Role 4 already has the correct preset applied at this block
     role = 4
 
-    fork_unlock_account(w3, disassembler_address)
+    local_node_eth.unlock_account(disassembler_address)
     top_up_address(w3, disassembler_address, 100)
 
     aura_disassembler = AuraDisassembler(
@@ -113,7 +114,7 @@ def test_integration_exit_2_2(local_node_eth):
     # Role 4 already has the correct preset applied at this block
     role = 4
 
-    fork_unlock_account(w3, disassembler_address)
+    local_node_eth.unlock_account(disassembler_address)
     top_up_address(w3, disassembler_address, 100)
 
     aura_disassembler = AuraDisassembler(

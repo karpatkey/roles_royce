@@ -3,7 +3,10 @@ from roles_royce import roles
 from roles_royce.protocols.cowswap.contract_methods import SignOrder
 from roles_royce.protocols.cowswap.utils import create_order_api, quote_order_api
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import accounts, create_simple_safe, local_node_eth, fork_unlock_account
+from tests.utils import create_simple_safe
+from tests.fork_fixtures import accounts
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
+
 import json
 
 
@@ -46,7 +49,7 @@ def test_integration_uid_match(local_node_eth, accounts, requests_mock):
 
     avatar_safe_address = '0x58e6c7ab55Aa9012eAccA16d1ED4c15795669E1C'
     disassembler_address = '0x8072470F155c69C0706dd6016D6720D7Eb0438Fb'
-    fork_unlock_account(w3, disassembler_address)
+    local_node_eth.unlock_account(disassembler_address)
     role = 1
 
     sell_token = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
@@ -69,6 +72,7 @@ def test_integration_uid_match(local_node_eth, accounts, requests_mock):
                                         "expiration": "2024-04-10T21:07:34.875627713Z", "id": 481408144,
                                         "verified": False}),
                        status_code=200)
+
     order = quote_order_api(
         blockchain=blockchain,
         sell_token=sell_token,
