@@ -30,9 +30,10 @@ docker run --rm -v $(pwd):/workspace -v $(pwd)/kaniko/.cache:/cache -v $(pwd)/ka
   --destination "$DOCKER_TAG_WITH_HASH" \
   --cache=true \
   --cache-dir=/cache \
-  --cache-repo="$DOCKER_IMAGE_NAME"
+  --cache-copy-layers \
+  --cache-run-layers \
+  --compressed-caching=true \
+  --cache-repo="$DOCKER_IMAGE_NAME" \
+  --insecure --skip-tls-verify-pull
 
-
-  # --cache-dir=/cache \
-  # --insecure --skip-tls-verify-pull
 echo "Image pushed to registry: $DOCKER_TAG"
