@@ -61,6 +61,7 @@ class ENV:
     LOCAL_FORK_PORT: int | None = field(init=False)
     LOCAL_FORK_HOST: str = field(init=False)
 
+    prod_mode_override: bool = field(init=True, default=False)
     local_fork_url: str | None = field(init=True, default=None)
     LOCAL_FORK_URL: str = field(init=False)
 
@@ -122,6 +123,9 @@ class ENV:
 
         # Environment mode: development or production
         self.MODE: Modes = custom_config("ENVIRONMENT", cast=Modes, default=Modes.DEVELOPMENT)
+        if self.prod_mode_override:
+            self.MODE = Modes.PRODUCTION
+
         if self.MODE.lower() not in ["development", "production"]:
             raise ValueError(
                 f"ENVIRONMENT is not valid: {self.MODE}. Options are either 'development' or 'production'."

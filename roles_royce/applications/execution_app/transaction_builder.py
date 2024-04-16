@@ -127,7 +127,7 @@ def build_transaction(
     rpc_url: str | None = None,
 ):
     try:
-        env = ENV(DAO=dao, BLOCKCHAIN=blockchain, local_fork_url=rpc_url)
+        env = ENV(DAO=dao, BLOCKCHAIN=blockchain, local_fork_url=rpc_url, prod_mode_override=not run_check)
 
         return build_transaction_env(
             env,
