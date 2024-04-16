@@ -11,10 +11,10 @@ from defabipedia.types import Chain
 from joblib import Parallel, delayed
 from web3 import Web3
 
-from roles_royce.applications.execution_app.execute import execute_env
-from roles_royce.applications.execution_app.pulley_fork import PulleyFork
-from roles_royce.applications.execution_app.transaction_builder import build_transaction_env
-from roles_royce.applications.execution_app.utils import ENV, recovery_mode_balancer, start_the_engine
+from .execute import execute_env
+from .pulley_fork import PulleyFork
+from .transaction_builder import build_transaction_env
+from .utils import ENV, recovery_mode_balancer, start_the_engine
 
 logging.basicConfig(
     level=logging.INFO,

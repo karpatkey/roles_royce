@@ -6,7 +6,7 @@ from web3 import Web3
 
 from roles_royce.roles_modifier import ROLES_ERRORS, GasStrategies, set_gas_strategy
 
-from utils import ENV, ExecConfig, decode_transaction, gear_up, start_the_engine
+from .utils import ENV, ExecConfig, decode_transaction, gear_up, start_the_engine
 
 
 def transaction_check(dao, blockchain, percentage, protocol, exit_strategy, exit_arguments, rpc_url: str | None = None):
