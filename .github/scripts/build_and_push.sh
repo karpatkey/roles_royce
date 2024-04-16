@@ -31,7 +31,7 @@ DOCKER_TAG_WITH_HASH="${DOCKER_IMAGE_NAME}:${BRANCH_NAME}-${COMMIT_SHA:0:7}"
 # docker push "${DOCKER_TAG}"
 
 docker run --rm -v $(pwd):/workspace \
-  -v /path/to/kaniko/.cache:/cache \ 
+  -v kaniko/.cache:/cache \ 
   -v kaniko/.docker:/kaniko/.docker \ 
   gcr.io/kaniko-project/executor:latest \
   --context "$CONTEXT_DIR" \
