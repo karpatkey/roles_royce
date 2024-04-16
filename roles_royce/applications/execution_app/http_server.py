@@ -34,7 +34,7 @@ async def build(params: BuildParams, response: Response):
         exit_strategy=params.strategy,
         exit_arguments=params.arguments,
         run_check=False,
-        rpc_url=params.rpc_url,
+        # rpc_url=params.rpc_url,
     )
 
     response.status = res["status"]
