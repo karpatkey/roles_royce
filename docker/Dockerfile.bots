@@ -1,5 +1,5 @@
 # Build Stage
-FROM python:3.10-slim-buster AS builder
+FROM python:3.11-alpine3.19 AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -9,22 +9,20 @@ WORKDIR /build
 COPY . .
 
 # Install build dependencies and compile
-RUN apt-get update -qq && apt-get upgrade -qq -y && \
-    apt-get install -qq -y git
+RUN apk --no-cache add git gcc musl-dev libffi-dev bash
 
 # Download safe_pysha3 wheels so there is no need to build them
 RUN git clone --depth=1 https://github.com/sanekto/safe_pysha3_whl.git /tmp/safe_pysha3_whl && \
     pip install --find-links=file:///tmp/safe_pysha3_whl . \
     pip install -r roles_royce/applications/bots_requirements.txt
 
-
 # Final Stage
-FROM python:3.10-slim-buster
+FROM python:3.11-alpine3.19
 
 WORKDIR /app
 
 # Copy the installed code from the build stage
-COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY roles_royce ./roles_royce
 COPY tests tests
@@ -41,4 +39,4 @@ ENV PYTHONPATH=.
 #
 # In doubt check roles_royce/applications/run_bot.sh
 
-CMD ["/app/roles_royce/applications/run_bot.sh"]
+CMD ["/bin/sh", "-c", "/app/roles_royce/applications/run_bot.sh"]
