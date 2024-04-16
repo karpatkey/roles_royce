@@ -19,6 +19,7 @@ COMMIT_SHA=$(git rev-parse HEAD)
 DOCKER_TAG="${DOCKER_IMAGE_NAME}:${BRANCH_NAME}"
 DOCKER_TAG_WITH_HASH="${DOCKER_IMAGE_NAME}:${BRANCH_NAME}-${COMMIT_SHA:0:7}"
 
+docker pull $DOCKER_TAG || true
 docker build  --tag "${DOCKER_TAG}" --tag "${DOCKER_TAG_WITH_HASH}" --file "${DOCKERFILE}" .
 
 echo "$DOCKER_PASSWORD" | docker login $DOCKER_REGISTRY --username "$DOCKER_USERNAME" --password-stdin
