@@ -30,7 +30,7 @@ docker run --rm -v $(pwd):/workspace -v $(pwd)/kaniko/.cache:/cache -v $(pwd)/ka
   --destination "$DOCKER_TAG_WITH_HASH" \
   --cache=true \
   --cache-dir=/cache \
-  --cache-repo="$DOCKER_IMAGE_NAME" \
+  --cache-repo="$DOCKER_IMAGE_NAME"
 
 
   # --cache-dir=/cache \
