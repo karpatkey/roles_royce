@@ -69,7 +69,7 @@ async def sumilate(params: SimulateParams, response: Response):
 
 if __name__ == "__main__":
     
-    HOST = os.environ.get("SERVER_HOST", "127.0.0.1")
+    HOST = os.environ.get("SERVER_HOST", "0.0.0.0")
 
     # TODO: in depth review of the logging config
     log_cfg = {
