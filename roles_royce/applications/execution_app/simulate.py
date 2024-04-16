@@ -1,8 +1,9 @@
 import argparse
 import json
 
-from roles_royce.applications.execution_app.utils import ENV, start_the_engine
 from roles_royce.toolshed.simulation import TenderlyCredentials, simulate_tx
+
+from .utils import ENV, start_the_engine
 
 
 def simulate(dao, blockchain, transaction, rpc_url: str | None = None):

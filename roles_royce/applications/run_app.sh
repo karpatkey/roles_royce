@@ -11,7 +11,10 @@ elif [[ "$APP" == "EURe_rebalancing" ]]; then
 elif [[ "$APP" == "GBPe_rebalancing" ]]; then
   python3 -u "$SCRIPT_DIR/GBPe_rebalancing_bot/GBPe_bot.py"
 elif [[ "$APP" == "execution_app" ]]; then
-  python3 -u "$SCRIPT_DIR/execution_app/http_server.py"
+  uvicorn roles_royce.applications.execution_app.http_server:app \
+    --log-level=info \
+    --host=0.0.0.0 \
+    --port ${PORT:-8080}
 elif [[ "$APP" == "spark_anti_liquidation" ]]; then
   python3 -u "$SCRIPT_DIR/spark_anti_liquidation_bot/spark_anti_liquidation.py"
 else
