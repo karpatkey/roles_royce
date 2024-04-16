@@ -10,6 +10,8 @@ elif [[ "$BOT_NAME" == "EURe_rebalancing" ]]; then
   python3 -u "$SCRIPT_DIR/EURe_rebalancing_bot/EURe_bot.py"
 elif [[ "$BOT_NAME" == "GBPe_rebalancing" ]]; then
   python3 -u "$SCRIPT_DIR/GBPe_rebalancing_bot/GBPe_bot.py"
+elif [[ "$BOT_NAME" == "Execution_http_server" ]]; then
+  python3 -u "$SCRIPT_DIR/execution_app/http_server.py"
 elif [[ "$BOT_NAME" == "spark_anti_liquidation" ]]; then
   python3 -u "$SCRIPT_DIR/spark_anti_liquidation_bot/spark_anti_liquidation.py"
 else
