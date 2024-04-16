@@ -9,8 +9,8 @@ REPO_URL="https://github.com/karpatkey/roles_royce.git"
 # DOCKER_USERNAME="your_docker_username"
 # DOCKER_PASSWORD="your_docker_password"
 
-mkdir -p /kaniko/.docker
-echo "{\"auths\":{\"$DOCKER_REGISTRY\":{\"username\":\"$DOCKER_USERNAME\",\"password\":\"$DOCKER_PASSWORD\"}}}" > ./config.json
+mkdir -p kaniko/.docker
+echo "{\"auths\":{\"$DOCKER_REGISTRY\":{\"username\":\"$DOCKER_USERNAME\",\"password\":\"$DOCKER_PASSWORD\"}}}" > kaniko/.docker/config.json
 
 git clone $REPO_URL repo
 cd repo
@@ -32,7 +32,7 @@ DOCKER_TAG_WITH_HASH="${DOCKER_IMAGE_NAME}:${BRANCH_NAME}-${COMMIT_SHA:0:7}"
 
 docker run --rm -v $(pwd):/workspace \
   -v /path/to/kaniko/.cache:/cache \ 
-  -v /kaniko/.docker:/kaniko/.docker \ 
+  -v kaniko/.docker:/kaniko/.docker \ 
   gcr.io/kaniko-project/executor:latest \
   --context "$CONTEXT_DIR" \
   --dockerfile "$DOCKERFILE" \
