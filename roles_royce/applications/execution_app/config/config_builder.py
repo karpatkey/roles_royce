@@ -122,6 +122,7 @@ class DAO(StrEnum):
     karpatkey = "karpatkey"
     ENS = "ENS"
     BalancerDAO = "BalancerDAO"
+    TestSafeDAO = "TestSafeDAO"
 
     def __str__(self):
         return self.name
