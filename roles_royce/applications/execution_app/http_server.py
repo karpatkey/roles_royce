@@ -68,8 +68,6 @@ async def sumilate(params: SimulateParams, response: Response):
     return res
 
 if __name__ == "__main__":
-    
-    HOST = os.environ.get("SERVER_HOST", "0.0.0.0")
 
     # TODO: in depth review of the logging config
     log_cfg = {
@@ -108,4 +106,4 @@ if __name__ == "__main__":
             },
         },
     }
-    uvicorn.run(app, host=HOST, port=8080, log_level="info", log_config=log_cfg)
+    uvicorn.run(app, host="0.0.0.0", port=8080, log_level="info", log_config=log_cfg)
