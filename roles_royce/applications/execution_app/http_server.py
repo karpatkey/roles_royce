@@ -1,8 +1,6 @@
+import uvicorn
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
-import os
-import uvicorn
-
 from simulate import simulate as simulate_tx
 from transaction_builder import build_transaction, transaction_check
 
@@ -39,7 +37,7 @@ async def build(params: BuildParams, response: Response):
         # rpc_url=params.rpc_url,
     )
 
-    response.status = res["status"]
+    response.status_code = res["status"]
 
     return res
 
@@ -55,7 +53,7 @@ async def check(params: BuildParams, response: Response):
         exit_arguments=params.arguments,
         rpc_url=params.rpc_url,
     )
-    response.status = res["status"]
+    response.status_code = res["status"]
     return res
 
 
@@ -64,8 +62,9 @@ async def sumilate(params: SimulateParams, response: Response):
     res = simulate_tx(
         dao=params.dao, blockchain=params.blockchain, transaction=params.transaction, rpc_url=params.rpc_url
     )
-    response.status = res["status"]
+    response.status_code = res["status"]
     return res
+
 
 if __name__ == "__main__":
 
