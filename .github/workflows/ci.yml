@@ -36,6 +36,7 @@ jobs:
         run: coverage report
 
   docker-bots:
+    if: github.ref == 'refs/heads/main' # Run only for the main branch
     runs-on: self-hosted
     needs: Test
     steps:
