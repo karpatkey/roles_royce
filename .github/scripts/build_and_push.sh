@@ -9,9 +9,6 @@ REPO_URL="https://github.com/karpatkey/roles_royce.git"
 # DOCKER_USERNAME="your_docker_username"
 # DOCKER_PASSWORD="your_docker_password"
 
-mkdir -p kaniko/.docker
-echo "{\"auths\":{\"$DOCKER_REGISTRY\":{\"username\":\"$DOCKER_USERNAME\",\"password\":\"$DOCKER_PASSWORD\"}}}" > kaniko/.docker/config.json
-
 git clone $REPO_URL repo
 cd repo
 git checkout $GIT_REF
@@ -30,6 +27,9 @@ DOCKER_TAG_WITH_HASH="${DOCKER_IMAGE_NAME}:${BRANCH_NAME}-${COMMIT_SHA:0:7}"
 # docker push "${DOCKER_TAG_WITH_HASH}"
 # docker push "${DOCKER_TAG}"
 
+mkdir -p kaniko/.docker
+echo "{\"auths\":{\"$DOCKER_REGISTRY\":{\"username\":\"$DOCKER_USERNAME\",\"password\":\"$DOCKER_PASSWORD\"}}}" > kaniko/.docker/config.json
+
 docker run --rm -v $(pwd):/workspace -v $(pwd)/kaniko/.cache:/cache -v $(pwd)kaniko/.docker:/kaniko/.docker \
   gcr.io/kaniko-project/executor:latest \
   --context . \
@@ -42,4 +42,4 @@ docker run --rm -v $(pwd):/workspace -v $(pwd)/kaniko/.cache:/cache -v $(pwd)kan
   --cache-repo="$DOCKER_IMAGE_NAME" \
   --insecure --skip-tls-verify-pull
 
-echo "Image pushed to registry: $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG"
+echo "Image pushed to registry: $DOCKER_TAG"
