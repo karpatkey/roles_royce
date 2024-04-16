@@ -32,14 +32,14 @@ DOCKER_TAG_WITH_HASH="${DOCKER_IMAGE_NAME}:${BRANCH_NAME}-${COMMIT_SHA:0:7}"
 
 docker run --rm -v $(pwd):/workspace -v $(pwd)/kaniko/.cache:/cache -v $(pwd)kaniko/.docker:/kaniko/.docker \
   gcr.io/kaniko-project/executor:latest \
-  --context "$CONTEXT_DIR" \
+  --context . \
   --dockerfile "$DOCKERFILE" \
-  --destination "$DOCKER_TAG_WITH_HASH" \
   --destination "$DOCKER_TAG" \
+  --destination "$DOCKER_TAG_WITH_HASH" \
   --cache=true \
   --cache-dir=/cache \
-  --cache-repo="$DOCKER_REGISTRY" \
-  --cache-tag="$DOCKER_TAG" \
+  --cache-copy-layers \
+  --cache-repo="$DOCKER_IMAGE_NAME" \
   --insecure --skip-tls-verify-pull
 
 echo "Image pushed to registry: $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG"
