@@ -37,7 +37,7 @@ ENV PYTHONPATH=.
 # * APP=EURe_rebalancing
 # * APP=spark_anti_liquidation
 # * APP=GBPe_rebalancing
-# * APP=Execution_http_server
+# * APP=execution_app
 #
 # In doubt check roles_royce/applications/run_app.sh
 
