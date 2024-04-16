@@ -31,12 +31,13 @@ COPY tests tests
 
 ENV PYTHONPATH=.
 
-
 # To run the specific bot an environment variable BOT_NAME must be defined.
 # Options are:
 # * BOT_NAME=bridge_keeper
 # * BOT_NAME=EURe_rebalancing
 # * BOT_NAME=spark_anti_liquidation
+# * BOT_NAME=GBPe_rebalancing
+# * BOT_NAME=Execution_http_server
 #
 # In doubt check roles_royce/applications/run_bot.sh
 
