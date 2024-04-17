@@ -103,7 +103,7 @@ wallet_tokens_swap = [
         "gnosis": [
             {
                 "token_in": ["0xcB444e90D8198415266c6a2724b7900fb12FC56E",], # EURe
-                "token_out": ["0x0ca1c1ec4ebf3cc67a9f545ff90a3795b318ca4a"  # 3CRV
+                "token_out": ["0x1337BedC9D22ecbe766dF105c9623922A27963EC"  # 3CRV
                 ],  
             },
             {
