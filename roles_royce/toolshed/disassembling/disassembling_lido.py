@@ -233,7 +233,7 @@ class LidoDisassembler(Disassembler):
                                                 role=self.role,
                                                 signer_address=self.signer_address,
                                             )
-        txns = swap_disassembler.exit_2(self, percentage, exit_arguments, amount_to_redeem)
+        txns = swap_disassembler.exit_2(percentage, exit_arguments, amount_to_redeem)
 
         return txns
 
@@ -261,7 +261,7 @@ class LidoDisassembler(Disassembler):
                                         role=self.role,
                                         signer_address=self.signer_address,
                                     )
-        txns = swap_disassembler.exit_3(self, percentage, exit_arguments, amount_to_redeem)
+        txns = swap_disassembler.exit_3(percentage, exit_arguments, amount_to_redeem)
 
         return txns
 
@@ -289,7 +289,7 @@ class LidoDisassembler(Disassembler):
                                         role=self.role,
                                         signer_address=self.signer_address,
                                     )
-        txns = swap_disassembler.exit_4(self, percentage, exit_arguments, amount_to_redeem)
+        txns = swap_disassembler.exit_4(percentage, exit_arguments, amount_to_redeem)
 
         return txns
     
@@ -317,7 +317,7 @@ class LidoDisassembler(Disassembler):
                                         signer_address=self.signer_address,
                                     )
         
-        txns = swap_disassembler.exit_2(self, percentage, exit_arguments, amount_to_redeem)
+        txns = swap_disassembler.exit_2(percentage, exit_arguments, amount_to_redeem)
 
         return txns
     
@@ -345,7 +345,7 @@ class LidoDisassembler(Disassembler):
                                         signer_address=self.signer_address,
                                     )
         
-        txns = swap_disassembler.exit_3(self, percentage, exit_arguments, amount_to_redeem)
+        txns = swap_disassembler.exit_3(percentage, exit_arguments, amount_to_redeem)
 
         return txns
     
@@ -372,6 +372,6 @@ class LidoDisassembler(Disassembler):
                                         role=self.role,
                                         signer_address=self.signer_address,
                                     )
-        txns = swap_disassembler.exit_4(self, percentage, exit_arguments, amount_to_redeem)
+        txns = swap_disassembler.exit_4(percentage, exit_arguments, amount_to_redeem)
 
         return txns
