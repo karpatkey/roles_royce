@@ -590,11 +590,11 @@ class DAOStrategiesBuilder:
 
                             for instance in instances:
                                 if instance["pool"].protocol == "Balancer":
-                                    i = 0
-                                elif instance["pool"].protocol == "Curve":
                                     i = 1
-                                elif instance["pool"].protocol == "UniswapV3":
+                                elif instance["pool"].protocol == "Curve":
                                     i = 2
+                                elif instance["pool"].protocol == "UniswapV3":
+                                    i = 3
                                 if instance["pair"][0] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
                                     token_in_symbol = "ETH"
                                     token_out_contract = erc20_contract(w3, instance["pair"][1])
