@@ -115,7 +115,7 @@ def _local_node_replay(local_node, request, chain_name, chain_id):
     test_file_path = Path(request.node.path)
     directory = test_file_path.parent.resolve()
     test_name = request.node.name
-    filename = f"{test_file_path.name}::{test_name}::{chain_name}.json.gz"
+    filename = f"{test_file_path.name}-{test_name}-{chain_name}.json.gz"
     web3_test_data_file = directory / "test_data" / filename
 
     if os.path.exists(web3_test_data_file):
