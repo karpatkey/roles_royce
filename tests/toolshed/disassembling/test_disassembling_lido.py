@@ -302,7 +302,7 @@ def test_integration_exit_4(local_node_eth, accounts, requests_mock):
                        text='"0x59dadaec2dd2b84fc499cc62cf95b244701685c9f58491f4f0dd60cfdb9305733e83a898fcbe5d4a0d3e886b287a8359034a595266188cb7"',
                        status_code=201)
     w3 = local_node_eth.w3
-    local_node_eth.set_block(19636117)
+    local_node_eth.set_block(19636004)
     set_gas_strategy(GasStrategies.AGGRESIVE)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
