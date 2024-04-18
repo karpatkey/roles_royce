@@ -120,6 +120,10 @@ wallet_tokens_swap = [
                 "token_in": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"], # USDC
                 "token_out": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
                               "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
+            },
+            {
+                "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"], # WSTETH
+                "token_out": ["0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1"], # WETH
             }
         ]
     },
@@ -581,6 +585,28 @@ class DAOStrategiesBuilder:
                             position["position_id_tech"] = wallet_position.position_id_tech()
                             position["position_id_human_readable"] = wallet_position.position_id_human_readable(w3)
 
+                            #add swaps for cowswap
+                            position["exec_config"][0]["parameters"][0]["options"][0]["value"]=token_in_address
+                            del position["exec_config"][0]["parameters"][2]["options"][0]
+                            if token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                                token_in_symbol = "ETH"
+                            else:
+                                token_in_contract = erc20_contract(w3, token_in_address)
+                                token_in_symbol = token_in_contract.functions.symbol().call()
+                            position["exec_config"][0]["parameters"][0]["options"][0]["label"]=token_in_symbol
+                            for token_out in swap_entry["token_out"]:
+                                if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                                    token_out_symbol = "ETH"
+                                else:
+                                    token_out_contract = erc20_contract(w3, token_out)
+                                    token_out_symbol = token_out_contract.functions.symbol().call()
+                                
+                                position["exec_config"][0]["parameters"][2]["options"].append(
+                                    {"value": token_out, "label": token_out_symbol}
+                                )
+                                position["position_id_human_readable"] += f"_to_{token_out_symbol}_in_CowSwap"
+
+                            #add swaps for balancer, curve and uniswapv3
                             token_pairs = []
                             for token_out in swap_entry["token_out"]:
                                 token_pairs.append([token_in_address, token_out])
