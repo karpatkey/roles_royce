@@ -6,6 +6,7 @@ from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address
 from roles_royce.protocols import cowswap
 from roles_royce.protocols.eth import lido
+from roles_royce.toolshed.disassembling.disassembling_swaps import SwapDisassembler
 
 from .disassembler import Disassembler, validate_percentage
 
@@ -207,3 +208,123 @@ class LidoDisassembler(Disassembler):
                                              max_slippage=max_slippage,
                                              valid_duration=20 * 60,
                                              fork=fork)
+    
+    def exit_5(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
+        """Make a swap on Balancer with stETH to ETH
+        Args:
+            percentage (float): Percentage of token to remove.
+            exit_arguments (list[dict], optional): List of dictionaries with the withdrawal parameters.
+                arg_dicts = [
+                    {
+                        "token_in_address: "FillMewithTokenAddress",
+                        "max_slippage": 0.01,
+                        "token_out_address": "FillMewithTokenAddress"
+                    }
+                ]
+            amount_to_redeem (int, optional): Amount of wallet token to redeem. Defaults to None.
+        Returns:
+            list[ Transactable]:  List of transactions to execute.
+        """
+        txns = SwapDisassembler.exit_2(self, percentage, exit_arguments, amount_to_redeem)
+
+        return txns
+
+    def exit_6(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
+        """Make a swap on Curve with stETH to ETH
+        Args:
+            percentage (float): Percentage of token to remove.
+            exit_arguments (list[dict], optional): List of dictionaries with the withdrawal parameters.
+                arg_dicts = [
+                    {
+                        "token_in_address: "FillMewithTokenAddress",
+                        "max_slippage": 0.01,
+                        "token_out_address": "FillMewithTokenAddress"
+                    }
+                ]
+            amount_to_redeem (int, optional): Amount of wallet token to redeem. Defaults to None.
+        Returns:
+            list[ Transactable]:  List of transactions to execute.
+        """
+        txns = SwapDisassembler.exit_3(self, percentage, exit_arguments, amount_to_redeem)
+
+        return txns
+
+    def exit_7(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
+        """Make a swap on UniswapV3 with stETH to ETH
+        Args:
+            percentage (float): Percentage of token to remove.
+            exit_arguments (list[dict], optional): List of dictionaries with the withdrawal parameters.
+                arg_dicts = [
+                    {
+                        "token_in_address: "FillMewithTokenAddress",
+                        "max_slippage": 0.01,
+                        "token_out_address": "FillMewithTokenAddress"
+                    }
+                ]
+            amount_to_redeem (int, optional): Amount of wallet token to redeem. Defaults to None.
+        Returns:
+            list[ Transactable]:  List of transactions to execute.
+        """
+        txns = SwapDisassembler.exit_4(self, percentage, exit_arguments, amount_to_redeem)
+
+        return txns
+    
+    def exit_8(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
+        """Make a swap on Balancer with wstETH to ETH
+        Args:
+            percentage (float): Percentage of token to remove.
+            exit_arguments (list[dict], optional): List of dictionaries with the withdrawal parameters.
+                arg_dicts = [
+                    {
+                        "token_in_address: "FillMewithTokenAddress",
+                        "max_slippage": 0.01,
+                        "token_out_address": "FillMewithTokenAddress"
+                    }
+                ]
+            amount_to_redeem (int, optional): Amount of wallet token to redeem. Defaults to None.
+        Returns:
+            list[ Transactable]:  List of transactions to execute.
+        """
+        txns = SwapDisassembler.exit_2(self, percentage, exit_arguments, amount_to_redeem)
+
+        return txns
+    
+    def exit_9(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
+        """Make a swap on Curve with wsteth to ETH
+        Args:
+            percentage (float): Percentage of token to remove.
+            exit_arguments (list[dict], optional): List of dictionaries with the withdrawal parameters.
+                arg_dicts = [
+                    {
+                        "token_in_address: "FillMewithTokenAddress",
+                        "max_slippage": 0.01,
+                        "token_out_address": "FillMewithTokenAddress"
+                    }
+                ]
+            amount_to_redeem (int, optional): Amount of wallet token to redeem. Defaults to None.
+        Returns:
+            list[ Transactable]:  List of transactions to execute.
+        """
+        txns = SwapDisassembler.exit_3(self, percentage, exit_arguments, amount_to_redeem)
+
+        return txns
+    
+    def exit_10(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
+        """Make a swap on UnsiwapV3 with wstETH to ETH
+        Args:
+            percentage (float): Percentage of token to remove.
+            exit_arguments (list[dict], optional): List of dictionaries with the withdrawal parameters.
+                arg_dicts = [
+                    {
+                        "token_in_address: "FillMewithTokenAddress",
+                        "max_slippage": 0.01,
+                        "token_out_address": "FillMewithTokenAddress"
+                    }
+                ]
+            amount_to_redeem (int, optional): Amount of wallet token to redeem. Defaults to None.
+        Returns:
+            list[ Transactable]:  List of transactions to execute.
+        """
+        txns = SwapDisassembler.exit_4(self, percentage, exit_arguments, amount_to_redeem)
+
+        return txns
