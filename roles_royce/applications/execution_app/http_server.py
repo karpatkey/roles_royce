@@ -8,13 +8,20 @@ app = FastAPI()
 
 
 class BuildParams(BaseModel):
-    rpc_url: str
     dao: str
     blockchain: str
     protocol: str
     percentage: float
     strategy: str
     arguments: list[dict[str, object]]
+
+
+class CheckParams(BaseModel):
+    rpc_url: str
+    dao: str
+    blockchain: str
+    protocol: str
+    tx_transactables: list[object]
 
 
 class SimulateParams(BaseModel):
@@ -34,7 +41,6 @@ async def build(params: BuildParams, response: Response):
         exit_strategy=params.strategy,
         exit_arguments=params.arguments,
         run_check=False,
-        # rpc_url=params.rpc_url,
     )
 
     response.status_code = res["status"]
@@ -43,14 +49,12 @@ async def build(params: BuildParams, response: Response):
 
 
 @app.post("/check")
-async def check(params: BuildParams, response: Response):
+async def check(params: CheckParams, response: Response):
     res = transaction_check(
         dao=params.dao,
         blockchain=params.blockchain,
         protocol=params.protocol,
-        percentage=params.percentage,
-        exit_strategy=params.strategy,
-        exit_arguments=params.arguments,
+        tx_transactables=params.tx_transactables,
         rpc_url=params.rpc_url,
     )
     response.status_code = res["status"]

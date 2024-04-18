@@ -1,5 +1,6 @@
 import argparse
 import json
+import traceback
 
 from roles_royce.toolshed.simulation import TenderlyCredentials, simulate_tx
 
@@ -31,6 +32,8 @@ def simulate(dao, blockchain, transaction, rpc_url: str | None = None):
         }
 
     except Exception as e:
+        print(e)
+        print(traceback.format_exc())
         return {"status": 500, "message": f"Error: {e}"}
 
 
