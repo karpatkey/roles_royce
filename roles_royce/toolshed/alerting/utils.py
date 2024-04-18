@@ -64,7 +64,7 @@ def get_token_amounts_from_transfer_events(
 ) -> (list[dict], str):
     transfers = []
     message = ""
-    for element in tx_receipt.logs:
+    for element in tx_receipt["logs"]:
         address = element["address"]
         event = erc20_event_log_decoder.decode_log(element)
         if not event:
@@ -106,16 +106,16 @@ ExplorerTxUrls = {Chain.ETHEREUM: "https://etherscan.io/tx/", Chain.GNOSIS: "htt
 
 
 def get_tx_link(tx_receipt: TxReceipt, chain: Blockchain) -> str:
-    return f"{ExplorerTxUrls[chain]}{tx_receipt.transactionHash.hex()}"
+    return f"{ExplorerTxUrls[chain]}{tx_receipt['transactionHash'].hex()}"
 
 
 def get_tx_executed_msg(tx_receipt: TxReceipt, chain: Blockchain) -> (str, str):
     tx_link = get_tx_link(tx_receipt, chain)
-    if tx_receipt.status == 1:
-        message_slack = f"  *Txn hash (Success):* <{tx_link}|{tx_receipt.transactionHash.hex()}>."
+    if tx_receipt["status"] == 1:
+        message_slack = f"  *Txn hash (Success):* <{tx_link}|{tx_receipt['transactionHash'].hex()}>."
         message = f"  Txn hash (Success): {tx_link}."
     else:
-        message_slack = f"  *Txn hash (Failure):* <{tx_link}|{tx_receipt.transactionHash.hex()}>."
+        message_slack = f"  *Txn hash (Failure):* <{tx_link}|{tx_receipt['transactionHash'].hex()}>."
         message = f"  Txn hash (Failure): {tx_link}."
 
     return message, message_slack

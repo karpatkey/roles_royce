@@ -103,9 +103,24 @@ wallet_tokens_swap = [
         "gnosis": [
             {
                 "token_in": ["0xcB444e90D8198415266c6a2724b7900fb12FC56E",], # EURe
-                "token_out": ["0x0ca1c1ec4ebf3cc67a9f545ff90a3795b318ca4a"  # 3CRV
+                "token_out": ["0x1337BedC9D22ecbe766dF105c9623922A27963EC"  # 3CRV
                 ],  
             },
+            {
+                "token_in": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6"], # USDT
+                "token_out": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", # USDC
+                              "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
+            },
+            {
+                "token_in": ["0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
+                "token_out": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
+                              "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"], # USDC
+            },
+            {
+                "token_in": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"], # USDC
+                "token_out": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
+                              "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
+            }
         ]
     },
 ]
@@ -122,6 +137,7 @@ class DAO(StrEnum):
     karpatkey = "karpatkey"
     ENS = "ENS"
     BalancerDAO = "BalancerDAO"
+    TestSafeDAO = "TestSafeDAO"
 
     def __str__(self):
         return self.name

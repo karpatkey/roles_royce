@@ -1,6 +1,5 @@
 from roles_royce.protocols import balancer
-
-from ...utils import local_node_eth
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 # --------------------------------------------------------------------------------------------------------------------
 # Staking and unstaking in gauge

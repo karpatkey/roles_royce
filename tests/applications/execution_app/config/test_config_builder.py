@@ -13,7 +13,7 @@ from roles_royce.applications.execution_app.config.config_builder import (
     WalletPosition,
     LidoPosition
 )
-from tests.utils import local_node_eth, local_node_gc
+from tests.fork_fixtures import local_node_eth, local_node_gc
 
 # Load the contents of your test JSON file
 with open(os.path.join(os.path.dirname(__file__), "test_aura_template.json"), "r") as f:

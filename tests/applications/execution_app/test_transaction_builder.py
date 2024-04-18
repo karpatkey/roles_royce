@@ -2,7 +2,8 @@ import pytest
 
 from roles_royce.applications.execution_app.transaction_builder import build_transaction
 from roles_royce.applications.execution_app.utils import ENV, ExecConfig
-from tests.utils import accounts, assign_role, local_node_eth
+from tests.utils import assign_role
+from tests.fork_fixtures import local_node_eth, accounts
 
 dao = "GnosisDAO"
 blockchain = "ETHEREUM"

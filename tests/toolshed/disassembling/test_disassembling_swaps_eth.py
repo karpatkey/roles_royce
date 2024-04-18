@@ -1,17 +1,13 @@
-import json
-
-import pytest
-import requests
 from defabipedia.rocket_pool import ContractSpecs
 from defabipedia.swap_pools import EthereumSwapPools
 from defabipedia.tokens import Abis
 from defabipedia.types import Chain
 
-from roles_royce.protocols.eth import lido
-from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
 from roles_royce.toolshed.disassembling import SwapDisassembler
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import accounts, create_simple_safe, local_node_eth, steal_token
+from tests.utils import create_simple_safe
+from tests.fork_fixtures import accounts
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 ROLE = 4
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"

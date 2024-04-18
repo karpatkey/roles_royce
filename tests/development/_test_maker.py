@@ -8,13 +8,13 @@ from roles_royce.utils import to_checksum_address
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
 from tests.utils import (
     LOCAL_NODE_PORT,
-    accounts,
     create_simple_safe,
     gen_test_accounts,
     get_balance,
     local_node,
     steal_token,
 )
+from tests.fork_fixtures import accounts
 
 wstETH_JOIN = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH
 ABI_GEM_JOIN = '[{"constant":true,"inputs":[],"name":"gem","outputs":[{"internalType":"contract GemLike_3","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"ilk","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"}]'

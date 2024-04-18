@@ -7,7 +7,7 @@ from roles_royce.toolshed.simulation import (
     tenderly_simulate,
 )
 
-from .utils import local_node_eth
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 API_URL = "https://api.tenderly.co/api/v1/"
 
