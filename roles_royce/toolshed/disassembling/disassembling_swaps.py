@@ -112,38 +112,35 @@ class SwapDisassembler(Disassembler):
         Returns:
             list[ Transactable]:  List of transactions to execute.
         """
-        for element in exit_arguments:
-            max_slippage = element["max_slippage"] / 100
-            token_in = element["token_in_address"]
-            token_out = element["token_out_address"]
-            fraction = validate_percentage(percentage)
 
-            if amount_to_redeem is None:
-                amount_to_redeem = self.get_amount_to_redeem(token_in, fraction)
+        max_slippage = exit_arguments[0]["max_slippage"] / 100
+        token_in = exit_arguments[0]["token_in_address"]
+        token_out = exit_arguments[0]["token_out_address"]
+        fraction = validate_percentage(percentage)
 
-            txns = []
+        if amount_to_redeem is None:
+            amount_to_redeem = self.get_amount_to_redeem(token_in, fraction)
 
-            if amount_to_redeem == 0:
-                return []
-            
-            if 'anvil' in self.w3.client_version:
-                fork = True
-            else:
-                fork = False
+        txns = []
 
-            cower = cowswap.create_order_and_swap(w3=self.w3,
-                                                avatar=self.avatar_safe_address,
-                                                sell_token=token_in,
-                                                buy_token=token_out,
-                                                amount=amount_to_redeem,
-                                                kind=cowswap.SwapKind.SELL,
-                                                max_slippage=max_slippage,
-                                                valid_duration=20 * 60,
-                                                fork=fork)
-            
-            txns.append(cower)
-            return txns
-            
+        if amount_to_redeem == 0:
+            return []
+        
+        if 'anvil' in self.w3.client_version:
+            fork = True
+        else:
+            fork = False
+
+        return cowswap.create_order_and_swap(w3=self.w3,
+                                            avatar=self.avatar_safe_address,
+                                            sell_token=token_in,
+                                            buy_token=token_out,
+                                            amount=amount_to_redeem,
+                                            kind=cowswap.SwapKind.SELL,
+                                            max_slippage=max_slippage,
+                                            valid_duration=20 * 60,
+                                            fork=fork)
+        
     
     def exit_2(
         self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None

@@ -225,7 +225,15 @@ class LidoDisassembler(Disassembler):
         Returns:
             list[ Transactable]:  List of transactions to execute.
         """
-        txns = SwapDisassembler.exit_2(self, percentage, exit_arguments, amount_to_redeem)
+
+        swap_disassembler = SwapDisassembler(
+                                                w3=self.w3,
+                                                avatar_safe_address=self.avatar_safe_address,
+                                                roles_mod_address=self.roles_mod_address,
+                                                role=self.role,
+                                                signer_address=self.signer_address,
+                                            )
+        txns = swap_disassembler.exit_2(self, percentage, exit_arguments, amount_to_redeem)
 
         return txns
 
@@ -245,7 +253,15 @@ class LidoDisassembler(Disassembler):
         Returns:
             list[ Transactable]:  List of transactions to execute.
         """
-        txns = SwapDisassembler.exit_3(self, percentage, exit_arguments, amount_to_redeem)
+
+        swap_disassembler = SwapDisassembler(
+                                        w3=self.w3,
+                                        avatar_safe_address=self.avatar_safe_address,
+                                        roles_mod_address=self.roles_mod_address,
+                                        role=self.role,
+                                        signer_address=self.signer_address,
+                                    )
+        txns = swap_disassembler.exit_3(self, percentage, exit_arguments, amount_to_redeem)
 
         return txns
 
@@ -265,7 +281,15 @@ class LidoDisassembler(Disassembler):
         Returns:
             list[ Transactable]:  List of transactions to execute.
         """
-        txns = SwapDisassembler.exit_4(self, percentage, exit_arguments, amount_to_redeem)
+
+        swap_disassembler = SwapDisassembler(
+                                        w3=self.w3,
+                                        avatar_safe_address=self.avatar_safe_address,
+                                        roles_mod_address=self.roles_mod_address,
+                                        role=self.role,
+                                        signer_address=self.signer_address,
+                                    )
+        txns = swap_disassembler.exit_4(self, percentage, exit_arguments, amount_to_redeem)
 
         return txns
     
@@ -285,7 +309,15 @@ class LidoDisassembler(Disassembler):
         Returns:
             list[ Transactable]:  List of transactions to execute.
         """
-        txns = SwapDisassembler.exit_2(self, percentage, exit_arguments, amount_to_redeem)
+        swap_disassembler = SwapDisassembler(
+                                        w3=self.w3,
+                                        avatar_safe_address=self.avatar_safe_address,
+                                        roles_mod_address=self.roles_mod_address,
+                                        role=self.role,
+                                        signer_address=self.signer_address,
+                                    )
+        
+        txns = swap_disassembler.exit_2(self, percentage, exit_arguments, amount_to_redeem)
 
         return txns
     
@@ -305,7 +337,15 @@ class LidoDisassembler(Disassembler):
         Returns:
             list[ Transactable]:  List of transactions to execute.
         """
-        txns = SwapDisassembler.exit_3(self, percentage, exit_arguments, amount_to_redeem)
+        swap_disassembler = SwapDisassembler(
+                                        w3=self.w3,
+                                        avatar_safe_address=self.avatar_safe_address,
+                                        roles_mod_address=self.roles_mod_address,
+                                        role=self.role,
+                                        signer_address=self.signer_address,
+                                    )
+        
+        txns = swap_disassembler.exit_3(self, percentage, exit_arguments, amount_to_redeem)
 
         return txns
     
@@ -325,6 +365,13 @@ class LidoDisassembler(Disassembler):
         Returns:
             list[ Transactable]:  List of transactions to execute.
         """
-        txns = SwapDisassembler.exit_4(self, percentage, exit_arguments, amount_to_redeem)
+        swap_disassembler = SwapDisassembler(
+                                        w3=self.w3,
+                                        avatar_safe_address=self.avatar_safe_address,
+                                        roles_mod_address=self.roles_mod_address,
+                                        role=self.role,
+                                        signer_address=self.signer_address,
+                                    )
+        txns = swap_disassembler.exit_4(self, percentage, exit_arguments, amount_to_redeem)
 
         return txns
