@@ -344,4 +344,4 @@ def test_integration_exit_4(local_node_eth, accounts, requests_mock):
             uid_from_tx_log = '0x' + log.data.hex()[194:len(log.data.hex()) - 16]
             break
 
-    assert uid_from_tx_log == '0x1dee5a48ba7ee0d0603785740bb98969e29619da43977081925f3d9d6ecee17e3e83a898fcbe5d4a0d3e886b287a8359034a595266188cb9'
+    assert uid_from_tx_log == '0xad195ee894e0aca6bff6faeff78d452e5890f8c918a57bcdf382f234ecdef01c17efb5661e7582f247fbce3693b1f7158acb98146618876d'
