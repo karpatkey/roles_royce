@@ -98,7 +98,7 @@ def test_integration_exit_1(local_node_eth, accounts):
     weth_balance = weth_contract.functions.balanceOf(avatar_safe_address).call()
     assert weth_balance == 0
 
-    txn_transactable = swap_balancer_disassembler.exit_1(
+    txn_transactable = swap_balancer_disassembler.exit_2(
         percentage=50,
         exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
         amount_to_redeem=amount_in,
@@ -189,7 +189,7 @@ def test_integration_exit_2(local_node_eth, accounts):
     steth_balance = steth_contract.functions.balanceOf(avatar_safe_address).call()
     assert steth_balance == 0
 
-    txn_transactable = swap_curve_disassembler.exit_2(
+    txn_transactable = swap_curve_disassembler.exit_3(
         percentage=50,
         exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
         amount_to_redeem=amount_in
@@ -330,7 +330,7 @@ def test_integration_exit_3(local_node_eth, accounts):
     wsteth_balance = wsteth_contract.functions.balanceOf(avatar_safe_address).call()
     assert wsteth_balance == 0
 
-    txn_transactable = swap_uniswapv3_disassembler.exit_3(
+    txn_transactable = swap_uniswapv3_disassembler.exit_4(
         percentage=50,
         exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
         amount_to_redeem=amount_in
