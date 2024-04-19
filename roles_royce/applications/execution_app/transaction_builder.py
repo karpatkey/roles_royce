@@ -75,7 +75,6 @@ def build_transaction_env(
                 "tx_data": {
                     "transaction": tx,
                     "decoded_transaction": decoded_transaction,
-                    "transactables": txn_transactables,
                 },
             }
         else:
