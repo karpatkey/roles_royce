@@ -64,12 +64,8 @@ def create_order_and_swap(w3: Web3,
         valid_to=order.valid_to,
         order=order)
 
-    if fork:
-        message = "Order not send to API on forked blockchain"
-        print(message)
-    else:
-        if not response_create_order["UID"]:
-            raise ValueError(f"Order creation failed: {response_create_order['error']}")
+    if not fork and not response_create_order["UID"]:
+        raise ValueError(f"Order creation failed: {response_create_order['error']}")
 
     result = []
     approve_transactable = check_allowance_and_approve(w3=w3,
