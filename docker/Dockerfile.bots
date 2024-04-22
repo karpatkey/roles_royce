@@ -10,7 +10,7 @@ WORKDIR /build
 # Install build dependencies and compile
 RUN apk --no-cache add git gcc musl-dev libffi-dev bash
 
-COPY requirements.txt .
+COPY roles_royce/applications/requirements.txt .
 COPY pyproject.toml .
 
 RUN pip install -r requirements.txt
