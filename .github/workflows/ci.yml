@@ -7,10 +7,13 @@ env:
   DOCKER_REGISTRY: ${{ secrets.DOCKER_URL }}
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  ETH: http://knode-proxy.knode-proxy.svc/chain/ethereum?key=ci-test
+  GNOSIS: http://knode-proxy.knode-proxy.svc/chain/gnosis?key=ci-test
+
 
 jobs:
   Test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v3
@@ -30,8 +33,10 @@ jobs:
           pip install -r requirements-dev.txt
       - name: Try anvil
         run: anvil --version
+      # - name: Run tests
+      #   run: RR_ETH_FORK_URL=${{ secrets.NODE_ETH }} RR_GC_FORK_URL=${{ secrets.NODE_XDAI }} RR_RUN_LOCAL_NODE=1 pytest -v --cov --durations=10
       - name: Run tests
-        run: RR_ETH_FORK_URL=${{ secrets.NODE_ETH }} RR_GC_FORK_URL=${{ secrets.NODE_XDAI }} RR_RUN_LOCAL_NODE=1 pytest -v --cov --durations=10
+        run: RR_ETH_FORK_URL=$ETH RR_GC_FORK_URL=$GNOSIS RR_RUN_LOCAL_NODE=1 pytest -v --cov --durations=10
       - name: Coverage report
         run: coverage report
 
