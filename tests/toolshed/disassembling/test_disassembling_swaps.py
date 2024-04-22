@@ -11,12 +11,15 @@ from roles_royce.protocols.eth import lido
 from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
 from roles_royce.toolshed.disassembling import SwapDisassembler
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import accounts, create_simple_safe, local_node_eth, steal_token
+from tests.utils import create_simple_safe, steal_token
+from tests.fork_fixtures import accounts
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 TEST_ETH_BLOCK = 19590108
 ROLE = 4
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
 ROLES_MOD = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
+BLOCK = 19620486
 
 presets_balancer = """{
   "version": "1.0",
@@ -51,12 +54,13 @@ presets_balancer = """{
 ]
 }"""
 
-# TODO: add tests for exit strategies
+@pytest.mark.skip(reason="Cowswap Signer is tested in test_disassembling_lido tests 3 and 4")
+def test_integration_exit_1():
+    pass
 
-
-def test_integration_exit_1(local_node_eth, accounts):
+def test_integration_exit_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    local_node_eth.set_block(TEST_ETH_BLOCK)
+    local_node_eth.set_block(BLOCK)
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -103,7 +107,7 @@ def test_integration_exit_1(local_node_eth, accounts):
     weth_balance = weth_contract.functions.balanceOf(avatar_safe_address).call()
     assert weth_balance == 0
 
-    txn_transactable = swap_balancer_disassembler.exit_1(
+    txn_transactable = swap_balancer_disassembler.exit_2(
         percentage=50,
         exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
     )
@@ -151,9 +155,9 @@ presets_curve = """{
 # TODO: add tests for exit strategies
 
 
-def test_integration_exit_2(local_node_eth, accounts):
+def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    local_node_eth.set_block(TEST_ETH_BLOCK)
+    local_node_eth.set_block(BLOCK)
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -200,7 +204,7 @@ def test_integration_exit_2(local_node_eth, accounts):
     usdc_balance = usdc_contract.functions.balanceOf(avatar_safe_address).call()
     assert usdc_balance == 0
 
-    txn_transactable = swap_curve_disassembler.exit_2(
+    txn_transactable = swap_curve_disassembler.exit_3(
         percentage=50,
         exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
     )
@@ -278,11 +282,9 @@ preset_uniswapv3_v2 = """{
 }"""
 
 
-# TODO: add tests for exit strategies
-#@pytest.mark.skip(reason="Test is not implemented")
-def test_integration_exit_3(local_node_eth, accounts):
+def test_integration_exit_4(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    local_node_eth.set_block(TEST_ETH_BLOCK)
+    local_node_eth.set_block(BLOCK)
 
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
@@ -329,7 +331,7 @@ def test_integration_exit_3(local_node_eth, accounts):
     usdc_balance = usdc_contract.functions.balanceOf(avatar_safe_address).call()
     assert usdc_balance == 0
 
-    txn_transactable = swap_uniswapv3_disassembler.exit_3(
+    txn_transactable = swap_uniswapv3_disassembler.exit_4(
         percentage=50,
         exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
     )

@@ -2,7 +2,9 @@ from decimal import Decimal
 
 from roles_royce.applications.EURe_rebalancing_bot.swaps import Swapper, SwapsData, SwapsDataManager
 from roles_royce.evm_utils import erc20_abi
-from tests.utils import accounts, assign_role, local_node_gc
+from tests.utils import assign_role
+from tests.fork_fixtures import accounts
+from tests.fork_fixtures import local_node_gc_replay as local_node_gc
 
 
 def test_swaps_data():
@@ -87,7 +89,7 @@ def test_integration_swaps(local_node_gc, accounts):
     assert balance_EURe_1 == 155137225438047710385402
 
     tx_receipt_EURe_to_WXDAI = swapper.swap_WXDAI_for_EURe(data)
-    assert tx_receipt_EURe_to_WXDAI.status == 1
+    assert tx_receipt_EURe_to_WXDAI["status"] == 1
 
     data = swaps_data_manager.get_data(amount_WXDAI, amount_EURe)
     balance_WXDAI_2 = contract_WXDAI.functions.balanceOf(avatar_safe_address).call()
@@ -99,7 +101,7 @@ def test_integration_swaps(local_node_gc, accounts):
     assert balance_EURe_2 == 183430354569876169864074
 
     tx_receipt_EURe_to_WXDAI = swapper.swap_EURe_for_WXDAI(data)
-    assert tx_receipt_EURe_to_WXDAI.status == 1
+    assert tx_receipt_EURe_to_WXDAI["status"] == 1
 
     data = swaps_data_manager.get_data(amount_WXDAI, amount_EURe)
     balance_WXDAI_3 = contract_WXDAI.functions.balanceOf(avatar_safe_address).call()

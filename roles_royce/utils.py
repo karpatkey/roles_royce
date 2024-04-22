@@ -53,7 +53,7 @@ class MultiSendOffline(MultiSend):
 
 def _make_multisend(txs: List[Transactable], blockchain: Blockchain) -> tuple:
     multisend_address = MULTISENDS.get(blockchain)
-    transactions = [MultiSendTx(MultiSendOperation.CALL, tx.contract_address, tx.value, tx.data) for tx in txs]
+    transactions = [MultiSendTx(tx.operation, tx.contract_address, tx.value, tx.data) for tx in txs]
     data = MultiSendOffline(
         address=multisend_address,
         chain_id=blockchain.chain_id,

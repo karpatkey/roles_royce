@@ -79,6 +79,7 @@ class ENV:
             "karpatkey",
             "ENS",
             "BalancerDAO",
+            "TestSafeDAO"
         ]:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
         if self.BLOCKCHAIN.lower() not in ["mainnet", "ethereum", "gnosis"]:
