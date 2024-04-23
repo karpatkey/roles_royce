@@ -96,8 +96,6 @@ class RequestWithdrawalsStETH(ContractMethod):
         self.args.amounts = amounts
 
 
-# TODO: the amounts is a list, because it has a max of 1000 stETH per element, should built that in
-
 
 class RequestWithdrawalsWithPermitStETH(ContractMethod):
     """Sender requests a claim on his ETH from wstETH.
@@ -120,13 +118,20 @@ class RequestWithdrawalsWithPermitStETH(ContractMethod):
         self.args.amounts = amounts
 
 
-class RequestWithdrawalsWstETH(RequestWithdrawalsStETH):
+class RequestWithdrawalsWstETH(ContractMethod):
     """Transfers the wstETH to the unstETH to be burned in exchange for stETH
 
     Then it locks your stETH in the queue. In exchange, you receive an NFT that represents your position in the queue
     """
 
     name = "requestWithdrawalsWstETH"
+    in_signature = [("amounts", "uint256[]"), ("owner", "address")]
+    fixed_arguments = {"owner": AvatarAddress}
+    target_address = ETHAddr.unstETH
+
+    def __init__(self, amounts: list, avatar: Address):
+        super().__init__(avatar=avatar)
+        self.args.amounts = amounts
 
 
 class RequestWithdrawalsWithPermitWstETH(RequestWithdrawalsWithPermitStETH):

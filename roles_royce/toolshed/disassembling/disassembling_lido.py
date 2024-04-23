@@ -100,13 +100,14 @@ class LidoDisassembler(Disassembler):
 
         if amount_to_redeem is None:
             amount_to_redeem = self.get_amount_to_redeem(address, fraction)
-
+        contract = ContractSpecs[self.blockchain].wstETH.contract(self.w3)
+        amount_for_list = contract.functions.getWstETHByStETH(1_000_000_000_000_000_000_000).call() #just to be safe that the chunk size is too big
         chunk_amount = amount_to_redeem
-        if chunk_amount > 1000_000_000_000_000_000_000:
+        if chunk_amount > amount_for_list:
             chunks = []
-            while chunk_amount >= 1000_000_000_000_000_000_000:
-                chunks.append(1000_000_000_000_000_000_000)
-                chunk_amount -= 1000_000_000_000_000_000_000
+            while chunk_amount >= amount_for_list:
+                chunks.append(amount_for_list)
+                chunk_amount -= amount_for_list
             if chunk_amount > 0:
                 chunks.append(chunk_amount)
 
