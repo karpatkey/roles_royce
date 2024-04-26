@@ -1,17 +1,21 @@
 import json
 from types import SimpleNamespace
-from roles_royce.roles_modifier import Operation
+
 from web3 import Web3
 
+from roles_royce.roles_modifier import Operation
 
 Address = str
+
 
 class SimpleRepr(type):
     def __repr__(cls):
         return cls.__name__
 
+
 class AvatarAddress(metaclass=SimpleRepr):
     pass
+
 
 class InvalidArgument(Exception):
     pass
@@ -39,7 +43,7 @@ class ContractMethod:
     #: Provide fixed defaults to some function attributes.
     fixed_arguments = dict()
 
-    def __init__(self, value: int = 0, avatar: None | str = None):
+    def __init__(self, value: int = 0, avatar: None | AvatarAddress = None):
         """
         Args:
             value: The value of the tx, eg: amount of Wei in mainnet, xDai Weis in GC.
@@ -106,10 +110,11 @@ class ContractMethod:
     def _abi_for(self, element):
         name, _type = element
         if type(_type) in (list, tuple):
-            value = {"name": name,
-                     "type": _type[1],  # tuple or tuple[]
-                     "components": [self._abi_for(e) for e in _type[0]]
-                     }
+            value = {
+                "name": name,
+                "type": _type[1],  # tuple or tuple[]
+                "components": [self._abi_for(e) for e in _type[0]],
+            }
         else:
             value = {"name": name, "type": _type}
         return value
@@ -125,10 +130,11 @@ class ContractMethod:
 
 
 class BaseApprove(ContractMethod):
-    """Inherit from this class to define an approval that the token is fixed.
+    """Inherit from this class to define an approval where the token is fixed.
 
     Specify the token using the token class attribute
     """
+
     name = "approve"
     in_signature = [("spender", "address"), ("amount", "uint256")]
     token = None
@@ -151,3 +157,11 @@ class BaseApproveForToken(BaseApprove):
     def __init__(self, token: Address, amount: int):
         self.token = token
         super().__init__(amount)
+
+
+class ApproveForToken(BaseApproveForToken):
+    """Approve a token for a specific spender."""
+    def __init__(self, token: Address, spender: Address, amount: int):
+        self.token = token
+        self.fixed_arguments = {"spender": spender}
+        super().__init__(token, amount)

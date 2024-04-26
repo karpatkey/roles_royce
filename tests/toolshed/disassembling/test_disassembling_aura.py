@@ -1,12 +1,16 @@
-from roles_royce.constants import ETHAddr
-from tests.utils import local_node_eth, get_balance, top_up_address, fork_unlock_account
-from roles_royce.toolshed.disassembling import AuraDisassembler
+from decimal import Decimal
+
 from defabipedia.aura import Abis
 from defabipedia.types import Chain
-from decimal import Decimal
+
+from roles_royce.constants import ETHAddr
+from roles_royce.toolshed.disassembling import AuraDisassembler
+from tests.utils import get_balance, top_up_address
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 
 # TODO: build an adequate preset to execute the transactions with roles.send
+
 
 def test_integration_exit_1(local_node_eth):
     w3 = local_node_eth.w3
@@ -20,27 +24,30 @@ def test_integration_exit_1(local_node_eth):
     disassembler_address = "0xb11ea45e2d787323dFCF50cb52b4B3126b94810d"
     # Role 4 already has the correct preset applied
     role = 4
-
-    fork_unlock_account(w3, disassembler_address)
+    local_node_eth.unlock_account(disassembler_address)
     top_up_address(w3, disassembler_address, 100)
 
-    aura_disassembler = AuraDisassembler(w3=w3,
-                                         avatar_safe_address=avatar_safe_address,
-                                         roles_mod_address=roles_mod_address,
-                                         role=role,
-                                         signer_address=disassembler_address)
+    aura_disassembler = AuraDisassembler(
+        w3=w3,
+        avatar_safe_address=avatar_safe_address,
+        roles_mod_address=roles_mod_address,
+        role=role,
+        signer_address=disassembler_address,
+    )
 
     rETH_WETH_aura_rewards_address = "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
 
     # Initial data
-    aura_rewards_contract = w3.eth.contract(address=rETH_WETH_aura_rewards_address,
-                                            abi=Abis[blockchain].BaseRewardPool.abi)
+    aura_rewards_contract = w3.eth.contract(
+        address=rETH_WETH_aura_rewards_address, abi=Abis[blockchain].BaseRewardPool.abi
+    )
 
     aura_token_balance = aura_rewards_contract.functions.balanceOf(avatar_safe_address).call()
     assert aura_token_balance == 1503886609846287458132
 
-    txn_transactable = aura_disassembler.exit_1(percentage=50,
-                                                exit_arguments=[{"rewards_address": rETH_WETH_aura_rewards_address}])
+    txn_transactable = aura_disassembler.exit_1(
+        percentage=50, exit_arguments=[{"rewards_address": rETH_WETH_aura_rewards_address}]
+    )
     # Since we don't have the private key of the disassembler, we need to build the transaction and send it "manually"
     txn = aura_disassembler.build(txn_transactable, from_address=disassembler_address)
     w3.eth.send_transaction(txn)
@@ -61,21 +68,22 @@ def test_integration_exit_2_1(local_node_eth):
     # Role 4 already has the correct preset applied at this block
     role = 4
 
-    fork_unlock_account(w3, disassembler_address)
+    local_node_eth.unlock_account(disassembler_address)
     top_up_address(w3, disassembler_address, 100)
 
-    aura_disassembler = AuraDisassembler(w3=w3,
-                                         avatar_safe_address=avatar_safe_address,
-                                         roles_mod_address=roles_mod_address,
-                                         role=role,
-                                         signer_address=disassembler_address)
+    aura_disassembler = AuraDisassembler(
+        w3=w3,
+        avatar_safe_address=avatar_safe_address,
+        roles_mod_address=roles_mod_address,
+        role=role,
+        signer_address=disassembler_address,
+    )
 
     rETH_WETH_aura_rewards_address = "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
 
-    txn_transactable = aura_disassembler.exit_2_1(percentage=50,
-                                                  exit_arguments=[
-                                                      {"rewards_address": rETH_WETH_aura_rewards_address,
-                                                       "max_slippage": 0.01}])
+    txn_transactable = aura_disassembler.exit_2_1(
+        percentage=50, exit_arguments=[{"rewards_address": rETH_WETH_aura_rewards_address, "max_slippage": 0.01}]
+    )
 
     # Since we don't have the private key of the disassembler, we need to build the transaction and send it "manually"
     txn = aura_disassembler.build(txn_transactable)
@@ -106,22 +114,25 @@ def test_integration_exit_2_2(local_node_eth):
     # Role 4 already has the correct preset applied at this block
     role = 4
 
-    fork_unlock_account(w3, disassembler_address)
+    local_node_eth.unlock_account(disassembler_address)
     top_up_address(w3, disassembler_address, 100)
 
-    aura_disassembler = AuraDisassembler(w3=w3,
-                                         avatar_safe_address=avatar_safe_address,
-                                         roles_mod_address=roles_mod_address,
-                                         role=role,
-                                         signer_address=disassembler_address)
+    aura_disassembler = AuraDisassembler(
+        w3=w3,
+        avatar_safe_address=avatar_safe_address,
+        roles_mod_address=roles_mod_address,
+        role=role,
+        signer_address=disassembler_address,
+    )
 
     rETH_WETH_aura_rewards_address = "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D"
 
-    txn_transactable = aura_disassembler.exit_2_2(percentage=50,
-                                                  exit_arguments=[
-                                                      {"rewards_address": rETH_WETH_aura_rewards_address,
-                                                       "max_slippage": 0.01,
-                                                       "token_out_address": ETHAddr.WETH}])
+    txn_transactable = aura_disassembler.exit_2_2(
+        percentage=50,
+        exit_arguments=[
+            {"rewards_address": rETH_WETH_aura_rewards_address, "max_slippage": 0.01, "token_out_address": ETHAddr.WETH}
+        ],
+    )
 
     # Since we don't have the private key of the disassembler, we need to build the transaction and send it "manually"
     txn = aura_disassembler.build(txn_transactable)

@@ -1,67 +1,32 @@
-from dataclasses import dataclass, field
-from decouple import config
-from web3.types import ChecksumAddress
-from web3 import Web3
-from roles_royce.toolshed.alerting.alerting import Messenger, LoggingLevel
 import logging
-from roles_royce.protocols.base import Address
 import threading
-import schedule
 import time
+from dataclasses import dataclass, field
+
+import schedule
+from decouple import config
 from prometheus_client import Gauge
-from swaps import decimalsWXDAI, decimalsEURe
+from swaps import decimalsEURe, decimalsWXDAI
+from web3 import Web3
+from web3.types import ChecksumAddress
 
-
-# The next helper function allows to leave variables unfilled in the .env file
-def custom_config(variable, default, cast):
-    value = config(variable, default=default)
-    return default if value == '' else config(variable, default=default, cast=cast)
-
-
-@dataclass
-class ENV:
-    RPC_ENDPOINT: str = config('RPC_ENDPOINT')
-    FALLBACK_RPC_ENDPOINT: str = config('FALLBACK_RPC_ENDPOINT', default='')
-    AVATAR_SAFE_ADDRESS: Address | ChecksumAddress | str = config('AVATAR_SAFE_ADDRESS')
-    ROLES_MOD_ADDRESS: Address | ChecksumAddress | str = config('ROLES_MOD_ADDRESS')
-    ROLE: int = config('ROLE', cast=int)
-    PRIVATE_KEY: str = config('PRIVATE_KEY')
-    FIXER_API_ACCESS_KEY: str = config('FIXER_API_ACCESS_KEY', cast=str)
-    MAX_SLIPPAGE: float = custom_config('MAX_SLIPPAGE', default=0.01, cast=float)
-    DRIFT_THRESHOLD: float = config('DRIFT_THRESHOLD', cast=float)
-    AMOUNT: float = config('AMOUNT', cast=float)
-    COOLDOWN_MINUTES: int = custom_config('COOLDOWN_MINUTES', default=5, cast=int)
-    SLACK_WEBHOOK_URL: str = config('SLACK_WEBHOOK_URL', default='')
-    TELEGRAM_BOT_TOKEN: str = config('TELEGRAM_BOT_TOKEN', default='')
-    TELEGRAM_CHAT_ID: int = custom_config('TELEGRAM_CHAT_ID', default='', cast=int)
-    PROMETHEUS_PORT: int = custom_config('PROMETHEUS_PORT', default=8000, cast=int)
-    TEST_MODE: bool = config('TEST_MODE', default=False, cast=bool)
-    LOCAL_FORK_PORT: int = custom_config('LOCAL_FORK_PORT', default=8545, cast=int)
-
-    BOT_ADDRESS: Address | ChecksumAddress | str = field(init=False)
-
-    def __post_init__(self):
-        self.AVATAR_SAFE_ADDRESS = Web3.to_checksum_address(self.AVATAR_SAFE_ADDRESS)
-        self.ROLES_MOD_ADDRESS = Web3.to_checksum_address(self.ROLES_MOD_ADDRESS)
-        if not Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).is_connected():
-            raise ValueError(f"RPC_ENDPOINT is not valid or not active: {self.RPC_ENDPOINT}.")
-        self.BOT_ADDRESS = Web3(Web3.HTTPProvider(self.RPC_ENDPOINT)).eth.account.from_key(self.PRIVATE_KEY).address
-
-    def __repr__(self):
-        return 'Environment variables'
-
+from roles_royce.applications.EURe_rebalancing_bot.env import ENV
+from roles_royce.protocols.base import Address
+from roles_royce.toolshed.alerting.alerting import LoggingLevel, Messenger
 
 logger = logging.getLogger(__name__)
 
 
 def log_initial_data(env: ENV, messenger: Messenger):
     title = "EURe rebalancing bot started"
-    message = (f"  Avatar safe address: {env.AVATAR_SAFE_ADDRESS}\n"
-               f"  Roles mod address: {env.ROLES_MOD_ADDRESS}\n"
-               f"  Bot address: {env.BOT_ADDRESS}\n"
-               f"  Drift threshold: {env.DRIFT_THRESHOLD * 100}%\n"
-               f"  Initial amount to swap: {env.AMOUNT}\n"
-               f"  Cooldown Minutes: {env.COOLDOWN_MINUTES}\n")
+    message = (
+        f"  Avatar safe address: {env.AVATAR_SAFE_ADDRESS}\n"
+        f"  Roles mod address: {env.ROLES_MOD_ADDRESS}\n"
+        f"  Bot address: {env.BOT_ADDRESS}\n"
+        f"  Drift threshold: {env.DRIFT_THRESHOLD * 100}%\n"
+        f"  Initial amount to swap: {env.AMOUNT}\n"
+        f"  Cooldown Minutes: {env.COOLDOWN_MINUTES}\n"
+    )
 
     messenger.log_and_alert(LoggingLevel.Info, title, message)
 
@@ -79,33 +44,3 @@ class SchedulerThread(threading.Thread):
 
     def stop(self):
         self.running = False
-
-
-@dataclass
-class Gauges:
-    EUR_price_feed = Gauge('EUR_price_feed', 'EUR price from feed')
-    EURe_price_curve = Gauge('EURe_price_curve', 'EURe price from Curve')
-    bot_xDAI_balance = Gauge('bot_ETH_balance', 'ETH balance of the bot')
-    safe_WXDAI_balance = Gauge('safe_WXDAI_balance', 'WXDAI balance of the avatar safe')
-    safe_EURe_balance = Gauge('safe_EURe_balance', 'EURe balance of the avatar safe')
-    amount_WXDAI = Gauge('amount_WXDAI', 'Amount of WXDAI to swap')
-    amount_EURe = Gauge('amount_EURe', 'Amount of EURe to swap')
-    drift_threshold = Gauge('drift_threshold', 'Drift threshold')
-    drift_EURe_to_WXDAI = Gauge('EURe_to_WXDAI_drift', 'EURe to WXDAI drift')
-    drift_WXDAI_to_EURe = Gauge('WXDAI_to_EURe_drift', 'WXDAI to EURe drift')
-    last_updated = Gauge('last_updated', 'Last updated time and date')
-
-    def update(self, EUR_price_feed: float, EURe_price_curve: float, bot_xDAI_balance: int, safe_WXDAI_balance: int,
-               safe_EURe_balance: int, amount_WXDAI: float, amount_EURe: float, drift_threshold: float,
-               drift_EURe_to_WXDAI: float, drift_WXDAI_to_EURe: float):
-        self.EUR_price_feed.set(EUR_price_feed)
-        self.EURe_price_curve.set(EURe_price_curve)
-        self.bot_xDAI_balance.set(bot_xDAI_balance / (10 ** 18))
-        self.safe_WXDAI_balance.set(safe_WXDAI_balance / (10 ** decimalsWXDAI))
-        self.safe_EURe_balance.set(safe_EURe_balance / (10 ** decimalsEURe))
-        self.amount_WXDAI.set(amount_WXDAI)
-        self.amount_EURe.set(amount_EURe)
-        self.drift_threshold.set(drift_threshold)
-        self.drift_EURe_to_WXDAI.set(drift_EURe_to_WXDAI)
-        self.drift_WXDAI_to_EURe.set(drift_WXDAI_to_EURe)
-        self.last_updated.set_to_current_time()

@@ -1,11 +1,11 @@
+import logging
 from dataclasses import dataclass
 from enum import Enum, IntEnum
-import logging
 from typing import Optional
 
+from eth_account import Account
 from web3 import Web3, exceptions
 from web3.types import Address, ChecksumAddress, TxParams, TxReceipt
-from eth_account import Account
 
 logger = logging.getLogger(__name__)
 
@@ -22,11 +22,25 @@ ROLES_ABI = (
 )
 
 ROLES_ERRORS = (
-    "NoMembership()", "ArraysDifferentLength()", "FunctionSignatureTooShort()", "DelegateCallNotAllowed()", "TargetAddressNotAllowed()",
-    "FunctionNotAllowed()", "SendNotAllowed()", "ParameterNotAllowed()", "ParameterNotOneOfAllowed()", "ParameterLessThanAllowed()",
-    "ParameterGreaterThanAllowed()", "UnacceptableMultiSendOffset()", "UnsuitableOneOfComparison()", "UnsuitableRelativeComparison()",
-    "UnsuitableStaticCompValueSize()", "UnsuitableDynamic32CompValueSize()", "ScopeMaxParametersExceeded()", "NotEnoughCompValuesForOneOf()",
-    "CalldataOutOfBounds()"
+    "NoMembership()",
+    "ArraysDifferentLength()",
+    "FunctionSignatureTooShort()",
+    "DelegateCallNotAllowed()",
+    "TargetAddressNotAllowed()",
+    "FunctionNotAllowed()",
+    "SendNotAllowed()",
+    "ParameterNotAllowed()",
+    "ParameterNotOneOfAllowed()",
+    "ParameterLessThanAllowed()",
+    "ParameterGreaterThanAllowed()",
+    "UnacceptableMultiSendOffset()",
+    "UnsuitableOneOfComparison()",
+    "UnsuitableRelativeComparison()",
+    "UnsuitableStaticCompValueSize()",
+    "UnsuitableDynamic32CompValueSize()",
+    "ScopeMaxParametersExceeded()",
+    "NotEnoughCompValuesForOneOf()",
+    "CalldataOutOfBounds()",
 )
 
 ROLES_ERRORS_SELECTORS = {Web3.keccak(text=error).hex()[:10]: error for error in ROLES_ERRORS}
@@ -38,6 +52,7 @@ class TransactionWouldBeReverted(Exception):
 
 class Operation(IntEnum):
     """Types of operations."""
+
     CALL = 0
     DELEGATE_CALL = 1
 
@@ -88,20 +103,16 @@ class RolesMod:
         if self.private_key:
             self.account = Account.from_key(self.private_key)
             self.account = self.account.address
-        self.contract = self.web3.eth.contract(
-            address=self.contract_address, abi=self.contract_abi
-        )
+        self.contract = self.web3.eth.contract(address=self.contract_address, abi=self.contract_abi)
 
     def get_base_fee_per_gas(self) -> int:
         latest_block = self.web3.eth.get_block("latest")
         base_fee_per_gas = latest_block["baseFeePerGas"]
         return base_fee_per_gas
 
-    def build(self,
-              contract_address: str,
-              data: str,
-              max_priority_fee: int | None = None,
-              max_fee_per_gas: int | None = None):
+    def build(
+        self, contract_address: str, data: str, max_priority_fee: int | None = None, max_fee_per_gas: int | None = None
+    ):
         """Creates a transaction ready to be sent"""
         gas_strategy = get_gas_strategy()
         if not max_priority_fee:
@@ -116,7 +127,7 @@ class RolesMod:
         tx = self._build_transaction(contract_address, data, gas_limit, max_priority_fee, max_fee_per_gas, nonce)
         return tx
 
-    def check(self, contract_address: str, data: str, block='latest') -> bool:
+    def check(self, contract_address: str, data: str, block="latest") -> bool:
         """Make a static call to validate a transaction."""
         try:
             self._build_exec_transaction(contract_address, data).call({"from": self.account}, block_identifier=block)
@@ -128,18 +139,20 @@ class RolesMod:
             else:
                 raise TransactionWouldBeReverted(e)
 
-    def estimate_gas(self, contract_address: str, data: str, block='latest') -> int:
+    def estimate_gas(self, contract_address: str, data: str, block="latest") -> int:
         """Estimate the gas that would be needed."""
-        return self._build_exec_transaction(contract_address, data).estimate_gas({"from": self.account},
-                                                                                 block_identifier=block)
+        return self._build_exec_transaction(contract_address, data).estimate_gas(
+            {"from": self.account}, block_identifier=block
+        )
 
-    def execute(self,
-                contract_address: str,
-                data: str,
-                max_priority_fee: int | None = None,
-                max_fee_per_gas: int | None = None,
-                check: bool = True,
-                ) -> str:
+    def execute(
+        self,
+        contract_address: str,
+        data: str,
+        max_priority_fee: int | None = None,
+        max_fee_per_gas: int | None = None,
+        check: bool = True,
+    ) -> str:
         """Execute a role-based transaction. Returns the transaction hash as a str."""
 
         if check:
@@ -161,13 +174,15 @@ class RolesMod:
             self.should_revert,
         )
 
-    def _build_transaction(self, contract_address: str,
-                           data: str,
-                           gas_limit: int,
-                           max_priority_fee_per_gas: int,
-                           max_fee_per_gas: int,
-                           nonce: int):
-
+    def _build_transaction(
+        self,
+        contract_address: str,
+        data: str,
+        gas_limit: int,
+        max_priority_fee_per_gas: int,
+        max_fee_per_gas: int,
+        nonce: int,
+    ):
         tx = self._build_exec_transaction(contract_address, data).build_transaction(
             {
                 "chainId": self.web3.eth.chain_id,
@@ -218,5 +233,5 @@ def update_gas_fees_parameters_and_nonce(w3: Web3, tx: dict) -> TxParams:
     max_fee_per_gas = max_priority_fee + int(base_fee_per_gas * gas_strategy.fee_multiplier)
     tx["maxFeePerGas"] = max_fee_per_gas
     tx["maxPriorityFeePerGas"] = max_priority_fee
-    tx['nonce'] = w3.eth.get_transaction_count(tx['from'])
+    tx["nonce"] = w3.eth.get_transaction_count(tx["from"])
     return tx

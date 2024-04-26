@@ -1,0 +1,43 @@
+from defabipedia.types import Chain
+
+from roles_royce.protocols.swap_pools import quote_methods
+
+TOKEN_X = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+TOKEN_Y = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+AMOUNT_X = 1_000_000_000_000_000_000_000
+MIN_AMOUNT_Y = 0
+DEADLINE = 1_000_000_000_000
+
+
+def test_quote_curve():
+    method = quote_methods.QuoteCurve(
+        blockchain=Chain.ETHEREUM,
+        pool_address="0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51",
+        token_x=0,
+        token_y=1,
+        amount_x=AMOUNT_X,
+    )
+    assert method.target_address == "0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51"
+    assert (
+        method.data
+        == "0x5e0d443f0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000003635c9adc5dea00000"
+    )
+
+
+def test_quote_uniswap_v3():
+    method = quote_methods.QuoteUniswapV3(
+        blockchain=Chain.ETHEREUM, token_in=TOKEN_X, token_out=TOKEN_Y, amount_in=AMOUNT_X
+    )
+    assert method.args_list == [
+        (
+            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+            1000000000000000000000,
+            100,
+            0,
+        )
+    ]
+    assert (
+        method.data
+        == "0xc6a5026a000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000dac17f958d2ee523a2206206994597c13d831ec700000000000000000000000000000000000000000000003635c9adc5dea0000000000000000000000000000000000000000000000000000000000000000000640000000000000000000000000000000000000000000000000000000000000000"
+    )

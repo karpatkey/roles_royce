@@ -35,7 +35,7 @@ jobs:
       - name: Coverage report
         run: coverage report
 
-  docker-spark:
+  docker-bots:
     runs-on: self-hosted
     needs: Test
     steps:
@@ -44,29 +44,5 @@ jobs:
       - name: Build and push
         run: ./.github/scripts/build_and_push.sh
         env:
-          DOCKER_IMAGE_NAME: "registry.digitalocean.com/karpatkey/spark-anti-liquidation-bot"
-          DOCKERFILE: "./docker/Dockerfile.spark"
-
-  docker-eur:
-    runs-on: self-hosted
-    needs: Test
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build and push
-        run: ./.github/scripts/build_and_push.sh
-        env:
-          DOCKER_IMAGE_NAME: "registry.digitalocean.com/karpatkey/eure-rebalancing-bot"
-          DOCKERFILE: "./docker/Dockerfile.eur"
-
-  docker-keeper:
-    runs-on: self-hosted
-    needs: Test
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build and push
-        run: ./.github/scripts/build_and_push.sh
-        env:
-          DOCKER_IMAGE_NAME: "registry.digitalocean.com/karpatkey/bridge-keeper-bot"
-          DOCKERFILE: "./docker/Dockerfile.keeper"
+          DOCKER_IMAGE_NAME: "registry.digitalocean.com/karpatkey/bots"
+          DOCKERFILE: "./docker/Dockerfile.bots"

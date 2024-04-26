@@ -1,0 +1,4 @@
+-r spark_anti_liquidation_bot/requirements.txt
+-r EURe_rebalancing_bot/requirements.txt
+-r bridge_keeper/requirements.txt
+-r GBPe_rebalancing_bot/requirements.txt
