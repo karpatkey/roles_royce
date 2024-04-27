@@ -21,7 +21,7 @@ class CheckParams(BaseModel):
     dao: str
     blockchain: str
     protocol: str
-    tx_transactables: list[object]
+    tx_transactables: list[int]
 
 
 class SimulateParams(BaseModel):

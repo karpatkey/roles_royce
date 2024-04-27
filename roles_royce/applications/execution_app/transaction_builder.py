@@ -1,5 +1,6 @@
 import argparse
 import json
+import pickle
 import traceback
 
 from web3 import Web3
@@ -9,30 +10,35 @@ from roles_royce.roles_modifier import ROLES_ERRORS, GasStrategies, set_gas_stra
 from .utils import ENV, ExecConfig, decode_transaction, disassembler_from_config, gear_up, start_the_engine
 
 
-def transaction_check(dao, blockchain, protocol, tx_transactables, rpc_url: str | None = None):
+def transaction_check(dao, blockchain, protocol, tx_transactables: list[int], rpc_url: str | None = None):
     env = ENV(DAO=dao, BLOCKCHAIN=blockchain, local_fork_url=rpc_url)
     w3, _ = start_the_engine(env)
 
     try:
+        p = bytes(tx_transactables)
+        # unleashing dragons here!
+        # TODO We should either use json or sign the message to make it secure
+        transactables = pickle.loads(p)
+
         disassembler = disassembler_from_config(w3=w3, env=env, protocol=protocol)
-        if disassembler.check(txns=tx_transactables, from_address=env.DISASSEMBLER_ADDRESS):
+        if disassembler.check(txns=transactables, from_address=env.DISASSEMBLER_ADDRESS):
             return {"status": 200, "check": "ok"}
         else:
             return {
                 "status": 422,
-                "message": "Error: Transaction reverted when simulated with local eth_call",
+                "error": "Error: Transaction reverted when simulated with local eth_call",
             }
 
     except Exception as e:
         if str(e) in ROLES_ERRORS:
             return {
                 "status": 422,
-                "message": f"Role permissions error: {e}",
+                "error": f"Role permissions error: {e}",
             }
         else:
             return {
                 "status": 500,
-                "message": f"Error: {e}",
+                "error": f"Error: {e}",
             }
 
 
@@ -53,6 +59,7 @@ def build_transaction_env(
     else:
         w3 = web3
 
+    decoded_transaction = ""
     try:
         set_gas_strategy(GasStrategies.AGGRESIVE)
         disassembler, txn_transactables = gear_up(w3=w3, env=env, exec_config=exec_config)
@@ -75,13 +82,14 @@ def build_transaction_env(
                 "tx_data": {
                     "transaction": tx,
                     "decoded_transaction": decoded_transaction,
+                    "tx_transactables": [c for c in pickle.dumps(txn_transactables)],
                 },
             }
         else:
             return {
                 "status": 422,
                 "tx_data": {"decoded_transaction": decoded_transaction},
-                "message": "Error: Transaction reverted when simulated with local eth_call",
+                "error": "Error: Transaction reverted when simulated with local eth_call",
             }
 
     except Exception as e:
@@ -89,13 +97,14 @@ def build_transaction_env(
             return {
                 "status": 422,
                 "tx_data": {"decoded_transaction": decoded_transaction},
-                "message": f"Role permissions error: {e}",
+                "error": f"Role permissions error: {e}",
             }
         else:
+            traceback.print_exception(e)
             return {
                 "status": 500,
                 "tx_data": {"decoded_transaction": decoded_transaction},
-                "message": f"Error: {e}",
+                "error": f"Error: {e}",
             }
 
 

@@ -34,7 +34,7 @@ def simulate(dao, blockchain, transaction, rpc_url: str | None = None):
     except Exception as e:
         print(e)
         print(traceback.format_exc())
-        return {"status": 500, "message": f"Error: {e}"}
+        return {"status": 500, "error": f"Error: {e}"}
 
 
 def main():
