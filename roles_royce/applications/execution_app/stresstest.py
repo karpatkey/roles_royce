@@ -184,7 +184,10 @@ def stresstest(
             try:
                 with PulleyFork(blockchain) as fork:
                     env = ENV(DAO=dao or "", BLOCKCHAIN=blockchain, local_fork_url=fork.url())
-                    web3, _ = start_the_engine(env, presets=presets)
+                    if presets:
+                        web3, _ = start_the_engine(env, presets=presets)
+                    else:
+                        web3, _ = start_the_engine(env)
 
                     return single_stresstest(*args, web3=web3)
             except Exception as e:

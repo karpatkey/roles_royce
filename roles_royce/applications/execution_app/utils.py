@@ -163,12 +163,13 @@ class ExecConfig:
 # -----------------------------------------------------------------------------------------------------------------------
 
 
-def start_the_engine(env: ENV, presets: dict) -> tuple[Web3, Web3]:
+def start_the_engine(env: ENV, presets: dict = None) -> tuple[Web3, Web3]:
     if env.MODE == Modes.DEVELOPMENT:
         w3 = Web3(Web3.HTTPProvider(env.LOCAL_FORK_URL or f"http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}"))
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
         top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)
-        apply_presets(w3, env.AVATAR_SAFE_ADDRESS, presets)
+        if presets:
+            apply_presets(w3, env.AVATAR_SAFE_ADDRESS, presets)
         
         w3_MEV = w3
     else:
