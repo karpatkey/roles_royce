@@ -54,10 +54,11 @@ presets_balancer = """{
 ]
 }"""
 
-# TODO: add tests for exit strategies
+@pytest.mark.skip(reason="Cowswap Signer is tested in test_disassembling_lido tests 3 and 4")
+def test_integration_exit_1():
+    pass
 
-
-def test_integration_exit_1(local_node_eth, accounts):
+def test_integration_exit_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
     local_node_eth.set_block(BLOCK)
 
@@ -106,7 +107,7 @@ def test_integration_exit_1(local_node_eth, accounts):
     weth_balance = weth_contract.functions.balanceOf(avatar_safe_address).call()
     assert weth_balance == 0
 
-    txn_transactable = swap_balancer_disassembler.exit_1(
+    txn_transactable = swap_balancer_disassembler.exit_2(
         percentage=50,
         exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
     )
@@ -154,7 +155,7 @@ presets_curve = """{
 # TODO: add tests for exit strategies
 
 
-def test_integration_exit_2(local_node_eth, accounts):
+def test_integration_exit_3(local_node_eth, accounts):
     w3 = local_node_eth.w3
     local_node_eth.set_block(BLOCK)
 
@@ -203,7 +204,7 @@ def test_integration_exit_2(local_node_eth, accounts):
     usdc_balance = usdc_contract.functions.balanceOf(avatar_safe_address).call()
     assert usdc_balance == 0
 
-    txn_transactable = swap_curve_disassembler.exit_2(
+    txn_transactable = swap_curve_disassembler.exit_3(
         percentage=50,
         exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
     )
@@ -281,7 +282,7 @@ preset_uniswapv3_v2 = """{
 }"""
 
 
-def test_integration_exit_3(local_node_eth, accounts):
+def test_integration_exit_4(local_node_eth, accounts):
     w3 = local_node_eth.w3
     local_node_eth.set_block(BLOCK)
 
@@ -330,7 +331,7 @@ def test_integration_exit_3(local_node_eth, accounts):
     usdc_balance = usdc_contract.functions.balanceOf(avatar_safe_address).call()
     assert usdc_balance == 0
 
-    txn_transactable = swap_uniswapv3_disassembler.exit_3(
+    txn_transactable = swap_uniswapv3_disassembler.exit_4(
         percentage=50,
         exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
     )

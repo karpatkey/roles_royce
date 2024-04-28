@@ -15,6 +15,7 @@ from roles_royce.protocols.balancer.methods_general import ApproveForVault
 from roles_royce.protocols.balancer.methods_swap import ExactTokenInSingleSwap, QuerySwap, SingleSwap
 from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from roles_royce.protocols.base import Address
+from roles_royce.protocols import cowswap
 from roles_royce.protocols.swap_pools.quote_methods import QuoteCurve, QuoteUniswapV3
 from roles_royce.protocols.swap_pools.swap_methods import ApproveCurve, ApproveUniswapV3, SwapCurve, SwapUniswapV3, WrapEther
 from roles_royce.toolshed.disassembling.disassembler import Disassembler, validate_percentage
@@ -71,7 +72,9 @@ class SwapDisassembler(Disassembler):
 
         elif swap_pool.protocol == "UniswapV3":
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                token_in = Addresses[self.blockchain].WETH            
+                token_in = Addresses[self.blockchain].WETH     
+            elif token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                token_out = Addresses[self.blockchain].WETH        
             quote = QuoteUniswapV3(self.blockchain, token_in, token_out, amount_in, swap_pool.uni_fee)
             amount_out = quote.call(web3=self.w3)
             return swap_pool, amount_out[0]
@@ -79,6 +82,8 @@ class SwapDisassembler(Disassembler):
         elif swap_pool.protocol == "Balancer":
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
                 token_in = Addresses[self.blockchain].WETH
+            elif token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                token_out = Addresses[self.blockchain].WETH 
             pool_id = self.get_pool_id(swap_pool.address)
             quote = QuerySwap(
                 self.blockchain,
@@ -94,7 +99,59 @@ class SwapDisassembler(Disassembler):
         else:
             raise ValueError("Protocol not supported")
 
-    def exit_1(
+    def exit_1(self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
+               ) -> list[Transactable]:
+        """Make a swap on CowSwap with best amount out
+            Args:
+            percentage (float): Percentage of token to remove.
+            exit_arguments (list[dict], optional): List of dictionaries with the withdrawal parameters.
+                arg_dicts = [
+                    {
+                        "token_in_address: "FillMewithTokenAddress",
+                        "max_slippage": 0.01,
+                        "token_out_address": "FillMewithTokenAddress"
+                    }
+                ]
+            amount_to_redeem (int, optional): Amount of wallet token to redeem. Defaults to None.
+        Returns:
+            list[ Transactable]:  List of transactions to execute.
+        """
+
+        max_slippage = exit_arguments[0]["max_slippage"] / 100
+        token_in = exit_arguments[0]["token_in_address"]
+        token_out = exit_arguments[0]["token_out_address"]
+        fraction = validate_percentage(percentage)
+
+        if amount_to_redeem is None:
+            amount_to_redeem = self.get_amount_to_redeem(token_in, fraction)
+
+        txns = []
+
+        if amount_to_redeem == 0:
+            return []
+        
+        if 'anvil' in self.w3.client_version:
+            fork = True
+        else:
+            fork = False
+   
+        if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+            wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
+            txns.append(wrapETH)
+            token_in = Addresses[self.blockchain].WETH        
+
+        return cowswap.create_order_and_swap(w3=self.w3,
+                                            avatar=self.avatar_safe_address,
+                                            sell_token=token_in,
+                                            buy_token=token_out,
+                                            amount=amount_to_redeem,
+                                            kind=cowswap.SwapKind.SELL,
+                                            max_slippage=max_slippage,
+                                            valid_duration=20 * 60,
+                                            fork=fork)
+        
+    
+    def exit_2(
         self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
     ) -> list[Transactable]:
         """Make a swap on Balancer with best amount out
@@ -140,6 +197,8 @@ class SwapDisassembler(Disassembler):
                 wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
                 txns.append(wrapETH)
                 token_in = Addresses[self.blockchain].WETH
+            elif token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                token_out = Addresses[self.blockchain].WETH
             approve_vault = ApproveForVault(token=token_in, amount=amount_to_redeem)
             swap_balancer = SingleSwap(
                 blockchain=self.blockchain,
@@ -157,7 +216,7 @@ class SwapDisassembler(Disassembler):
             txns.append(swap_balancer)
         return txns
 
-    def exit_2(
+    def exit_3(
         self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
     ) -> list[Transactable]:
         """Make a swap on Curve with best amount out
@@ -222,7 +281,7 @@ class SwapDisassembler(Disassembler):
             txns.append(swap_curve)
         return txns
 
-    def exit_3(
+    def exit_4(
         self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
     ) -> list[Transactable]:
         """Make a swap on UniswapV3 with best amount out
@@ -268,6 +327,8 @@ class SwapDisassembler(Disassembler):
                 wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
                 txns.append(wrapETH)
                 token_in = Addresses[self.blockchain].WETH
+            elif token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                token_out = Addresses[self.blockchain].WETH
                 
             approve_uniswapV3 = ApproveUniswapV3(
                 blockchain=self.blockchain,
