@@ -59,6 +59,8 @@ wallet_tokens_swap = [
                     "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",  # stETH
                     "0xae78736Cd615f374D3085123A210448E74Fc6393",  # rETH
                     "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",  # wstETH
+                    "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",  # ankrETH
+                    "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b",  # ETHx
                 ],  
                 "token_out": [
                     "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  # ETH
@@ -70,10 +72,16 @@ wallet_tokens_swap = [
                 "token_in": [
                     "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  # ETH
                     "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",  # WETH
-                ],  
-                "token_out": [
                     "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",  # stETH
                     "0xae78736Cd615f374D3085123A210448E74Fc6393",  # rETH
+                    "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",  # wstETH
+                    "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",  # ankrETH
+                    "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b",  # ETHx
+                ],  
+                "token_out": [
+                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",  # DAI
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",  # USDT 
+                    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
                 ],  
             },
             {
