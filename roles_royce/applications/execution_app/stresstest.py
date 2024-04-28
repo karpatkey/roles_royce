@@ -163,6 +163,7 @@ def stresstest(
     dao: str | None = None,
     blockchain: str | None = None,
     w3: Web3 | None = None,
+    presets: dict | None = None,
 ):
     dao = dao or positions_dict["dao"]
     blockchain = blockchain or positions_dict["blockchain"]
@@ -183,7 +184,7 @@ def stresstest(
             try:
                 with PulleyFork(blockchain) as fork:
                     env = ENV(DAO=dao or "", BLOCKCHAIN=blockchain, local_fork_url=fork.url())
-                    web3, _ = start_the_engine(env)
+                    web3, _ = start_the_engine(env, presets=presets)
 
                     return single_stresstest(*args, web3=web3)
             except Exception as e:

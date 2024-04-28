@@ -163,11 +163,13 @@ class ExecConfig:
 # -----------------------------------------------------------------------------------------------------------------------
 
 
-def start_the_engine(env: ENV) -> tuple[Web3, Web3]:
+def start_the_engine(env: ENV, presets: dict) -> tuple[Web3, Web3]:
     if env.MODE == Modes.DEVELOPMENT:
         w3 = Web3(Web3.HTTPProvider(env.LOCAL_FORK_URL or f"http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}"))
         fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
         top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)
+        apply_presets(w3, env.AVATAR_SAFE_ADDRESS, presets)
+        
         w3_MEV = w3
     else:
         w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
@@ -307,6 +309,24 @@ def fork_reset_state(w3: Web3, url: str, block: int | str = "latest"):
             raise ValueError(f"Block number {block} is greater than the latest block {latest_block}")
     return w3.provider.make_request("anvil_reset", [{"forking": {"jsonRpcUrl": url, "blockNumber": block}}])
 
+def apply_presets(w3, safe_address, presets_data):
+    length_presets = len(presets_data["transactions"])
+    i = 0
+    for tx in presets_data["transactions"]:
+
+        tx_to_assign_role = {
+            "from": safe_address,
+            "to": tx["to"],
+            "data": tx["data"],
+            "value": "0",
+        }
+
+        fork_unlock_account(w3, safe_address)
+        tx_hash = w3.eth.send_transaction(tx_to_assign_role)
+        tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)
+        if tx_receipt.status == 1:
+            i += 1
+    print(f"Applied {i} out of {length_presets} presets")
 
 # -----------------------------------------------------------------------------------------------------------------------
 
