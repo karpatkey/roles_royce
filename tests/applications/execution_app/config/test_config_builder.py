@@ -432,5 +432,45 @@ def test_build_swap_pool_positions(local_node_eth):
                     ],
                 },
             ],
-        }
+        },
+        {
+            "protocol": "Wallet",
+            "position_id": "226",
+            "position_id_tech": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+            "position_id_human_readable": "ethereum_WalletPosition_stETH_to_DAI_in_CowSwap_to_USDT_in_CowSwap_to_USDC_in_CowSwap",
+            "exec_config": [
+                {
+                    "function_name": "exit_1",
+                    "label": "Exchange Wallet Token on Cowswap",
+                    "test": True,
+                    "stresstest": False,
+                    "stresstest_error": "None",
+                    "description": "Exchange a wallet token through Cowswap",
+                    "parameters": [
+                        {
+                            "name": "token_in_address",
+                            "label": "Token in",
+                            "type": "input",
+                            "options": [{"value": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84", "label": "stETH"}],
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {"min": 0.001, "max": 100},
+                        },
+                        {
+                            "name": "token_out_address",
+                            "label": "Token out",
+                            "type": "input",
+                            "options": [
+                                {"value": "0x6B175474E89094C44Da98b954EedeAC495271d0F", "label": "DAI"},
+                                {"value": "0xdAC17F958D2ee523a2206206994597C13D831ec7", "label": "USDT"},
+                                {"value": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "label": "USDC"},
+                            ],
+                        },
+                    ],
+                }
+            ],
+        },
     ]
