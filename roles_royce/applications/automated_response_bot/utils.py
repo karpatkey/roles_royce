@@ -59,8 +59,8 @@ exit_strat = {
     "positions": [
         {
             "position_id": "142",
-            "position_id_tech": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526",
-            "position_id_human_readable": "gnosis_Aura_WETH_wstETH",
+            "position_id_tech": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA",
+            "position_id_human_readable": "gnosis_Aura_USDT_sDAI_USDC",
             "protocol": "Aura",
             "exec_config": [
                 {
@@ -74,7 +74,7 @@ exit_strat = {
                         {
                             "name": "rewards_address",
                             "type": "constant",
-                            "value": "0x026d163C28cC7dbf57d6ED57f14208Ee412CA526"
+                            "value": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA"
                         }
                     ]
                 },
