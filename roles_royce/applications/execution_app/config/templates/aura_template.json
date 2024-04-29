@@ -63,7 +63,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token Out Address",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
