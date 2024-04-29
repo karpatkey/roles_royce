@@ -220,7 +220,7 @@ class AuraDisassembler(Disassembler):
         txns = []
 
         for element in exit_arguments:
-            aura_rewards_address = to_checksum_address(element[0]["value"])
+            aura_rewards_address = to_checksum_address(element["rewards_address"])
 
             bpt_address, amount_to_redeem = self.aura_contracts_helper(
                 aura_rewards_address=aura_rewards_address, fraction=fraction
