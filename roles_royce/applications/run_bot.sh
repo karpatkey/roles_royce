@@ -12,6 +12,8 @@ elif [[ "$BOT_NAME" == "GBPe_rebalancing" ]]; then
   python3 -u "$SCRIPT_DIR/GBPe_rebalancing_bot/GBPe_bot.py"
 elif [[ "$BOT_NAME" == "spark_anti_liquidation" ]]; then
   python3 -u "$SCRIPT_DIR/spark_anti_liquidation_bot/spark_anti_liquidation.py"
+elif [[ "$BOT_NAME" == "automated_response_bot" ]]; then
+  python3 -u "$SCRIPT_DIR/automated_response_bot/response_bot.py"
 else
   echo Bad bot name: "$BOT_NAME"
   exit 1
