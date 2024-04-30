@@ -58,6 +58,7 @@
         },
         {
           "name": "max_slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": { "min": 0, "max": 100 }
         },
