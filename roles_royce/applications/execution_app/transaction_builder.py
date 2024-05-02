@@ -7,18 +7,16 @@ from web3 import Web3
 
 from roles_royce.roles_modifier import ROLES_ERRORS, GasStrategies, set_gas_strategy
 
+from .code_transporter import CodeTransporter
 from .utils import ENV, ExecConfig, decode_transaction, disassembler_from_config, gear_up, start_the_engine
 
 
-def transaction_check(dao, blockchain, protocol, tx_transactables: list[int], rpc_url: str | None = None):
+def transaction_check(dao, blockchain, protocol, tx_transactables: str, rpc_url: str | None = None):
     env = ENV(DAO=dao, BLOCKCHAIN=blockchain, local_fork_url=rpc_url)
     w3, _ = start_the_engine(env)
 
     try:
-        p = bytes(tx_transactables)
-        # unleashing dragons here!
-        # TODO We should either use json or sign the message to make it secure
-        transactables = pickle.loads(p)
+        transactables = CodeTransporter().safe_deserialize(tx_transactables)
 
         disassembler = disassembler_from_config(w3=w3, env=env, protocol=protocol)
         if disassembler.check(txns=transactables, from_address=env.DISASSEMBLER_ADDRESS):
@@ -77,12 +75,13 @@ def build_transaction_env(
 
         if not run_check or check_exit_tx:
             tx = disassembler.build(txns=txn_transactables, from_address=env.DISASSEMBLER_ADDRESS)
+            transactables = CodeTransporter().safe_serialize(txn_transactables)
             return {
                 "status": 200,
                 "tx_data": {
                     "transaction": tx,
                     "decoded_transaction": decoded_transaction,
-                    "tx_transactables": [c for c in pickle.dumps(txn_transactables)],
+                    "tx_transactables": transactables,
                 },
             }
         else:
