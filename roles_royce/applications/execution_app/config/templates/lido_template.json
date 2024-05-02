@@ -33,7 +33,7 @@
         {
           "name": "max_slippage",
           "type": "input",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "rules": {
             "min": 0.001,
             "max": 100
@@ -51,7 +51,7 @@
       "parameters": [
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -70,7 +70,7 @@
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -81,7 +81,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -90,7 +90,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -111,7 +111,7 @@
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -122,7 +122,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -131,7 +131,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -152,7 +152,7 @@
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -163,7 +163,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -172,7 +172,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -193,7 +193,7 @@
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -204,7 +204,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -213,7 +213,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -234,7 +234,7 @@
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -245,7 +245,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -254,7 +254,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -275,7 +275,7 @@
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -286,7 +286,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -295,7 +295,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
