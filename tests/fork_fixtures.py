@@ -77,6 +77,8 @@ class ReplayAndAssertMiddleware:
         recorded_request = self.interactions.pop()
         assert "request" in recorded_request
         assert method == recorded_request["request"]["method"]
+        if list(params) != recorded_request["request"]["params"]:
+            raise AssertionError("Params not match: %s != %s" % (params, recorded_request["request"]["params"]))
 
         recorded_response = self.interactions.pop()
         assert "response" in recorded_response
