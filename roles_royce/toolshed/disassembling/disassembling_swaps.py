@@ -37,11 +37,10 @@ class SwapDisassembler(Disassembler):
         )
 
     def get_amount_to_redeem(self, token_in_address: Address, fraction: float | Decimal) -> int:
-        eth = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
-        xdai = "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"
+        native = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
 
         balance = 0
-        if token_in_address == eth:
+        if token_in_address == native:
             balance = self.w3.eth.get_balance(self.avatar_safe_address)
         else:
             token_in_contract = self.w3.eth.contract(address=token_in_address, abi=Abis.ERC20.abi)
@@ -49,7 +48,7 @@ class SwapDisassembler(Disassembler):
 
         amount = int(Decimal(balance) * Decimal(fraction))
 
-        if token_in_address in [eth, xdai]:
+        if token_in_address == native:
             min_amount = 3
             if balance - amount <= Web3.to_wei(min_amount, "ether"):
                 raise ValueError(f"Must keep at least a balance of {min_amount} of native token")
