@@ -11,13 +11,19 @@ from web3 import Web3
 from web3.exceptions import ContractLogicError
 
 from roles_royce.generic_method import Transactable
+from roles_royce.protocols import cowswap
 from roles_royce.protocols.balancer.methods_general import ApproveForVault
 from roles_royce.protocols.balancer.methods_swap import ExactTokenInSingleSwap, QuerySwap, SingleSwap
 from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from roles_royce.protocols.base import Address
-from roles_royce.protocols import cowswap
 from roles_royce.protocols.swap_pools.quote_methods import QuoteCurve, QuoteUniswapV3
-from roles_royce.protocols.swap_pools.swap_methods import ApproveCurve, ApproveUniswapV3, SwapCurve, SwapUniswapV3, WrapEther
+from roles_royce.protocols.swap_pools.swap_methods import (
+    ApproveCurve,
+    ApproveUniswapV3,
+    SwapCurve,
+    SwapUniswapV3,
+    WrapEther,
+)
 from roles_royce.toolshed.disassembling.disassembler import Disassembler, validate_percentage
 
 
@@ -31,11 +37,24 @@ class SwapDisassembler(Disassembler):
         )
 
     def get_amount_to_redeem(self, token_in_address: Address, fraction: float | Decimal) -> int:
-        if token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-            return int(Decimal(self.w3.eth.get_balance(self.avatar_safe_address) * Decimal(fraction))) 
+        eth = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+        xdai = "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"
+
+        balance = 0
+        if token_in_address == eth:
+            balance = self.w3.eth.get_balance(self.avatar_safe_address)
         else:
             token_in_contract = self.w3.eth.contract(address=token_in_address, abi=Abis.ERC20.abi)
-            return int(Decimal(token_in_contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
+            balance = token_in_contract.functions.balanceOf(self.avatar_safe_address).call()
+
+        amount = int(Decimal(balance) * Decimal(fraction))
+
+        if token_in_address in [eth, xdai]:
+            min_amount = 3
+            if balance - amount <= Web3.to_wei(min_amount, "ether"):
+                raise ValueError(f"Must keep at least a balance of {min_amount} of native token")
+
+        return amount
 
     def get_swap_pools(self, blockchain, protocol, token_in, token_out):
         """Returns all instances of SwapPools within the specified blockchain's SwapPools class, filtered by protocol and tokens."""
@@ -72,9 +91,9 @@ class SwapDisassembler(Disassembler):
 
         elif swap_pool.protocol == "UniswapV3":
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                token_in = Addresses[self.blockchain].WETH     
+                token_in = Addresses[self.blockchain].WETH
             elif token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                token_out = Addresses[self.blockchain].WETH        
+                token_out = Addresses[self.blockchain].WETH
             quote = QuoteUniswapV3(self.blockchain, token_in, token_out, amount_in, swap_pool.uni_fee)
             amount_out = quote.call(web3=self.w3)
             return swap_pool, amount_out[0]
@@ -83,7 +102,7 @@ class SwapDisassembler(Disassembler):
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
                 token_in = Addresses[self.blockchain].WETH
             elif token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                token_out = Addresses[self.blockchain].WETH 
+                token_out = Addresses[self.blockchain].WETH
             pool_id = self.get_pool_id(swap_pool.address)
             quote = QuerySwap(
                 self.blockchain,
@@ -99,8 +118,9 @@ class SwapDisassembler(Disassembler):
         else:
             raise ValueError("Protocol not supported")
 
-    def exit_1(self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
-               ) -> list[Transactable]:
+    def exit_1(
+        self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
+    ) -> list[Transactable]:
         """Make a swap on CowSwap with best amount out
             Args:
             percentage (float): Percentage of token to remove.
@@ -129,28 +149,29 @@ class SwapDisassembler(Disassembler):
 
         if amount_to_redeem == 0:
             return []
-        
-        if 'anvil' in self.w3.client_version:
+
+        if "anvil" in self.w3.client_version:
             fork = True
         else:
             fork = False
-   
+
         if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
             wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
             txns.append(wrapETH)
-            token_in = Addresses[self.blockchain].WETH        
+            token_in = Addresses[self.blockchain].WETH
 
-        return cowswap.create_order_and_swap(w3=self.w3,
-                                            avatar=self.avatar_safe_address,
-                                            sell_token=token_in,
-                                            buy_token=token_out,
-                                            amount=amount_to_redeem,
-                                            kind=cowswap.SwapKind.SELL,
-                                            max_slippage=max_slippage,
-                                            valid_duration=20 * 60,
-                                            fork=fork)
-        
-    
+        return cowswap.create_order_and_swap(
+            w3=self.w3,
+            avatar=self.avatar_safe_address,
+            sell_token=token_in,
+            buy_token=token_out,
+            amount=amount_to_redeem,
+            kind=cowswap.SwapKind.SELL,
+            max_slippage=max_slippage,
+            valid_duration=20 * 60,
+            fork=fork,
+        )
+
     def exit_2(
         self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
     ) -> list[Transactable]:
@@ -264,7 +285,10 @@ class SwapDisassembler(Disassembler):
             else:
                 eth_amount = 0
                 approve_curve = ApproveCurve(
-                blockchain=self.blockchain, token_address=token_in, spender=swap_pool.address, amount=amount_to_redeem
+                    blockchain=self.blockchain,
+                    token_address=token_in,
+                    spender=swap_pool.address,
+                    amount=amount_to_redeem,
                 )
                 txns.append(approve_curve)
 
@@ -275,7 +299,7 @@ class SwapDisassembler(Disassembler):
                 token_y=swap_pool.tokens.index(token_out),
                 amount_x=amount_to_redeem,
                 min_amount_y=amount_out_min_slippage,
-                eth_amount=eth_amount
+                eth_amount=eth_amount,
             )
 
             txns.append(swap_curve)
@@ -329,7 +353,7 @@ class SwapDisassembler(Disassembler):
                 token_in = Addresses[self.blockchain].WETH
             elif token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
                 token_out = Addresses[self.blockchain].WETH
-                
+
             approve_uniswapV3 = ApproveUniswapV3(
                 blockchain=self.blockchain,
                 token_address=token_in,
