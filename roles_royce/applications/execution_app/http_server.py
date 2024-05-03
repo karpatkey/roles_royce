@@ -62,7 +62,7 @@ async def check(params: CheckParams, response: Response):
 
 
 @app.post("/simulate")
-async def sumilate(params: SimulateParams, response: Response):
+async def simulate(params: SimulateParams, response: Response):
     res = simulate_tx(
         dao=params.dao, blockchain=params.blockchain, transaction=params.transaction, rpc_url=params.rpc_url
     )
