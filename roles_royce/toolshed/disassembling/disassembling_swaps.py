@@ -30,6 +30,25 @@ class SwapDisassembler(Disassembler):
             return Addresses[self.blockchain].WXDAI
         else:
             raise ValueError("Blockchain not supported")
+        
+    def get_amount_to_redeem(self, token_in_address: Address, fraction: float | Decimal) -> int:
+        native = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+
+        balance = 0
+        if token_in_address == native:
+            balance = self.w3.eth.get_balance(self.avatar_safe_address)
+        else:
+            token_in_contract = self.w3.eth.contract(address=token_in_address, abi=Abis.ERC20.abi)
+            balance = token_in_contract.functions.balanceOf(self.avatar_safe_address).call()
+
+        amount = int(Decimal(balance) * Decimal(fraction))
+
+        if token_in_address == native:
+            min_amount = 3
+            if balance - amount <= Web3.to_wei(min_amount, "ether"):
+                raise ValueError(f"Must keep at least a balance of {min_amount} of native token")
+
+        return amount
     
     def get_pool_id(self, pool_address: Address) -> str:
         return (
