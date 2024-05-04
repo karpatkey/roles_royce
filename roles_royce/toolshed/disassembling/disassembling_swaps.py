@@ -17,12 +17,20 @@ from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from roles_royce.protocols.base import Address
 from roles_royce.protocols import cowswap
 from roles_royce.protocols.swap_pools.quote_methods import QuoteCurve, QuoteUniswapV3
-from roles_royce.protocols.swap_pools.swap_methods import ApproveCurve, ApproveUniswapV3, SwapCurve, SwapUniswapV3, WrapEther
+from roles_royce.protocols.swap_pools.swap_methods import ApproveCurve, ApproveUniswapV3, SwapCurve, SwapUniswapV3, WrapNativeToken
 from roles_royce.toolshed.disassembling.disassembler import Disassembler, validate_percentage
 
 
 @dataclass
 class SwapDisassembler(Disassembler):
+    def get_wrapped_token(self) -> Address:
+        if self.blockchain == Chain.ETHEREUM:
+            return Addresses[self.blockchain].WETH
+        elif self.blockchain == Chain.GNOSIS:
+            return Addresses[self.blockchain].WXDAI
+        else:
+            raise ValueError("Blockchain not supported")
+    
     def get_pool_id(self, pool_address: Address) -> str:
         return (
             self.w3.eth.contract(address=pool_address, abi=BalancerAbis[self.blockchain].UniversalBPT.abi)
@@ -47,9 +55,9 @@ class SwapDisassembler(Disassembler):
             if isinstance(attr_value, SwapPools) and attr_value.protocol == protocol:
                 if protocol == "UniswapV3" or protocol == "Balancer":
                     if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                        token_in = Addresses[blockchain].WETH
+                        token_in = self.get_wrapped_token() 
                     if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                        token_out = Addresses[blockchain].WETH
+                        token_out = self.get_wrapped_token() 
                 # Check if both tokens are in the instance's tokens list
                 if token_in in attr_value.tokens and token_out in attr_value.tokens:
                     instances.append(attr_value)
@@ -72,18 +80,18 @@ class SwapDisassembler(Disassembler):
 
         elif swap_pool.protocol == "UniswapV3":
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                token_in = Addresses[self.blockchain].WETH     
+                token_in = self.get_wrapped_token()    
             elif token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                token_out = Addresses[self.blockchain].WETH        
+                token_out = self.get_wrapped_token()       
             quote = QuoteUniswapV3(self.blockchain, token_in, token_out, amount_in, swap_pool.uni_fee)
             amount_out = quote.call(web3=self.w3)
             return swap_pool, amount_out[0]
 
         elif swap_pool.protocol == "Balancer":
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                token_in = Addresses[self.blockchain].WETH
+                token_in = self.get_wrapped_token() 
             elif token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                token_out = Addresses[self.blockchain].WETH 
+                token_out = self.get_wrapped_token() 
             pool_id = self.get_pool_id(swap_pool.address)
             quote = QuerySwap(
                 self.blockchain,
@@ -136,9 +144,9 @@ class SwapDisassembler(Disassembler):
             fork = False
    
         if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-            wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
-            txns.append(wrapETH)
-            token_in = Addresses[self.blockchain].WETH        
+            wraptoken = WrapNativeToken(blockchain=self.blockchain, eth_amount=amount_to_redeem)
+            txns.append(wraptoken)
+            token_in = self.get_wrapped_token()      
 
         return cowswap.create_order_and_swap(w3=self.w3,
                                             avatar=self.avatar_safe_address,
@@ -194,11 +202,11 @@ class SwapDisassembler(Disassembler):
             best_quote = max(quotes)
             amount_out_min_slippage = int(Decimal(best_quote) * Decimal(1 - max_slippage))
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
-                txns.append(wrapETH)
-                token_in = Addresses[self.blockchain].WETH
+                wraptoken = WrapNativeToken(blockchain=self.blockchain, eth_amount=amount_to_redeem)
+                txns.append(wraptoken)
+                token_in = self.get_wrapped_token() 
             elif token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                token_out = Addresses[self.blockchain].WETH
+                token_out = self.get_wrapped_token()
             approve_vault = ApproveForVault(token=token_in, amount=amount_to_redeem)
             swap_balancer = SingleSwap(
                 blockchain=self.blockchain,
@@ -324,11 +332,11 @@ class SwapDisassembler(Disassembler):
             best_quote = max(quotes)
             amount_out_min_slippage = int(Decimal(best_quote) * Decimal(1 - max_slippage))
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                wrapETH = WrapEther(blockchain=self.blockchain, eth_amount=amount_to_redeem)
-                txns.append(wrapETH)
-                token_in = Addresses[self.blockchain].WETH
+                wraptoken = WrapNativeToken(blockchain=self.blockchain, eth_amount=amount_to_redeem)
+                txns.append(wraptoken)
+                token_in = self.get_wrapped_token() 
             elif token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                token_out = Addresses[self.blockchain].WETH
+                token_out = self.get_wrapped_token()
                 
             approve_uniswapV3 = ApproveUniswapV3(
                 blockchain=self.blockchain,
