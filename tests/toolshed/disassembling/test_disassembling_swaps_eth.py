@@ -1,13 +1,18 @@
+import json
+from web3 import Web3
+import pytest
+
 from defabipedia.rocket_pool import ContractSpecs
 from defabipedia.swap_pools import EthereumSwapPools
 from defabipedia.tokens import Abis
 from defabipedia.types import Chain
 
+from roles_royce.roles_modifier import set_gas_strategy, GasStrategies
 from roles_royce.toolshed.disassembling import SwapDisassembler
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import create_simple_safe
+from tests.utils import create_simple_safe, steal_token
 from tests.fork_fixtures import accounts
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth
+from tests.fork_fixtures import local_node_eth_replay as local_node_eth, local_node_gc
 
 ROLE = 4
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
@@ -70,6 +75,11 @@ def test_integration_exit_1(local_node_eth, accounts):
         json_data=presets_balancer,
         replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
     )
+    w3.eth.send_transaction({
+        'to': avatar_safe.address,
+        'from': "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc", #5th fork account
+        'value': Web3.to_wei(6000, "ether")
+    })
 
     blockchain = Chain.get_blockchain_from_web3(w3)
 
@@ -114,6 +124,56 @@ def test_integration_exit_1(local_node_eth, accounts):
     reth_balance = reth_contract.functions.balanceOf(avatar_safe_address).call()
     assert reth_balance > 0
 
+def test_integration_exit_1_not_enough_eth(local_node_eth, accounts):
+    w3 = local_node_eth.w3
+    local_node_eth.set_block(BLOCK)
+
+    avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
+    roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
+    setup_common_roles(avatar_safe, roles_contract)
+    apply_presets(
+        avatar_safe,
+        roles_contract,
+        json_data=presets_balancer,
+        replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
+    )
+
+    blockchain = Chain.get_blockchain_from_web3(w3)
+
+    avatar_safe_address = avatar_safe.address
+    disassembler_address = accounts[4].address
+    private_key = accounts[4].key
+    role = 4
+
+    token_out = EthereumSwapPools.bal_rETH_WETH.tokens[0]
+    token_in = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+
+    amount_in = 500_000_000_000_000_000
+
+    swap_balancer_disassembler = SwapDisassembler(
+        w3=w3,
+        avatar_safe_address=avatar_safe_address,
+        roles_mod_address=roles_contract.address,
+        role=role,
+        signer_address=disassembler_address,
+    )
+
+    eth_balance = w3.eth.get_balance(avatar_safe_address)
+    assert (eth_balance - amount_in) < 3_000_000_000_000_000_000
+
+    weth_contract = w3.eth.contract(address=EthereumSwapPools.bal_rETH_WETH.tokens[1], abi=Abis.ERC20.abi)
+    weth_balance = weth_contract.functions.balanceOf(avatar_safe_address).call()
+    assert weth_balance == 0
+
+    with pytest.raises(ValueError) as exc_info:
+        swap_balancer_disassembler.exit_2(
+            percentage=50,
+            exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
+            amount_to_redeem=amount_in,
+        )
+    
+    expected_error_message = "Must keep at least a balance of 3 of native token"
+    assert str(exc_info.value) == expected_error_message
 
 presets_curve = """{
   "version": "1.0",
@@ -161,6 +221,11 @@ def test_integration_exit_2(local_node_eth, accounts):
         json_data=presets_curve,
         replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
     )
+    w3.eth.send_transaction({
+        'to': avatar_safe.address,
+        'from': "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc", #5th fork account
+        'value': Web3.to_wei(6000, "ether")
+    })
 
     blockchain = Chain.get_blockchain_from_web3(w3)
 
@@ -302,6 +367,12 @@ def test_integration_exit_3(local_node_eth, accounts):
         json_data=preset_uniswapv3,
         replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
     )
+
+    w3.eth.send_transaction({
+        'to': avatar_safe.address,
+        'from': "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc", #5th fork account
+        'value': Web3.to_wei(6000, "ether")
+    })
 
     blockchain = Chain.get_blockchain_from_web3(w3)
 

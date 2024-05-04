@@ -1,4 +1,4 @@
-from defabipedia.types import Blockchain
+from defabipedia.types import Blockchain, Chain
 from defabipedia.uniswap_v3 import ContractSpecs
 from defabipedia.tokens import Abis, Addresses
 
@@ -99,10 +99,15 @@ class ApproveUniswapV3(ContractMethod):
         self.args.spender = ContractSpecs[blockchain].UniV3_SwapRouter.address
         self.args.amount = amount
 
-class WrapEther(ContractMethod):
+class WrapNativeToken(ContractMethod):
     name = "deposit"
 
     def __init__(self, blockchain: Blockchain, eth_amount: int):
         super().__init__(value=eth_amount)
-        self.target_address = Addresses[blockchain].WETH
+        if blockchain == Chain.ETHEREUM:
+            self.target_address = Addresses[blockchain].WETH
+        elif blockchain == Chain.GNOSIS:
+            self.target_address = Addresses[blockchain].WXDAI
+        else:
+            raise ValueError(f"Unsupported blockchain {blockchain}")
 

@@ -132,6 +132,20 @@ wallet_tokens_swap = [
             {
                 "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"], # WSTETH
                 "token_out": ["0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1"], # WETH
+            },
+            {
+                "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"], # sDAI
+                "token_out": ["0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1", # WETH
+                              "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d", # WXDAI
+                              "0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
+                              "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", # USDC
+                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"] # xDAI
+            },
+            {
+                "token_in": ["0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # xDAI
+                "token_out": ["0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d", # WXDAI
+                              "0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
+                              "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"] # USDC
             }
         ]
     },
