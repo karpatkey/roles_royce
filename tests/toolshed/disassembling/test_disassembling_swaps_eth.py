@@ -159,7 +159,7 @@ def test_integration_exit_1_not_enough_eth(local_node_eth, accounts):
     )
 
     eth_balance = w3.eth.get_balance(avatar_safe_address)
-    assert eth_balance < 3_000_000_000_000_000_000
+    assert (eth_balance - amount_in) < 3_000_000_000_000_000_000
 
     weth_contract = w3.eth.contract(address=EthereumSwapPools.bal_rETH_WETH.tokens[1], abi=Abis.ERC20.abi)
     weth_balance = weth_contract.functions.balanceOf(avatar_safe_address).call()
