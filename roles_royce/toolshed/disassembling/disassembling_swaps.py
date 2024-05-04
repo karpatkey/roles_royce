@@ -163,6 +163,8 @@ class SwapDisassembler(Disassembler):
             fork = False
 
         if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+            if amount_to_redeem != None:
+                amount_to_redeem = self.get_amount_to_redeem(token_in, fraction)
             wraptoken = WrapNativeToken(blockchain=self.blockchain, eth_amount=amount_to_redeem)
             txns.append(wraptoken)
             token_in = self.get_wrapped_token()
@@ -222,6 +224,8 @@ class SwapDisassembler(Disassembler):
             best_quote = max(quotes)
             amount_out_min_slippage = int(Decimal(best_quote) * Decimal(1 - max_slippage))
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                if amount_to_redeem != None:
+                    amount_to_redeem = self.get_amount_to_redeem(token_in, fraction)
                 wraptoken = WrapNativeToken(blockchain=self.blockchain, eth_amount=amount_to_redeem)
                 txns.append(wraptoken)
                 token_in = self.get_wrapped_token()
@@ -288,6 +292,8 @@ class SwapDisassembler(Disassembler):
             amount_out_min_slippage = int(Decimal(best_quote) * Decimal(1 - max_slippage))
 
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                if amount_to_redeem != None:
+                    amount_to_redeem = self.get_amount_to_redeem(token_in, fraction)
                 eth_amount = amount_to_redeem
             else:
                 eth_amount = 0
@@ -355,6 +361,8 @@ class SwapDisassembler(Disassembler):
             best_quote = max(quotes)
             amount_out_min_slippage = int(Decimal(best_quote) * Decimal(1 - max_slippage))
             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
+                if amount_to_redeem != None:
+                    amount_to_redeem = self.get_amount_to_redeem(token_in, fraction)
                 wraptoken = WrapNativeToken(blockchain=self.blockchain, eth_amount=amount_to_redeem)
                 txns.append(wraptoken)
                 token_in = self.get_wrapped_token()
