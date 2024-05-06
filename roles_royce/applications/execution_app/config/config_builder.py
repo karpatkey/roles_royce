@@ -208,6 +208,18 @@ def seed_dict(dao: DAO, blockchain: Blockchain, positions: list) -> dict:
     }
     return data
 
+def get_wrapped_from_native(w3: Web3) -> str:
+    Blockchain = Chain.get_blockchain_from_web3(w3)
+    if Blockchain == Chain.ETHEREUM:
+        wrapped_token = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"   
+        wrapped_symbol = "WETH"
+        return wrapped_token, wrapped_symbol
+    elif Blockchain == Chain.GNOSIS:
+        wrapped_token = "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"
+        wrapped_symbol = "WXDAI"
+        return wrapped_token, wrapped_symbol
+    else:
+        raise ValueError("Blockchain not supported")
 
 # -----------------------------------------------------------------------------------------------------------------------
 # Position classes
@@ -318,7 +330,10 @@ class WalletPosition:
     def position_id_human_readable(self, w3: Web3) -> str:
         blockchain = Chain.get_blockchain_from_web3(w3)
         if self.token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-            return f"{blockchain}_WalletPosition_ETH"
+            if blockchain == Chain.GNOSIS:
+                return f"{blockchain}_WalletPosition_xDAI"
+            else:
+                return f"{blockchain}_WalletPosition_ETH"
         else:
             token_contract = erc20_contract(w3, self.token_in_address)
             token_symbol = token_contract.functions.symbol().call()
@@ -610,14 +625,14 @@ class DAOStrategiesBuilder:
                             position["exec_config"][0]["parameters"][0]["options"][0]["value"]=token_in_address
                             del position["exec_config"][0]["parameters"][2]["options"][0]
                             if token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                token_in_symbol = "ETH"
+                                token_address, token_in_symbol = get_wrapped_from_native(w3)
                             else:
                                 token_in_contract = erc20_contract(w3, token_in_address)
                                 token_in_symbol = token_in_contract.functions.symbol().call()
                             position["exec_config"][0]["parameters"][0]["options"][0]["label"]=token_in_symbol
                             for token_out in swap_entry["token_out"]:
                                 if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    token_out_symbol = "ETH"
+                                    token_address, token_out_symbol = get_wrapped_from_native(w3)
                                 else:
                                     token_out_contract = erc20_contract(w3, token_out)
                                     token_out_symbol = token_out_contract.functions.symbol().call()
@@ -644,9 +659,9 @@ class DAOStrategiesBuilder:
                                             attr_value.protocol == "Balancer" or attr_value.protocol == "UniswapV3"
                                         ) and (token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"):
                                             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                                token_in = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+                                                token_in, token_symbol = get_wrapped_from_native(w3)
                                             if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                                token_out = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+                                                token_out, token_symbol = get_wrapped_from_native(w3)
 
                                         if token_in in attr_value.tokens and token_out in attr_value.tokens:
                                             instances.append({"pair": token_pair, "pool": attr_value})
@@ -659,11 +674,11 @@ class DAOStrategiesBuilder:
                                 elif instance["pool"].protocol == "UniswapV3":
                                     i = 3
                                 if instance["pair"][0] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    token_in_symbol = "ETH"
+                                    token_not, token_in_symbol = get_wrapped_from_native(w3)
                                     token_out_contract = erc20_contract(w3, instance["pair"][1])
                                     token_out_symbol = token_out_contract.functions.symbol().call()
                                 elif instance["pair"][1] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    token_out_symbol = "ETH"
+                                    token_not, token_out_symbol = get_wrapped_from_native(w3)
                                     token_in_contract = erc20_contract(w3, instance["pair"][0])
                                     token_in_symbol = token_in_contract.functions.symbol().call()
                                 else:
