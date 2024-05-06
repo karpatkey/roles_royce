@@ -169,7 +169,7 @@ class SwapDisassembler(Disassembler):
             txns.append(wraptoken)
             token_in = self.get_wrapped_token()
 
-        return cowswap.create_order_and_swap(
+        cow_txns = cowswap.create_order_and_swap(
             w3=self.w3,
             avatar=self.avatar_safe_address,
             sell_token=token_in,
@@ -180,6 +180,11 @@ class SwapDisassembler(Disassembler):
             valid_duration=20 * 60,
             fork=fork,
         )
+
+        for cow_txn in cow_txns:
+            txns.append(cow_txn)
+
+        return txns
 
     def exit_2(
         self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
