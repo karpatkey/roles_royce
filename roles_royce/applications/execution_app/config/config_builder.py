@@ -117,7 +117,7 @@ wallet_tokens_swap = [
             {
                 "token_in": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6"], # USDT
                 "token_out": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", # USDC
-                              "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
+                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # XDAI
             },
             {
                 "token_in": ["0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
@@ -127,7 +127,7 @@ wallet_tokens_swap = [
             {
                 "token_in": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"], # USDC
                 "token_out": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
-                              "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
+                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # XDAI
             },
             {
                 "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"], # WSTETH
@@ -136,7 +136,6 @@ wallet_tokens_swap = [
             {
                 "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"], # sDAI
                 "token_out": ["0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1", # WETH
-                              "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d", # WXDAI
                               "0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
                               "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", # USDC
                               "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"] # xDAI
@@ -676,11 +675,11 @@ class DAOStrategiesBuilder:
                                 elif instance["pool"].protocol == "UniswapV3":
                                     i = 3
                                 if instance["pair"][0] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    token_in_symbol = "ETH"
+                                    x, y, token_in_symbol = get_wrapped_from_native(w3)
                                     token_out_contract = erc20_contract(w3, instance["pair"][1])
                                     token_out_symbol = token_out_contract.functions.symbol().call()
                                 elif instance["pair"][1] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    token_out_symbol = "ETH"
+                                    x, y, token_out_symbol = get_wrapped_from_native(w3)
                                     token_in_contract = erc20_contract(w3, instance["pair"][0])
                                     token_in_symbol = token_in_contract.functions.symbol().call()
                                 else:
