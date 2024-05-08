@@ -675,11 +675,11 @@ class DAOStrategiesBuilder:
                                 elif instance["pool"].protocol == "UniswapV3":
                                     i = 3
                                 if instance["pair"][0] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    x, token_in_symbol, y = get_wrapped_from_native(w3)
+                                    x, y, token_in_symbol = get_wrapped_from_native(w3)
                                     token_out_contract = erc20_contract(w3, instance["pair"][1])
                                     token_out_symbol = token_out_contract.functions.symbol().call()
                                 elif instance["pair"][1] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    x, token_out_symbol, y = get_wrapped_from_native(w3)
+                                    x, y, token_out_symbol = get_wrapped_from_native(w3)
                                     token_in_contract = erc20_contract(w3, instance["pair"][0])
                                     token_in_symbol = token_in_contract.functions.symbol().call()
                                 else:
