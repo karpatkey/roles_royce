@@ -5,7 +5,7 @@ from unittest.mock import mock_open, patch
 import pytest
 from defabipedia.types import Chain
 
-from roles_royce.applications.execution_app.config.config_builder import (
+from transaction_builder.applications.execution_app.config.config_builder import (
     DAO,
     AuraPosition,
     BalancerPosition,
@@ -27,11 +27,11 @@ test_data_str = json.dumps(test_data)
 @patch("builtins.open", mock_open(read_data=test_data_str))
 def test_build_aura_positions(local_node_gc):
     with patch(
-        "roles_royce.applications.execution_app.config.config_builder.get_bpt_from_aura_address"
+        "transaction_builder.applications.execution_app.config.config_builder.get_bpt_from_aura_address"
     ) as mock_get_bpt_from_aura_address, patch(
-        "roles_royce.applications.execution_app.config.config_builder.get_tokens_from_bpt"
+        "transaction_builder.applications.execution_app.config.config_builder.get_tokens_from_bpt"
     ) as mock_get_tokens_from_bpt, patch(
-        "roles_royce.applications.execution_app.config.config_builder.get_pool_id_from_bpt"
+        "transaction_builder.applications.execution_app.config.config_builder.get_pool_id_from_bpt"
     ) as mock_get_pool_id_from_bpt:
         dao = DAO.GnosisDAO
         blockchain = Chain.GNOSIS
@@ -131,9 +131,9 @@ test_data_str = json.dumps(test_data)
 @patch("builtins.open", mock_open(read_data=test_data_str))
 def test_build_balancer_positions(local_node_gc):
     with patch(
-        "roles_royce.applications.execution_app.config.config_builder.get_tokens_from_bpt"
+        "transaction_builder.applications.execution_app.config.config_builder.get_tokens_from_bpt"
     ) as mock_get_tokens_from_bpt, patch(
-        "roles_royce.applications.execution_app.config.config_builder.get_pool_id_from_bpt"
+        "transaction_builder.applications.execution_app.config.config_builder.get_pool_id_from_bpt"
     ) as mock_get_pool_id_from_bpt:
         dao = DAO.GnosisDAO
         blockchain = Chain.GNOSIS

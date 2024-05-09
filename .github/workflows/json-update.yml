@@ -40,7 +40,7 @@ jobs:
 
       - name: Run Python script
         run: |
-          RR_ETH_FORK_URL=${{ secrets.NODE_ETH }} RR_GC_FORK_URL=${{ secrets.NODE_XDAI }} python3 roles_royce/applications/execution_app/config/dao_config_builder.py
+          RR_ETH_FORK_URL=${{ secrets.NODE_ETH }} RR_GC_FORK_URL=${{ secrets.NODE_XDAI }} python3 transaction_builder/applications/execution_app/config/dao_config_builder.py
 
       - name: Commit and Push changes
         run: |

@@ -8,7 +8,7 @@ Example
 
 .. code-block:: python
 
-    from roles_royce import roles, GenericMethodTransaction, Operation, Chain
+    from transaction_builder import roles, GenericMethodTransaction, Operation, Chain
 
     CURVE_USDC_USDT_REWARD_GAUGE = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
 

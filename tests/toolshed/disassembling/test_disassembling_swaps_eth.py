@@ -7,8 +7,8 @@ from defabipedia.swap_pools import EthereumSwapPools
 from defabipedia.tokens import Abis
 from defabipedia.types import Chain
 
-from roles_royce.roles_modifier import set_gas_strategy, GasStrategies
-from roles_royce.toolshed.disassembling import SwapDisassembler
+from transaction_builder.roles_modifier import set_gas_strategy, GasStrategies
+from transaction_builder.toolshed.disassembling import SwapDisassembler
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
 from tests.utils import create_simple_safe, steal_token
 from tests.fork_fixtures import accounts

@@ -1,11 +1,11 @@
-Welcome to Roles Royce's docs!
+Welcome to Transaction Builder's docs!
 ==============================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-Roles Royce is a Python library designed to execute transactions using Zodiac
+Transaction Builder is a Python library designed to execute transactions using Zodiac
 `Roles Modifier contracts <https://github.com/gnosis/zodiac-modifier-roles-v1>`_.
 With support for many DeFi protocols this library serves as a versatile toolkit
 for securing your decentralized finance operations through the use of the
@@ -21,12 +21,12 @@ Roles Modifier contracts.
 Overview
 --------
 
-Roles Royce provides a way to declare protocol functions, called :class:`~roles_royce.protocols.base.ContractMethod`,
+Transaction Builder provides a way to declare protocol functions, called :class:`~transaction_builder.protocols.base.ContractMethod`,
 and some functions to interact with the Roles Modifier contract:
 
-- :meth:`roles_royce.roles.check` to statically check if a transaction will go through or will fail.
-- :meth:`roles_royce.roles.send` to actually send the transaction to the blockchain.
-- :meth:`roles_royce.roles.build` to create a transaction to later be sent to the blockchain
+- :meth:`transaction_builder.roles.check` to statically check if a transaction will go through or will fail.
+- :meth:`transaction_builder.roles.send` to actually send the transaction to the blockchain.
+- :meth:`transaction_builder.roles.build` to create a transaction to later be sent to the blockchain
   or other uses such as studying it or composing it with other contracts.
 
 Many DeFi protocols are already implemented, ready to be used. See `Supported protocols`_.
@@ -39,8 +39,8 @@ using an EOA, that has roles modifier preset with permissions, into the Spark pr
 
 .. code-block:: python
 
-    from roles_royce import roles
-    from roles_royce.protocols.eth import spark
+    from transaction_builder import roles
+    from transaction_builder.protocols.eth import spark
     from web3 import Web3, HTTPProvider
 
     safe_address = "0x..."
@@ -86,16 +86,16 @@ How to add support for a new protocol
 -------------------------------------
 
 To add support for ``My Porotocol`` in Mainnet create a python module in
-``roles_royce/protocols/eth/myproto.py``.
-In that file create a subclass of :class:`~roles_royce.protocols.base.ContractMethod` per function
+``transaction_builder/protocols/eth/myproto.py``.
+In that file create a subclass of :class:`~transaction_builder.protocols.base.ContractMethod` per function
 of the contract (or contracts of the protocols) that you want to support.
 
 Example of a simple function from the Lido protocol:
 
 .. code-block:: python
 
-    from roles_royce.constants import ETHAddr
-    from roles_royce.protocols.base import ContractMethod, Address
+    from transaction_builder.constants import ETHAddr
+    from transaction_builder.protocols.base import ContractMethod, Address
 
     class Wrap(ContractMethod):
         name = "wrap" # name of the function in the contract
@@ -162,9 +162,9 @@ Example:
 
 .. code-block:: python
 
-    from roles_royce import roles
-    from roles_royce.protocols.eth import aura
-    from roles_royce.utils import simulate_tx
+    from transaction_builder import roles
+    from transaction_builder.protocols.eth import aura
+    from transaction_builder.utils import simulate_tx
 
     ROLES_MOD = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
     REVOKER_ROLE = "0xf099e0f6604BDE0AA860B39F7da75770B34aC804"
@@ -199,13 +199,13 @@ Api
 Roles methods
 ~~~~~~~~~~~~~
 
-.. autofunction:: roles_royce.roles.build
+.. autofunction:: transaction_builder.roles.build
     :noindex:
 
-.. autofunction:: roles_royce.roles.check
+.. autofunction:: transaction_builder.roles.check
     :noindex:
 
-.. autofunction:: roles_royce.roles.send
+.. autofunction:: transaction_builder.roles.send
     :noindex:
 
 Reference

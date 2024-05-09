@@ -1,4 +1,4 @@
-name: Roles Royce tests
+name: Transaction Builder tests
 
 on: [push]
 

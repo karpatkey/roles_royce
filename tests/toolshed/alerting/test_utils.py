@@ -1,6 +1,6 @@
 from defabipedia.types import Chain
 
-from roles_royce.toolshed.alerting.utils import (
+from transaction_builder.toolshed.alerting.utils import (
     get_token_amounts_from_transfer_events,
     get_tx_executed_msg,
     get_tx_receipt_message_with_transfers,

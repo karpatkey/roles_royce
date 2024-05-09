@@ -7,9 +7,9 @@ from gnosis.safe import Safe, addresses
 from hexbytes import HexBytes
 from web3.types import TxParams, TxReceipt
 
-from roles_royce.constants import ETHAddr
-from roles_royce.generic_method import Transactable
-from roles_royce.utils import multi_or_one
+from transaction_builder.constants import ETHAddr
+from transaction_builder.generic_method import Transactable
+from transaction_builder.utils import multi_or_one
 
 
 class SafeExecutionFailure(Exception):

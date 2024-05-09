@@ -1,4 +1,4 @@
-from roles_royce.protocols.utils import check_allowance_and_approve
+from transaction_builder.protocols.utils import check_allowance_and_approve
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 

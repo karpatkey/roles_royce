@@ -1,6 +1,6 @@
-from roles_royce import roles
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols.eth import lido
+from transaction_builder import roles
+from transaction_builder.constants import ETHAddr
+from transaction_builder.protocols.eth import lido
 
 from .utils import create_simple_safe, get_balance
 from .fork_fixtures import accounts

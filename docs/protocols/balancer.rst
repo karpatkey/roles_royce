@@ -1,6 +1,6 @@
 Balancer
 ========
 
-.. automodule:: roles_royce.protocols.eth.balancer
+.. automodule:: transaction_builder.protocols.eth.balancer
     :members:
     :undoc-members:

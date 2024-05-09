@@ -1,0 +1,29 @@
+from transaction_builder.protocols.base import AvatarAddress, ApproveForToken
+from web3 import Web3
+from transaction_builder.generic_method import Transactable
+from defabipedia.tokens import Abis
+from web3.types import Address
+
+
+def check_allowance_and_approve(w3: Web3, avatar: AvatarAddress, token: Address, spender: Address,
+                                amount: int) -> Transactable | None:
+    """
+    Checks if the allowance of the token is enough for the spender to spend the amount and if not, returns an
+    approve transactable to approve the spender to spend the amount
+
+    Args:
+        w3: Web3 instance
+        avatar: Avatar address
+        token: Token address
+        spender: Spender address
+        amount: Amount to approve
+
+    Returns:
+        Transactable | None: ApproveForToken if allowance is not enough, None otherwise
+    """
+    allowance = w3.eth.contract(address=token, abi=Abis.ERC20.abi).functions.allowance(avatar, spender).call()
+
+    if allowance < amount:
+        return ApproveForToken(amount=amount, token=token, spender=spender)
+    else:
+        return None

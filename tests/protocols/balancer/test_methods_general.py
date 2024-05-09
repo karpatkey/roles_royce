@@ -1,4 +1,4 @@
-from roles_royce.protocols import balancer
+from transaction_builder.protocols import balancer
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 # --------------------------------------------------------------------------------------------------------------------

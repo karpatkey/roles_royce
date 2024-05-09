@@ -1,6 +1,6 @@
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols import aura
-from roles_royce.roles_modifier import RolesMod
+from transaction_builder.constants import ETHAddr
+from transaction_builder.protocols import aura
+from transaction_builder.roles_modifier import RolesMod
 
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 

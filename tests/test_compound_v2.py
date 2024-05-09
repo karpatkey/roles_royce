@@ -1,5 +1,5 @@
-import roles_royce.protocols.eth.compound_v2 as compound
-from roles_royce.constants import ETHAddr
+import transaction_builder.protocols.eth.compound_v2 as compound
+from transaction_builder.constants import ETHAddr
 
 
 def test_approve():

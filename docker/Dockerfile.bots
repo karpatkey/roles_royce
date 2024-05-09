@@ -15,7 +15,7 @@ RUN apt-get update -qq && apt-get upgrade -qq -y && \
 # Download safe_pysha3 wheels so there is no need to build them
 RUN git clone --depth=1 https://github.com/sanekto/safe_pysha3_whl.git /tmp/safe_pysha3_whl && \
     pip install --find-links=file:///tmp/safe_pysha3_whl . \
-    pip install -r roles_royce/applications/bots_requirements.txt
+    pip install -r transaction_builder/applications/bots_requirements.txt
 
 
 # Final Stage
@@ -26,7 +26,7 @@ WORKDIR /app
 # Copy the installed code from the build stage
 COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
-COPY roles_royce ./roles_royce
+COPY transaction_builder ./transaction_builder
 COPY tests tests
 
 ENV PYTHONPATH=.
@@ -38,6 +38,6 @@ ENV PYTHONPATH=.
 # * BOT_NAME=EURe_rebalancing
 # * BOT_NAME=spark_anti_liquidation
 #
-# In doubt check roles_royce/applications/run_bot.sh
+# In doubt check transaction_builder/applications/run_bot.sh
 
-CMD ["/app/roles_royce/applications/run_bot.sh"]
+CMD ["/app/transaction_builder/applications/run_bot.sh"]

@@ -2,8 +2,8 @@ from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 from karpatkit.constants import Address as GenAddr
 from pytest import approx
 
-from roles_royce import roles
-from roles_royce.protocols import uniswap_v3
+from transaction_builder import roles
+from transaction_builder.protocols import uniswap_v3
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
 from tests.utils import create_simple_safe, get_balance, steal_token, top_up_address
 from tests.fork_fixtures import accounts

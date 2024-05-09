@@ -1,8 +1,8 @@
 from decimal import Decimal
 
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols.eth import spark
-from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
+from transaction_builder.constants import ETHAddr
+from transaction_builder.protocols.eth import spark
+from transaction_builder.toolshed.protocol_utils.spark.utils import SparkUtils
 
 from .utils import create_simple_safe, get_balance, steal_token
 from .fork_fixtures import accounts

@@ -1,6 +1,6 @@
 Lido
 ====
 
-.. automodule:: roles_royce.protocols.eth.lido
+.. automodule:: transaction_builder.protocols.eth.lido
     :members:
     :undoc-members:

@@ -2,11 +2,11 @@ from decimal import Decimal
 
 from pytest import approx
 
-from roles_royce import roles
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols.eth import spark
-from roles_royce.toolshed.anti_liquidation.spark import CDPData, SparkCDPManager
-from roles_royce.toolshed.protocol_utils.spark.utils import SparkToken, SparkUtils
+from transaction_builder import roles
+from transaction_builder.constants import ETHAddr
+from transaction_builder.protocols.eth import spark
+from transaction_builder.toolshed.anti_liquidation.spark import CDPData, SparkCDPManager
+from transaction_builder.toolshed.protocol_utils.spark.utils import SparkToken, SparkUtils
 from tests.utils import (
     assign_role,
     create_simple_safe,

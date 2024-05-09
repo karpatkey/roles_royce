@@ -1,6 +1,6 @@
-from roles_royce.constants import ETHAddr, GCAddr
-from roles_royce.protocols.eth import aave_v2 as aave
-from roles_royce.roles_modifier import RolesMod
+from transaction_builder.constants import ETHAddr, GCAddr
+from transaction_builder.protocols.eth import aave_v2 as aave
+from transaction_builder.roles_modifier import RolesMod
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 AVATAR = "0x0EFcCBb9E2C09Ea29551879bd9Da32362b32fc89"

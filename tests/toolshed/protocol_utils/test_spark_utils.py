@@ -1,4 +1,4 @@
-from roles_royce.toolshed.protocol_utils.spark.utils import SparkToken, SparkUtils
+from transaction_builder.toolshed.protocol_utils.spark.utils import SparkToken, SparkUtils
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 

@@ -4,14 +4,14 @@ API
 Roles functions
 ---------------
 
-.. module:: roles_royce.roles
+.. module:: transaction_builder.roles
 
 
-.. autofunction:: roles_royce.roles.build
+.. autofunction:: transaction_builder.roles.build
 
-.. autofunction:: roles_royce.roles.check
+.. autofunction:: transaction_builder.roles.check
 
-.. autofunction:: roles_royce.roles.send
+.. autofunction:: transaction_builder.roles.send
 
 
 Transactable elements
@@ -21,20 +21,20 @@ Transactable elements
    :members:
    :inherited-members:
 
-.. autoclass:: roles_royce.protocols.base.ContractMethod
+.. autoclass:: transaction_builder.protocols.base.ContractMethod
    :members:
    :inherited-members:
 
 Roles Modifier
 --------------
 
-.. autointenum:: roles_royce.roles_modifier.Operation
+.. autointenum:: transaction_builder.roles_modifier.Operation
     :members:
 
-.. autoexception:: roles_royce.roles_modifier.TransactionWouldBeReverted
+.. autoexception:: transaction_builder.roles_modifier.TransactionWouldBeReverted
     :members:
 
-.. autoclass:: roles_royce.roles_modifier.RolesMod
+.. autoclass:: transaction_builder.roles_modifier.RolesMod
     :members:
 
 Simulation
@@ -42,8 +42,8 @@ Simulation
 
 Transactions can be simulated using Tenderly.
 
-.. autofunction:: roles_royce.utils.simulate_tx
+.. autofunction:: transaction_builder.utils.simulate_tx
 
-.. autofunction:: roles_royce.utils.tenderly_simulate
+.. autofunction:: transaction_builder.utils.tenderly_simulate
 
-.. autofunction:: roles_royce.utils.tenderly_share_simulation
+.. autofunction:: transaction_builder.utils.tenderly_share_simulation

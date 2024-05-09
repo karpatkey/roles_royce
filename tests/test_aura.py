@@ -1,6 +1,6 @@
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols.eth import aura
-from roles_royce.roles_modifier import RolesMod
+from transaction_builder.constants import ETHAddr
+from transaction_builder.protocols.eth import aura
+from transaction_builder.roles_modifier import RolesMod
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"

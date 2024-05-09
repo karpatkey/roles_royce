@@ -4,8 +4,8 @@ from defabipedia import Chain
 from defabipedia.rocket_pool import Abis, ContractSpecs
 from pytest import approx
 
-from roles_royce import roles
-from roles_royce.protocols.eth import rocket_pool
+from transaction_builder import roles
+from transaction_builder.protocols.eth import rocket_pool
 
 from .roles import apply_presets, deploy_roles, setup_common_roles
 from .utils import create_simple_safe, get_balance, top_up_address

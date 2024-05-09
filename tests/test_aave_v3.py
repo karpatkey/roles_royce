@@ -8,9 +8,9 @@ from defabipedia.types import Chain
 from eth_abi import encode
 from pytest import approx
 
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols.eth import aave_v3
-from roles_royce.toolshed.protocol_utils.aave_v3.cdp import AaveV3CDPManager, CDPData
+from transaction_builder.constants import ETHAddr
+from transaction_builder.protocols.eth import aave_v3
+from transaction_builder.toolshed.protocol_utils.aave_v3.cdp import AaveV3CDPManager, CDPData
 
 from .utils import get_balance
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth

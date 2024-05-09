@@ -1,6 +1,6 @@
 AAVEv2
 ======
 
-.. automodule:: roles_royce.protocols.eth.aave_v2
+.. automodule:: transaction_builder.protocols.eth.aave_v2
     :members:
     :undoc-members:
