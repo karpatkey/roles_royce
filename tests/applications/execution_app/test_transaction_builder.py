@@ -1,6 +1,6 @@
 import pytest
 
-from transaction_builder.applications.execution_app.transaction_builder import build_transaction
+from transaction_builder.applications.execution_app.axa_transaction_builder import build_transaction
 from transaction_builder.applications.execution_app.utils import ENV, ExecConfig
 from tests.utils import assign_role
 from tests.fork_fixtures import local_node_eth, accounts
