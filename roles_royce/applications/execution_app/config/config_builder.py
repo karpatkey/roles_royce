@@ -45,7 +45,7 @@ whitelist_poolIDs = [
     "0x49cbd67651fbabce12d1df18499896ec87bef46f00000000000000000000064a",  # USDC-USDT-DAI-sDAI eth
     "0xbad20c15a773bf03ab973302f61fabcea5101f0a000000000000000000000034",  # WETH-wstETH gc
     "0x7644fa5d0ea14fcf3e813fdf93ca9544f8567655000000000000000000000066",  # USDT-sDAI-USDC gc
-    "0xdd439304a77f54b1f7854751ac1169b279591ef7000000000000000000000064",  # sDAI-EURe gc
+    #"0xdd439304a77f54b1f7854751ac1169b279591ef7000000000000000000000064",  # sDAI-EURe gc
     "0x2086f52651837600180de173b09470f54ef7491000000000000000000000004f",  # USDT-USDC-WXDAI gc
     "0x06135a9ae830476d3a941bae9010b63732a055f4000000000000000000000065",  # stERU-EURe gc
     "0xc9f00c3a713008ddf69b768d90d4978549bfdf9400000000000000000000006d",  # crvUSD-sDAI gc
@@ -117,7 +117,7 @@ wallet_tokens_swap = [
             {
                 "token_in": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6"], # USDT
                 "token_out": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", # USDC
-                              "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
+                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # XDAI
             },
             {
                 "token_in": ["0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
@@ -127,11 +127,23 @@ wallet_tokens_swap = [
             {
                 "token_in": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"], # USDC
                 "token_out": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
-                              "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
+                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # XDAI
             },
             {
                 "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"], # WSTETH
                 "token_out": ["0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1"], # WETH
+            },
+            {
+                "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"], # sDAI
+                "token_out": ["0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1", # WETH
+                              "0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
+                              "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", # USDC
+                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"] # xDAI
+            },
+            {
+                "token_in": ["0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # xDAI
+                "token_out": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
+                              "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"] # USDC
             }
         ]
     },
@@ -195,6 +207,20 @@ def seed_dict(dao: DAO, blockchain: Blockchain, positions: list) -> dict:
     }
     return data
 
+def get_wrapped_from_native(w3: Web3) -> str:
+    Blockchain = Chain.get_blockchain_from_web3(w3)
+    if Blockchain == Chain.ETHEREUM:
+        wrapped_token = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"   
+        wrapped_symbol = "WETH"
+        native_symbol = "ETH"
+        return wrapped_token, wrapped_symbol, native_symbol
+    elif Blockchain == Chain.GNOSIS:
+        wrapped_token = "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"
+        wrapped_symbol = "WXDAI"
+        native_symbol = "xDAI"
+        return wrapped_token, wrapped_symbol, native_symbol
+    else:
+        raise ValueError("Blockchain not supported")
 
 # -----------------------------------------------------------------------------------------------------------------------
 # Position classes
@@ -305,7 +331,10 @@ class WalletPosition:
     def position_id_human_readable(self, w3: Web3) -> str:
         blockchain = Chain.get_blockchain_from_web3(w3)
         if self.token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-            return f"{blockchain}_WalletPosition_ETH"
+            if blockchain == Chain.GNOSIS:
+                return f"{blockchain}_WalletPosition_xDAI"
+            else:
+                return f"{blockchain}_WalletPosition_ETH"
         else:
             token_contract = erc20_contract(w3, self.token_in_address)
             token_symbol = token_contract.functions.symbol().call()
@@ -597,14 +626,14 @@ class DAOStrategiesBuilder:
                             position["exec_config"][0]["parameters"][0]["options"][0]["value"]=token_in_address
                             del position["exec_config"][0]["parameters"][2]["options"][0]
                             if token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                token_in_symbol = "ETH"
+                                x, y, token_in_symbol = get_wrapped_from_native(w3)
                             else:
                                 token_in_contract = erc20_contract(w3, token_in_address)
                                 token_in_symbol = token_in_contract.functions.symbol().call()
                             position["exec_config"][0]["parameters"][0]["options"][0]["label"]=token_in_symbol
                             for token_out in swap_entry["token_out"]:
                                 if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    token_out_symbol = "ETH"
+                                    x, y, token_out_symbol = get_wrapped_from_native(w3)
                                 else:
                                     token_out_contract = erc20_contract(w3, token_out)
                                     token_out_symbol = token_out_contract.functions.symbol().call()
@@ -631,9 +660,9 @@ class DAOStrategiesBuilder:
                                             attr_value.protocol == "Balancer" or attr_value.protocol == "UniswapV3"
                                         ) and (token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"):
                                             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                                token_in = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+                                                token_in, y, z = get_wrapped_from_native(w3)
                                             if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                                token_out = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+                                                token_out, y, z = get_wrapped_from_native(w3)
 
                                         if token_in in attr_value.tokens and token_out in attr_value.tokens:
                                             instances.append({"pair": token_pair, "pool": attr_value})
@@ -646,11 +675,11 @@ class DAOStrategiesBuilder:
                                 elif instance["pool"].protocol == "UniswapV3":
                                     i = 3
                                 if instance["pair"][0] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    token_in_symbol = "ETH"
+                                    x, y, token_in_symbol = get_wrapped_from_native(w3)
                                     token_out_contract = erc20_contract(w3, instance["pair"][1])
                                     token_out_symbol = token_out_contract.functions.symbol().call()
                                 elif instance["pair"][1] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    token_out_symbol = "ETH"
+                                    x, y, token_out_symbol = get_wrapped_from_native(w3)
                                     token_in_contract = erc20_contract(w3, instance["pair"][0])
                                     token_in_symbol = token_in_contract.functions.symbol().call()
                                 else:

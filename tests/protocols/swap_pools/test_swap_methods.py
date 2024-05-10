@@ -51,6 +51,6 @@ def test_swap_uniswap_v3():
     )
 
 def test_wrap_ether():
-    method = swap_methods.WrapEther(blockchain=Chain.ETHEREUM,
+    method = swap_methods.WrapNativeToken(blockchain=Chain.ETHEREUM,
                                     eth_amount=500_000_000_000_000_000)
     assert method.data == "0xd0e30db0"
