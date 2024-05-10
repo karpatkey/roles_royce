@@ -7,10 +7,10 @@ from defabipedia.tokens import erc20_contract
 from defabipedia.types import Chain
 from pytest import approx
 
-from roles_royce import roles
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols.eth import maker
-from roles_royce.utils import to_checksum_address
+from artemis import roles
+from artemis.constants import ETHAddr
+from artemis.protocols.eth import maker
+from artemis.utils import to_checksum_address
 
 from .roles import apply_presets, deploy_roles, setup_common_roles
 from .utils import create_simple_safe, get_balance, steal_token, top_up_address

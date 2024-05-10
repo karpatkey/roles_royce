@@ -1,10 +1,10 @@
 from defi_protocols.Maker import underlying
 from web3 import HTTPProvider, Web3
 
-from roles_royce import roles
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols.eth import maker
-from roles_royce.utils import to_checksum_address
+from artemis import roles
+from artemis.constants import ETHAddr
+from artemis.protocols.eth import maker
+from artemis.utils import to_checksum_address
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
 from tests.utils import (
     LOCAL_NODE_PORT,

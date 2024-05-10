@@ -1,8 +1,8 @@
 import json
 from defabipedia.types import Chain
-from roles_royce import roles
-from roles_royce.protocols.cowswap.methods_swap import create_order_and_swap, swap
-from roles_royce.protocols.cowswap.utils import SwapKind, Order, quote_order_api
+from artemis import roles
+from artemis.protocols.cowswap.methods_swap import create_order_and_swap, swap
+from artemis.protocols.cowswap.utils import SwapKind, Order, quote_order_api
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
 from tests.utils import create_simple_safe
 from tests.fork_fixtures import accounts

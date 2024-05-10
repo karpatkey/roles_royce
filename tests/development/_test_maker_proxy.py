@@ -3,7 +3,7 @@ from defi_protocols.functions import get_contract, get_data, get_decimals
 from defi_protocols.Maker import get_vault_data, underlying
 from web3 import HTTPProvider, Web3
 
-from roles_royce.utils import to_checksum_address
+from artemis.utils import to_checksum_address
 from tests.utils import LOCAL_NODE_PORT, fork_reset_state, fork_unlock_account
 
 VAT = "0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B"

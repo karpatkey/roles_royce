@@ -1,7 +1,7 @@
 from decimal import Decimal
 
-from roles_royce.applications.EURe_rebalancing_bot.swaps import Swapper, SwapsData, SwapsDataManager
-from roles_royce.evm_utils import erc20_abi
+from artemis.applications.EURe_rebalancing_bot.swaps import Swapper, SwapsData, SwapsDataManager
+from artemis.evm_utils import erc20_abi
 from tests.utils import assign_role
 from tests.fork_fixtures import accounts
 from tests.fork_fixtures import local_node_gc_replay as local_node_gc

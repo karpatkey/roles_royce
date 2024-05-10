@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from roles_royce.applications.execution_app.utils import ENV, ExecConfig
+from artemis.applications.execution_app.utils import ENV, ExecConfig
 from tests.utils import assign_role
 from tests.fork_fixtures import accounts, local_node_eth
 
@@ -105,7 +105,7 @@ def test_execute(local_node_eth, accounts, monkeypatch, tx):
 
     file_path_execute = os.path.join(
         Path(os.path.dirname(__file__)).resolve().parent.parent.parent,
-        "roles_royce",
+        "artemis",
         "applications",
         "execution_app",
         "execute.py",

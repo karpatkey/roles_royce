@@ -2,8 +2,8 @@ import json
 import os
 from dataclasses import dataclass
 
-from roles_royce.applications.execution_app.stresstest import stresstest
-from roles_royce.applications.execution_app.utils import ENV
+from artemis.applications.execution_app.stresstest import stresstest
+from artemis.applications.execution_app.utils import ENV
 from tests.utils import assign_role
 
 

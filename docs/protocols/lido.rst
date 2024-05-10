@@ -1,6 +1,6 @@
 Lido
 ====
 
-.. automodule:: roles_royce.protocols.eth.lido
+.. automodule:: artemis.protocols.eth.lido
     :members:
     :undoc-members:

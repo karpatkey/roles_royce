@@ -1,6 +1,6 @@
-from roles_royce import roles
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols.eth import lido
+from artemis import roles
+from artemis.constants import ETHAddr
+from artemis.protocols.eth import lido
 
 from .utils import create_simple_safe, get_balance
 from .fork_fixtures import accounts

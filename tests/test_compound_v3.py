@@ -1,7 +1,7 @@
 from web3 import Web3
 
-import roles_royce.protocols.eth.compound_v3 as compound
-from roles_royce.constants import ETHAddr
+import artemis.protocols.eth.compound_v3 as compound
+from artemis.constants import ETHAddr
 
 
 def test_approve():

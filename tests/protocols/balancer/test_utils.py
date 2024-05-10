@@ -1,7 +1,7 @@
 import pytest
 
-from roles_royce.protocols.balancer.types_and_enums import PoolKind
-from roles_royce.protocols.balancer.utils import Pool
+from artemis.protocols.balancer.types_and_enums import PoolKind
+from artemis.protocols.balancer.utils import Pool
 
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 

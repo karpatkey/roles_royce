@@ -1,6 +1,6 @@
 Makerdao
 ========
 
-.. automodule:: roles_royce.protocols.eth.maker
+.. automodule:: artemis.protocols.eth.maker
     :members:
     :undoc-members:

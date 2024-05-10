@@ -3,9 +3,9 @@ import json
 from defabipedia.types import Chain
 from web3 import Web3
 
-from roles_royce.evm_utils import roles_abi, roles_bytecode
-from roles_royce.generic_method import TxData
-from roles_royce.utils import MULTISENDS, to_checksum_address
+from artemis.evm_utils import roles_abi, roles_bytecode
+from artemis.generic_method import TxData
+from artemis.utils import MULTISENDS, to_checksum_address
 
 from .utils import TEST_ACCOUNTS, SimpleSafe
 

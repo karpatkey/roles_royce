@@ -1,4 +1,4 @@
-from roles_royce.applications.execution_app.config.utils import get_pool_id_from_bpt
+from artemis.applications.execution_app.config.utils import get_pool_id_from_bpt
 from tests.fork_fixtures import local_node_gc_replay as local_node_gc
 
 BPT = "0x06135A9Ae830476d3a941baE9010B63732a055F4"

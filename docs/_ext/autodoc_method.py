@@ -5,8 +5,8 @@ from docutils.statemachine import StringList
 from sphinx.application import Sphinx
 from sphinx.ext.autodoc import ClassDocumenter, bool_option, get_class_members
 
-from roles_royce.constants import StrEnum
-from roles_royce.protocols.base import ContractMethod
+from artemis.constants import StrEnum
+from artemis.protocols.base import ContractMethod
 
 
 class ContractMethodDocumenter(ClassDocumenter):

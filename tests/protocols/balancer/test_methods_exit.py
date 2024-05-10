@@ -1,5 +1,5 @@
-from roles_royce.protocols import balancer
-from roles_royce.protocols.balancer.utils import Pool
+from artemis.protocols import balancer
+from artemis.protocols.balancer.utils import Pool
 
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 

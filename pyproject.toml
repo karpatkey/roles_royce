@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "rolesroyce"
+name = "artemis"
 dynamic = ["version"]
 description = "Create and execute DeFi transactions through the Roles Modifier contracts"
 readme = "README.md"
@@ -28,7 +28,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/karpatkey/roles_royce"
+Homepage = "https://github.com/karpatkey/artemis"
 
 [tool.hatch.version]
 source = "vcs"
@@ -40,7 +40,7 @@ version-file = "_version.py"
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["roles_royce"]
+packages = ["artemis"]
 
 # Linter configuration.
 [tool.isort]

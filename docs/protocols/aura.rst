@@ -1,6 +1,6 @@
 Aura
 ====
 
-.. automodule:: roles_royce.protocols.eth.aura
+.. automodule:: artemis.protocols.eth.aura
     :members:
     :undoc-members:

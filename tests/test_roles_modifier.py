@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from roles_royce.roles_modifier import (
+from artemis.roles_modifier import (
     AGGRESIVE_FEE_MULTIPLER,
     AGGRESIVE_GAS_LIMIT_MULTIPLIER,
     NORMAL_FEE_MULTIPLER,

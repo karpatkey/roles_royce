@@ -1,6 +1,6 @@
 import pytest
 
-from roles_royce.applications.execution_app.utils import (
+from artemis.applications.execution_app.utils import (
     ENV,
     ExecConfig,
     Modes,

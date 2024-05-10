@@ -5,14 +5,14 @@ from gnosis.eth import EthereumNetwork
 from gnosis.safe import Safe, SafeOperation, addresses
 from web3 import Web3
 
-from roles_royce import roles
-from roles_royce.constants import ETHAddr
-from roles_royce.evm_utils import dai_abi, roles_abi, roles_bytecode
-from roles_royce.generic_method import TxData
-from roles_royce.protocols import balancer
-from roles_royce.protocols.eth import aura
-from roles_royce.roles_modifier import TransactionWouldBeReverted
-from roles_royce.utils import MULTISENDS, to_checksum_address
+from artemis import roles
+from artemis.constants import ETHAddr
+from artemis.evm_utils import dai_abi, roles_abi, roles_bytecode
+from artemis.generic_method import TxData
+from artemis.protocols import balancer
+from artemis.protocols.eth import aura
+from artemis.roles_modifier import TransactionWouldBeReverted
+from artemis.utils import MULTISENDS, to_checksum_address
 
 from .roles import apply_presets, deploy_roles, setup_common_roles
 from .utils import (
