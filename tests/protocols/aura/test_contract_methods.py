@@ -1,6 +1,6 @@
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols import aura
-from roles_royce.roles_modifier import RolesMod
+from artemis.constants import ETHAddr
+from artemis.protocols import aura
+from artemis.roles_modifier import RolesMod
 
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 

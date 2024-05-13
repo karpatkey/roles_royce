@@ -1,6 +1,6 @@
-from roles_royce import roles
-from roles_royce.protocols.eth import aura
-from roles_royce.toolshed.simulation import (
+from artemis import roles
+from artemis.protocols.eth import aura
+from artemis.toolshed.simulation import (
     TenderlyCredentials,
     simulate_tx,
     tenderly_share_simulation,

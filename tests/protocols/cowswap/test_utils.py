@@ -1,5 +1,5 @@
 from defabipedia.types import Chain
-from roles_royce.protocols.cowswap.utils import SwapKind, create_order_api, quote_order_api, Order, create_order
+from artemis.protocols.cowswap.utils import SwapKind, create_order_api, quote_order_api, Order, create_order
 import json
 
 

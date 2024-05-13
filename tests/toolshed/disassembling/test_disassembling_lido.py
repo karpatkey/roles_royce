@@ -5,9 +5,9 @@ import requests
 from defabipedia.lido import ContractSpecs
 from defabipedia.types import Chain
 
-from roles_royce.protocols.eth import lido
-from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
-from roles_royce.toolshed.disassembling import LidoDisassembler
+from artemis.protocols.eth import lido
+from artemis.roles_modifier import GasStrategies, set_gas_strategy
+from artemis.toolshed.disassembling import LidoDisassembler
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
 from tests.utils import create_simple_safe, steal_token
 from tests.fork_fixtures import accounts

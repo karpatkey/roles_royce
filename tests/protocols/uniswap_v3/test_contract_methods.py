@@ -3,8 +3,8 @@ from defabipedia.types import Chain
 from defabipedia.uniswap_v3 import ContractSpecs
 from pytest import approx
 
-from roles_royce import roles
-from roles_royce.protocols import uniswap_v3
+from artemis import roles
+from artemis.protocols import uniswap_v3
 from tests.roles import apply_presets, deploy_roles, setup_common_roles
 from tests.utils import create_simple_safe, get_balance, steal_token, top_up_address
 from tests.fork_fixtures import accounts

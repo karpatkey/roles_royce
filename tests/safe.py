@@ -7,9 +7,9 @@ from gnosis.safe import Safe, addresses
 from hexbytes import HexBytes
 from web3.types import TxParams, TxReceipt
 
-from roles_royce.constants import ETHAddr
-from roles_royce.generic_method import Transactable
-from roles_royce.utils import multi_or_one
+from artemis.constants import ETHAddr
+from artemis.generic_method import Transactable
+from artemis.utils import multi_or_one
 
 
 class SafeExecutionFailure(Exception):

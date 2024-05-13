@@ -1,6 +1,6 @@
-# Roles Royce
+# Artemis
 
-Roles Royce is a Python library designed to execute transactions using Zodiac
+Artemis is a Python library designed to execute transactions using Zodiac
 Roles Modifier contracts (https://github.com/gnosis/zodiac-modifier-roles-v1).
 With support for many DeFi protocols this library serves as a versatile toolkit
 for securing your decentralized finance operations through the use of the
@@ -21,8 +21,8 @@ Check the docs in TODO
 Send a tx to the blockchain through a Roles Modifier contract:
 
 ```python 
-from roles_royce.protocols.eth import aave_v2
-from roles_royce import roles
+from artemis.protocols.eth import aave_v2
+from artemis import roles
 from web3 import Web3, HTTPProvider
 
 w3 = Web3(HTTPProvider("https://..."))
@@ -38,7 +38,7 @@ status = roles.send([claim],
 ## Development
 
 * Install the python dev dependencies: `pip install -r requirements-dev.txt`
-* Install rolls_royce in editable mode: `pip install -e .`
+* Install artemis in editable mode: `pip install -e .`
 * Install anvil by downloading it from https://github.com/foundry-rs/foundry.
 
 To run the tests start anvil in a terminal in fork mode on ports 8546 and 8547 with:

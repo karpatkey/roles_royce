@@ -16,8 +16,8 @@ from web3 import HTTPProvider, Web3
 from web3.exceptions import ContractLogicError
 from web3.types import TxReceipt
 
-from roles_royce.constants import ETHAddr
-from roles_royce.evm_utils import erc20_abi
+from artemis.constants import ETHAddr
+from artemis.evm_utils import erc20_abi
 
 from .safe import SimpleSafe
 

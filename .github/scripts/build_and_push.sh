@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 
-REPO_URL="https://github.com/karpatkey/roles_royce.git"
+REPO_URL="https://github.com/karpatkey/artemis.git"
 
 # pass as environment variables
 # GIT_REF= #GITHUB_REF

@@ -1,6 +1,6 @@
 Spark
 =====
 
-.. automodule:: roles_royce.protocols.eth.spark
+.. automodule:: artemis.protocols.eth.spark
     :members:
     :undoc-members:

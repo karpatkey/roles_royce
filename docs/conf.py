@@ -8,7 +8,7 @@ import sys
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "Roles Royce"
+project = "Artemis"
 copyright = "2023, Karpatkey"
 author = "Karpatkey"
 
@@ -45,8 +45,8 @@ html_theme_options = {
     "page_width": "1200px",
     #'canonical_url': ,
     "extra_nav_links": {
-        "Source code": "https://github.com/KarpatkeyDAO/roles_royce/",
-        "Issue tracker": "https://github.com/KarpatkeyDAO/roles_royce/issues",
+        "Source code": "https://github.com/KarpatkeyDAO/artemis/",
+        "Issue tracker": "https://github.com/KarpatkeyDAO/artemis/issues",
         "Karpatkey": "https://www.karpatkey.com/",
     },
 }
