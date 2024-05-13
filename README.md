@@ -35,10 +35,29 @@ status = roles.send([claim],
 
 ```
 
+## Install
+
+When using `roleroyce` as a library, you have two way to install it:
+```sh
+pip install . 'roleroyce[all]'
+```
+or, if you experiment dependencies conflicts, you can take control over some dependencies version by removing `[all]`
+but specifying each missing dependencie.
+```sh
+pip install . 'roleroyce'
+pip install "karpatkit @ git+https://github.com/karpatkey/karpatkit.git@another_specific_version"
+```
+where `another_specific_version` should be a git reference (tag, hash, branch).
+
+Have a look `all` in the [pyproject.toml](pyproject.toml) file, `[project.optional-dependencies]` section.
+
+> Take into account that installing just `roleroyce` without `roleroyce[all]` is an incompleted instalation.
+
+
 ## Development
 
 * Install the python dev dependencies: `pip install -r requirements-dev.txt`
-* Install rolls_royce in editable mode: `pip install -e .`
+* Install rolls_royce in editable mode: `pip install -e . 'rolesroyce[all]'`
 * Install anvil by downloading it from https://github.com/foundry-rs/foundry.
 
 To run the tests start anvil in a terminal in fork mode on ports 8546 and 8547 with:
