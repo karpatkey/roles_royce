@@ -37,21 +37,21 @@ status = roles.send([claim],
 
 ## Install
 
-When using `roleroyce` as a library, you have two way to install it:
+When using `rolesroyce` as a library, you have two way to install it:
 ```sh
-pip install . 'roleroyce[all]'
+pip install . 'rolesroyce[all]'
 ```
 or, if you experiment dependencies conflicts, you can take control over some dependencies version by removing `[all]`
 but specifying each missing dependencie.
 ```sh
-pip install . 'roleroyce'
+pip install . 'rolesroyce'
 pip install "karpatkit @ git+https://github.com/karpatkey/karpatkit.git@another_specific_version"
 ```
 where `another_specific_version` should be a git reference (tag, hash, branch).
 
 Have a look `all` in the [pyproject.toml](pyproject.toml) file, `[project.optional-dependencies]` section.
 
-> Take into account that installing just `roleroyce` without `roleroyce[all]` is an incompleted instalation.
+> Take into account that installing just `rolesroyce` without `rolesroyce[all]` is an incompleted instalation.
 
 
 ## Development
