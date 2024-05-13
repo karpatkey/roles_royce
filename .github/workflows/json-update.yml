@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip3 install web3
-          pip3 install -e .
+          pip3 install -e . 'rolesroyce[all]'
           pip3 install --upgrade setuptools
 
       - name: Run Python script
