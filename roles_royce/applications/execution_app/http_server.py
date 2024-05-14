@@ -32,7 +32,7 @@ class SimulateParams(BaseModel):
 
 
 @app.post("/build")
-async def build(params: BuildParams, response: Response):
+def build(params: BuildParams, response: Response):
     res = build_transaction(
         dao=params.dao,
         blockchain=params.blockchain,
@@ -49,7 +49,7 @@ async def build(params: BuildParams, response: Response):
 
 
 @app.post("/check")
-async def check(params: CheckParams, response: Response):
+def check(params: CheckParams, response: Response):
     res = transaction_check(
         dao=params.dao,
         blockchain=params.blockchain,
@@ -62,7 +62,7 @@ async def check(params: CheckParams, response: Response):
 
 
 @app.post("/simulate")
-async def simulate(params: SimulateParams, response: Response):
+def simulate(params: SimulateParams, response: Response):
     res = simulate_tx(
         dao=params.dao, blockchain=params.blockchain, transaction=params.transaction, rpc_url=params.rpc_url
     )
