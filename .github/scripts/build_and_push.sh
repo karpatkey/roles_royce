@@ -19,9 +19,22 @@ COMMIT_SHA=$(git rev-parse HEAD)
 DOCKER_TAG="${DOCKER_IMAGE_NAME}:${BRANCH_NAME}"
 DOCKER_TAG_WITH_HASH="${DOCKER_IMAGE_NAME}:${BRANCH_NAME}-${COMMIT_SHA:0:7}"
 
-docker build  --tag "${DOCKER_TAG}" --tag "${DOCKER_TAG_WITH_HASH}" --file "${DOCKERFILE}" .
+mkdir -p kaniko/.docker
+echo "{\"auths\":{\"$DOCKER_REGISTRY\":{\"username\":\"$DOCKER_USERNAME\",\"password\":\"$DOCKER_PASSWORD\"}}}" > kaniko/.docker/config.json
 
-echo "$DOCKER_PASSWORD" | docker login $DOCKER_REGISTRY --username "$DOCKER_USERNAME" --password-stdin
+docker run --rm -v $(pwd):/workspace -v $(pwd)/kaniko/.cache:/cache -v $(pwd)/kaniko/.docker:/kaniko/.docker \
+  gcr.io/kaniko-project/executor:latest \
+  --context . \
+  --dockerfile "$DOCKERFILE" \
+  --destination "$DOCKER_TAG" \
+  --destination "$DOCKER_TAG_WITH_HASH" \
+  --cache=true \
+  --cache-dir=/cache \
+  --compressed-caching=true \
+  --cache-repo="$DOCKER_IMAGE_NAME"
 
-docker push "${DOCKER_TAG_WITH_HASH}"
-docker push "${DOCKER_TAG}"
+  # --cache-copy-layers \
+  # --cache-run-layers \
+  # --insecure --skip-tls-verify-pull
+
+echo "Image pushed to registry: $DOCKER_TAG"
