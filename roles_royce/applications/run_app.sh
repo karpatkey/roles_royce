@@ -11,6 +11,10 @@ elif [[ "$APP" == "EURe_rebalancing" ]]; then
 elif [[ "$APP" == "GBPe_rebalancing" ]]; then
   python3 -u "$SCRIPT_DIR/GBPe_rebalancing_bot/GBPe_bot.py"
 elif [[ "$APP" == "execution_app" ]]; then
+  DEFAULT_VAULT_FILE=/vault/secrets/envrc
+  ENV_FILE=${ENVRC:-$DEFAULT_VAULT_FILE}
+
+  [ ! -e $ENV_FILE ] || command . $ENV_FILE && \
   uvicorn roles_royce.applications.execution_app.http_server:app \
     --log-level=info \
     --no-use-colors \
