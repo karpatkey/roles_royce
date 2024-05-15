@@ -64,7 +64,7 @@ def build_transaction_env(
         if not txn_transactables:
             return {
                 "status": 400,
-                "message": "There are no funds in the position, no transactions to build",
+                "error": "There are no funds in the position, no transactions to build",
             }
 
         decoded_transaction = decode_transaction(txns=txn_transactables, env=env)
@@ -130,7 +130,7 @@ def build_transaction(
         )
     except Exception as e:
         print(traceback.format_exc())
-        return {"status": 500, "message": f"Error: {e}"}
+        return {"status": 500, "error": f"Error: {e}"}
 
 
 def main():

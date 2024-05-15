@@ -125,9 +125,9 @@ def single_stresstest(
             web3=web3,
         )
         if result["status"] != 200:
-            logger.info(f'Error in transaction builder. Error1: {result["message"]}')
+            logger.info(f'Error in transaction builder. Error1: {result["error"]}')
             exec_config["stresstest"] = False
-            exec_config["stresstest_error"] = f"error: {result['message']}"
+            exec_config["stresstest_error"] = f'error: {result["error"]}'
         else:
             logger.info(f'Status of transaction builder: {result["status"]}')
             tx = result["tx_data"]["transaction"]
@@ -135,9 +135,9 @@ def single_stresstest(
             try:
                 result = execute_env(env=env, transaction=tx, web3=web3)
                 if result["status"] != 200:
-                    logger.info(f'Error in execution. Error: {result["message"]}')
+                    logger.info(f'Error in execution. Error: {result["error"]}')
                     exec_config["stresstest"] = False
-                    exec_config["stresstest_error"] = f"error: {result['message']}"
+                    exec_config["stresstest_error"] = f"error: {result['error']}"
                 else:
                     logger.info(f'Status of execution: {result["status"]}')
                     exec_config["stresstest"] = True
