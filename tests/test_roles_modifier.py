@@ -37,7 +37,6 @@ class RolesModTester(RolesMod):
         return super().estimate_gas(contract_address, data, block=block)
 
 
-@pytest.mark.skip(reason="test passes locally but we get different gas results on CI")
 def test_check_and_execute(local_node_gc):
     w3 = local_node_gc.w3
     local_node_gc.set_block(TEST_BLOCK)
@@ -53,12 +52,12 @@ def test_check_and_execute(local_node_gc):
         roles.execute(contract_address="0x4ECaBa5870353805a9F068101A40E0f32ed605C6", data=usdt_approve, check=False)
         assert roles._tx["value"] == 0
         assert roles._tx["chainId"] == 0x64
+        assert roles._tx["nonce"] == 42
         # Different Rpc endpoints return different values for the gas
         # "https://rpc.ankr.com/gnosis" returns 132_451
         # "https://gnosis-mainnet.public.blastapi.io" returns 142_641
         # Some endpoints fail when calling the estimate_gas method
-        assert roles._tx["gas"] == 132_451 or roles._tx["gas"] == 142_641
-        assert roles._tx["nonce"] == 42
+        # assert roles._tx["gas"] == 132_451 or roles._tx["gas"] == 142_641
 
 
 def test_roles_v2(local_node_eth):
