@@ -16,7 +16,6 @@ from roles_royce.utils import MULTISENDS, to_checksum_address
 
 from .roles import apply_presets, deploy_roles, setup_common_roles
 from .utils import (
-    ETH_LOCAL_NODE_URL,
     create_simple_safe,
     get_balance,
     steal_token,

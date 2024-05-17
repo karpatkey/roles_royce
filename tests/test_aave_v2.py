@@ -33,7 +33,7 @@ def test_approve_method_with_roles(local_node_eth):
     ROLE = 1
     ROLES_MOD_ADDRESS = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
     REVOKER_ADDRESS = "0xf099e0f6604BDE0AA860B39F7da75770B34aC804"
-    roles_mod = RolesMod(role=ROLE, contract_address=ROLES_MOD_ADDRESS, account=REVOKER_ADDRESS, web3=w3)
+    roles_mod = RolesMod(role=ROLE, contract_address=ROLES_MOD_ADDRESS, account=REVOKER_ADDRESS, w3=w3)
     check_transaction = roles_mod.check(method.target_address, method.data, block=17603159)
     assert check_transaction
 
@@ -109,7 +109,7 @@ def test_cooldown(local_node_eth):
     w3 = local_node_eth.w3
     local_node_eth.set_block(17683159)
     method = aave.CooldownStkAAVE()
-    roles_mod = RolesMod(role=1, contract_address=ROLES_MOD_ADDRESS, account=MANAGER_SAFE_ADDRESS, web3=w3)
+    roles_mod = RolesMod(role=1, contract_address=ROLES_MOD_ADDRESS, account=MANAGER_SAFE_ADDRESS, w3=w3)
     check_transaction = roles_mod.check(method.target_address, method.data, block=17603159)
     assert check_transaction
 
@@ -119,7 +119,7 @@ def test_claim(local_node_eth):
     local_node_eth.set_block(17683159)
     method = aave.ClaimAAVERewards(avatar=AVATAR, amount=10)
 
-    roles_mod = RolesMod(role=1, contract_address=ROLES_MOD_ADDRESS, account=MANAGER_SAFE_ADDRESS, web3=w3)
+    roles_mod = RolesMod(role=1, contract_address=ROLES_MOD_ADDRESS, account=MANAGER_SAFE_ADDRESS, w3=w3)
     check_transaction = roles_mod.check(method.target_address, method.data, block=17603159)
     assert check_transaction
 

@@ -35,7 +35,7 @@ def build(
         contract_address=roles_mod_address,
         account=account,
         operation=tx_data.operation,
-        web3=web3,
+        w3=web3,
         value=tx_data.value,
     )
     tx_kwargs = tx_kwargs or {}
@@ -71,7 +71,7 @@ def check(
         contract_address=roles_mod_address,
         account=account,
         operation=tx_data.operation,
-        web3=web3,
+        w3=web3,
         value=tx_data.value,
     )
     return roles_mod.check(tx_data.contract_address, tx_data.data, block=block)
@@ -104,7 +104,7 @@ def send(
         contract_address=roles_mod_address,
         private_key=private_key,
         operation=tx_data.operation,
-        web3=web3,
+        w3=web3,
         value=tx_data.value,
     )
     tx_kwargs = tx_kwargs or {}
