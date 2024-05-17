@@ -52,23 +52,23 @@ ROLES_V1_ERRORS = [
 ]
 
 ROLES_V2_ERRORS = [
-    "AlreadyDisabledModule()",
-    "AlreadyEnabledModule()",
+    "AlreadyDisabledModule(address)",
+    "AlreadyEnabledModule(address)",
     "ArraysDifferentLength()",
     "CalldataOutOfBounds()",
-    "ConditionViolation()",
+    "ConditionViolation(uint8,bytes32)",
     "FunctionSignatureTooShort()",
-    "HashAlreadyConsumed()",
+    "HashAlreadyConsumed(bytes32)",
     "InvalidInitialization()",
-    "InvalidModule()",
+    "InvalidModule(address)",
     "InvalidPageSize()",
     "MalformedMultiEntrypoint()",
     "ModuleTransactionFailed()",
     "NoMembership()",
-    "NotAuthorized()",
+    "NotAuthorized(address)",
     "NotInitializing()",
-    "OwnableInvalidOwner()",
-    "OwnableUnauthorizedAccount()",
+    "OwnableInvalidOwner(address)",
+    "OwnableUnauthorizedAccount(address)",
     "SetupModulesAlreadyCalled()",
 ]
 
@@ -192,9 +192,10 @@ class RolesMod:
             self._build_exec_transaction(contract_address, data).call({"from": self.account}, block_identifier=block)
             return True
         except exceptions.ContractCustomError as e:
-            custom_roles_error = ROLES_ERRORS_SELECTORS.get(e.data, None)
+            custom_roles_error = ROLES_ERRORS_SELECTORS.get(e.data[:10], None)
+            # TODO: decode the error arguments from the data
             if custom_roles_error:
-                raise TransactionWouldBeReverted(ROLES_ERRORS_SELECTORS.get(e.data))
+                raise TransactionWouldBeReverted(custom_roles_error)
             else:
                 raise TransactionWouldBeReverted(e)
 

@@ -82,8 +82,9 @@ def test_roles_v2(local_node_eth):
 
     # test invalid user
     method = aave_v3.DelegateAAVE(delegatee="0xBADcAFE000000000000000000000000000000000")
-    with pytest.raises(TransactionWouldBeReverted):
+    with pytest.raises(TransactionWouldBeReverted) as e:
         roles.check(contract_address=method.contract_address, data=method.data, block=test_block)
+    assert e.value.args[0] == "ConditionViolation(uint8,bytes32)"
 
 
 @pytest.mark.skip(reason="test passes locally but we get different gas results on CI")
