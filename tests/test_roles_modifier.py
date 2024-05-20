@@ -42,7 +42,7 @@ def test_check_and_execute(local_node_gc):
     local_node_gc.set_block(TEST_BLOCK)
     usdt_approve = "0x095ea7b30000000000000000000000007f90122bf0700f9e7e1f688fe926940e8839f35300000000000000000000000000000000000000000000000000000000000003e8"
     roles = RolesModTester(
-        role=ROLE, contract_address="0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503", web3=w3, account=ACCOUNT
+        role=ROLE, contract_address="0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503", w3=w3, account=ACCOUNT
     )
 
     assert roles.check(contract_address=USDT, data=usdt_approve)
