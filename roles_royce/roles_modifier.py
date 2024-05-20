@@ -3,6 +3,7 @@ import logging
 from dataclasses import dataclass
 from enum import Enum, IntEnum
 
+import eth_abi
 from eth_account import Account
 from web3 import Web3, exceptions
 from web3.types import Address, ChecksumAddress, TxParams, TxReceipt
@@ -193,9 +194,13 @@ class RolesMod:
             return True
         except exceptions.ContractCustomError as e:
             custom_roles_error = ROLES_ERRORS_SELECTORS.get(e.data[:10], None)
-            # TODO: decode the error arguments from the data
             if custom_roles_error:
-                raise TransactionWouldBeReverted(custom_roles_error)
+                if "()" not in custom_roles_error:
+                    types = custom_roles_error[custom_roles_error.index("("):]
+                    decoded_values = eth_abi.decode([types], bytes.fromhex(e.data[10:]))[0]
+                else:
+                    decoded_values = None
+                raise TransactionWouldBeReverted(custom_roles_error, decoded_values)
             else:
                 raise TransactionWouldBeReverted(e)
 

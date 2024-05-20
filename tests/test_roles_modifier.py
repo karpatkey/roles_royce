@@ -84,6 +84,7 @@ def test_roles_v2(local_node_eth):
     with pytest.raises(TransactionWouldBeReverted) as e:
         roles.check(contract_address=method.contract_address, data=method.data, block=test_block)
     assert e.value.args[0] == "ConditionViolation(uint8,bytes32)"
+    assert e.value.args[1] == (7, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
 
 
 @pytest.mark.skip(reason="test passes locally but we get different gas results on CI")
