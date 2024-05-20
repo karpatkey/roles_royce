@@ -76,8 +76,6 @@ class ExactBptSingleTokenExit(_ExactBptSingleTokenExit):
             assets = Pool(w3, pool_id).assets()
         else:
             exit_token_index_up = exit_token_index
-        
-
 
         super().__init__(
             blockchain=Chain.get_blockchain_from_web3(w3),

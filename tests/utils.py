@@ -179,7 +179,7 @@ class LocalNode:
         self.port = port
         self.url = f"http://127.0.0.1:{port}"
         self.default_block = default_block
-        self.w3 = Web3(HTTPProvider(self.url, request_kwargs={'timeout': 30}))
+        self.w3 = Web3(HTTPProvider(self.url, request_kwargs={"timeout": 30}))
 
     def reset_state(self):
         fork_reset_state(self.w3, self.remote_url, self.default_block)

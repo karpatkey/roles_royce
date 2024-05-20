@@ -10,8 +10,8 @@ from roles_royce.applications.execution_app.config.config_builder import (
     AuraPosition,
     BalancerPosition,
     DAOStrategiesBuilder,
-    WalletPosition,
     LidoPosition,
+    WalletPosition,
 )
 from tests.fork_fixtures import local_node_eth, local_node_gc
 
@@ -26,13 +26,17 @@ test_data_str = json.dumps(test_data)
 # Use patch to replace the open function
 @patch("builtins.open", mock_open(read_data=test_data_str))
 def test_build_aura_positions(local_node_gc):
-    with patch(
-        "roles_royce.applications.execution_app.config.config_builder.get_bpt_from_aura_address"
-    ) as mock_get_bpt_from_aura_address, patch(
-        "roles_royce.applications.execution_app.config.config_builder.get_tokens_from_bpt"
-    ) as mock_get_tokens_from_bpt, patch(
-        "roles_royce.applications.execution_app.config.config_builder.get_pool_id_from_bpt"
-    ) as mock_get_pool_id_from_bpt:
+    with (
+        patch(
+            "roles_royce.applications.execution_app.config.config_builder.get_bpt_from_aura_address"
+        ) as mock_get_bpt_from_aura_address,
+        patch(
+            "roles_royce.applications.execution_app.config.config_builder.get_tokens_from_bpt"
+        ) as mock_get_tokens_from_bpt,
+        patch(
+            "roles_royce.applications.execution_app.config.config_builder.get_pool_id_from_bpt"
+        ) as mock_get_pool_id_from_bpt,
+    ):
         dao = DAO.GnosisDAO
         blockchain = Chain.GNOSIS
         aura_position = AuraPosition(position_id="226", reward_address="0x750c5ED835d300d4ba5054cf2Fad946f0a0df0CD")
@@ -130,11 +134,14 @@ test_data_str = json.dumps(test_data)
 # Use patch to replace the open function
 @patch("builtins.open", mock_open(read_data=test_data_str))
 def test_build_balancer_positions(local_node_gc):
-    with patch(
-        "roles_royce.applications.execution_app.config.config_builder.get_tokens_from_bpt"
-    ) as mock_get_tokens_from_bpt, patch(
-        "roles_royce.applications.execution_app.config.config_builder.get_pool_id_from_bpt"
-    ) as mock_get_pool_id_from_bpt:
+    with (
+        patch(
+            "roles_royce.applications.execution_app.config.config_builder.get_tokens_from_bpt"
+        ) as mock_get_tokens_from_bpt,
+        patch(
+            "roles_royce.applications.execution_app.config.config_builder.get_pool_id_from_bpt"
+        ) as mock_get_pool_id_from_bpt,
+    ):
         dao = DAO.GnosisDAO
         blockchain = Chain.GNOSIS
         balancer_position = BalancerPosition(

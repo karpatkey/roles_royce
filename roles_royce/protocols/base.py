@@ -161,6 +161,7 @@ class BaseApproveForToken(BaseApprove):
 
 class ApproveForToken(BaseApproveForToken):
     """Approve a token for a specific spender."""
+
     def __init__(self, token: Address, spender: Address, amount: int):
         self.token = token
         self.fixed_arguments = {"spender": spender}

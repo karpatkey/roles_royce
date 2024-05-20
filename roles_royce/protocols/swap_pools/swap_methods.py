@@ -1,6 +1,6 @@
+from defabipedia.tokens import Abis, Addresses
 from defabipedia.types import Blockchain, Chain
 from defabipedia.uniswap_v3 import ContractSpecs
-from defabipedia.tokens import Abis, Addresses
 
 from roles_royce.protocols.base import Address, AvatarAddress, BaseApproveForToken, ContractMethod, Operation
 
@@ -17,7 +17,7 @@ class SwapCurve(ContractMethod):
         token_y: int,
         amount_x: int,
         min_amount_y: int,
-        eth_amount: int = 0
+        eth_amount: int = 0,
     ):
         super().__init__(value=eth_amount)
         self.target_address = pool_address
@@ -99,6 +99,7 @@ class ApproveUniswapV3(ContractMethod):
         self.args.spender = ContractSpecs[blockchain].UniV3_SwapRouter.address
         self.args.amount = amount
 
+
 class WrapNativeToken(ContractMethod):
     name = "deposit"
 
@@ -110,4 +111,3 @@ class WrapNativeToken(ContractMethod):
             self.target_address = Addresses[blockchain].WXDAI
         else:
             raise ValueError(f"Unsupported blockchain {blockchain}")
-

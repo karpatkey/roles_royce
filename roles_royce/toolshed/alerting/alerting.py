@@ -86,7 +86,7 @@ def send_slack_msg(slack_webhook: str, icon: SlackMessageIcon, title: str, messa
                 "mrkdwn_in": ["text"],
                 "color": color,
                 "title": title,
-                "text": message
+                "text": message,
                 # 'image_url': image_url,
                 # 'fields': [
                 #     {

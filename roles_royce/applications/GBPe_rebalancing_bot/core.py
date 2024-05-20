@@ -115,8 +115,7 @@ class DynamicDataManager:
         amount_int = int(Decimal(amount_in) * Decimal(10**self.static_data.decimals_x3CRV))
         if amount_int == 0:
             raise ValueError(
-                "Amount of x3CRV too small. Amount of x3CRV: %f."
-                % (amount_in * (10**self.static_data.decimals_x3CRV))
+                "Amount of x3CRV too small. Amount of x3CRV: %f." % (amount_in * (10**self.static_data.decimals_x3CRV))
             )
         rate = contract.functions.get_dy(1, 0, amount_int).call()
         return float(Decimal(rate) / Decimal(10**self.static_data.decimals_GBPe))

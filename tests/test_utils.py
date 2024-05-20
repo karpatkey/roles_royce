@@ -1,6 +1,7 @@
 import pytest
-from .utils import assign_role, create_simple_safe, to_hex_32_bytes
+
 from .fork_fixtures import accounts, local_node_gc_replay
+from .utils import assign_role, create_simple_safe, to_hex_32_bytes
 
 
 def test_to_hex_32_bytes():

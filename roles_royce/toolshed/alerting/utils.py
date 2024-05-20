@@ -3,12 +3,13 @@ from typing import Any, Dict, cast
 
 from defabipedia.types import Blockchain, Chain
 from eth_utils import event_abi_to_log_topic
+from eth_utils.abi import collapse_if_tuple
 from hexbytes import HexBytes
 from web3 import Web3
 from web3._utils.abi import map_abi_data
 from web3._utils.normalizers import BASE_RETURN_NORMALIZERS
 from web3.types import Address, ChecksumAddress, TxReceipt
-from eth_utils.abi import collapse_if_tuple
+
 from roles_royce.evm_utils import erc20_abi
 from roles_royce.utils import to_checksum_address
 
@@ -16,14 +17,14 @@ from roles_royce.utils import to_checksum_address
 def get_abi_input_names(abi, indexed):
     if "inputs" not in abi and abi["type"] == "fallback":
         return []
-    return [arg["name"] for arg in abi["inputs"] if arg['indexed'] == indexed]
+    return [arg["name"] for arg in abi["inputs"] if arg["indexed"] == indexed]
 
 
 def get_abi_input_types(abi, indexed):
     if "inputs" not in abi and (abi["type"] == "fallback" or abi["type"] == "receive"):
         return []
     else:
-        return [collapse_if_tuple(cast(Dict[str, Any], arg)) for arg in abi["inputs"] if arg['indexed'] == indexed]
+        return [collapse_if_tuple(cast(Dict[str, Any], arg)) for arg in abi["inputs"] if arg["indexed"] == indexed]
 
 
 @dataclass

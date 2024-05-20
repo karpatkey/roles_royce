@@ -196,7 +196,7 @@ class RolesMod:
             custom_roles_error = ROLES_ERRORS_SELECTORS.get(e.data[:10], None)
             if custom_roles_error:
                 if "()" not in custom_roles_error:
-                    types = custom_roles_error[custom_roles_error.index("("):]
+                    types = custom_roles_error[custom_roles_error.index("(") :]
                     decoded_values = eth_abi.decode([types], bytes.fromhex(e.data[10:]))[0]
                 else:
                     decoded_values = None

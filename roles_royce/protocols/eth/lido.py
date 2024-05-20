@@ -96,7 +96,6 @@ class RequestWithdrawalsStETH(ContractMethod):
         self.args.amounts = amounts
 
 
-
 class RequestWithdrawalsWithPermitStETH(ContractMethod):
     """Sender requests a claim on his ETH from wstETH.
 
