@@ -5,7 +5,7 @@ import traceback
 
 from web3 import Web3
 
-from roles_royce.roles_modifier import ROLES_ERRORS, GasStrategies, set_gas_strategy
+from roles_royce.roles_modifier import ROLES_V1_ERRORS, GasStrategies, set_gas_strategy
 
 from .code_transporter import CodeTransporter
 from .utils import ENV, ExecConfig, decode_transaction, disassembler_from_config, gear_up, start_the_engine
@@ -28,7 +28,7 @@ def transaction_check(dao, blockchain, protocol, tx_transactables: str, rpc_url:
             }
 
     except Exception as e:
-        if str(e) in ROLES_ERRORS:
+        if str(e) in ROLES_V1_ERRORS:
             return {
                 "status": 422,
                 "error": f"Role permissions error: {e}",
@@ -92,7 +92,7 @@ def build_transaction_env(
             }
 
     except Exception as e:
-        if str(e) in ROLES_ERRORS:
+        if str(e) in ROLES_V1_ERRORS:
             return {
                 "status": 422,
                 "tx_data": {"decoded_transaction": decoded_transaction},
