@@ -10,10 +10,10 @@ from defabipedia.types import Chain
 from roles_royce.protocols.eth import lido
 from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
 from roles_royce.toolshed.disassembling import SwapDisassembler
-from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import create_simple_safe, steal_token
 from tests.fork_fixtures import accounts
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
+from tests.roles import apply_presets, deploy_roles, setup_common_roles
+from tests.utils import create_simple_safe, steal_token
 
 TEST_ETH_BLOCK = 19590108
 ROLE = 4
@@ -54,9 +54,11 @@ presets_balancer = """{
 ]
 }"""
 
+
 @pytest.mark.skip(reason="Cowswap Signer is tested in test_disassembling_lido tests 3 and 4")
 def test_integration_exit_1():
     pass
+
 
 def test_integration_exit_2(local_node_eth, accounts):
     w3 = local_node_eth.w3

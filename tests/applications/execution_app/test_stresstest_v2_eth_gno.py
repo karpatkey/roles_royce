@@ -6,7 +6,6 @@ from roles_royce.applications.execution_app.stresstest import stresstest
 from roles_royce.applications.execution_app.utils import ENV
 from tests.utils import assign_role
 
-
 PERCENTAGE = 20
 MAX_SLIPPAGE = 1
 TEST_ETH_BLOCK = 19590108

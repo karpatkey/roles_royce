@@ -22,9 +22,11 @@ class TxResult:
     tx_params: TxParams
     receipt: TxReceipt
 
+
 class SimpleEthereumClient(EthereumClient):
     def __init__(self, w3):
         self.w3 = w3
+
 
 class SimpleSafe(Safe):
     """A simple Safe with one signer to be used in tests"""

@@ -8,7 +8,7 @@ from roles_royce.applications.execution_app.utils import (
     gear_up,
     start_the_engine,
 )
-from tests.fork_fixtures import local_node_eth, accounts
+from tests.fork_fixtures import accounts, local_node_eth
 
 dao = "GnosisDAO"
 blockchain = "ETHEREUM"

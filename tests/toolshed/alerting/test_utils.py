@@ -1,15 +1,16 @@
-from web3 import Web3
 import defabipedia
 from defabipedia.types import Chain
+from web3 import Web3
 
 from roles_royce.toolshed.alerting.utils import (
+    EventLogDecoder,
     get_token_amounts_from_transfer_events,
     get_tx_executed_msg,
     get_tx_receipt_message_with_transfers,
-    EventLogDecoder,
 )
-from tests.utils import web3_gnosis
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
+from tests.utils import web3_gnosis
+
 
 # FIXME: the following should use local_node_gc instead of web3_gnosis, but for some reason it's not working
 def test_get_token_transfers(local_node_eth, web3_gnosis):
@@ -135,16 +136,19 @@ def test_get_token_transfers(local_node_eth, web3_gnosis):
 def test_decoder(local_node_eth):
     local_node_eth.set_block(19882187)
     w3_eth = local_node_eth.w3
-    abi = defabipedia.balancer.ContractSpecs['ethereum'].Vault.abi
+    abi = defabipedia.balancer.ContractSpecs["ethereum"].Vault.abi
     decoder = EventLogDecoder(Web3().eth.contract(abi=abi))
 
-    tx_receipt = w3_eth.eth.get_transaction_receipt("0xf06ca527de1a62ba96d67335bc09b961504aec5db78f83a86576546d7e48f775")
+    tx_receipt = w3_eth.eth.get_transaction_receipt(
+        "0xf06ca527de1a62ba96d67335bc09b961504aec5db78f83a86576546d7e48f775"
+    )
 
-    event = decoder.decode_log(tx_receipt['logs'][4])
-    assert event.name == 'PoolBalanceChanged'
+    event = decoder.decode_log(tx_receipt["logs"][4])
+    assert event.name == "PoolBalanceChanged"
     assert event.values == {
-        'poolId': b'\xf4\xc0\xdd\x9b\x82\xda6\xc0v\x05\xdf\x83\xc8\xa4\x16\xf1\x17$\xd8\x8b\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00&',
-        'liquidityProvider': '0x849D52316331967b6fF1198e5E32A0eB168D039d',
-        'tokens': ['0x6810e776880C02933D47DB1b9fc05908e5386b96', '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'],
-        'deltas': [-18960441620315391058848, -283825508617941472088], 'protocolFeeAmounts': [923065361645970665, 0]
+        "poolId": b"\xf4\xc0\xdd\x9b\x82\xda6\xc0v\x05\xdf\x83\xc8\xa4\x16\xf1\x17$\xd8\x8b\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00&",
+        "liquidityProvider": "0x849D52316331967b6fF1198e5E32A0eB168D039d",
+        "tokens": ["0x6810e776880C02933D47DB1b9fc05908e5386b96", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"],
+        "deltas": [-18960441620315391058848, -283825508617941472088],
+        "protocolFeeAmounts": [923065361645970665, 0],
     }
