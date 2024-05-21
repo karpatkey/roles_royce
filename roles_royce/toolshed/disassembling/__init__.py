@@ -3,10 +3,12 @@ from .disassembling_aura import AuraDisassembler
 from .disassembling_balancer import BalancerDisassembler
 from .disassembling_lido import LidoDisassembler
 from .disassembling_swaps import SwapDisassembler
+from .disassembling_dsr import DSRDisassembler
 
 DISASSEMBLERS = {
     "balancer": BalancerDisassembler,
     "aura": AuraDisassembler,
     "lido": LidoDisassembler,
     "swaps": SwapDisassembler,
+    "dsr": DSRDisassembler,
 }
