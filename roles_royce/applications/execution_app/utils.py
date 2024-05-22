@@ -21,6 +21,7 @@ from roles_royce.toolshed.disassembling import (
     Disassembler,
     LidoDisassembler,
     SwapDisassembler,
+    DSRDisassembler,
 )
 from roles_royce.utils import to_checksum_address
 
@@ -220,10 +221,11 @@ def disassembler_from_config(w3: Web3, env: ENV, protocol: str) -> Disassembler:
         "Balancer": BalancerDisassembler,
         "Lido": LidoDisassembler,
         "Wallet": SwapDisassembler,
+        "Maker": DSRDisassembler,
     }.get(protocol)
 
     if not disassembler_klass:
-        raise Exception(f"Status 422: Invalid protocol: {exec_config.protocol}")
+        raise Exception(f"Status 422: Invalid protocol: {protocol}")
     else:
         return disassembler_klass(
             w3=w3,
