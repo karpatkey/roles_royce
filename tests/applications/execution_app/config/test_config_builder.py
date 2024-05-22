@@ -12,6 +12,7 @@ from roles_royce.applications.execution_app.config.config_builder import (
     DAOStrategiesBuilder,
     WalletPosition,
     LidoPosition,
+    MakerPosition,
 )
 from tests.fork_fixtures import local_node_eth, local_node_gc
 
@@ -473,4 +474,52 @@ def test_build_swap_pool_positions(local_node_eth):
                 }
             ],
         },
+    ]
+
+
+with open(os.path.join(os.path.dirname(__file__), "test_maker_template.json"), "r") as f:
+    test_data = json.load(f)
+
+test_data_str = json.dumps(test_data)
+
+
+@patch("builtins.open", mock_open(read_data=test_data_str))
+def test_build_maker_positions(local_node_eth):
+    dao = DAO.GnosisDAO
+    blockchain = Chain.ETHEREUM
+    maker_position = MakerPosition(position_id="226", address="0x373238337Bfe1146fb49989fc222523f83081dDb")
+    w3 = local_node_eth.w3
+    block = 19663216
+    local_node_eth.set_block(block)
+
+    builder = DAOStrategiesBuilder(dao, blockchain, maker=[maker_position])
+    result = builder.build_maker_positions(w3, [maker_position])
+
+    assert result == [
+        {
+            "protocol": "Maker",
+            "position_id": "226",
+            "position_id_tech": "0x373238337Bfe1146fb49989fc222523f83081dDb",
+            "position_id_human_readable": "ethereum_MakerPosition_0x373238337Bfe1146fb49989fc222523f83081dDb",
+            "exec_config": [
+                {
+                    "function_name": "exit_1",
+                    "label": "Withdraw from DSR through proxy",
+                    "test": True,
+                    "stresstest": False,
+                    "stresstest_error": "None",
+                    "description": "Withdraw DAI from DSR with the use of the proxy",
+                    "parameters": [],
+                },
+                {
+                    "function_name": "exit_2",
+                    "label": "Withdraw from DSR no proxy",
+                    "test": True,
+                    "stresstest": False,
+                    "stresstest_error": "None",
+                    "description": "Withdraw DAI from DSR without the use of the proxy",
+                    "parameters": [],
+                },
+            ],
+        }
     ]
