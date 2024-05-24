@@ -6,7 +6,6 @@ from roles_royce.applications.execution_app.stresstest import stresstest
 from roles_royce.applications.execution_app.utils import ENV
 from tests.utils import assign_role
 
-
 PERCENTAGE = 20
 MAX_SLIPPAGE = 1
 TEST_ETH_BLOCK = 19590108
@@ -137,28 +136,39 @@ def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
     return w3, private_key
 
 
-def set_env(monkeypatch, private_key: str, dao: DAO) -> ENV:
-    monkeypatch.setenv(f"{dao.name.upper()}_{dao.blockchain.upper()}_AVATAR_SAFE_ADDRESS", dao.avatar_safe_address)
-    monkeypatch.setenv(f"{dao.name.upper()}_{dao.blockchain.upper()}_ROLES_MOD_ADDRESS", dao.roles_mod_address)
-    monkeypatch.setenv(f"{dao.name.upper()}_{dao.blockchain.upper()}_ROLE", dao.role)
-    monkeypatch.setenv(f"{dao.name.upper()}_{dao.blockchain.upper()}_PRIVATE_KEY", private_key)
-    return ENV(dao.name, dao.blockchain)
+def get_env(dao: DAO, disassembler, rpc_url) -> ENV:
+    return ENV(
+        rpc_url=rpc_url,
+        rpc_fallback_url=rpc_url,
+        avatar_safe_address=dao.avatar_safe_address,
+        roles_mod_address=dao.roles_mod_address,
+        disassembler_address=disassembler,
+        role=dao.role,
+        mode="development",
+    )
 
 
-def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch):
-    w3, private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
-    set_env(monkeypatch, private_key, dao)
+with open(os.path.join(os.path.dirname(__file__), "test_stresstest_v2_eth_gno.json"), "r") as f:
+    test_data = json.load(f)
 
-    with open(os.path.join(os.path.dirname(__file__), "test_stresstest_v2_eth_gno.json"), "r") as f:
-        test_data = json.load(f)
+
+def test_stresstest(local_node_eth, local_node_gc, accounts):
+    w3, _ = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
+    if dao.blockchain == "ETHEREUM":
+        rpc_url = local_node_eth.url
+    elif dao.blockchain == "GNOSIS":
+        rpc_url = local_node_gc.url
+    else:
+        raise ValueError(f"Blockchain {dao.blockchain} not supported")
+
+    env = get_env(dao=dao, disassembler=accounts[0].address, rpc_url=rpc_url)
 
     stresstest_tester = stresstest(
+        env=env,
         w3=w3,
         positions_dict=test_data,
         percentage=PERCENTAGE,
         max_slippage=MAX_SLIPPAGE,
-        dao=dao.name,
-        blockchain=dao.blockchain,
     )
 
     assert stresstest_tester == stresstest_outcome
