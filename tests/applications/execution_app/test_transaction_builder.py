@@ -1,26 +1,26 @@
 import pytest
 
-from roles_royce.applications.execution_app.transaction_builder import build_transaction
+from roles_royce.applications.execution_app.transaction_builder import build_transaction_env
 from roles_royce.applications.execution_app.utils import ENV, ExecConfig
 from tests.fork_fixtures import accounts, local_node_eth
 from tests.utils import assign_role
 
-dao = "GnosisDAO"
-blockchain = "ETHEREUM"
 avatar_safe_address = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
 roles_mod_address = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
 role = 4
 
 
-def set_env(monkeypatch, private_key: str) -> ENV:
-    monkeypatch.setenv("ETHEREUM_RPC_ENDPOINT", "DummyString")
-    monkeypatch.setenv("ETHEREUM_RPC_ENDPOINT_FALLBACK", "DummyString")
-    monkeypatch.setenv("GNOSISDAO_ETHEREUM_AVATAR_SAFE_ADDRESS", avatar_safe_address)
-    monkeypatch.setenv("GNOSISDAO_ETHEREUM_ROLES_MOD_ADDRESS", roles_mod_address)
-    monkeypatch.setenv("GNOSISDAO_ETHEREUM_ROLE", role)
-    monkeypatch.setenv("GNOSISDAO_ETHEREUM_PRIVATE_KEY", private_key)
+def get_env() -> ENV:
     # Without setting the MODE env it will default to DEVELOPMENT and use the local fork
-    return ENV(dao, blockchain)
+    return ENV(
+        rpc_url="DummyString",
+        rpc_fallback_url="DummyString",
+        avatar_safe_address=avatar_safe_address,
+        roles_mod_address=roles_mod_address,
+        role=role,
+        disassembler_address="0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        mode="development",
+    )
 
 
 def set_up_roles(local_node_eth, accounts):
@@ -28,7 +28,6 @@ def set_up_roles(local_node_eth, accounts):
     local_node_eth.set_block(block)
 
     disassembler_address = accounts[0].address
-    private_key = accounts[0].key.hex()
 
     assign_role(
         local_node=local_node_eth,
@@ -37,7 +36,6 @@ def set_up_roles(local_node_eth, accounts):
         role=role,
         asignee=disassembler_address,
     )
-    return private_key
 
 
 JSON_FORM = {
@@ -52,8 +50,6 @@ JSON_FORM = {
 
 exec_config = ExecConfig(
     percentage=JSON_FORM["percentage"],
-    dao=dao,
-    blockchain=blockchain,
     protocol=JSON_FORM["protocol"],
     exit_strategy=JSON_FORM["exit_strategy"],
     exit_arguments=[JSON_FORM["exit_arguments"]],
@@ -306,9 +302,10 @@ expected_outputs = [
 
 
 @pytest.mark.parametrize("args, expected", zip(positions_mock[0]["exec_config"], expected_outputs))
-def test_transaction_builder(local_node_eth, accounts, monkeypatch, args, expected):
-    private_key = set_up_roles(local_node_eth, accounts)
-    set_env(monkeypatch, private_key)
+def test_transaction_builder(local_node_eth, accounts, args, expected):
+    set_up_roles(local_node_eth, accounts)
+    env = get_env()
+    env.web3 = local_node_eth.w3
 
     percentage = 23
     protocol = positions_mock[0]["protocol"]
@@ -323,13 +320,13 @@ def test_transaction_builder(local_node_eth, accounts, monkeypatch, args, expect
         elif item["name"] == "token_out_address":
             exit_arguments_dict[item["name"]] = item["options"][0]["value"]
 
-    result = build_transaction(
+    result = build_transaction_env(
+        env=env,
         percentage=percentage,
-        dao=dao,
-        blockchain=blockchain,
         protocol=protocol,
         exit_strategy=exit_strategy,
         exit_arguments=[exit_arguments_dict],
+        run_check=True,
     )
 
     assert result["status"] == 200

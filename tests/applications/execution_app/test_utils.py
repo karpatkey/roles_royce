@@ -8,7 +8,7 @@ from roles_royce.applications.execution_app.utils import (
     gear_up,
     start_the_engine,
 )
-from tests.fork_fixtures import local_node_eth, accounts
+from tests.fork_fixtures import accounts, local_node_eth
 
 dao = "GnosisDAO"
 blockchain = "ETHEREUM"
@@ -17,15 +17,16 @@ roles_mod_address = "0x1cFB0CD7B1111bf2054615C7C491a15C4A3303cc"
 role = 4
 
 
-def set_env(monkeypatch, private_key: str) -> ENV:
-    monkeypatch.setenv("ETHEREUM_RPC_ENDPOINT", "DummyString")
-    monkeypatch.setenv("ETHEREUM_RPC_ENDPOINT_FALLBACK", "DummyString")
-    monkeypatch.setenv("GNOSISDAO_ETHEREUM_AVATAR_SAFE_ADDRESS", avatar_safe_address)
-    monkeypatch.setenv("GNOSISDAO_ETHEREUM_ROLES_MOD_ADDRESS", roles_mod_address)
-    monkeypatch.setenv("GNOSISDAO_ETHEREUM_ROLE", role)
-    monkeypatch.setenv("GNOSISDAO_ETHEREUM_PRIVATE_KEY", private_key)
-    # Without setting the MODE env it will default to DEVELOPMENT and use the local fork
-    return ENV(dao, blockchain)
+def get_env() -> ENV:
+    return ENV(
+        rpc_url="DummyString",
+        rpc_fallback_url="DummyString",
+        avatar_safe_address=avatar_safe_address,
+        roles_mod_address=roles_mod_address,
+        role=role,
+        disassembler_address="0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        mode="development",
+    )
 
 
 JSON_FORM = {
@@ -38,28 +39,31 @@ JSON_FORM = {
 
 exec_config = ExecConfig(
     percentage=JSON_FORM["percentage"],
-    dao=dao,
-    blockchain=blockchain,
+    # blockchain=blockchain,
     protocol=JSON_FORM["protocol"],
     exit_strategy=JSON_FORM["exit_strategy"],
     exit_arguments=[JSON_FORM["exit_arguments"]],
 )
 
 
-def test_start_the_engine(monkeypatch):
-    env = set_env(monkeypatch, "0x0000000000000000000000000000000000000000000000000000000000000000")
+def test_start_the_engine_dev(local_node_eth):
+    env = get_env()
+    env.rpc_url = local_node_eth.url
 
-    w3, w3_MEV = start_the_engine(env)
+    w3 = start_the_engine(env)
     assert w3.is_connected()
 
-    env.MODE = Modes.PRODUCTION
+
+def test_start_the_engine_prod():
+    env = get_env()
+
+    env.mode = Modes.PRODUCTION
     with pytest.raises(Exception):
         start_the_engine(env)  # RPC endpoints are 'DummyString'
 
 
 def test_gear_up(monkeypatch, local_node_eth):
-    private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-    env = set_env(monkeypatch, private_key)
+    env = get_env()
 
     w3 = local_node_eth.w3
     local_node_eth.set_block(18437790)
@@ -77,8 +81,7 @@ def test_gear_up(monkeypatch, local_node_eth):
 
 
 def test_decode_transaction(local_node_eth, accounts, monkeypatch):
-    private_key = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-    env = set_env(monkeypatch, private_key)
+    env = get_env()
 
     w3 = local_node_eth.w3
     local_node_eth.set_block(18437790)
@@ -87,7 +90,7 @@ def test_decode_transaction(local_node_eth, accounts, monkeypatch):
 
     decoded = decode_transaction(txn_transactables, env)
 
-    assert decoded == [
+    expected = [
         {
             "data": "0xc32e72020000000000000000000000000000000000000000000000111ed47dc81e6e5ad80000000000000000000000000000000000000000000000000000000000000001",
             "from_address": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -136,3 +139,5 @@ def test_decode_transaction(local_node_eth, accounts, monkeypatch):
             "value": 0,
         },
     ]
+
+    assert decoded == expected

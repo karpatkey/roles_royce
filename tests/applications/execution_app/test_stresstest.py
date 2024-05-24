@@ -11,81 +11,6 @@ MAX_SLIPPAGE = 1
 TEST_ETH_BLOCK = 19590108
 TEST_GNOSIS_BLOCK = 33291126
 
-stresstest_outcome_1 = {
-    "dao": "GnosisDAO",
-    "blockchain": "ethereum",
-    "general_parameters": [
-        {"name": "percentage", "label": "Percentage", "type": "input", "rules": {"min": 0.001, "max": 100}}
-    ],
-    "positions": [
-        {
-            "position_id": "33",
-            "position_id_tech": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
-            "position_id_human_readable": "ethereum_Aura_rETH_WETH",
-            "protocol": "Aura",
-            "exec_config": [
-                {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
-                    "test": True,
-                    "stresstest": True,
-                    "stresstest_error": "None",
-                    "description": "Unstake BPT from Aura gauge",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
-                        }
-                    ],
-                },
-                {
-                    "function_name": "exit_2_1",
-                    "label": "Unstake + withdraw (proportional)",
-                    "test": True,
-                    "stresstest": True,
-                    "stresstest_error": "None",
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit (Not for recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max Slippage",
-                            "type": "input",
-                            "rules": {"min": 0.001, "max": 100},
-                        },
-                    ],
-                },
-                {
-                    "function_name": "exit_2_3",
-                    "label": "Unstake + withdraw (proportional) (Recovery mode)",
-                    "test": True,
-                    "stresstest": False,
-                    "stresstest_error": "error: Skip recovery",
-                    "description": "Unstake the BPT from Aura and exit pool on Balancer with proportional exit. (Recovery mode)",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0xDd1fE5AD401D4777cE89959b7fa587e569Bf125D",
-                        },
-                        {
-                            "name": "max_slippage",
-                            "label": "Max Slippage",
-                            "type": "input",
-                            "rules": {"min": 0.001, "max": 100},
-                        },
-                    ],
-                },
-            ],
-        }
-    ],
-}
-
 
 @dataclass
 class DAO:
@@ -136,31 +61,16 @@ def set_up_roles(local_node_eth, local_node_gc, accounts, dao: DAO):
     return w3, private_key
 
 
-def set_env(monkeypatch, private_key: str, dao: DAO) -> ENV:
-    monkeypatch.setenv(f"{dao.name.upper()}_{dao.blockchain.upper()}_AVATAR_SAFE_ADDRESS", dao.avatar_safe_address)
-    monkeypatch.setenv(f"{dao.name.upper()}_{dao.blockchain.upper()}_ROLES_MOD_ADDRESS", dao.roles_mod_address)
-    monkeypatch.setenv(f"{dao.name.upper()}_{dao.blockchain.upper()}_ROLE", dao.role)
-    monkeypatch.setenv(f"{dao.name.upper()}_{dao.blockchain.upper()}_PRIVATE_KEY", private_key)
-    return ENV(dao.name, dao.blockchain)
-
-
-def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch):
-    w3, private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
-    set_env(monkeypatch, private_key, dao)
-
-    with open(os.path.join(os.path.dirname(__file__), "test_stresstest_1.json"), "r") as f:
-        test_data = json.load(f)
-
-    stresstest_tester = stresstest(
-        w3=w3,
-        positions_dict=test_data,
-        percentage=PERCENTAGE,
-        max_slippage=MAX_SLIPPAGE,
-        dao=dao.name,
-        blockchain=dao.blockchain,
+def get_env(dao: DAO, disassembler, rpc_url) -> ENV:
+    return ENV(
+        rpc_url=rpc_url,
+        rpc_fallback_url=rpc_url,
+        avatar_safe_address=dao.avatar_safe_address,
+        roles_mod_address=dao.roles_mod_address,
+        disassembler_address=disassembler,
+        role=dao.role,
+        mode="development",
     )
-
-    assert stresstest_tester == stresstest_outcome_1
 
 
 stresstest_outcome = {
@@ -247,20 +157,27 @@ stresstest_outcome = {
 }
 
 
-def test_stresstest_tokens(local_node_eth, local_node_gc, accounts, monkeypatch):
-    w3, private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
-    set_env(monkeypatch, private_key, dao)
+with open(os.path.join(os.path.dirname(__file__), "test_stresstest_token.json"), "r") as f:
+    test_data = json.load(f)
 
-    with open(os.path.join(os.path.dirname(__file__), "test_stresstest_token.json"), "r") as f:
-        test_data = json.load(f)
+
+def test_stresstest(local_node_eth, local_node_gc, accounts):
+    w3, _ = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
+    if dao.blockchain == "ETHEREUM":
+        rpc_url = local_node_eth.url
+    elif dao.blockchain == "GNOSIS":
+        rpc_url = local_node_gc.url
+    else:
+        raise ValueError(f"Blockchain {dao.blockchain} not supported")
+
+    env = get_env(dao=dao, disassembler=accounts[0].address, rpc_url=rpc_url)
 
     stresstest_tester = stresstest(
+        env=env,
         w3=w3,
         positions_dict=test_data,
         percentage=PERCENTAGE,
         max_slippage=MAX_SLIPPAGE,
-        dao=dao.name,
-        blockchain=dao.blockchain,
     )
 
     assert stresstest_tester == stresstest_outcome

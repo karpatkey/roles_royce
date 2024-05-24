@@ -47,7 +47,9 @@ def initialize_logging(log_level, log_name="stresstest"):
     return logger, mh
 
 
-def run_with_args(dao, protocol, blockchain, exit_strategy, percentage, exit_arguments_dict, function_name, w3, logger):
+def run_with_args(
+    env: ENV, protocol, blockchain, exit_strategy, percentage, exit_arguments_dict, function_name, w3, logger
+):
     exit_arguments = [exit_arguments_dict]
 
     chain_id = {"ethereum": 1, "gnosis": 100}[blockchain.lower()]
@@ -86,20 +88,16 @@ def run_with_args(dao, protocol, blockchain, exit_strategy, percentage, exit_arg
 
     logger.info(f"Exit arguments: {exit_arguments}")
 
-    env = ENV(DAO=dao or "", BLOCKCHAIN=blockchain)
     result = build_transaction_env(
         env=env,
         percentage=percentage,
         protocol=protocol,
         exit_strategy=exit_strategy,
         exit_arguments=exit_arguments,
-        web3=w3,
     )
     if result["status"] != 200:
         logger.info(f'Error in transaction builder. Error1: {result["error"]}')
         return (False, f'error: {result["error"]}')
-        # exec_config["stresstest"] = False
-        # exec_config["stresstest_error"] =
     else:
         logger.info(f'Status of transaction builder: {result["status"]}')
         tx = result["tx_data"]["transaction"]
@@ -108,28 +106,23 @@ def run_with_args(dao, protocol, blockchain, exit_strategy, percentage, exit_arg
             result = execute_env(env=env, transaction=tx, web3=w3)
             if result["status"] != 200:
                 logger.info(f'Error in execution. Error: {result["error"]}')
-                return (False, f"error: {result['error']}")
+                return (False, str(result["error"]))
             else:
                 logger.info(f'Status of execution: {result["status"]}')
-                # exec_config["stresstest"] = True
                 return (True, None)
 
         except Exception as f:
             logger.info(f"Exception in execution. Error: {f}")
-            # exec_config["stresstest"] = False
-            # exec_config["stresstest_error"] =
-            return (False, f"error: {str(f)}")
+            return (False, str(f))
 
 
 def single_stresstest(
-    percentage: int, max_slippage: int, dao: str, blockchain: str, protocol: str, exec_config, web3: Web3
+    env: ENV, percentage: int, max_slippage: int, dao: str, blockchain: str, protocol: str, exec_config, web3: Web3
 ):
     id = f"{dao}-{blockchain}-{protocol}-{exec_config['function_name']}"
     logger, logger_handler = initialize_logging(logging.INFO, id)
 
     try:
-        w3 = web3
-
         logger.info(f"Running stresstest on DAO: {dao}, Blockchain: {blockchain}, Protocol: {protocol}")
         logger.info(f'Position: {exec_config["function_name"]}, description: {exec_config["description"]}')
 
@@ -179,7 +172,7 @@ def single_stresstest(
                 exit_arguments_dict[option_arg] = option_value
 
             (result, err) = run_with_args(
-                dao=dao,
+                env=env,
                 protocol=protocol,
                 blockchain=blockchain,
                 exit_strategy=exit_strategy,
@@ -222,22 +215,21 @@ def single_stresstest(
 
 
 def stresstest(
+    env: ENV,
     positions_dict: dict,
     percentage: int,
     max_slippage: int,
-    dao: str | None = None,
-    blockchain: str | None = None,
     w3: Web3 | None = None,
 ):
-    dao = dao or positions_dict["dao"]
-    blockchain = blockchain or positions_dict["blockchain"]
+    dao = positions_dict["dao"]
+    blockchain = positions_dict["blockchain"]
     logger = logging.getLogger(__name__)
 
     executions = []
     for position in positions_dict["positions"]:
         protocol = position["protocol"]
         for exec_config in position["exec_config"]:
-            executions.append([percentage, max_slippage, dao, blockchain, protocol, exec_config])
+            executions.append([env, percentage, max_slippage, dao, blockchain, protocol, exec_config])
 
     if w3:
         for args in executions:
@@ -247,8 +239,8 @@ def stresstest(
         def with_pulley(*args):
             try:
                 with PulleyFork(blockchain) as fork:
-                    env = ENV(DAO=dao or "", BLOCKCHAIN=blockchain, local_fork_url=fork.url())
-                    web3, _ = start_the_engine(env)
+                    fork_env = env.with_fork(fork)
+                    web3 = fork_env.web3 or start_the_engine(fork_env)
 
                     return single_stresstest(*args, web3=web3)
             except Exception as e:

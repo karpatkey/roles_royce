@@ -1,17 +1,18 @@
 import json
 import logging
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from typing import Optional
 
 from decouple import config
 from defabipedia.aura import Abis as AuraAbis
 from defabipedia.balancer import Abis as BalancerAbis
 from defabipedia.types import Chain
-from eth_account import Account
+from pydantic import BaseModel, ConfigDict
 from web3 import Web3
 from web3.exceptions import ContractLogicError
-from web3.types import Address
 
+from roles_royce.applications.execution_app.pulley_fork import PulleyFork
 from roles_royce.constants import StrEnum
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address, ContractMethod
@@ -40,120 +41,51 @@ def custom_config(variable, default, cast):
     return default if value == "" else config(variable, default=default, cast=cast)
 
 
-@dataclass
-class ENV:
-    DAO: str
-    BLOCKCHAIN: str
-
-    TENDERLY_ACCOUNT_ID: str = field(init=False)
-    TENDERLY_PROJECT: str = field(init=False)
-    TENDERLY_API_TOKEN: str = field(init=False)
-
-    RPC_ENDPOINT: str = field(init=False)
-    RPC_ENDPOINT_FALLBACK: str = field(init=False)
-    RPC_ENDPOINT_MEV: str = field(init=False)
-
-    AVATAR_SAFE_ADDRESS: Address = field(init=False)
-    ROLES_MOD_ADDRESS: Address = field(init=False)
-    ROLE: int = field(init=False)
-    PRIVATE_KEY: str = field(init=False)
-    DISASSEMBLER_ADDRESS: Address = field(init=False)
-
-    MODE: Modes = field(init=False)
-    LOCAL_FORK_PORT: int | None = field(init=False)
-    LOCAL_FORK_HOST: str = field(init=False)
-
-    prod_mode_override: bool = field(init=True, default=False)
-    local_fork_url: str | None = field(init=True, default=None)
-    LOCAL_FORK_URL: str = field(init=False)
-
-    SLACK_WEBHOOK_URL: str = field(init=False)
+class ENV(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    rpc_url: str
+    rpc_fallback_url: str
+    avatar_safe_address: Address
+    disassembler_address: Address
+    roles_mod_address: Address
+    role: int
+    mode: str
+    web3: Optional[Web3] = None
 
     def __post_init__(self):
-        # Tenderly credentials
-        self.TENDERLY_ACCOUNT_ID: str = config("TENDERLY_ACCOUNT_ID", default="")
-        self.TENDERLY_PROJECT: str = config("TENDERLY_PROJECT", default="")
-        self.TENDERLY_API_TOKEN: str = config("TENDERLY_API_TOKEN", default="")
+        self.avatar_safe_address = to_checksum_address(self.avatar_safe_address)
+        self.roles_mod_address = to_checksum_address(self.roles_mod_address)
 
-        # DAO and blockchain
-        if self.DAO not in ["GnosisDAO", "GnosisLtd", "karpatkey", "ENS", "BalancerDAO", "TestSafeDAO"]:
-            raise ValueError(f"DAO is not valid: {self.DAO}.")
-        if self.BLOCKCHAIN.lower() not in ["mainnet", "ethereum", "gnosis"]:
-            raise ValueError(f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}. Options are either 'ethereum' or 'gnosis'.")
-        elif self.BLOCKCHAIN.lower() == "mainnet":
-            self.BLOCKCHAIN = "ethereum"
-        self.BLOCKCHAIN = self.BLOCKCHAIN.lower()
-
-        # RPC endpoints
-        self.RPC_ENDPOINT: str = config(self.BLOCKCHAIN.upper() + "_RPC_ENDPOINT", default="")
-        self.RPC_ENDPOINT_FALLBACK: str = config(self.BLOCKCHAIN.upper() + "_RPC_ENDPOINT_FALLBACK", default="")
-        self.RPC_ENDPOINT_MEV: str = config(self.BLOCKCHAIN.upper() + "_RPC_ENDPOINT_MEV", default="")
-
-        # Configuration addresses and key
-        self.AVATAR_SAFE_ADDRESS: Address = config(
-            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_AVATAR_SAFE_ADDRESS",
-            default="",
-        )
-        self.ROLES_MOD_ADDRESS: Address = config(
-            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLES_MOD_ADDRESS",
-            default="",
-        )
-        self.ROLE: int = config(
-            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLE",
-            cast=int,
-            default=0,
-        )
-        self.PRIVATE_KEY: str = config(
-            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_PRIVATE_KEY",
-            default="",
-        )
-        self.AVATAR_SAFE_ADDRESS = to_checksum_address(self.AVATAR_SAFE_ADDRESS)
-        self.ROLES_MOD_ADDRESS = to_checksum_address(self.ROLES_MOD_ADDRESS)
-        if self.PRIVATE_KEY != "":
-            self.DISASSEMBLER_ADDRESS = Account.from_key(self.PRIVATE_KEY).address
-        else:
-            self.DISASSEMBLER_ADDRESS = config(
-                self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_DISASSEMBLER_ADDRESS",
-                default="",
-            )
-
-        # Environment mode: development or production
-        self.MODE: Modes = custom_config("ENVIRONMENT", cast=Modes, default=Modes.DEVELOPMENT)
-        if self.prod_mode_override:
-            self.MODE = Modes.PRODUCTION
-
-        if self.MODE.lower() not in ["development", "production"]:
+        if self.mode.lower() not in ["development", "production"]:
             raise ValueError(
-                f"ENVIRONMENT is not valid: {self.MODE}. Options are either 'development' or 'production'."
+                f"ENVIRONMENT is not valid: {self.mode}. Options are either 'development' or 'production'."
             )
         else:
-            self.MODE = self.MODE.lower()
-        if self.MODE == Modes.DEVELOPMENT:
-            if self.BLOCKCHAIN == "ethereum":
-                self.LOCAL_FORK_PORT = custom_config("LOCAL_FORK_PORT_ETHEREUM", cast=int, default=8546)
-            else:
-                self.LOCAL_FORK_PORT = custom_config("LOCAL_FORK_PORT_GNOSIS", cast=int, default=8547)
-        else:
-            self.LOCAL_FORK_PORT = None
-        self.LOCAL_FORK_HOST: str = custom_config(
-            "LOCAL_FORK_HOST" + "_" + self.BLOCKCHAIN.upper(),
-            default="localhost",
-            cast=str,
-        )
+            self.mode = self.mode.lower()
 
-        self.LOCAL_FORK_URL = self.local_fork_url or config("LOCAL_FORK_URL", default="")
-
-        self.SLACK_WEBHOOK_URL: str = config("SLACK_WEBHOOK_URL", default="")
+        if self.mode == Modes.PRODUCTION:
+            self.web3 = start_the_engine(self)
 
     def __repr__(self):
         return "Environment variables"
+
+    def with_fork(self, fork: PulleyFork):
+        rpc_url = fork.url()
+        return ENV(
+            rpc_url=rpc_url,
+            rpc_fallback_url=rpc_url,
+            avatar_safe_address=self.avatar_safe_address,
+            disassembler_address=self.disassembler_address,
+            roles_mod_address=self.roles_mod_address,
+            role=self.role,
+            mode=self.mode,
+            web3=None,
+        )
 
 
 @dataclass
 class ExecConfig:
     percentage: float
-    dao: str
-    blockchain: str
     protocol: str
     exit_strategy: str
     exit_arguments: list[dict]
@@ -162,32 +94,24 @@ class ExecConfig:
 # -----------------------------------------------------------------------------------------------------------------------
 
 
-def start_the_engine(env: ENV) -> tuple[Web3, Web3]:
-    if env.MODE == Modes.DEVELOPMENT:
-        w3 = Web3(Web3.HTTPProvider(env.LOCAL_FORK_URL or f"http://{env.LOCAL_FORK_HOST}:{env.LOCAL_FORK_PORT}"))
-        fork_unlock_account(w3, env.DISASSEMBLER_ADDRESS)
-        top_up_address(w3, env.DISASSEMBLER_ADDRESS, 1)
-        w3_MEV = w3
+def start_the_engine(env: ENV) -> Web3:
+    if env.mode == Modes.DEVELOPMENT:
+        w3 = Web3(Web3.HTTPProvider(env.rpc_url))
+        fork_unlock_account(w3, env.disassembler_address)
+        top_up_address(w3, env.disassembler_address, 1)
     else:
-        w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+        w3 = Web3(Web3.HTTPProvider(env.rpc_url))
         if not w3.is_connected():
-            w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
+            w3 = Web3(Web3.HTTPProvider(env.rpc_fallback_url))
             if not w3.is_connected():
                 time.sleep(2)
-                w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
+                w3 = Web3(Web3.HTTPProvider(env.rpc_url))
                 if not w3.is_connected():
-                    w3 = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
+                    w3 = Web3(Web3.HTTPProvider(env.rpc_fallback_url))
                     if not w3.is_connected():
                         raise Exception("No connection to RPC endpoint")
-        w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_MEV))
-        if not w3_MEV.is_connected():
-            w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT))
-            if not w3_MEV.is_connected():
-                w3_MEV = Web3(Web3.HTTPProvider(env.RPC_ENDPOINT_FALLBACK))
-                if not w3_MEV.is_connected():
-                    raise Exception("No connection to RPC endpoint")
 
-    return w3, w3_MEV
+    return w3
 
 
 def bytes_to_hex_in_iterable(data):
@@ -211,7 +135,7 @@ def decode_transaction(txns: list[ContractMethod], env: ENV) -> list[dict]:
         tx["to_address"] = transactable.contract_address
         tx["value"] = transactable.value
         tx["data"] = transactable.data
-        tx["from_address"] = env.DISASSEMBLER_ADDRESS
+        tx["from_address"] = env.disassembler_address
         result.append(tx)
     return result
 
@@ -231,10 +155,10 @@ def disassembler_from_config(w3: Web3, env: ENV, protocol: str) -> Disassembler:
     else:
         return disassembler_klass(
             w3=w3,
-            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
-            roles_mod_address=env.ROLES_MOD_ADDRESS,
-            role=env.ROLE,
-            signer_address=env.DISASSEMBLER_ADDRESS,
+            avatar_safe_address=env.avatar_safe_address,
+            roles_mod_address=env.roles_mod_address,
+            role=env.role,
+            signer_address=env.disassembler_address,
         )
 
 
