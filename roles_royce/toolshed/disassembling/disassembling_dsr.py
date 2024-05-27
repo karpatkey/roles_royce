@@ -1,13 +1,9 @@
 from dataclasses import dataclass
 from decimal import Decimal
 from defabipedia.maker import ContractSpecs
-from defabipedia.tokens import EthereumTokenAddr
-from defabipedia.types import Chain
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols.base import Address
-from roles_royce.protocols import cowswap
 from roles_royce.protocols.eth import maker
-from roles_royce.toolshed.disassembling.disassembling_swaps import SwapDisassembler
 
 from .disassembler import Disassembler, validate_percentage
 
