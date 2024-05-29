@@ -1,0 +1,26 @@
+{
+    "protocol": "Maker",
+    "position_id": "FllMeWithPositionId",
+    "position_id_tech": "FillMeWithAnAddress",
+    "position_id_human_readable": "FillMeWithPositionIdHumanReadable",
+    "exec_config": [
+      {
+        "function_name": "exit_1",
+        "label": "Withdraw from DSR through proxy",
+        "test": true,
+        "stresstest": false,
+        "stresstest_error": "None",
+        "description": "Withdraw DAI from DSR with the use of the proxy",
+        "parameters": []
+      },
+      {
+        "function_name": "exit_2",
+        "label": "Withdraw from DSR no proxy",
+        "test": true,
+        "stresstest": false,
+        "stresstest_error": "None",
+        "description": "Withdraw DAI from DSR without the use of the proxy",
+        "parameters": []
+      }
+    ]
+}

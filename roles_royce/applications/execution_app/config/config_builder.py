@@ -172,6 +172,7 @@ class Protocol(StrEnum):
     Aura = "Aura"
     Lido = "Lido"
     Wallet = "Wallet"
+    Maker = "Maker"
 
     def __str__(self):
         return self.name
@@ -339,6 +340,22 @@ class WalletPosition:
             token_contract = erc20_contract(w3, self.token_in_address)
             token_symbol = token_contract.functions.symbol().call()
             return f"{blockchain}_WalletPosition_{token_symbol}"
+        
+@dataclass
+class MakerPosition:
+    position_id: str
+    address: Address
+
+    def __post_init__(self):
+        self.address = to_checksum_address(self.address)
+
+    def position_id_tech(self) -> Address:
+        """The address used at Maker"""
+        return self.address
+
+    def position_id_human_readable(self, w3: Web3) -> str:
+        blockchain = Chain.get_blockchain_from_web3(w3)
+        return f"{blockchain}_MakerPosition_{self.address}"
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -352,6 +369,7 @@ class DAOStrategiesBuilder:
     aura: list[AuraPosition] | None = None
     lido: list[LidoPosition] | None = None
     wallet_tokens: list[WalletPosition] | None = None
+    maker: list[MakerPosition] | None = None
 
     def build_dict(self, w3: Web3) -> dict:
         positions = []
@@ -368,6 +386,9 @@ class DAOStrategiesBuilder:
         print(f"    Adding Wallet positions")
         if self.wallet_tokens:
             positions.extend(self.build_wallet_positions(w3, self.wallet_tokens))
+        print(f"    Adding Maker positions")
+        if self.maker:
+            positions.extend(self.build_maker_positions(w3, self.maker))
         return seed_dict(self.dao, self.blockchain, positions)
 
     def build_json(self, w3: Web3):
@@ -384,6 +405,9 @@ class DAOStrategiesBuilder:
         print(f"    Adding Wallet positions")
         if self.wallet_tokens:
             self.add_to_json(self.build_wallet_positions(w3, self.wallet_tokens))
+        print(f"    Adding Maker positions")
+        if self.maker:
+            self.add_to_json(self.build_maker_positions(w3, self.maker))
 
     def add_to_json(self, positions: list[dict]):
         file = os.path.join(os.path.dirname(__file__), "strategies", f"{self.dao}-{self.blockchain}.json")
@@ -542,8 +566,6 @@ class DAOStrategiesBuilder:
 
             protocol_list = []
             pools_class = SwapPoolInstances[blockchain]
-            bla = ContractSpecs[blockchain].wstETH.address
-            blad = ContractSpecs[blockchain].stETH.address
             for attr_name in dir(pools_class):
                 attr_value = getattr(pools_class, attr_name)
                 if isinstance(attr_value, SwapPools):
@@ -728,4 +750,32 @@ class DAOStrategiesBuilder:
                                 )
                             else:
                                 print("        Not adding: ", wallet_position)
+        return result
+    
+    @staticmethod
+    def build_maker_positions(w3: Web3, positions: list[MakerPosition]) -> list[dict]:
+        with open(os.path.join(os.path.dirname(__file__), "templates", "maker_template.json"), "r") as f:
+            maker_template = json.load(f)
+
+        result = []
+        for maker_position in positions:
+            print("        Adding: ", maker_position)
+            position = copy.deepcopy(maker_template)
+            blockchain = Chain.get_blockchain_from_web3(w3)
+            position["position_id"] = maker_position.position_id
+            position["position_id_tech"] = maker_position.position_id_tech()
+            position["position_id_human_readable"] = maker_position.position_id_human_readable(w3)
+
+            for i in range(len(position["exec_config"])):
+                print(
+                    "                Adding: ",
+                    position["exec_config"][i]["function_name"],
+                    position["exec_config"][i]["label"],
+                )
+
+            print(
+                f"        Done adding: Maker position", position["position_id"], position["position_id_human_readable"]
+            )
+
+            result.append(position)
         return result
