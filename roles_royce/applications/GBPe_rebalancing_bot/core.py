@@ -39,10 +39,14 @@ class DynamicData:
     bot_xDAI_balance: int
     drift_GBPe_to_USD: float = field(init=False)
     drift_USD_to_GBPe: float = field(init=False)
+    GBPe_spot_price: float
+    drift_in_spot_price: float = field(init=False)
+
 
     def __post_init__(self):
         self.drift_GBPe_to_x3CRV = self.GBPe_to_x3CRV * self.x3CRV_price / (self.GBP_price * self.amount_GBPe) - 1
         self.drift_x3CRV_to_GBPe = self.x3CRV_to_GBPe * self.GBP_price / (self.amount_x3CRV * self.x3CRV_price) - 1
+        self.drift_in_spot_price = self.GBPe_spot_price / self.GBP_price - 1
 
     def get_GBPe_price_curve(self) -> float:
         return self.GBPe_to_x3CRV * self.x3CRV_price / self.amount_GBPe
@@ -172,6 +176,10 @@ class DynamicDataManager:
             .call()
         )
         bot_xDAI_balance = self.w3.eth.get_balance(self.static_data.env.BOT_ADDRESS)
+
+        # We're using a fixed swap of 1000 GBPe to estimate the GBPe spot price
+        GBPe_spot_price = self.get_GBPe_to_x3CRV_curve(1000) * x3CRV_price / 1000
+
         return DynamicData(
             amount_x3CRV=amount_x3CRV,
             amount_GBPe=amount_GBPe,
@@ -182,6 +190,7 @@ class DynamicDataManager:
             x3CRV_balance=x3CRV_balance,
             GBPe_balance=GBPe_balance,
             bot_xDAI_balance=bot_xDAI_balance,
+            GBPe_spot_price=GBPe_spot_price,
         )
 
 
