@@ -15,8 +15,8 @@ git checkout $GIT_REF
 
 BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD | sed 's/[^a-zA-Z0-9]/-/g')  # should be the same as GIT_REF
 COMMIT_SHA=$(git rev-parse HEAD)
-CURRENT_DATE=$(date +"%Y%m%d")
-CURRENT_TIME=$(date +"%H%M%S")
+CURRENT_DATE=$(date -u +"%Y%m%d")
+CURRENT_TIME=$(date -u +"%H%M%S")
 
 DOCKER_TAG="${DOCKER_IMAGE_NAME}:${BRANCH_NAME}"
 DOCKER_TAG_WITH_HASH="${DOCKER_IMAGE_NAME}:${BRANCH_NAME}-${COMMIT_SHA:0:7}"
