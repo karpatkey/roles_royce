@@ -130,7 +130,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
 
     # -----------------------------------------------------------------------------------------------------------------------
 
-    if dynamic_data.drift_GBPe_to_x3CRV > env.DRIFT_THRESHOLD and balance_GBPe >= amount_GBPe * (10**decimals_GBPe):
+    if dynamic_data.drift_in_spot_price > env.DRIFT_THRESHOLD and balance_GBPe >= amount_GBPe * (10**decimals_GBPe):
         logger.info(f"Swapping {amount_GBPe:,.3f} GBPe for x3CRV...")
         tx_receipt_GBPe_to_x3CRV = swapper.swap_GBPe_for_x3CRV(static_data, dynamic_data)
 
@@ -143,7 +143,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
 
         flags.tx_executed.set()
 
-    elif dynamic_data.drift_x3CRV_to_GBPe > env.DRIFT_THRESHOLD and balance_x3CRV >= amount_x3CRV * (
+    elif dynamic_data.drift_in_spot_price < -env.DRIFT_THRESHOLD and balance_x3CRV >= amount_x3CRV * (
         10**decimals_x3CRV
     ):
         logger.info(f"Swapping {amount_x3CRV:,.3f} x3CRV for GBPe...")
