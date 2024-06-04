@@ -479,6 +479,8 @@ class DAOStrategiesBuilder:
                         position["exec_config"][1]["parameters"][2]["options"].append(
                             {"value": token["address"], "label": token["symbol"]}
                         )
+                    if len(position["exec_config"][1]["parameters"][2]["options"]) == 1:
+                        position["exec_config"][1]["parameters"][2]['type'] = "constant"
                 else:
                     del position["exec_config"][
                         1
@@ -535,6 +537,8 @@ class DAOStrategiesBuilder:
                         position["exec_config"][2]["parameters"][2]["options"].append(
                             {"value": token["address"], "label": token["symbol"]}
                         )
+                    if len(position["exec_config"][2]["parameters"][2]["options"]) == 1:
+                        position["exec_config"][2]["parameters"][2]['type'] = "constant"
                 else:
                     del position["exec_config"][
                         2
@@ -742,6 +746,12 @@ class DAOStrategiesBuilder:
                                     del position["exec_config"][i]
 
                             if len(position["exec_config"]) > 0:
+                                for config in position["exec_config"]:
+                                    if len(config["parameters"][0]["options"]) == 1:
+                                        config["parameters"][0]["type"] = "constant"
+                                    if len(config["parameters"][2]["options"]) == 1:
+                                        config["parameters"][2]["type"] = "constant"
+                                    
                                 result.append(position)
                                 print(
                                     f"        Done adding: Wallet position",

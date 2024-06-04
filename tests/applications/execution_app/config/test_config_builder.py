@@ -298,7 +298,7 @@ def test_build_lido_positions(local_node_eth):
                         {
                             "name": "token_in_address",
                             "label": "Token in",
-                            "type": "input",
+                            "type": "constant",
                             "options": [{"value": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84", "label": "stETH"}],
                         },
                         {
@@ -310,7 +310,7 @@ def test_build_lido_positions(local_node_eth):
                         {
                             "name": "token_out_address",
                             "label": "Token out",
-                            "type": "input",
+                            "type": "constant",
                             "options": [{"value": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", "label": "ETH"}],
                         },
                     ],
@@ -326,7 +326,7 @@ def test_build_lido_positions(local_node_eth):
                         {
                             "name": "token_in_address",
                             "label": "Token in",
-                            "type": "input",
+                            "type": "constant",
                             "options": [{"value": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84", "label": "stETH"}],
                         },
                         {
@@ -338,7 +338,7 @@ def test_build_lido_positions(local_node_eth):
                         {
                             "name": "token_out_address",
                             "label": "Token out",
-                            "type": "input",
+                            "type": "constant",
                             "options": [{"value": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", "label": "ETH"}],
                         },
                     ],
@@ -384,7 +384,7 @@ def test_build_swap_pool_positions(local_node_eth):
                         {
                             "name": "token_in_address",
                             "label": "Token in",
-                            "type": "input",
+                            "type": "constant",
                             "options": [{"value": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84", "label": "stETH"}],
                         },
                         {
@@ -415,7 +415,7 @@ def test_build_swap_pool_positions(local_node_eth):
                         {
                             "name": "token_in_address",
                             "label": "Token in",
-                            "type": "input",
+                            "type": "constant",
                             "options": [{"value": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84", "label": "stETH"}],
                         },
                         {
@@ -427,7 +427,7 @@ def test_build_swap_pool_positions(local_node_eth):
                         {
                             "name": "token_out_address",
                             "label": "Token out",
-                            "type": "input",
+                            "type": "constant",
                             "options": [{"value": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", "label": "ETH"}],
                         },
                     ],
@@ -451,7 +451,7 @@ def test_build_swap_pool_positions(local_node_eth):
                         {
                             "name": "token_in_address",
                             "label": "Token in",
-                            "type": "input",
+                            "type": "constant",
                             "options": [{"value": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84", "label": "stETH"}],
                         },
                         {
