@@ -1,0 +1,49 @@
+{
+    "protocol": "Aave_V3",
+    "position_id": "FllMeWithPositionId",
+    "position_id_tech": "FillMeWithBptAddressAndStakedOrNot",
+    "position_id_human_readable": "FillMeWithPositionIdHumanReadable",
+    "exec_config": [
+      {
+        "function_name": "exit_1",
+        "label": "Withdraw and Repay",
+        "test": true,
+        "stresstest": false,
+        "stresstest_error": "None",
+        "description": "Withdraw supplied token(s) and/or repay borrowed token(s)",
+        "parameters": [
+            {
+                "name": "supplied_token_in_address",
+                "label": "Supplied Token In",
+                "type": "input",
+                "options": [
+                  {
+                    "value": "FillMewithTokenAddress",
+                    "label": "FillMeWithTokenSymbol",
+                    "amount": "Something!"
+                  }
+                ]
+              },
+              {
+                "name": "borrowed_token_in_address",
+                "label": "Borrowed Token In",
+                "type": "input",
+                "options": [
+                  {
+                    "value": "FillMewithTokenAddress",
+                    "label": "FillMeWithTokenSymbol",
+                    "amount": "Something!"
+                  }
+                ]
+              },
+          {
+            "name": "max_slippage",
+            "label": "Max Slippage",
+            "type": "input",
+            "rules": {
+              "min": 0.001,
+              "max": 100
+            }
+          }
+        ]
+      }]}
