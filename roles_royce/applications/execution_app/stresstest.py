@@ -206,6 +206,12 @@ def single_stresstest(
             else:
                 exec_config["stresstest"] = True
 
+        for item in exec_config["parameters"]:
+            if item["name"] == "token_in_address" or item["name"] == "token_out_address":
+                if len(item["options"]) == 1:
+                    item["type"] = "constant"
+                
+
     except Exception as e:
         logger.info(f"Error in transaction builder. Error: {str(e)}")
         exec_config["stresstest"] = False
