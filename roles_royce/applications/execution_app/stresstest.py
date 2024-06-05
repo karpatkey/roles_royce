@@ -210,7 +210,8 @@ def single_stresstest(
             if item["name"] == "token_in_address" or item["name"] == "token_out_address":
                 if len(item["options"]) == 1:
                     item["type"] = "constant"
-                
+                    item["value"] = item["options"][0]["value"]
+                    del item["options"]
 
     except Exception as e:
         logger.info(f"Error in transaction builder. Error: {str(e)}")
