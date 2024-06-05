@@ -65,7 +65,7 @@ def run_with_args(dao, protocol, blockchain, exit_strategy, percentage, exit_arg
         bpt_address = gauge_contract.functions.lp_token().call()
         test = recovery_mode_balancer(w3, bpt_address, function_name, blockchain=bc)
         if test:
-            if exec_config["function_name"] == "exit_2_1":
+            if function_name == "exit_2_1":
                 raise ValueError("Skip non-recovery")
             else:
                 raise ValueError("Skip recovery")
@@ -145,21 +145,25 @@ def single_stresstest(
             elif item["name"] == "max_slippage":
                 exit_arguments_dict[item["name"]] = max_slippage
             elif item["name"] == "token_in_address":
-                # exit_arguments_dict[item["name"]] = item["options"][0]["value"]
-                token_ins = [i["value"] for i in item["options"]]
+                if len(item["options"]) == 1:
+                    exit_arguments_dict[item["name"]] = item["options"][0]["value"]
+                else:
+                    token_ins = [i["value"] for i in item["options"]]
             elif item["name"] == "token_out_address":
-                # exit_arguments_dict[item["name"]] = item["options"][0]["value"]
-                token_outs = [i["value"] for i in item["options"]]
+                if len(item["options"]) == 1:
+                    exit_arguments_dict[item["name"]] = item["options"][0]["value"]
+                else:
+                    token_outs = [i["value"] for i in item["options"]]
 
         if len(token_ins) > 1 and len(token_outs) > 1:
             raise ValueError(
                 "Sorry Jose. No possibru for now to support multiple options for both token ins and out. Ask support!!! good luck <3 belive in yourself"
             )
 
-        if len(token_ins) > 0:
+        if len(token_ins) > 1:
             option_arg = "token_in_address"
             options = token_ins
-        elif len(token_outs) > 0:
+        elif len(token_outs) > 1:
             option_arg = "token_out_address"
             options = token_outs
         else:
@@ -189,10 +193,12 @@ def single_stresstest(
                 error = err
 
         if option_arg:
-            exec_config[option_arg] = [a for a in exec_config[option_arg] if a["value"] in passing_results]
-            if len(exec_config[option_arg]) == 0:
-                exec_config["stresstest"] = False
-                exec_config["stresstest_error"] = error
+            for item in exec_config["parameters"]:
+                if item["name"] == option_arg:
+                    item["options"] = [a for a in item["options"] if a["value"] in passing_results]
+                    if len(item["options"]) == 0:
+                        exec_config["stresstest"] = False
+                        exec_config["stresstest_error"] = error
         else:
             if error:
                 exec_config["stresstest"] = False
