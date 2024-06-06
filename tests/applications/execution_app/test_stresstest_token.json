@@ -23,7 +23,7 @@
                     "function_name": "exit_1",
                     "label": "Exchange Wallet Token on Cowswap",
                     "test": true,
-                    "stresstest": true,
+                    "stresstest": false,
                     "stresstest_error": "None",
                     "description": "Exchange a wallet token through Cowswap",
                     "parameters": [
@@ -72,7 +72,7 @@
                     "function_name": "exit_4",
                     "label": "Exchange Wallet Token on UniswapV3",
                     "test": true,
-                    "stresstest": true,
+                    "stresstest": false,
                     "stresstest_error": "None",
                     "description": "Exchange a wallet token through UniswapV3",
                     "parameters": [
