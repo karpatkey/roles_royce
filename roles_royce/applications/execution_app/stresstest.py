@@ -98,8 +98,6 @@ def run_with_args(dao, protocol, blockchain, exit_strategy, percentage, exit_arg
     if result["status"] != 200:
         logger.info(f'Error in transaction builder. Error1: {result["error"]}')
         return (False, f'error: {result["error"]}')
-        # exec_config["stresstest"] = False
-        # exec_config["stresstest_error"] =
     else:
         logger.info(f'Status of transaction builder: {result["status"]}')
         tx = result["tx_data"]["transaction"]
@@ -111,13 +109,10 @@ def run_with_args(dao, protocol, blockchain, exit_strategy, percentage, exit_arg
                 return (False, f"error: {result['error']}")
             else:
                 logger.info(f'Status of execution: {result["status"]}')
-                # exec_config["stresstest"] = True
                 return (True, None)
 
         except Exception as f:
             logger.info(f"Exception in execution. Error: {f}")
-            # exec_config["stresstest"] = False
-            # exec_config["stresstest_error"] =
             return (False, f"error: {str(f)}")
 
 
