@@ -24,16 +24,16 @@
     },
     {
       "function_name": "exit_3",
-      "label": "Swap stETH",
+      "label": "Swap stETH on CowSwap",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Swap stETH for ETH",
+      "description": "Swap stETH for ETH on CowSwap",
       "parameters": [
         {
           "name": "max_slippage",
           "type": "input",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "rules": {
             "min": 0.001,
             "max": 100
@@ -43,15 +43,15 @@
     },
     {
       "function_name": "exit_4",
-      "label": "Swap wstETH",
+      "label": "Swap wstETH on CowSwap",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Swap wstETH for ETH",
+      "description": "Swap wstETH for ETH on CowSwap",
       "parameters": [
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -62,15 +62,15 @@
     },
     {
       "function_name": "exit_5",
-      "label": "Exchange Wallet Token on Balancer",
+      "label": "Exchange stETH on Balancer",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Exchange a wallet token through Balancer",
+      "description": "Exchange stETH for ETH on Balancer",
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -81,7 +81,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -90,7 +90,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -103,15 +103,15 @@
     },
     {
       "function_name": "exit_6",
-      "label": "Exchange Wallet Token on Curve",
+      "label": "Exchange stETH on Curve",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Exchange a wallet token through Curve",
+      "description": "Exchange stETH for ETH on Curve",
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -122,7 +122,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -131,7 +131,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -144,15 +144,15 @@
     },
     {
       "function_name": "exit_7",
-      "label": "Exchange Wallet Token on UniswapV3",
+      "label": "Exchange stETH on UniswapV3",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Exchange a wallet token through UniswapV3",
+      "description": "Exchange stETH to ETH on UniswapV3",
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -163,7 +163,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -172,7 +172,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -185,15 +185,15 @@
     },
     {
       "function_name": "exit_8",
-      "label": "Exchange Wallet Token on Balancer",
+      "label": "Exchange wstETH on Balancer",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Exchange a wallet token through Balancer",
+      "description": "Exchange wstETH to ETH on Balancer",
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -204,7 +204,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -213,7 +213,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -226,15 +226,15 @@
     },
     {
       "function_name": "exit_9",
-      "label": "Exchange Wallet Token on Curve",
+      "label": "Exchange wstETH on Curve",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Exchange a wallet token through Curve",
+      "description": "Exchange wstETH to ETH on Curve",
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -245,7 +245,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -254,7 +254,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -267,15 +267,15 @@
     },
     {
       "function_name": "exit_10",
-      "label": "Exchange Wallet Token on UniswapV3",
+      "label": "Exchange wstETH on UniswapV3",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Exchange a wallet token through UniswapV3",
+      "description": "Exchange wstETH to ETH on UniswapV3",
       "parameters": [
         {
           "name": "token_in_address",
-          "label": "Token in",
+          "label": "Token In",
           "type": "input",
           "options": [
             {
@@ -286,7 +286,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -295,7 +295,7 @@
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {

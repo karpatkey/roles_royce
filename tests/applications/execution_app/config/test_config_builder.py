@@ -12,6 +12,7 @@ from roles_royce.applications.execution_app.config.config_builder import (
     DAOStrategiesBuilder,
     WalletPosition,
     LidoPosition,
+    MakerPosition,
 )
 from tests.fork_fixtures import local_node_eth, local_node_gc
 
@@ -430,6 +431,94 @@ def test_build_swap_pool_positions(local_node_eth):
                             "options": [{"value": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", "label": "ETH"}],
                         },
                     ],
+                },
+            ],
+        },
+        {
+            "protocol": "Wallet",
+            "position_id": "226",
+            "position_id_tech": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+            "position_id_human_readable": "ethereum_WalletPosition_stETH_to_DAI_in_CowSwap_to_USDT_in_CowSwap_to_USDC_in_CowSwap",
+            "exec_config": [
+                {
+                    "function_name": "exit_1",
+                    "label": "Exchange Wallet Token on Cowswap",
+                    "test": True,
+                    "stresstest": False,
+                    "stresstest_error": "None",
+                    "description": "Exchange a wallet token through Cowswap",
+                    "parameters": [
+                        {
+                            "name": "token_in_address",
+                            "label": "Token in",
+                            "type": "input",
+                            "options": [{"value": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84", "label": "stETH"}],
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max slippage",
+                            "type": "input",
+                            "rules": {"min": 0.001, "max": 100},
+                        },
+                        {
+                            "name": "token_out_address",
+                            "label": "Token out",
+                            "type": "input",
+                            "options": [
+                                {"value": "0x6B175474E89094C44Da98b954EedeAC495271d0F", "label": "DAI"},
+                                {"value": "0xdAC17F958D2ee523a2206206994597C13D831ec7", "label": "USDT"},
+                                {"value": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "label": "USDC"},
+                            ],
+                        },
+                    ],
+                }
+            ],
+        },
+    ]
+
+
+with open(os.path.join(os.path.dirname(__file__), "test_maker_template.json"), "r") as f:
+    test_data = json.load(f)
+
+test_data_str = json.dumps(test_data)
+
+
+@patch("builtins.open", mock_open(read_data=test_data_str))
+def test_build_maker_positions(local_node_eth):
+    dao = DAO.GnosisDAO
+    blockchain = Chain.ETHEREUM
+    maker_position = MakerPosition(position_id="226", address="0x373238337Bfe1146fb49989fc222523f83081dDb")
+    w3 = local_node_eth.w3
+    block = 19663216
+    local_node_eth.set_block(block)
+
+    builder = DAOStrategiesBuilder(dao, blockchain, maker=[maker_position])
+    result = builder.build_maker_positions(w3, [maker_position])
+
+    assert result == [
+        {
+            "protocol": "Maker",
+            "position_id": "226",
+            "position_id_tech": "0x373238337Bfe1146fb49989fc222523f83081dDb",
+            "position_id_human_readable": "ethereum_MakerPosition_0x373238337Bfe1146fb49989fc222523f83081dDb",
+            "exec_config": [
+                {
+                    "function_name": "exit_1",
+                    "label": "Withdraw from DSR through proxy",
+                    "test": True,
+                    "stresstest": False,
+                    "stresstest_error": "None",
+                    "description": "Withdraw DAI from DSR with the use of the proxy",
+                    "parameters": [],
+                },
+                {
+                    "function_name": "exit_2",
+                    "label": "Withdraw from DSR no proxy",
+                    "test": True,
+                    "stresstest": False,
+                    "stresstest_error": "None",
+                    "description": "Withdraw DAI from DSR without the use of the proxy",
+                    "parameters": [],
                 },
             ],
         }

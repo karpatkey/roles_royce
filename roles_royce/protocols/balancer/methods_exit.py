@@ -33,6 +33,7 @@ class _ExactBptSingleTokenExit(Exit):
         assets: list[Address],
         bpt_amount_in: int,
         exit_token_index: int,
+        exit_token_index_up: int,
         min_amounts_out: list[int],
     ):
         if pool_kind == PoolKind.ComposableStablePool:
@@ -46,7 +47,7 @@ class _ExactBptSingleTokenExit(Exit):
             avatar=avatar,
             assets=assets,
             min_amounts_out=min_amounts_out,
-            user_data=[self.exit_kind, bpt_amount_in, exit_token_index],
+            user_data=[self.exit_kind, bpt_amount_in, exit_token_index_up],
         )
 
 
@@ -64,8 +65,19 @@ class ExactBptSingleTokenExit(_ExactBptSingleTokenExit):
         if assets is None:
             assets = Pool(w3, pool_id).assets()
         pool_kind = Pool(w3, pool_id).pool_kind()
+
         exit_token_index = assets.index(token_out_address)
         min_amounts_out = [0] * exit_token_index + [min_amount_out] + [0] * (len(assets) - exit_token_index - 1)
+
+        if pool_kind == PoolKind.ComposableStablePool:
+            bpt_index = Pool(w3, pool_id).bpt_index_from_composable()
+            assets.pop(bpt_index)
+            exit_token_index_up = assets.index(token_out_address)
+            assets = Pool(w3, pool_id).assets()
+        else:
+            exit_token_index_up = exit_token_index
+        
+
 
         super().__init__(
             blockchain=Chain.get_blockchain_from_web3(w3),
@@ -75,6 +87,7 @@ class ExactBptSingleTokenExit(_ExactBptSingleTokenExit):
             assets=assets,
             bpt_amount_in=bpt_amount_in,
             exit_token_index=exit_token_index,
+            exit_token_index_up=exit_token_index_up,
             min_amounts_out=min_amounts_out,
         )
 

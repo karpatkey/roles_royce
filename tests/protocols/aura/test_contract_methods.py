@@ -160,6 +160,6 @@ def test_approve_method_with_roles(local_node_eth):
     w3 = local_node_eth.w3
     method = aura.ApproveForBooster(token=LP80GNO20WETH, amount=1000)
     ROLE = 1
-    roles_mod = RolesMod(role=ROLE, contract_address=ROLES_MOD, account=REVOKER_ROLE, web3=w3)
+    roles_mod = RolesMod(role=ROLE, contract_address=ROLES_MOD, account=REVOKER_ROLE, w3=w3)
     check_transaction = roles_mod.check(method.target_address, method.data)
     assert check_transaction

@@ -1,18 +1,29 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Union, cast
+from typing import Any, Dict, cast
 
 from defabipedia.types import Blockchain, Chain
-from eth_typing import HexStr
 from eth_utils import event_abi_to_log_topic
 from hexbytes import HexBytes
 from web3 import Web3
-from web3._utils.abi import get_abi_input_names, get_abi_input_types, map_abi_data
+from web3._utils.abi import map_abi_data
 from web3._utils.normalizers import BASE_RETURN_NORMALIZERS
-from web3.contract import Contract
 from web3.types import Address, ChecksumAddress, TxReceipt
-
+from eth_utils.abi import collapse_if_tuple
 from roles_royce.evm_utils import erc20_abi
 from roles_royce.utils import to_checksum_address
+
+
+def get_abi_input_names(abi, indexed):
+    if "inputs" not in abi and abi["type"] == "fallback":
+        return []
+    return [arg["name"] for arg in abi["inputs"] if arg['indexed'] == indexed]
+
+
+def get_abi_input_types(abi, indexed):
+    if "inputs" not in abi and (abi["type"] == "fallback" or abi["type"] == "receive"):
+        return []
+    else:
+        return [collapse_if_tuple(cast(Dict[str, Any], arg)) for arg in abi["inputs"] if arg['indexed'] == indexed]
 
 
 @dataclass
@@ -25,21 +36,13 @@ class Event:
 class EventLogDecoder:
     """Helper to decode events from tx receipts."""
 
-    def __init__(self, contract: Contract):
+    def __init__(self, contract):
         self.contract = contract
         self.event_abis = [abi for abi in self.contract.abi if abi["type"] == "event"]
         self._sign_abis = {event_abi_to_log_topic(abi): abi for abi in self.event_abis}
 
     def decode_log(self, result: Dict[str, Any]):
-        data = b""
-        for t in result["topics"]:
-            data += t
-        data += result["data"]
-        return self.decode_event_input(data)
-
-    def decode_event_input(self, data: Union[HexStr, str, bytes]) -> Event | None:
-        # type ignored b/c expects data arg to be HexBytes
-        data = HexBytes(data)  # type: ignore
+        data = b"".join([t for t in result["topics"]])
         selector, params = data[:32], data[32:]
 
         try:
@@ -47,13 +50,17 @@ class EventLogDecoder:
         except KeyError:
             return None
 
-        names = get_abi_input_names(func_abi)
-        types = get_abi_input_types(func_abi)
+        def _decode(indexed, data):
+            names = get_abi_input_names(func_abi, indexed=indexed)
+            types = get_abi_input_types(func_abi, indexed=indexed)
 
-        decoded = self.contract.w3.codec.decode(types, cast(HexBytes, params))
-        normalized = map_abi_data(BASE_RETURN_NORMALIZERS, types, decoded)
-        values = dict(zip(names, normalized))
-        return Event(name=func_abi["name"], topic=selector, values=values)
+            decoded = self.contract.w3.codec.decode(types, data)
+            normalized = map_abi_data(BASE_RETURN_NORMALIZERS, types, decoded)
+            return dict(zip(names, normalized))
+
+        values = _decode(indexed=True, data=params)
+        values |= _decode(indexed=False, data=result["data"])
+        return Event(name=func_abi["name"], topic=HexBytes(selector), values=values)
 
 
 erc20_event_log_decoder = EventLogDecoder(Web3().eth.contract(abi=erc20_abi))
