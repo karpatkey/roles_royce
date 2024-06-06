@@ -190,6 +190,7 @@ def single_stresstest(
             if result:
                 passing_results.append(option_value)
             else:
+                logger.info(f"Error in transaction builder with option {option_value}. Error: {str(err)}")
                 error = err
 
         if option_arg:
