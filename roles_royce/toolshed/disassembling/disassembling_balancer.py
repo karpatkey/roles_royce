@@ -278,7 +278,7 @@ class BalancerDisassembler(Disassembler):
             withdraw_balancer = self.exit_1_1(
                 percentage=fraction,
                 exit_arguments=[{"bpt_address": bpt_address, "max_slippage": max_slippage}],
-                amount_to_redeem=amount_to_redeem,
+                amount_to_redeem=amount,
             )
             for transactable in withdraw_balancer:
                 txns.append(transactable)
@@ -333,7 +333,7 @@ class BalancerDisassembler(Disassembler):
                 exit_arguments=[
                     {"bpt_address": bpt_address, "token_out_address": token_out_address, "max_slippage": max_slippage}
                 ],
-                amount_to_redeem=amount_to_redeem,
+                amount_to_redeem=amount,
             )
             for transactable in withdraw_balancer:
                 txns.append(transactable)
@@ -379,7 +379,7 @@ class BalancerDisassembler(Disassembler):
             bpt_address = gauge_contract.functions.lp_token().call()
 
             withdraw_balancer = self.exit_1_3(
-                percentage=fraction, exit_arguments=[{"bpt_address": bpt_address}], amount_to_redeem=amount_to_redeem
+                percentage=fraction, exit_arguments=[{"bpt_address": bpt_address}], amount_to_redeem=amount
             )
             for transactable in withdraw_balancer:
                 txns.append(transactable)
