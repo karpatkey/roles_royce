@@ -47,39 +47,39 @@ def initialize_logging(log_level, log_name="stresstest"):
     return logger, mh
 
 
-def run_with_args(dao, protocol, blockchain, exit_strategy, percentage, exit_arguments_dict, function_name, w3, logger):
+def run_with_args(dao, protocol, blockchain, exit_strategy, percentage, exit_arguments_dict, w3, logger):
     exit_arguments = [exit_arguments_dict]
 
     chain_id = {"ethereum": 1, "gnosis": 100}[blockchain.lower()]
     bc = Chain.get_blockchain_by_chain_id(chain_id)
 
-    if protocol == "Balancer" and (function_name == "exit_1_1" or function_name == "exit_1_3"):
+    if protocol == "Balancer" and (exit_strategy == "exit_1_1" or exit_strategy == "exit_1_3"):
         bpt_address = exit_arguments_dict["bpt_address"]
-        test = recovery_mode_balancer(w3, bpt_address, function_name, blockchain=bc)
+        test = recovery_mode_balancer(w3, bpt_address, exit_strategy, blockchain=bc)
         if test:
             raise ValueError("Skip recovery")
 
-    elif protocol == "Balancer" and (function_name == "exit_2_1" or function_name == "exit_2_3"):
+    elif protocol == "Balancer" and (exit_strategy == "exit_2_1" or exit_strategy == "exit_2_3"):
         gauge_address = exit_arguments_dict["gauge_address"]
         gauge_contract = w3.eth.contract(address=gauge_address, abi=BalancerAbis[bc].Gauge.abi)
         bpt_address = gauge_contract.functions.lp_token().call()
-        test = recovery_mode_balancer(w3, bpt_address, function_name, blockchain=bc)
+        test = recovery_mode_balancer(w3, bpt_address, exit_strategy, blockchain=bc)
         if test:
-            if function_name == "exit_2_1":
+            if exit_strategy == "exit_2_1":
                 raise ValueError("Skip non-recovery")
             else:
                 raise ValueError("Skip recovery")
 
-    elif protocol == "Aura" and (function_name == "exit_2_1" or function_name == "exit_2_3"):
+    elif protocol == "Aura" and (exit_strategy == "exit_2_1" or exit_strategy == "exit_2_3"):
         aura_rewards_address = exit_arguments_dict["rewards_address"]
         aura_rewards_contract = w3.eth.contract(
             address=aura_rewards_address,
             abi=AuraAbis[bc].BaseRewardPool.abi,
         )
         bpt_address = aura_rewards_contract.functions.asset().call()
-        test = recovery_mode_balancer(w3, bpt_address, function_name, blockchain=bc)
+        test = recovery_mode_balancer(w3, bpt_address, exit_strategy, blockchain=bc)
         if test:
-            if function_name == "exit_2_1":
+            if exit_strategy == "exit_2_1":
                 raise ValueError("Skip non-recovery")
             else:
                 raise ValueError("Skip recovery")
@@ -123,8 +123,6 @@ def single_stresstest(
     logger, logger_handler = initialize_logging(logging.INFO, id)
 
     try:
-        w3 = web3
-
         logger.info(f"Running stresstest on DAO: {dao}, Blockchain: {blockchain}, Protocol: {protocol}")
         logger.info(f'Position: {exec_config["function_name"]}, description: {exec_config["description"]}')
 
@@ -178,7 +176,6 @@ def single_stresstest(
                 exit_strategy=exit_strategy,
                 percentage=percentage,
                 exit_arguments_dict=exit_arguments_dict,
-                function_name=exec_config["function_name"],
                 w3=web3,
                 logger=logger,
             )
