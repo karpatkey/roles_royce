@@ -190,7 +190,7 @@ def single_stresstest(
                 if item["name"] == option_arg:
                     item["options"] = [a for a in item["options"] if a["value"] in passing_results]
                     if len(item["options"]) == 0:
-                        exec_config["stresstest"] = False
+                        exec_config["stresstest"] = error and True or False
                         exec_config["stresstest_error"] = error
         else:
             if error:
