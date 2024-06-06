@@ -47,6 +47,80 @@ def initialize_logging(log_level, log_name="stresstest"):
     return logger, mh
 
 
+def run_with_args(dao, protocol, blockchain, exit_strategy, percentage, exit_arguments_dict, function_name, w3, logger):
+    exit_arguments = [exit_arguments_dict]
+
+    chain_id = {"ethereum": 1, "gnosis": 100}[blockchain.lower()]
+    bc = Chain.get_blockchain_by_chain_id(chain_id)
+
+    if protocol == "Balancer" and (function_name == "exit_1_1" or function_name == "exit_1_3"):
+        bpt_address = exit_arguments_dict["bpt_address"]
+        test = recovery_mode_balancer(w3, bpt_address, function_name, blockchain=bc)
+        if test:
+            raise ValueError("Skip recovery")
+
+    elif protocol == "Balancer" and (function_name == "exit_2_1" or function_name == "exit_2_3"):
+        gauge_address = exit_arguments_dict["gauge_address"]
+        gauge_contract = w3.eth.contract(address=gauge_address, abi=BalancerAbis[bc].Gauge.abi)
+        bpt_address = gauge_contract.functions.lp_token().call()
+        test = recovery_mode_balancer(w3, bpt_address, function_name, blockchain=bc)
+        if test:
+            if function_name == "exit_2_1":
+                raise ValueError("Skip non-recovery")
+            else:
+                raise ValueError("Skip recovery")
+
+    elif protocol == "Aura" and (function_name == "exit_2_1" or function_name == "exit_2_3"):
+        aura_rewards_address = exit_arguments_dict["rewards_address"]
+        aura_rewards_contract = w3.eth.contract(
+            address=aura_rewards_address,
+            abi=AuraAbis[bc].BaseRewardPool.abi,
+        )
+        bpt_address = aura_rewards_contract.functions.asset().call()
+        test = recovery_mode_balancer(w3, bpt_address, function_name, blockchain=bc)
+        if test:
+            if function_name == "exit_2_1":
+                raise ValueError("Skip non-recovery")
+            else:
+                raise ValueError("Skip recovery")
+
+    logger.info(f"Exit arguments: {exit_arguments}")
+
+    env = ENV(DAO=dao or "", BLOCKCHAIN=blockchain)
+    result = build_transaction_env(
+        env=env,
+        percentage=percentage,
+        protocol=protocol,
+        exit_strategy=exit_strategy,
+        exit_arguments=exit_arguments,
+        web3=w3,
+    )
+    if result["status"] != 200:
+        logger.info(f'Error in transaction builder. Error1: {result["error"]}')
+        return (False, f'error: {result["error"]}')
+        # exec_config["stresstest"] = False
+        # exec_config["stresstest_error"] =
+    else:
+        logger.info(f'Status of transaction builder: {result["status"]}')
+        tx = result["tx_data"]["transaction"]
+
+        try:
+            result = execute_env(env=env, transaction=tx, web3=w3)
+            if result["status"] != 200:
+                logger.info(f'Error in execution. Error: {result["error"]}')
+                return (False, f"error: {result['error']}")
+            else:
+                logger.info(f'Status of execution: {result["status"]}')
+                # exec_config["stresstest"] = True
+                return (True, None)
+
+        except Exception as f:
+            logger.info(f"Exception in execution. Error: {f}")
+            # exec_config["stresstest"] = False
+            # exec_config["stresstest_error"] =
+            return (False, f"error: {str(f)}")
+
+
 def single_stresstest(
     percentage: int, max_slippage: int, dao: str, blockchain: str, protocol: str, exec_config, web3: Web3
 ):
@@ -61,91 +135,83 @@ def single_stresstest(
 
         exit_strategy = exec_config["function_name"]
 
+        token_ins = []
+        token_outs = []
+
         exit_arguments_dict = {}
         for item in exec_config["parameters"]:
             if item["type"] == "constant":
                 exit_arguments_dict[item["name"]] = item["value"]
             elif item["name"] == "max_slippage":
                 exit_arguments_dict[item["name"]] = max_slippage
-            elif item["name"] == "token_out_address":
-                exit_arguments_dict[item["name"]] = item["options"][0]["value"]
             elif item["name"] == "token_in_address":
-                exit_arguments_dict[item["name"]] = item["options"][0]["value"]
-        exit_arguments = [exit_arguments_dict]
-
-        chain_id = {"ethereum": 1, "gnosis": 100}[blockchain.lower()]
-        bc = Chain.get_blockchain_by_chain_id(chain_id)
-
-        if protocol == "Balancer" and (
-            exec_config["function_name"] == "exit_1_1" or exec_config["function_name"] == "exit_1_3"
-        ):
-            bpt_address = exit_arguments_dict["bpt_address"]
-            test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"], blockchain=bc)
-            if test:
-                raise ValueError("Skip recovery")
-
-        elif protocol == "Balancer" and (
-            exec_config["function_name"] == "exit_2_1" or exec_config["function_name"] == "exit_2_3"
-        ):
-            gauge_address = exit_arguments_dict["gauge_address"]
-            gauge_contract = w3.eth.contract(address=gauge_address, abi=BalancerAbis[bc].Gauge.abi)
-            bpt_address = gauge_contract.functions.lp_token().call()
-            test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"], blockchain=bc)
-            if test:
-                if exec_config["function_name"] == "exit_2_1":
-                    raise ValueError("Skip non-recovery")
+                if len(item["options"]) == 1:
+                    exit_arguments_dict[item["name"]] = item["options"][0]["value"]
                 else:
-                    raise ValueError("Skip recovery")
+                    token_ins = [i["value"] for i in item["options"]]
+            elif item["name"] == "token_out_address":
+                if len(item["options"]) == 1:
+                    exit_arguments_dict[item["name"]] = item["options"][0]["value"]
+                else:
+                    token_outs = [i["value"] for i in item["options"]]
 
-        elif protocol == "Aura" and (
-            exec_config["function_name"] == "exit_2_1" or exec_config["function_name"] == "exit_2_3"
-        ):
-            aura_rewards_address = exit_arguments_dict["rewards_address"]
-            aura_rewards_contract = w3.eth.contract(
-                address=aura_rewards_address,
-                abi=AuraAbis[bc].BaseRewardPool.abi,
+        if len(token_ins) > 1 and len(token_outs) > 1:
+            raise ValueError(
+                "Sorry Jose. No possibru for now to support multiple options for both token ins and out. Ask support!!! good luck <3 belive in yourself"
             )
-            bpt_address = aura_rewards_contract.functions.asset().call()
-            test = recovery_mode_balancer(w3, bpt_address, exec_config["function_name"], blockchain=bc)
-            if test:
-                if exec_config["function_name"] == "exit_2_1":
-                    raise ValueError("Skip non-recovery")
-                else:
-                    raise ValueError("Skip recovery")
 
-        logger.info(f"Exit arguments: {exit_arguments}")
-
-        env = ENV(DAO=dao or "", BLOCKCHAIN=blockchain)
-        result = build_transaction_env(
-            env=env,
-            percentage=percentage,
-            protocol=protocol,
-            exit_strategy=exit_strategy,
-            exit_arguments=exit_arguments,
-            web3=web3,
-        )
-        if result["status"] != 200:
-            logger.info(f'Error in transaction builder. Error1: {result["error"]}')
-            exec_config["stresstest"] = False
-            exec_config["stresstest_error"] = f'error: {result["error"]}'
+        if len(token_ins) > 1:
+            option_arg = "token_in_address"
+            options = token_ins
+        elif len(token_outs) > 1:
+            option_arg = "token_out_address"
+            options = token_outs
         else:
-            logger.info(f'Status of transaction builder: {result["status"]}')
-            tx = result["tx_data"]["transaction"]
+            option_arg = None
+            options = ["dummy_option"]
 
-            try:
-                result = execute_env(env=env, transaction=tx, web3=web3)
-                if result["status"] != 200:
-                    logger.info(f'Error in execution. Error: {result["error"]}')
-                    exec_config["stresstest"] = False
-                    exec_config["stresstest_error"] = f"error: {result['error']}"
-                else:
-                    logger.info(f'Status of execution: {result["status"]}')
-                    exec_config["stresstest"] = True
+        passing_results = []
+        error = None
+        for option_value in options:
+            if option_arg:
+                exit_arguments_dict[option_arg] = option_value
 
-            except Exception as f:
-                logger.info(f"Exception in execution. Error: {f}")
+            (result, err) = run_with_args(
+                dao=dao,
+                protocol=protocol,
+                blockchain=blockchain,
+                exit_strategy=exit_strategy,
+                percentage=percentage,
+                exit_arguments_dict=exit_arguments_dict,
+                function_name=exec_config["function_name"],
+                w3=web3,
+                logger=logger,
+            )
+            if result:
+                passing_results.append(option_value)
+            else:
+                error = err
+
+        if option_arg:
+            for item in exec_config["parameters"]:
+                if item["name"] == option_arg:
+                    item["options"] = [a for a in item["options"] if a["value"] in passing_results]
+                    if len(item["options"]) == 0:
+                        exec_config["stresstest"] = False
+                        exec_config["stresstest_error"] = error
+        else:
+            if error:
                 exec_config["stresstest"] = False
-                exec_config["stresstest_error"] = f"error: {str(f)}"
+                exec_config["stresstest_error"] = error
+            else:
+                exec_config["stresstest"] = True
+
+        for item in exec_config["parameters"]:
+            if item["name"] == "token_in_address" or item["name"] == "token_out_address":
+                if len(item["options"]) == 1:
+                    item["type"] = "constant"
+                    item["value"] = item["options"][0]["value"]
+                    del item["options"]
 
     except Exception as e:
         logger.info(f"Error in transaction builder. Error: {str(e)}")
