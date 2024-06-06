@@ -199,6 +199,8 @@ def single_stresstest(
                     if len(item["options"]) == 0:
                         exec_config["stresstest"] = False
                         exec_config["stresstest_error"] = error
+                    else:
+                        exec_config["stresstest"] = True
         else:
             if error:
                 exec_config["stresstest"] = False
