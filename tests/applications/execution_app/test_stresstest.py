@@ -12,7 +12,7 @@ MAX_SLIPPAGE = 1
 TEST_ETH_BLOCK = 19590108
 TEST_GNOSIS_BLOCK = 33291126
 
-stresstest_outcome = {
+stresstest_outcome_1 = {
     "dao": "GnosisDAO",
     "blockchain": "ethereum",
     "general_parameters": [
@@ -149,7 +149,100 @@ def test_stresstest(local_node_eth, local_node_gc, accounts, monkeypatch):
     w3, private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
     set_env(monkeypatch, private_key, dao)
 
-    with open(os.path.join(os.path.dirname(__file__), "test_stresstest_v2_eth_gno.json"), "r") as f:
+    with open(os.path.join(os.path.dirname(__file__), "test_stresstest_1.json"), "r") as f:
+        test_data = json.load(f)
+
+    stresstest_tester = stresstest(
+        w3=w3,
+        positions_dict=test_data,
+        percentage=PERCENTAGE,
+        max_slippage=MAX_SLIPPAGE,
+        dao=dao.name,
+        blockchain=dao.blockchain,
+    )
+
+    assert stresstest_tester == stresstest_outcome_1
+
+
+stresstest_outcome = {
+    "dao": "GnosisDAO",
+    "blockchain": "ethereum",
+    "general_parameters": [
+        {"name": "percentage", "label": "Percentage", "type": "input", "rules": {"min": 0, "max": 100}}
+    ],
+    "positions": [
+        {
+            "protocol": "Wallet",
+            "position_id": "34",
+            "position_id_tech": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+            "position_id_human_readable": "ethereum_WalletPosition_WETH_to_DAI_in_CowSwap_to_USDT_in_CowSwap_to_USDC_in_CowSwap_to_USDT_in_UniswapV3",
+            "exec_config": [
+                {
+                    "function_name": "exit_1",
+                    "label": "Exchange Wallet Token on Cowswap",
+                    "test": True,
+                    "stresstest": True,
+                    "stresstest_error": "None",
+                    "description": "Exchange a wallet token through Cowswap",
+                    "parameters": [
+                        {
+                            "name": "token_in_address",
+                            "label": "Token In",
+                            "type": "constant",
+                            "value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {"min": 0.001, "max": 100},
+                        },
+                        {
+                            "name": "token_out_address",
+                            "label": "Token Out",
+                            "type": "input",
+                            "options": [
+                                {"value": "0x6B175474E89094C44Da98b954EedeAC495271d0F", "label": "DAI"},
+                                {"value": "0xdAC17F958D2ee523a2206206994597C13D831ec7", "label": "USDT"},
+                                {"value": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "label": "USDC"},
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "function_name": "exit_4",
+                    "label": "Exchange Wallet Token on UniswapV3",
+                    "test": True,
+                    "stresstest": False,
+                    "stresstest_error": "error: Error: ('ParameterNotAllowed()', None)",
+                    "description": "Exchange a wallet token through UniswapV3",
+                    "parameters": [
+                        {
+                            "name": "token_in_address",
+                            "label": "Token In",
+                            "type": "constant",
+                            "value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                        },
+                        {
+                            "name": "max_slippage",
+                            "label": "Max Slippage",
+                            "type": "input",
+                            "rules": {"min": 0.001, "max": 100},
+                        },
+                        {"name": "token_out_address", "label": "Token Out", "type": "input", "options": []},
+                    ],
+                },
+            ],
+        }
+    ],
+}
+
+
+def test_stresstest_tokens(local_node_eth, local_node_gc, accounts, monkeypatch):
+    w3, private_key = set_up_roles(local_node_eth, local_node_gc, accounts, dao)
+    set_env(monkeypatch, private_key, dao)
+
+    with open(os.path.join(os.path.dirname(__file__), "test_stresstest_token.json"), "r") as f:
         test_data = json.load(f)
 
     stresstest_tester = stresstest(
