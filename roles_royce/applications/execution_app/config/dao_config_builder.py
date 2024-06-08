@@ -9,6 +9,7 @@ from roles_royce.applications.execution_app.config.config_builder import (
     LidoPosition,
     WalletPosition,
     MakerPosition,
+    SparkPosition,
 )
 from roles_royce.applications.execution_app.pulley_fork import PulleyFork
 
@@ -21,6 +22,7 @@ def main(
     lido: list[LidoPosition],
     wallet_tokens: list[WalletPosition],
     maker: list[MakerPosition],
+    spark: list[SparkPosition]
 ):
     with PulleyFork(blockchain) as fork:
         w3 = Web3(Web3.HTTPProvider(fork.url()))
