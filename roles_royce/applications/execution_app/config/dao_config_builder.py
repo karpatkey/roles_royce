@@ -28,7 +28,7 @@ def main(
         w3 = Web3(Web3.HTTPProvider(fork.url()))
 
         strategies = DAOStrategiesBuilder(
-            dao, blockchain, balancer=balancer, aura=aura, lido=lido, wallet_tokens=wallet_tokens, maker=maker
+            dao, blockchain, balancer=balancer, aura=aura, lido=lido, wallet_tokens=wallet_tokens, maker=maker, spark=spark
         )
         strategies_dict = strategies.build_dict(w3)
         return strategies_dict
