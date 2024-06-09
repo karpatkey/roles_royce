@@ -173,6 +173,7 @@ class Protocol(StrEnum):
     Lido = "Lido"
     Wallet = "Wallet"
     Maker = "Maker"
+    Spark = "Spark"
 
     def __str__(self):
         return self.name
@@ -356,6 +357,22 @@ class MakerPosition:
     def position_id_human_readable(self, w3: Web3) -> str:
         blockchain = Chain.get_blockchain_from_web3(w3)
         return f"{blockchain}_MakerPosition_{self.address}"
+    
+@dataclass
+class SparkPosition:
+    position_id: str
+    address: Address
+
+    def __post_init__(self):
+        self.address = to_checksum_address(self.address)
+
+    def position_id_tech(self) -> Address:
+        """The address used at Spark"""
+        return self.address
+    
+    def position_id_human_readable(self, w3: Web3) -> str:
+        blockchain = Chain.get_blockchain_from_web3(w3)
+        return f"{blockchain}_SparkPosition_{self.address}"
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -370,6 +387,7 @@ class DAOStrategiesBuilder:
     lido: list[LidoPosition] | None = None
     wallet_tokens: list[WalletPosition] | None = None
     maker: list[MakerPosition] | None = None
+    spark: list[SparkPosition] | None = None
 
     def build_dict(self, w3: Web3) -> dict:
         positions = []
@@ -389,6 +407,8 @@ class DAOStrategiesBuilder:
         print(f"    Adding Maker positions")
         if self.maker:
             positions.extend(self.build_maker_positions(w3, self.maker))
+        if self.spark:
+            positions.extend(self.build_spark_positions(w3, self.spark))    
         return seed_dict(self.dao, self.blockchain, positions)
 
     def build_json(self, w3: Web3):
@@ -408,6 +428,8 @@ class DAOStrategiesBuilder:
         print(f"    Adding Maker positions")
         if self.maker:
             self.add_to_json(self.build_maker_positions(w3, self.maker))
+        if self.spark:
+            self.add_to_json(self.build_spark_positions(w3, self.spark))
 
     def add_to_json(self, positions: list[dict]):
         file = os.path.join(os.path.dirname(__file__), "strategies", f"{self.dao}-{self.blockchain}.json")
@@ -779,3 +801,32 @@ class DAOStrategiesBuilder:
 
             result.append(position)
         return result
+    
+    @staticmethod
+    def build_spark_positions(w3: Web3, positions: list[SparkPosition]) -> list[dict]:
+        with open(os.path.join(os.path.dirname(__file__), "templates", "spark_template.json"), "r") as f:
+            spark_template = json.load(f)
+
+        result = []
+        for spark_position in positions:
+            print("        Adding: ", spark_position)
+            position = copy.deepcopy(spark_template)
+            blockchain = Chain.get_blockchain_from_web3(w3)
+            position["position_id"] = spark_position.position_id
+            position["position_id_tech"] = spark_position.position_id_tech()
+            position["position_id_human_readable"] = spark_position.position_id_human_readable(w3)
+
+            for i in range(len(position["exec_config"])):
+                print(
+                    "                Adding: ",
+                    position["exec_config"][i]["function_name"],
+                    position["exec_config"][i]["label"],
+                )
+
+            print(
+                f"        Done adding: Spark position", position["position_id"], position["position_id_human_readable"]
+            )
+
+            result.append(position)
+        return result
+

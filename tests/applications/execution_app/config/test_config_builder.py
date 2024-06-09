@@ -13,6 +13,7 @@ from roles_royce.applications.execution_app.config.config_builder import (
     WalletPosition,
     LidoPosition,
     MakerPosition,
+    SparkPosition
 )
 from tests.fork_fixtures import local_node_eth, local_node_gc
 
@@ -523,3 +524,56 @@ def test_build_maker_positions(local_node_eth):
             ],
         }
     ]
+
+with open(os.path.join(os.path.dirname(__file__), "test_spark_template.json"), "r") as f:
+    test_data = json.load(f)
+
+test_data_str = json.dumps(test_data)
+
+@patch("builtins.open", mock_open(read_data=test_data_str))
+def test_build_spark_positions(local_node_eth):
+    dao = DAO.GnosisDAO
+    blockchain = Chain.ETHEREUM
+    spark_position = SparkPosition(position_id="226", address="0x373238337Bfe1146fb49989fc222523f83081dDb")
+    w3 = local_node_eth.w3
+    block = 19663216
+    local_node_eth.set_block(block)
+
+    builder = DAOStrategiesBuilder(dao, blockchain, maker=[spark_position])
+    result = builder.build_spark_positions(w3, [spark_position])
+
+    assert result == [
+    {
+        "protocol": "Spark",
+        "position_id": "226",
+        "position_id_tech": "0x373238337Bfe1146fb49989fc222523f83081dDb",
+        "position_id_human_readable": "ethereum_SparkPosition_0x373238337Bfe1146fb49989fc222523f83081dDb",
+        "exec_config": [
+            {
+                "function_name": "exit_1",
+                "label": "Redeem sDAI",
+                "test": True,
+                "stresstest": False,
+                "stresstest_error": "None",
+                "description": "Redeem sDAI through Spark for either DAI (ethereum) or xDAI (gnosis)",
+                "parameters": [],
+            },
+            {
+                "function_name": "exit_2",
+                "label": "Swap sDAI on CowSwap",
+                "test": True,
+                "stresstest": False,
+                "stresstest_error": "None",
+                "description": "Swap sDAI for USDC on CowSwap",
+                "parameters": [
+                    {
+                        "name": "max_slippage",
+                        "label": "Max Slippage",
+                        "type": "input",
+                        "rules": {"min": 0.001, "max": 100},
+                    }
+                ],
+            },
+        ],
+    }
+]
