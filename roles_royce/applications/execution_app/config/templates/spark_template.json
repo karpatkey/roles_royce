@@ -1,0 +1,36 @@
+{
+    "protocol": "Spark",
+    "position_id": "FllMeWithPositionId",
+    "position_id_tech": "FillMeWithAnAddress",
+    "position_id_human_readable": "FillMeWithPositionIdHumanReadable",
+    "exec_config": [
+      {
+        "function_name": "exit_1",
+        "label": "Redeem sDAI",
+        "test": true,
+        "stresstest": false,
+        "stresstest_error": "None",
+        "description": "Redeem sDAI through Spark for either DAI (ethereum) or xDAI (gnosis)",
+        "parameters": []
+      },
+      {
+      "function_name": "exit_2",
+      "label": "Swap sDAI on CowSwap",
+      "test": true,
+      "stresstest": false,
+      "stresstest_error": "None",
+      "description": "Swap sDAI for USDC on CowSwap",
+      "parameters": [
+        {
+          "name": "max_slippage",
+          "label": "Max Slippage",
+          "type": "input",
+          "rules": {
+            "min": 0.001,
+            "max": 100
+          }
+        }
+      ]
+    }
+    ]
+}

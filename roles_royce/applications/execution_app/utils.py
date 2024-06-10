@@ -22,6 +22,7 @@ from roles_royce.toolshed.disassembling import (
     LidoDisassembler,
     SwapDisassembler,
     DSRDisassembler,
+    SparkDisassembler,
 )
 from roles_royce.utils import to_checksum_address
 
@@ -222,6 +223,7 @@ def disassembler_from_config(w3: Web3, env: ENV, protocol: str) -> Disassembler:
         "Lido": LidoDisassembler,
         "Wallet": SwapDisassembler,
         "Maker": DSRDisassembler,
+        "Spark": SparkDisassembler,
     }.get(protocol)
 
     if not disassembler_klass:
