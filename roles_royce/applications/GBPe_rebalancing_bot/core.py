@@ -1,4 +1,6 @@
 import json
+import math
+from datetime import datetime
 from dataclasses import dataclass, field
 from decimal import Decimal
 
@@ -6,6 +8,7 @@ import requests
 from defabipedia.chainlink import ContractSpecs as ChainlinkContractSpecs
 from defabipedia.curve import ContractSpecs as CurveContractSpecs
 from defabipedia.tokens import Addresses, erc20_contract
+from defabipedia.gnosis import GnosisContractSpecs
 from defabipedia.types import Chain
 from web3 import Web3
 from web3.types import TxReceipt
@@ -14,6 +17,7 @@ from roles_royce import roles
 from roles_royce.applications.GBPe_rebalancing_bot.env import ENV
 from roles_royce.applications.utils import to_dict
 from roles_royce.protocols.base import Address, ContractMethod
+from roles_royce.protocols.balancer import SingleSwap, SwapKind, QuerySwap
 
 
 @dataclass
@@ -21,6 +25,7 @@ class StaticData:
     env: ENV
     decimals_GBPe: int = 18
     decimals_x3CRV = 18
+    decimals_sDAI = 18
 
     def __str__(self):
         return json.dumps(to_dict(self, exclude_key="PRIVATE_KEY"), indent=4)
@@ -30,18 +35,22 @@ class StaticData:
 class DynamicData:
     amount_x3CRV: float
     amount_GBPe: float
+    amount_sDAI: float
     GBPe_to_x3CRV: float
     x3CRV_to_GBPe: float
+    GBPe_to_sDAI: float
+    sDAI_to_GBPe: float
     GBP_price: float
     x3CRV_price: float
     x3CRV_balance: int
     GBPe_balance: int
+    sDAI_price: float
+    sDAI_balance: int
     bot_xDAI_balance: int
     drift_GBPe_to_USD: float = field(init=False)
     drift_USD_to_GBPe: float = field(init=False)
     GBPe_spot_price: float
     drift_in_spot_price: float = field(init=False)
-
 
     def __post_init__(self):
         self.drift_GBPe_to_x3CRV = self.GBPe_to_x3CRV * self.x3CRV_price / (self.GBP_price * self.amount_GBPe) - 1
@@ -77,6 +86,48 @@ class SwapGBPeForx3CRV(ContractMethod):
         super().__init__(avatar=avatar)
         self.args.dx = amount
         self.args.min_dy = min_amount_out
+
+
+class SwapGBPeForsDAI(SingleSwap):
+    def __init__(
+        self,
+        avatar: Address,
+        amount_in: int,
+        min_amount_out: int,
+        deadline: int,
+    ):
+        super().__init__(
+            blockchain=Chain.GNOSIS,
+            pool_id="0x9d93f38b75b376acdfe607cd1ecf4495e047deff00000000000000000000009e",
+            avatar=avatar,
+            kind=SwapKind.OutGivenExactIn,
+            token_in_address=Addresses[Chain.GNOSIS].GBPe,
+            token_out_address=GnosisContractSpecs.sDAI.address,
+            amount_in=amount_in,
+            min_amount_out=min_amount_out,
+            deadline=deadline,
+        )
+
+
+class SwapsDAIForGBPe(SingleSwap):
+    def __init__(
+        self,
+        avatar: Address,
+        amount_in: int,
+        min_amount_out: int,
+        deadline: int,
+    ):
+        super().__init__(
+            blockchain=Chain.GNOSIS,
+            pool_id="0x9d93f38b75b376acdfe607cd1ecf4495e047deff00000000000000000000009e",
+            avatar=avatar,
+            kind=SwapKind.OutGivenExactIn,
+            token_in_address=GnosisContractSpecs.sDAI.address,
+            token_out_address=Addresses[Chain.GNOSIS].GBPe,
+            amount_in=amount_in,
+            min_amount_out=min_amount_out,
+            deadline=deadline,
+        )
 
 
 class DynamicDataManager:
@@ -119,11 +170,52 @@ class DynamicDataManager:
         amount_int = int(Decimal(amount_in) * Decimal(10**self.static_data.decimals_x3CRV))
         if amount_int == 0:
             raise ValueError(
-                "Amount of x3CRV too small. Amount of x3CRV: %f."
-                % (amount_in * (10**self.static_data.decimals_x3CRV))
+                "Amount of x3CRV too small. Amount of x3CRV: %f." % (amount_in * (10**self.static_data.decimals_x3CRV))
             )
         rate = contract.functions.get_dy(1, 0, amount_int).call()
         return float(Decimal(rate) / Decimal(10**self.static_data.decimals_GBPe))
+
+    def get_GBPe_to_sDAI_balancer(self, amount_in: float) -> float:
+        amount_int = int(amount_in * (10**self.static_data.decimals_GBPe))
+        if amount_int == 0:
+            raise ValueError(
+                "Amount of GBPe too small. Amount of GBPe: %f." % (amount_in * (10**self.static_data.decimals_GBPe))
+            )
+
+        return float(
+            Decimal(
+                QuerySwap(
+                    blockchain=Chain.GNOSIS,
+                    pool_id="0x9d93f38b75b376acdfe607cd1ecf4495e047deff00000000000000000000009e",
+                    avatar=self.static_data.env.AVATAR_SAFE_ADDRESS,
+                    token_in_address=Addresses[Chain.GNOSIS].GBPe,
+                    token_out_address=GnosisContractSpecs.sDAI.address,
+                    amount=amount_int,
+                ).call(web3=self.w3)
+            )
+            / Decimal((10**self.static_data.decimals_GBPe))
+        )
+
+    def get_sDAI_to_GBPe_balancer(self, amount_in: float) -> float:
+        amount_int = int(amount_in * (10**self.static_data.decimals_sDAI))
+        if amount_int == 0:
+            raise ValueError(
+                "Amount of sDAI too small. Amount of sDAI: %f." % (amount_in * (10**self.static_data.decimals_sDAI))
+            )
+
+        return float(
+            Decimal(
+                QuerySwap(
+                    blockchain=Chain.GNOSIS,
+                    pool_id="0x9d93f38b75b376acdfe607cd1ecf4495e047deff00000000000000000000009e",
+                    avatar=self.static_data.env.AVATAR_SAFE_ADDRESS,
+                    token_in_address=GnosisContractSpecs.sDAI.address,
+                    token_out_address=Addresses[Chain.GNOSIS].GBPe,
+                    amount=amount_int,
+                ).call(web3=self.w3)
+            )
+            / Decimal((10**self.static_data.decimals_sDAI))
+        )
 
     def get_GBP_oracle_price(self) -> float:
         """
@@ -160,11 +252,18 @@ class DynamicDataManager:
         USDT_share = (USDT_balance / 1e6) / (WXDAI_balance / 1e18 + USDC_balance / 1e6 + USDT_balance / 1e6)
         return WXDAI_amount / 1e18 * WXDAI_share + USDC_amount / 1e6 * USDC_share + USDT_amount / 1e6 * USDT_share
 
-    def get_data(self, amount_x3CRV: float, amount_GBPe: float) -> DynamicData:
+    def get_sDAI_price(self) -> float:
+        sDAI_contract = GnosisContractSpecs.sDAI.contract(self.w3)
+        return float(Decimal(sDAI_contract.functions.convertToAssets(int(1e18)).call()) / Decimal(10**18))
+
+    def get_data(self, amount_x3CRV: float, amount_GBPe: float, amount_sDAI: float) -> DynamicData:
         GBPe_price = self.get_GBP_oracle_price()
         x3CRV_price = self.get_x3CRV_price()
+        sDAI_price = self.get_sDAI_price()
         x3CRV_to_GBPe = self.get_x3CRV_to_GBPe_curve(amount_x3CRV)
         GBPe_to_x3CRV = self.get_GBPe_to_x3CRV_curve(amount_GBPe)
+        GBPe_to_sDAI = self.get_GBPe_to_sDAI_balancer(amount_GBPe)
+        sDAI_to_GBPe = self.get_sDAI_to_GBPe_balancer(amount_sDAI)
         x3CRV_balance = (
             erc20_contract(self.w3, Addresses[Chain.GNOSIS].x3CRV)
             .functions.balanceOf(self.static_data.env.AVATAR_SAFE_ADDRESS)
@@ -172,6 +271,11 @@ class DynamicDataManager:
         )
         GBPe_balance = (
             erc20_contract(self.w3, Addresses[Chain.GNOSIS].GBPe)
+            .functions.balanceOf(self.static_data.env.AVATAR_SAFE_ADDRESS)
+            .call()
+        )
+        sDAI_balance = (
+            erc20_contract(self.w3, GnosisContractSpecs.sDAI.address)
             .functions.balanceOf(self.static_data.env.AVATAR_SAFE_ADDRESS)
             .call()
         )
@@ -183,10 +287,15 @@ class DynamicDataManager:
         return DynamicData(
             amount_x3CRV=amount_x3CRV,
             amount_GBPe=amount_GBPe,
+            amount_sDAI=amount_sDAI,
             GBPe_to_x3CRV=GBPe_to_x3CRV,
             x3CRV_to_GBPe=x3CRV_to_GBPe,
+            GBPe_to_sDAI=GBPe_to_sDAI,
+            sDAI_to_GBPe=sDAI_to_GBPe,
             GBP_price=GBPe_price,
             x3CRV_price=x3CRV_price,
+            sDAI_price=sDAI_price,
+            sDAI_balance=sDAI_balance,
             x3CRV_balance=x3CRV_balance,
             GBPe_balance=GBPe_balance,
             bot_xDAI_balance=bot_xDAI_balance,
@@ -240,3 +349,64 @@ class Swapper:
             roles_mod_address=self.roles_mod_address,
             web3=self.w3,
         )
+
+    def swap_GBPe_for_sDAI(self, static_data: StaticData, dynamic_data: DynamicData) -> TxReceipt:
+        min_amount_out = int(
+            Decimal(1 - self.max_slippage) * Decimal(dynamic_data.GBPe_to_sDAI) * Decimal(10**static_data.decimals_sDAI)
+        )
+        amount = int(Decimal(dynamic_data.amount_GBPe) * Decimal(10**static_data.decimals_GBPe))
+        deadline = math.floor((datetime.now().timestamp() + 6000) * 1000)
+        return roles.send(
+            [
+                SwapGBPeForsDAI(
+                    avatar=self.avatar_safe_address, amount_in=amount, min_amount_out=min_amount_out, deadline=deadline
+                )
+            ],
+            role=self.role,
+            private_key=self.private_keys,
+            roles_mod_address=self.roles_mod_address,
+            web3=self.w3,
+        )
+
+    def swap_sDAI_for_GBPe(self, static_data: StaticData, dynamic_data: DynamicData) -> TxReceipt:
+        min_amount_out = int(
+            Decimal(1 - self.max_slippage) * Decimal(dynamic_data.sDAI_to_GBPe) * Decimal(10**static_data.decimals_GBPe)
+        )
+        amount = int(Decimal(dynamic_data.amount_sDAI) * Decimal(10**static_data.decimals_sDAI))
+        deadline = math.floor((datetime.now().timestamp() + 6000) * 1000)
+        return roles.send(
+            [
+                SwapsDAIForGBPe(
+                    avatar=self.avatar_safe_address, amount_in=amount, min_amount_out=min_amount_out, deadline=deadline
+                )
+            ],
+            role=self.role,
+            private_key=self.private_keys,
+            roles_mod_address=self.roles_mod_address,
+            web3=self.w3,
+        )
+
+
+# print(
+#     SwapGBPeForsDAI(
+#         avatar="0x10E4597fF93cbee194F4879f8f1d54a370DB6969", amount_in=1000, min_amount_out=1, deadline=1
+#     ).data
+# )
+
+# print(
+#     SwapsDAIForGBPe(
+#         avatar="0x10E4597fF93cbee194F4879f8f1d54a370DB6969", amount_in=1000, min_amount_out=1, deadline=1
+#     ).data
+# )
+
+# from karpatkit.node import get_node
+
+# w3 = get_node(Chain.GNOSIS)
+# w3_eth = get_node(Chain.ETHEREUM)
+
+# static_data = StaticData(ENV())
+# dynamic_data_manager = DynamicDataManager(w3, w3_eth, static_data=static_data)
+# print(dynamic_data_manager.get_sDAI_price())
+# print(dynamic_data_manager.get_GBPe_to_sDAI_balancer(1))
+# print(dynamic_data_manager.get_sDAI_to_GBPe_balancer(1))
+# print(dynamic_data_manager.get_data(1, 1, 1))
