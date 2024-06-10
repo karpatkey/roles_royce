@@ -9,13 +9,16 @@ from web3 import Web3
 app = FastAPI()
 
 w3 = Web3(Web3.HTTPProvider("https://rpc.gnosischain.com"))
+public_key_hyp = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEBgZAJk+OuOzp3sO6B+44gqLDzz/X1KloIQYkqefTYMv+URMIvN97gsoLYrZ9K08uQR0XHLXbB0RCTAt6BNFhzQ=="
 
 @app.post("/webhook")
 async def receive_webhook(data: dict):
     print("Received webhook message:")
     alert = Alert.from_webhook(data)
     print("received alert")
-    single_stresstest(percentage=50,
+    if validate_webhook(data, public_key_hyp):
+        print("Webhook message is valid")
+        single_stresstest(percentage=50,
                       max_slippage=1,
                       dao="TestSafeDAO",
                       blockchain="gnosis",

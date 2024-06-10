@@ -1,12 +1,4 @@
-# REQUIRED 3rd PARTY PACKAGES - cryptography
-
-import base64
-import json
-from datetime import datetime, timedelta
-
-from cryptography.exceptions import InvalidSignature
-from cryptography.hazmat.primitives import serialization, hashes
-from cryptography.hazmat.primitives.asymmetric.ec import ECDSA
+from roles_royce.applications.automated_response_bot.utils import validate_webhook
 
 received_webhook_msg = {
     "id": "125d5b5e-222a-4a5f-a325-28412ca8a771",
@@ -16,69 +8,8 @@ received_webhook_msg = {
 
 PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEBgZAJk+OuOzp3sO6B+44gqLDzz/X1KloIQYkqefTYMv+URMIvN97gsoLYrZ9K08uQR0XHLXbB0RCTAt6BNFhzQ=="
 
-FRESHNESS_VALIDATION_THRESHOLD_MINUTES = 60
-
-validator = serialization.load_der_public_key(base64.b64decode(PUBLIC_KEY.encode('ascii')))
+FRESHNESS_VALIDATION_THRESHOLD_MINUTES = 60000000000
 
 
-def validate_webhook(received_webhook_msg, PUBLIC_KEY, FRESHNESS_VALIDATION_THRESHOLD_MINUTES: int = None) -> bool:
-    validator = serialization.load_der_public_key(base64.b64decode(PUBLIC_KEY.encode('ascii')))
-
-    try:
-        validator.verify(
-            signature=base64.b64decode(received_webhook_msg["digitalSignature"].encode('ascii')),
-            data=received_webhook_msg["data"].encode(),
-            signature_algorithm=ECDSA(hashes.SHA256()),
-        )
-
-        if FRESHNESS_VALIDATION_THRESHOLD_MINUTES:
-            parsed_msg = json.loads(received_webhook_msg["data"]) # parsing data back to JSON
-            risk_insight = parsed_msg["riskInsight"]
-            risk_insight["timestamp"] = datetime.strptime(risk_insight["timestamp"], "%Y-%m-%dT%H:%M:%S.%fZ")
-            if risk_insight["timestamp"] < datetime.utcnow() - timedelta(minutes=FRESHNESS_VALIDATION_THRESHOLD_MINUTES):
-                raise ValueError("Timestamp crossed the freshness threshold")
-    except InvalidSignature:
-        print("Received an InvalidSignature")
-        return False
-    return True
-
-exit_strat = {
-    "dao": "TestSafeDAO",
-    "blockchain": "gnosis",
-    "general_parameters": [
-        {
-            "name": "percentage",
-            "label": "Percentage",
-            "type": "input",
-            "rules": {
-                "min": 0,
-                "max": 100
-            }
-        }
-    ],
-    "positions": [
-        {
-            "position_id": "142",
-            "position_id_tech": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA",
-            "position_id_human_readable": "gnosis_Aura_USDT_sDAI_USDC",
-            "protocol": "Aura",
-            "exec_config": [
-                {
-                    "function_name": "exit_1",
-                    "label": "Unstake",
-                    "test": True,
-                    "stresstest": True,
-                    "stresstest_error": "None",
-                    "description": "Unstake BPT from Aura gauge",
-                    "parameters": [
-                        {
-                            "name": "rewards_address",
-                            "type": "constant",
-                            "value": "0x7513105D6cF9D18756D95DeD81D6d3F68dB4b8DA"
-                        }
-                    ]
-                },
-            ]
-        }
-    ]
-}
+def test_validate_webhook():
+    assert validate_webhook(received_webhook_msg, PUBLIC_KEY) == True
