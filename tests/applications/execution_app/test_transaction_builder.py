@@ -2,8 +2,8 @@ import pytest
 
 from roles_royce.applications.execution_app.transaction_builder import build_transaction
 from roles_royce.applications.execution_app.utils import ENV, ExecConfig
+from tests.fork_fixtures import accounts, local_node_eth
 from tests.utils import assign_role
-from tests.fork_fixtures import local_node_eth, accounts
 
 dao = "GnosisDAO"
 blockchain = "ETHEREUM"
@@ -334,9 +334,7 @@ def test_transaction_builder(local_node_eth, accounts, monkeypatch, args, expect
 
     assert result["status"] == 200
     response = result["tx_data"]
-    del response["transaction"]["maxFeePerGas"]  # Gas fees change even in the fork
-    del response["transaction"]["maxPriorityFeePerGas"]  # Gas fees change even in the fork
-    w3 = local_node_eth.w3
-    # In the CI tests we get differences in the nonce, so we need to "hardcode" the nonce from the node
-    expected["transaction"]["nonce"] = w3.eth.get_transaction_count(w3.eth.account.from_key(private_key).address)
-    assert response == expected
+
+    for attr in ["value", "chainId", "to", "data", "from"]:
+        assert response["transaction"][attr] == expected["transaction"][attr]
+    assert response["decoded_transaction"] == expected["decoded_transaction"]

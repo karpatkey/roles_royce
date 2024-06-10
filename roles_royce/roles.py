@@ -13,14 +13,14 @@ logger = logging.getLogger(__name__)
 
 
 def build(
-    txs: List[Transactable], role: int, account: str, roles_mod_address: str, web3: Web3, tx_kwargs: dict | None = None
+    txs: List[Transactable], role: int | str, account: str, roles_mod_address: str, web3: Web3, tx_kwargs: dict | None = None
 ) -> dict:
     """Create a transaction to later be sent to the blockchain or other uses
     such as studying it or composing it with other contracts.
 
     Args:
         txs: List of transactable items, usually :class:`~roles_royce.protocols.base.ContractMethod` instances.
-        role: Role number of the execution.
+        role: Role of the execution. A str for roles v2 or an int for the legacy roles contracts.
         account: Account that wants to execute.
         roles_mod_address: Address to call execTransactionWithRole.
         web3: Web3 object.
@@ -35,7 +35,7 @@ def build(
         contract_address=roles_mod_address,
         account=account,
         operation=tx_data.operation,
-        web3=web3,
+        w3=web3,
         value=tx_data.value,
     )
     tx_kwargs = tx_kwargs or {}
@@ -46,7 +46,7 @@ def build(
 
 def check(
     txs: List[Transactable],
-    role: int,
+    role: int | str,
     account: str,
     roles_mod_address: str,
     web3: Web3,
@@ -56,7 +56,7 @@ def check(
 
     Args:
         txs: List of transactions.
-        role: Role that wants to execute.
+        role: Role of the execution. A str for roles v2 or an int for the legacy roles contracts.
         account: Account that wants to execute.
         roles_mod_address: Address to call execTransactionWithRole.
         web3: Web3 object.
@@ -71,7 +71,7 @@ def check(
         contract_address=roles_mod_address,
         account=account,
         operation=tx_data.operation,
-        web3=web3,
+        w3=web3,
         value=tx_data.value,
     )
     return roles_mod.check(tx_data.contract_address, tx_data.data, block=block)
@@ -79,7 +79,7 @@ def check(
 
 def send(
     txs: List[Transactable],
-    role: int,
+    role: int | str,
     private_key: str,
     roles_mod_address: str,
     web3: Web3,
@@ -89,7 +89,7 @@ def send(
 
     Args:
         txs: List of transactables.
-        role: Role that wants to execute.
+        role: Role of the execution. A str for roles v2 or an int for the legacy roles contracts.
         private_key: The private key.
         roles_mod_address: Address to call execTransactionWithRole.
         web3: Web3 object.
@@ -104,7 +104,7 @@ def send(
         contract_address=roles_mod_address,
         private_key=private_key,
         operation=tx_data.operation,
-        web3=web3,
+        w3=web3,
         value=tx_data.value,
     )
     tx_kwargs = tx_kwargs or {}

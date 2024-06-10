@@ -1,8 +1,9 @@
+import binascii
 import logging
 from dataclasses import dataclass
 from enum import Enum, IntEnum
-from typing import Optional
 
+import eth_abi
 from eth_account import Account
 from web3 import Web3, exceptions
 from web3.types import Address, ChecksumAddress, TxParams, TxReceipt
@@ -14,14 +15,22 @@ AGGRESIVE_GAS_LIMIT_MULTIPLIER = 3
 NORMAL_FEE_MULTIPLER = 1.2
 AGGRESIVE_FEE_MULTIPLER = 2
 
-ROLES_ABI = (
+ROLES_V1_ABI = (
     '[{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},'
     '{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"},'
     '{"internalType":"uint16","name":"role","type":"uint16"},{"internalType":"bool","name":"shouldRevert","type":"bool"}],"name":"execTransactionWithRole",'
     '"outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]'
 )
 
-ROLES_ERRORS = (
+ROLES_V2_ABI = (
+    '[{"inputs":['
+    '{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},'
+    '{"internalType":"bytes","name":"data","type":"bytes"},{"internalType":"enum Enum.Operation","name":"operation","type":"uint8"},'
+    '{"internalType":"bytes32","name":"roleKey","type":"bytes32"},{"internalType":"bool","name":"shouldRevert","type":"bool"}],"name":"execTransactionWithRole",'
+    '"outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]'
+)
+
+ROLES_V1_ERRORS = [
     "NoMembership()",
     "ArraysDifferentLength()",
     "FunctionSignatureTooShort()",
@@ -41,9 +50,30 @@ ROLES_ERRORS = (
     "ScopeMaxParametersExceeded()",
     "NotEnoughCompValuesForOneOf()",
     "CalldataOutOfBounds()",
-)
+]
 
-ROLES_ERRORS_SELECTORS = {Web3.keccak(text=error).hex()[:10]: error for error in ROLES_ERRORS}
+ROLES_V2_ERRORS = [
+    "AlreadyDisabledModule(address)",
+    "AlreadyEnabledModule(address)",
+    "ArraysDifferentLength()",
+    "CalldataOutOfBounds()",
+    "ConditionViolation(uint8,bytes32)",
+    "FunctionSignatureTooShort()",
+    "HashAlreadyConsumed(bytes32)",
+    "InvalidInitialization()",
+    "InvalidModule(address)",
+    "InvalidPageSize()",
+    "MalformedMultiEntrypoint()",
+    "ModuleTransactionFailed()",
+    "NoMembership()",
+    "NotAuthorized(address)",
+    "NotInitializing()",
+    "OwnableInvalidOwner(address)",
+    "OwnableUnauthorizedAccount(address)",
+    "SetupModulesAlreadyCalled()",
+]
+
+ROLES_ERRORS_SELECTORS = {Web3.keccak(text=error).hex()[:10]: error for error in ROLES_V1_ERRORS + ROLES_V2_ERRORS}
 
 
 class TransactionWouldBeReverted(Exception):
@@ -82,31 +112,61 @@ def set_gas_strategy(strategy: GasStrategies):
     _gas_strategy = strategy
 
 
-@dataclass
+def format_bytes32_string(input_string):
+    # Convert the string to bytes
+    input_bytes = input_string.encode("utf-8")
+    # Pad or truncate the bytes to 32 bytes
+    padded_bytes = input_bytes.ljust(32, b"\0")[:32]
+    # Convert the bytes to hexadecimal representation
+    hex_string = binascii.hexlify(padded_bytes).decode("utf-8")
+    return "0x" + hex_string
+
+
 class RolesMod:
     """A class to handle role-based transactions on a blockchain."""
 
-    role: int
-    contract_address: Address | ChecksumAddress | str
-    web3: Web3
-    value: int = 0
-    private_key: Optional[str] = None
-    account: Optional[str] = None
-    contract_abi: str = ROLES_ABI
-    operation: Operation = Operation.CALL
-    should_revert: bool = True
-    nonce: Optional[int] = None
+    def __init__(
+        self,
+        role: int | str,
+        contract_address: Address | ChecksumAddress | str,
+        w3: Web3,
+        value: int = 0,
+        private_key: str | None = None,
+        account: str | None = None,
+        operation: Operation = Operation.CALL,
+        should_revert: bool = True,
+        nonce: int | None = None,
+    ):
+        self.role = role
+        if type(role) is str:
+            self.role_version = 2
+            self.contract_abi = ROLES_V2_ABI
+            if not role.startswith("0x"):
+                self.role = format_bytes32_string(self.role)
+        elif type(role) is int:
+            self.roles_version = 1
+            self.contract_abi = ROLES_V1_ABI
+        else:
+            raise ValueError("role type must be either str (roles v2) or int (roles v1)")
 
-    def __post_init__(self):
+        self.contract_address = contract_address
+        self.w3 = w3
+        self.value = value
+        self.private_key = private_key
+        self.account = account
+        self.operation = operation
+        self.should_revert = should_revert
+        self.nonce = nonce
+
         if not self.private_key and not self.account:
             raise ValueError("Either 'private_key' or 'account' must be filled.")
         if self.private_key:
             self.account = Account.from_key(self.private_key)
             self.account = self.account.address
-        self.contract = self.web3.eth.contract(address=self.contract_address, abi=self.contract_abi)
+        self.contract = self.w3.eth.contract(address=self.contract_address, abi=self.contract_abi)
 
     def get_base_fee_per_gas(self) -> int:
-        latest_block = self.web3.eth.get_block("latest")
+        latest_block = self.w3.eth.get_block("latest")
         base_fee_per_gas = latest_block["baseFeePerGas"]
         return base_fee_per_gas
 
@@ -116,13 +176,13 @@ class RolesMod:
         """Creates a transaction ready to be sent"""
         gas_strategy = get_gas_strategy()
         if not max_priority_fee:
-            max_priority_fee = self.web3.eth.max_priority_fee
+            max_priority_fee = self.w3.eth.max_priority_fee
         if not max_fee_per_gas:
             max_fee_per_gas = max_priority_fee + int(self.get_base_fee_per_gas() * gas_strategy.fee_multiplier)
 
         gas_limit = int(self.estimate_gas(contract_address, data) * gas_strategy.limit_multiplier)
 
-        nonce = self.nonce or self.web3.eth.get_transaction_count(self.account)
+        nonce = self.nonce or self.w3.eth.get_transaction_count(self.account)
 
         tx = self._build_transaction(contract_address, data, gas_limit, max_priority_fee, max_fee_per_gas, nonce)
         return tx
@@ -133,9 +193,14 @@ class RolesMod:
             self._build_exec_transaction(contract_address, data).call({"from": self.account}, block_identifier=block)
             return True
         except exceptions.ContractCustomError as e:
-            custom_roles_error = ROLES_ERRORS_SELECTORS.get(e.data, None)
+            custom_roles_error = ROLES_ERRORS_SELECTORS.get(e.data[:10], None)
             if custom_roles_error:
-                raise TransactionWouldBeReverted(ROLES_ERRORS_SELECTORS.get(e.data))
+                if "()" not in custom_roles_error:
+                    types = custom_roles_error[custom_roles_error.index("("):]
+                    decoded_values = eth_abi.decode([types], bytes.fromhex(e.data[10:]))[0]
+                else:
+                    decoded_values = None
+                raise TransactionWouldBeReverted(custom_roles_error, decoded_values)
             else:
                 raise TransactionWouldBeReverted(e)
 
@@ -185,7 +250,7 @@ class RolesMod:
     ):
         tx = self._build_exec_transaction(contract_address, data).build_transaction(
             {
-                "chainId": self.web3.eth.chain_id,
+                "chainId": self.w3.eth.chain_id,
                 "gas": gas_limit,
                 "maxFeePerGas": max_fee_per_gas,  # base + priority. The base is always 12.5% higher than the last block
                 "maxPriorityFeePerGas": max_priority_fee_per_gas,
@@ -195,10 +260,10 @@ class RolesMod:
         return tx
 
     def _sign_transaction(self, tx):
-        return self.web3.eth.account.sign_transaction(tx, self.private_key)
+        return self.w3.eth.account.sign_transaction(tx, self.private_key)
 
     def _send_raw_transaction(self, raw_transaction):
-        return self.web3.eth.send_raw_transaction(raw_transaction)
+        return self.w3.eth.send_raw_transaction(raw_transaction)
 
     def get_tx_receipt(self, tx_hash: str) -> TxReceipt:
         """Get the transaction receipt from the blockchain.
@@ -210,7 +275,7 @@ class RolesMod:
             Transaction receipt as a TxReceipt object.
         """
         try:
-            transaction_receipt = self.web3.eth.wait_for_transaction_receipt(tx_hash)
+            transaction_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
             return transaction_receipt
         except exceptions.TransactionNotFound:
             return "Transaction not yet on blockchain"

@@ -21,6 +21,8 @@ from roles_royce.toolshed.disassembling import (
     Disassembler,
     LidoDisassembler,
     SwapDisassembler,
+    DSRDisassembler,
+    SparkDisassembler,
 )
 from roles_royce.utils import to_checksum_address
 
@@ -61,6 +63,7 @@ class ENV:
     LOCAL_FORK_PORT: int | None = field(init=False)
     LOCAL_FORK_HOST: str = field(init=False)
 
+    prod_mode_override: bool = field(init=True, default=False)
     local_fork_url: str | None = field(init=True, default=None)
     LOCAL_FORK_URL: str = field(init=False)
 
@@ -73,14 +76,7 @@ class ENV:
         self.TENDERLY_API_TOKEN: str = config("TENDERLY_API_TOKEN", default="")
 
         # DAO and blockchain
-        if self.DAO not in [
-            "GnosisDAO",
-            "GnosisLtd",
-            "karpatkey",
-            "ENS",
-            "BalancerDAO",
-            "TestSafeDAO"
-        ]:
+        if self.DAO not in ["GnosisDAO", "GnosisLtd", "karpatkey", "ENS", "BalancerDAO", "TestSafeDAO"]:
             raise ValueError(f"DAO is not valid: {self.DAO}.")
         if self.BLOCKCHAIN.lower() not in ["mainnet", "ethereum", "gnosis"]:
             raise ValueError(f"BLOCKCHAIN is not valid: {self.BLOCKCHAIN}. Options are either 'ethereum' or 'gnosis'.")
@@ -123,6 +119,9 @@ class ENV:
 
         # Environment mode: development or production
         self.MODE: Modes = custom_config("ENVIRONMENT", cast=Modes, default=Modes.DEVELOPMENT)
+        if self.prod_mode_override:
+            self.MODE = Modes.PRODUCTION
+
         if self.MODE.lower() not in ["development", "production"]:
             raise ValueError(
                 f"ENVIRONMENT is not valid: {self.MODE}. Options are either 'development' or 'production'."
@@ -217,46 +216,34 @@ def decode_transaction(txns: list[ContractMethod], env: ENV) -> list[dict]:
     return result
 
 
-def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> (Disassembler, list[Transactable]):
-    if exec_config.protocol == "Aura":
-        disassembler = AuraDisassembler(
-            w3=w3,
-            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
-            roles_mod_address=env.ROLES_MOD_ADDRESS,
-            role=env.ROLE,
-            signer_address=env.DISASSEMBLER_ADDRESS,
-        )
+def disassembler_from_config(w3: Web3, env: ENV, protocol: str) -> Disassembler:
+    disassembler_klass: Disassembler | None = {
+        "Aura": AuraDisassembler,
+        "Balancer": BalancerDisassembler,
+        "Lido": LidoDisassembler,
+        "Wallet": SwapDisassembler,
+        "Maker": DSRDisassembler,
+        "Spark": SparkDisassembler,
+    }.get(protocol)
 
-    elif exec_config.protocol == "Balancer":
-        disassembler = BalancerDisassembler(
-            w3=w3,
-            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
-            roles_mod_address=env.ROLES_MOD_ADDRESS,
-            role=env.ROLE,
-            signer_address=env.DISASSEMBLER_ADDRESS,
-        )
-    elif exec_config.protocol == "Lido":
-        disassembler = LidoDisassembler(
-            w3=w3,
-            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
-            roles_mod_address=env.ROLES_MOD_ADDRESS,
-            role=env.ROLE,
-            signer_address=env.DISASSEMBLER_ADDRESS,
-        )
-    elif exec_config.protocol == "Wallet":
-        disassembler = SwapDisassembler(
-            w3=w3,
-            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
-            roles_mod_address=env.ROLES_MOD_ADDRESS,
-            role=env.ROLE,
-            signer_address=env.DISASSEMBLER_ADDRESS,
-        )
+    if not disassembler_klass:
+        raise Exception(f"Status 422: Invalid protocol: {protocol}")
     else:
-        raise Exception("Status 422: Invalid protocol")
+        return disassembler_klass(
+            w3=w3,
+            avatar_safe_address=env.AVATAR_SAFE_ADDRESS,
+            roles_mod_address=env.ROLES_MOD_ADDRESS,
+            role=env.ROLE,
+            signer_address=env.DISASSEMBLER_ADDRESS,
+        )
 
-    exit_strategy = getattr(disassembler, exec_config.exit_strategy)
 
-    txn_transactables = exit_strategy(percentage=exec_config.percentage, exit_arguments=exec_config.exit_arguments)
+def gear_up(w3: Web3, env: ENV, exec_config: ExecConfig) -> tuple[Disassembler, list[Transactable]]:
+    disassembler = disassembler_from_config(w3, env, exec_config.protocol)
+
+    strategy = getattr(disassembler, exec_config.exit_strategy)
+
+    txn_transactables = strategy(percentage=exec_config.percentage, exit_arguments=exec_config.exit_arguments)
 
     return disassembler, txn_transactables
 

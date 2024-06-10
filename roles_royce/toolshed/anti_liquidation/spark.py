@@ -313,7 +313,7 @@ class SparkCDPManager:
         pool_addresses_provider_contract = ContractSpecs[self.blockchain].PoolAddressesProvider.contract(self.w3)
         lending_pool_address = pool_addresses_provider_contract.functions.getPool().call()
         allowance = token_in_contract.functions.allowance(self.owner_address, lending_pool_address).call()
-
+        blockchain = Chain.get_blockchain_from_web3(self.w3)
         if w3 is None:
             w3 = self.w3
 
@@ -321,7 +321,7 @@ class SparkCDPManager:
             tx_receipt = roles.send(
                 [
                     spark.ApproveToken(token=token_in_address, amount=token_in_amount),
-                    spark.Repay(
+                    spark.Repay(blockchain=blockchain,
                         token=token_in_address, amount=token_in_amount, rate_model=rate_model, avatar=self.owner_address
                     ),
                 ],
@@ -333,7 +333,7 @@ class SparkCDPManager:
         elif token_in_amount == allowance:
             tx_receipt = roles.send(
                 [
-                    spark.Repay(
+                    spark.Repay(blockchain=blockchain,
                         token=token_in_address, amount=token_in_amount, rate_model=rate_model, avatar=self.owner_address
                     ),
                 ],
@@ -345,7 +345,7 @@ class SparkCDPManager:
         else:
             tx_receipt = roles.send(
                 [
-                    spark.Repay(
+                    spark.Repay(blockchain=blockchain,
                         token=token_in_address, amount=token_in_amount, rate_model=rate_model, avatar=self.owner_address
                     ),
                     spark.ApproveToken(token=token_in_address, amount=0),

@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from defabipedia.types import Chain
+
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import spark
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
@@ -17,23 +19,24 @@ def test_integration(local_node_eth, accounts):
 
     steal_token(w3, ETHAddr.GNO, holder=ADDRESS_WITH_LOTS_OF_GNO, to=safe.address, amount=123_000_000)
     assert get_balance(w3, ETHAddr.GNO, safe.address) == 123_000_000
-
+    blockchain = Chain.get_blockchain_from_web3(w3)
     # Deposit GNO, receive spGNO
     safe.send(
         [
             spark.ApproveToken(token=ETHAddr.GNO, amount=123_000_000),
-            spark.DepositToken(token=ETHAddr.GNO, avatar=safe.address, amount=123_000_000),
+            spark.DepositToken(blockchain=blockchain, token=ETHAddr.GNO, avatar=safe.address, amount=123_000_000),
             spark.ApproveToken(token=ETHAddr.GNO, amount=0),
         ]
     )
     assert get_balance(w3, ETHAddr.GNO, safe.address) == 0
     assert get_balance(w3, ETHAddr.spGNO, safe.address) == 123_000_000
 
+    
     # Borrow DAI using GNO as collateral
-    res = safe.send([spark.SetUserUseReserveAsCollateral(asset=ETHAddr.GNO, use=True)])
+    res = safe.send([spark.SetUserUseReserveAsCollateral(blockchain=blockchain, asset=ETHAddr.GNO, use=True)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
     res = safe.send(
-        [spark.Borrow(token=ETHAddr.DAI, amount=1_000, rate_model=spark.RateModel.VARIABLE, avatar=safe.address)]
+        [spark.Borrow(blockchain=blockchain, token=ETHAddr.DAI, amount=1_000, rate_model=spark.RateModel.VARIABLE, avatar=safe.address)]
     )
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 1_000
 
@@ -41,7 +44,7 @@ def test_integration(local_node_eth, accounts):
     safe.send(
         [
             spark.ApproveDAIforSDAI(amount=1_000),
-            spark.DepositDAIforSDAI(amount=1_000, avatar=safe.address),
+            spark.DepositDAIforSDAI(blockchain=blockchain, amount=1_000, avatar=safe.address),
             spark.ApproveDAIforSDAI(amount=0),
         ]
     )
@@ -50,11 +53,11 @@ def test_integration(local_node_eth, accounts):
     assert get_balance(w3, ETHAddr.sDAI, safe.address) == int(Decimal(1_000) / (Decimal(chi) / Decimal(1e27)))  # 976
 
     # Repay sDAI to get DAI
-    safe.send([spark.RedeemSDAIforDAI(amount=976, avatar=safe.address)])
+    safe.send([spark.RedeemSDAIforDAI(blockchain=blockchain, amount=976, avatar=safe.address)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == int(Decimal(chi * 976) / Decimal(1e27))  # 999
     assert get_balance(w3, ETHAddr.sDAI, safe.address) == 0
 
     # Get back the original amount of GNO
-    safe.send([spark.WithdrawToken(token=ETHAddr.GNO, amount=123_000_000, avatar=safe.address)])
+    safe.send([spark.WithdrawToken(blockchain=blockchain, token=ETHAddr.GNO, amount=123_000_000, avatar=safe.address)])
     assert get_balance(w3, ETHAddr.GNO, safe.address) == 123_000_000
     assert get_balance(w3, ETHAddr.spGNO, safe.address) == 0

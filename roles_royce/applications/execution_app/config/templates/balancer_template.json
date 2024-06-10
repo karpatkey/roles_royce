@@ -19,7 +19,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -43,13 +43,13 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": { "min": 0, "max": 100 }
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -75,7 +75,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -99,7 +99,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,
@@ -123,13 +123,13 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": { "min": 0, "max": 100 }
         },
         {
           "name": "token_out_address",
-          "label": "Token out",
+          "label": "Token Out",
           "type": "input",
           "options": [
             {
@@ -155,7 +155,7 @@
         },
         {
           "name": "max_slippage",
-          "label": "Max slippage",
+          "label": "Max Slippage",
           "type": "input",
           "rules": {
             "min": 0.001,

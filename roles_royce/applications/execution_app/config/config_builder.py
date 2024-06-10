@@ -45,7 +45,7 @@ whitelist_poolIDs = [
     "0x49cbd67651fbabce12d1df18499896ec87bef46f00000000000000000000064a",  # USDC-USDT-DAI-sDAI eth
     "0xbad20c15a773bf03ab973302f61fabcea5101f0a000000000000000000000034",  # WETH-wstETH gc
     "0x7644fa5d0ea14fcf3e813fdf93ca9544f8567655000000000000000000000066",  # USDT-sDAI-USDC gc
-    "0xdd439304a77f54b1f7854751ac1169b279591ef7000000000000000000000064",  # sDAI-EURe gc
+    #"0xdd439304a77f54b1f7854751ac1169b279591ef7000000000000000000000064",  # sDAI-EURe gc
     "0x2086f52651837600180de173b09470f54ef7491000000000000000000000004f",  # USDT-USDC-WXDAI gc
     "0x06135a9ae830476d3a941bae9010b63732a055f4000000000000000000000065",  # stERU-EURe gc
     "0xc9f00c3a713008ddf69b768d90d4978549bfdf9400000000000000000000006d",  # crvUSD-sDAI gc
@@ -59,6 +59,8 @@ wallet_tokens_swap = [
                     "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",  # stETH
                     "0xae78736Cd615f374D3085123A210448E74Fc6393",  # rETH
                     "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",  # wstETH
+                    "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",  # ankrETH
+                    "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b",  # ETHx
                 ],  
                 "token_out": [
                     "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  # ETH
@@ -70,10 +72,16 @@ wallet_tokens_swap = [
                 "token_in": [
                     "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  # ETH
                     "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",  # WETH
-                ],  
-                "token_out": [
                     "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",  # stETH
                     "0xae78736Cd615f374D3085123A210448E74Fc6393",  # rETH
+                    "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",  # wstETH
+                    "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",  # ankrETH
+                    "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b",  # ETHx
+                ],  
+                "token_out": [
+                    "0x6B175474E89094C44Da98b954EedeAC495271d0F",  # DAI
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",  # USDT 
+                    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
                 ],  
             },
             {
@@ -109,7 +117,7 @@ wallet_tokens_swap = [
             {
                 "token_in": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6"], # USDT
                 "token_out": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", # USDC
-                              "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
+                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # XDAI
             },
             {
                 "token_in": ["0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
@@ -119,11 +127,23 @@ wallet_tokens_swap = [
             {
                 "token_in": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"], # USDC
                 "token_out": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
-                              "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
+                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # XDAI
             },
             {
                 "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"], # WSTETH
                 "token_out": ["0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1"], # WETH
+            },
+            {
+                "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"], # sDAI
+                "token_out": ["0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1", # WETH
+                              "0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
+                              "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", # USDC
+                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"] # xDAI
+            },
+            {
+                "token_in": ["0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # xDAI
+                "token_out": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
+                              "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"] # USDC
             }
         ]
     },
@@ -152,6 +172,8 @@ class Protocol(StrEnum):
     Aura = "Aura"
     Lido = "Lido"
     Wallet = "Wallet"
+    Maker = "Maker"
+    Spark = "Spark"
 
     def __str__(self):
         return self.name
@@ -187,6 +209,20 @@ def seed_dict(dao: DAO, blockchain: Blockchain, positions: list) -> dict:
     }
     return data
 
+def get_wrapped_from_native(w3: Web3) -> str:
+    Blockchain = Chain.get_blockchain_from_web3(w3)
+    if Blockchain == Chain.ETHEREUM:
+        wrapped_token = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"   
+        wrapped_symbol = "WETH"
+        native_symbol = "ETH"
+        return wrapped_token, wrapped_symbol, native_symbol
+    elif Blockchain == Chain.GNOSIS:
+        wrapped_token = "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"
+        wrapped_symbol = "WXDAI"
+        native_symbol = "xDAI"
+        return wrapped_token, wrapped_symbol, native_symbol
+    else:
+        raise ValueError("Blockchain not supported")
 
 # -----------------------------------------------------------------------------------------------------------------------
 # Position classes
@@ -297,11 +333,46 @@ class WalletPosition:
     def position_id_human_readable(self, w3: Web3) -> str:
         blockchain = Chain.get_blockchain_from_web3(w3)
         if self.token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-            return f"{blockchain}_WalletPosition_ETH"
+            if blockchain == Chain.GNOSIS:
+                return f"{blockchain}_WalletPosition_xDAI"
+            else:
+                return f"{blockchain}_WalletPosition_ETH"
         else:
             token_contract = erc20_contract(w3, self.token_in_address)
             token_symbol = token_contract.functions.symbol().call()
             return f"{blockchain}_WalletPosition_{token_symbol}"
+        
+@dataclass
+class MakerPosition:
+    position_id: str
+    address: Address
+
+    def __post_init__(self):
+        self.address = to_checksum_address(self.address)
+
+    def position_id_tech(self) -> Address:
+        """The address used at Maker"""
+        return self.address
+
+    def position_id_human_readable(self, w3: Web3) -> str:
+        blockchain = Chain.get_blockchain_from_web3(w3)
+        return f"{blockchain}_MakerPosition_{self.address}"
+    
+@dataclass
+class SparkPosition:
+    position_id: str
+    address: Address
+
+    def __post_init__(self):
+        self.address = to_checksum_address(self.address)
+
+    def position_id_tech(self) -> Address:
+        """The address used at Spark"""
+        return self.address
+    
+    def position_id_human_readable(self, w3: Web3) -> str:
+        blockchain = Chain.get_blockchain_from_web3(w3)
+        return f"{blockchain}_SparkPosition_{self.address}"
 
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -315,6 +386,8 @@ class DAOStrategiesBuilder:
     aura: list[AuraPosition] | None = None
     lido: list[LidoPosition] | None = None
     wallet_tokens: list[WalletPosition] | None = None
+    maker: list[MakerPosition] | None = None
+    spark: list[SparkPosition] | None = None
 
     def build_dict(self, w3: Web3) -> dict:
         positions = []
@@ -331,6 +404,11 @@ class DAOStrategiesBuilder:
         print(f"    Adding Wallet positions")
         if self.wallet_tokens:
             positions.extend(self.build_wallet_positions(w3, self.wallet_tokens))
+        print(f"    Adding Maker positions")
+        if self.maker:
+            positions.extend(self.build_maker_positions(w3, self.maker))
+        if self.spark:
+            positions.extend(self.build_spark_positions(w3, self.spark))    
         return seed_dict(self.dao, self.blockchain, positions)
 
     def build_json(self, w3: Web3):
@@ -347,6 +425,11 @@ class DAOStrategiesBuilder:
         print(f"    Adding Wallet positions")
         if self.wallet_tokens:
             self.add_to_json(self.build_wallet_positions(w3, self.wallet_tokens))
+        print(f"    Adding Maker positions")
+        if self.maker:
+            self.add_to_json(self.build_maker_positions(w3, self.maker))
+        if self.spark:
+            self.add_to_json(self.build_spark_positions(w3, self.spark))
 
     def add_to_json(self, positions: list[dict]):
         file = os.path.join(os.path.dirname(__file__), "strategies", f"{self.dao}-{self.blockchain}.json")
@@ -505,8 +588,6 @@ class DAOStrategiesBuilder:
 
             protocol_list = []
             pools_class = SwapPoolInstances[blockchain]
-            bla = ContractSpecs[blockchain].wstETH.address
-            blad = ContractSpecs[blockchain].stETH.address
             for attr_name in dir(pools_class):
                 attr_value = getattr(pools_class, attr_name)
                 if isinstance(attr_value, SwapPools):
@@ -589,14 +670,14 @@ class DAOStrategiesBuilder:
                             position["exec_config"][0]["parameters"][0]["options"][0]["value"]=token_in_address
                             del position["exec_config"][0]["parameters"][2]["options"][0]
                             if token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                token_in_symbol = "ETH"
+                                x, y, token_in_symbol = get_wrapped_from_native(w3)
                             else:
                                 token_in_contract = erc20_contract(w3, token_in_address)
                                 token_in_symbol = token_in_contract.functions.symbol().call()
                             position["exec_config"][0]["parameters"][0]["options"][0]["label"]=token_in_symbol
                             for token_out in swap_entry["token_out"]:
                                 if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    token_out_symbol = "ETH"
+                                    x, y, token_out_symbol = get_wrapped_from_native(w3)
                                 else:
                                     token_out_contract = erc20_contract(w3, token_out)
                                     token_out_symbol = token_out_contract.functions.symbol().call()
@@ -623,9 +704,9 @@ class DAOStrategiesBuilder:
                                             attr_value.protocol == "Balancer" or attr_value.protocol == "UniswapV3"
                                         ) and (token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"):
                                             if token_in == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                                token_in = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+                                                token_in, y, z = get_wrapped_from_native(w3)
                                             if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                                token_out = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+                                                token_out, y, z = get_wrapped_from_native(w3)
 
                                         if token_in in attr_value.tokens and token_out in attr_value.tokens:
                                             instances.append({"pair": token_pair, "pool": attr_value})
@@ -638,11 +719,11 @@ class DAOStrategiesBuilder:
                                 elif instance["pool"].protocol == "UniswapV3":
                                     i = 3
                                 if instance["pair"][0] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    token_in_symbol = "ETH"
+                                    x, y, token_in_symbol = get_wrapped_from_native(w3)
                                     token_out_contract = erc20_contract(w3, instance["pair"][1])
                                     token_out_symbol = token_out_contract.functions.symbol().call()
                                 elif instance["pair"][1] == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
-                                    token_out_symbol = "ETH"
+                                    x, y, token_out_symbol = get_wrapped_from_native(w3)
                                     token_in_contract = erc20_contract(w3, instance["pair"][0])
                                     token_in_symbol = token_in_contract.functions.symbol().call()
                                 else:
@@ -692,3 +773,60 @@ class DAOStrategiesBuilder:
                             else:
                                 print("        Not adding: ", wallet_position)
         return result
+    
+    @staticmethod
+    def build_maker_positions(w3: Web3, positions: list[MakerPosition]) -> list[dict]:
+        with open(os.path.join(os.path.dirname(__file__), "templates", "maker_template.json"), "r") as f:
+            maker_template = json.load(f)
+
+        result = []
+        for maker_position in positions:
+            print("        Adding: ", maker_position)
+            position = copy.deepcopy(maker_template)
+            blockchain = Chain.get_blockchain_from_web3(w3)
+            position["position_id"] = maker_position.position_id
+            position["position_id_tech"] = maker_position.position_id_tech()
+            position["position_id_human_readable"] = maker_position.position_id_human_readable(w3)
+
+            for i in range(len(position["exec_config"])):
+                print(
+                    "                Adding: ",
+                    position["exec_config"][i]["function_name"],
+                    position["exec_config"][i]["label"],
+                )
+
+            print(
+                f"        Done adding: Maker position", position["position_id"], position["position_id_human_readable"]
+            )
+
+            result.append(position)
+        return result
+    
+    @staticmethod
+    def build_spark_positions(w3: Web3, positions: list[SparkPosition]) -> list[dict]:
+        with open(os.path.join(os.path.dirname(__file__), "templates", "spark_template.json"), "r") as f:
+            spark_template = json.load(f)
+
+        result = []
+        for spark_position in positions:
+            print("        Adding: ", spark_position)
+            position = copy.deepcopy(spark_template)
+            blockchain = Chain.get_blockchain_from_web3(w3)
+            position["position_id"] = spark_position.position_id
+            position["position_id_tech"] = spark_position.position_id_tech()
+            position["position_id_human_readable"] = spark_position.position_id_human_readable(w3)
+
+            for i in range(len(position["exec_config"])):
+                print(
+                    "                Adding: ",
+                    position["exec_config"][i]["function_name"],
+                    position["exec_config"][i]["label"],
+                )
+
+            print(
+                f"        Done adding: Spark position", position["position_id"], position["position_id_human_readable"]
+            )
+
+            result.append(position)
+        return result
+
