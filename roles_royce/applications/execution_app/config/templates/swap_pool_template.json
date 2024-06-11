@@ -6,11 +6,11 @@
   "exec_config": [
     {
       "function_name": "exit_1",
-      "label": "Exchange Wallet Token on Cowswap",
+      "label": "Swap Wallet Token on Cowswap",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Exchange a wallet token through Cowswap",
+      "description": "Swap Wallet Token on Cowswap",
       "parameters": [
         {
           "name": "token_in_address",
@@ -47,11 +47,11 @@
     },
     {
       "function_name": "exit_2",
-      "label": "Exchange Wallet Token on Balancer",
+      "label": "Swap Wallet Token on Balancer",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Exchange a wallet token through Balancer",
+      "description": "Swap Wallet Token on Balancer",
       "parameters": [
         {
           "name": "token_in_address",
@@ -88,11 +88,11 @@
     },
     {
       "function_name": "exit_3",
-      "label": "Exchange Wallet Token on Curve",
+      "label": "Swap Wallet Token on Curve",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Exchange a wallet token through Curve",
+      "description": "Swap Wallet Token on Curve",
       "parameters": [
         {
           "name": "token_in_address",
@@ -129,11 +129,11 @@
     },
     {
       "function_name": "exit_4",
-      "label": "Exchange Wallet Token on UniswapV3",
+      "label": "Swap Wallet Token on UniswapV3",
       "test": true,
       "stresstest": false,
       "stresstest_error": "None",
-      "description": "Exchange a wallet token through UniswapV3",
+      "description": "Swap Wallet Token on UniswapV3",
       "parameters": [
         {
           "name": "token_in_address",
