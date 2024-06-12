@@ -44,10 +44,8 @@ class DSRDisassembler(Disassembler):
         if amount_to_redeem is None:
             amount_to_redeem = self.get_amount_to_redeem(fraction, proxy_address)
 
-        approve_dai = maker.ApproveDAI(spender=proxy_address, amount=amount_to_redeem)
         exit_dai = maker.ProxyActionExitDsr(proxy=proxy_address, wad=amount_to_redeem)
 
-        txns.append(approve_dai)
         txns.append(exit_dai)
 
         return txns
@@ -71,10 +69,8 @@ class DSRDisassembler(Disassembler):
         if amount_to_redeem is None:
             amount_to_redeem = self.get_amount_to_redeem(fraction)
         dsr_manager_address = ContractSpecs[self.blockchain].DsrManager.contract(self.w3).address
-        approve_dai = maker.ApproveDAI(spender=dsr_manager_address, amount=amount_to_redeem)
         exit_dai = maker.ExitDsr(avatar=self.avatar_safe_address, wad=amount_to_redeem)
 
-        txns.append(approve_dai)
         txns.append(exit_dai)
 
         return txns
