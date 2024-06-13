@@ -8,7 +8,7 @@ import requests
 from defabipedia.chainlink import ContractSpecs as ChainlinkContractSpecs
 from defabipedia.curve import ContractSpecs as CurveContractSpecs
 from defabipedia.tokens import Addresses, erc20_contract
-from defabipedia.gnosis import GnosisContractSpecs
+from defabipedia.gnosis import ContractSpecs as GnosisContractSpecs
 from defabipedia.types import Chain
 from web3 import Web3
 from web3.types import TxReceipt
@@ -102,7 +102,7 @@ class SwapGBPeForsDAI(SingleSwap):
             avatar=avatar,
             kind=SwapKind.OutGivenExactIn,
             token_in_address=Addresses[Chain.GNOSIS].GBPe,
-            token_out_address=GnosisContractSpecs.sDAI.address,
+            token_out_address=GnosisContractSpecs[Chain.GNOSIS].sDAI.address,
             amount_in=amount_in,
             min_amount_out=min_amount_out,
             deadline=deadline,
@@ -122,7 +122,7 @@ class SwapsDAIForGBPe(SingleSwap):
             pool_id="0x9d93f38b75b376acdfe607cd1ecf4495e047deff00000000000000000000009e",
             avatar=avatar,
             kind=SwapKind.OutGivenExactIn,
-            token_in_address=GnosisContractSpecs.sDAI.address,
+            token_in_address=GnosisContractSpecs[Chain.GNOSIS].sDAI.address,
             token_out_address=Addresses[Chain.GNOSIS].GBPe,
             amount_in=amount_in,
             min_amount_out=min_amount_out,
@@ -189,7 +189,7 @@ class DynamicDataManager:
                     pool_id="0x9d93f38b75b376acdfe607cd1ecf4495e047deff00000000000000000000009e",
                     avatar=self.static_data.env.AVATAR_SAFE_ADDRESS,
                     token_in_address=Addresses[Chain.GNOSIS].GBPe,
-                    token_out_address=GnosisContractSpecs.sDAI.address,
+                    token_out_address=GnosisContractSpecs[Chain.GNOSIS].sDAI.address,
                     amount=amount_int,
                 ).call(web3=self.w3)
             )
@@ -209,7 +209,7 @@ class DynamicDataManager:
                     blockchain=Chain.GNOSIS,
                     pool_id="0x9d93f38b75b376acdfe607cd1ecf4495e047deff00000000000000000000009e",
                     avatar=self.static_data.env.AVATAR_SAFE_ADDRESS,
-                    token_in_address=GnosisContractSpecs.sDAI.address,
+                    token_in_address=GnosisContractSpecs[Chain.GNOSIS].sDAI.address,
                     token_out_address=Addresses[Chain.GNOSIS].GBPe,
                     amount=amount_int,
                 ).call(web3=self.w3)
@@ -253,7 +253,7 @@ class DynamicDataManager:
         return WXDAI_amount / 1e18 * WXDAI_share + USDC_amount / 1e6 * USDC_share + USDT_amount / 1e6 * USDT_share
 
     def get_sDAI_price(self) -> float:
-        sDAI_contract = GnosisContractSpecs.sDAI.contract(self.w3)
+        sDAI_contract = GnosisContractSpecs[Chain.GNOSIS].sDAI.contract(self.w3)
         return float(Decimal(sDAI_contract.functions.convertToAssets(int(1e18)).call()) / Decimal(10**18))
 
     def get_data(self, amount_x3CRV: float, amount_GBPe: float, amount_sDAI: float) -> DynamicData:
@@ -275,7 +275,7 @@ class DynamicDataManager:
             .call()
         )
         sDAI_balance = (
-            erc20_contract(self.w3, GnosisContractSpecs.sDAI.address)
+            erc20_contract(self.w3, GnosisContractSpecs[Chain.GNOSIS].sDAI.address)
             .functions.balanceOf(self.static_data.env.AVATAR_SAFE_ADDRESS)
             .call()
         )
