@@ -6,7 +6,6 @@ from roles_royce.applications.execution_app.stresstest import stresstest
 from roles_royce.applications.execution_app.utils import ENV
 from tests.utils import assign_role
 
-
 PERCENTAGE = 20
 MAX_SLIPPAGE = 1
 TEST_ETH_BLOCK = 19590108
@@ -188,8 +187,13 @@ stresstest_outcome = {
                         {
                             "name": "token_in_address",
                             "label": "Token In",
-                            "type": "constant",
-                            "value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                            "type": "input",
+                            "options": [
+                                {
+                                    "label": "WETH",
+                                    "value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                                }
+                            ],
                         },
                         {
                             "name": "max_slippage",
@@ -220,8 +224,13 @@ stresstest_outcome = {
                         {
                             "name": "token_in_address",
                             "label": "Token In",
-                            "type": "constant",
-                            "value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                            "type": "input",
+                            "options": [
+                                {
+                                    "label": "WETH",
+                                    "value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                                }
+                            ],
                         },
                         {
                             "name": "max_slippage",
