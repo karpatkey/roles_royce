@@ -1,0 +1,7 @@
+dataclasses
+typing
+uvicorn
+web3
+requests
+cryptography
+fastapi
