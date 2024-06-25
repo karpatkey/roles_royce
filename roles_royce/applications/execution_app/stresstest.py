@@ -168,10 +168,10 @@ def single_stresstest(
             options = token_outs
         else:
             option_arg = None
-            options = ["dummy_option"]
+            options = ["_"]
 
         passing_results = []
-        error = None
+        errors: list[str] = []
         for option_value in options:
             if option_arg:
                 exit_arguments_dict[option_arg] = option_value
@@ -190,7 +190,7 @@ def single_stresstest(
             if result:
                 passing_results.append(option_value)
             else:
-                error = err
+                errors.append(f"[{option_value}]: {err}")
 
         if option_arg:
             for item in exec_config["parameters"]:
@@ -198,13 +198,13 @@ def single_stresstest(
                     item["options"] = [a for a in item["options"] if a["value"] in passing_results]
                     if len(item["options"]) == 0:
                         exec_config["stresstest"] = False
-                        exec_config["stresstest_error"] = error
+                        exec_config["stresstest_error"] = "; ".join(errors)
                     else:
                         exec_config["stresstest"] = True
         else:
-            if error:
+            if len(errors) > 0:
                 exec_config["stresstest"] = False
-                exec_config["stresstest_error"] = error
+                exec_config["stresstest_error"] = "; ".join(errors)
             else:
                 exec_config["stresstest"] = True
 
