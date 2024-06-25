@@ -148,12 +148,12 @@ def single_stresstest(
                 if len(item["options"]) == 1:
                     exit_arguments_dict[item["name"]] = item["options"][0]["value"]
                 else:
-                    token_ins = [i["value"] for i in item["options"]]
+                    token_ins = item["options"]
             elif item["name"] == "token_out_address":
                 if len(item["options"]) == 1:
                     exit_arguments_dict[item["name"]] = item["options"][0]["value"]
                 else:
-                    token_outs = [i["value"] for i in item["options"]]
+                    token_outs = item["options"]
 
         if len(token_ins) > 1 and len(token_outs) > 1:
             raise ValueError(
@@ -168,11 +168,13 @@ def single_stresstest(
             options = token_outs
         else:
             option_arg = None
-            options = ["dummy_option"]
+            options = [{"value": "_", "label": "_"}]
 
         passing_results = []
-        error = None
-        for option_value in options:
+        errors: list[str] = []
+        for option in options:
+            option_label = option["label"]
+            option_value = option["value"]
             if option_arg:
                 exit_arguments_dict[option_arg] = option_value
 
@@ -190,21 +192,23 @@ def single_stresstest(
             if result:
                 passing_results.append(option_value)
             else:
-                error = err
+                errors.append(f"[{option_label}]: {err}")
 
         if option_arg:
+            print(errors)
             for item in exec_config["parameters"]:
                 if item["name"] == option_arg:
                     item["options"] = [a for a in item["options"] if a["value"] in passing_results]
                     if len(item["options"]) == 0:
                         exec_config["stresstest"] = False
-                        exec_config["stresstest_error"] = error
+                        exec_config["stresstest_error"] = ";\n ".join(errors)
+                        print(exec_config["stresstest_error"])
                     else:
                         exec_config["stresstest"] = True
         else:
-            if error:
+            if len(errors) > 0:
                 exec_config["stresstest"] = False
-                exec_config["stresstest_error"] = error
+                exec_config["stresstest_error"] = ";\n ".join(errors)
             else:
                 exec_config["stresstest"] = True
 
