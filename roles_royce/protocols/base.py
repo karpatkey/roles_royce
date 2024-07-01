@@ -43,7 +43,7 @@ class ContractMethod:
     #: Provide fixed defaults to some function attributes.
     fixed_arguments = dict()
 
-    def __init__(self, value: int = 0, avatar: None | AvatarAddress = None):
+    def __init__(self, value: int = 0, avatar: None | Address = None):
         """
         Args:
             value: The value of the tx, eg: amount of Wei in mainnet, xDai Weis in GC.
