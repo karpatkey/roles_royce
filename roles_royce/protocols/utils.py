@@ -1,3 +1,5 @@
+import binascii
+
 from roles_royce.protocols.base import AvatarAddress, ApproveForToken
 from web3 import Web3
 from roles_royce.generic_method import Transactable
@@ -27,3 +29,13 @@ def check_allowance_and_approve(w3: Web3, avatar: AvatarAddress, token: Address,
         return ApproveForToken(amount=amount, token=token, spender=spender)
     else:
         return None
+
+
+def format_bytes32_string(input_string):
+    # Convert the string to bytes
+    input_bytes = input_string.encode("utf-8")
+    # Pad or truncate the bytes to 32 bytes
+    padded_bytes = input_bytes.ljust(32, b"\0")[:32]
+    # Convert the bytes to hexadecimal representation
+    hex_string = binascii.hexlify(padded_bytes).decode("utf-8")
+    return "0x" + hex_string

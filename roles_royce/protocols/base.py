@@ -1,9 +1,8 @@
+from enum import IntEnum
 import json
 from types import SimpleNamespace
 
 from web3 import Web3
-
-from roles_royce.roles_modifier import Operation
 
 Address = str
 
@@ -24,6 +23,12 @@ class InvalidArgument(Exception):
 class Args(SimpleNamespace):
     pass
 
+
+class Operation(IntEnum):
+    """Types of operations."""
+
+    CALL = 0
+    DELEGATE_CALL = 1
 
 class ContractMethod:
     """Inherit this class to declare a contract function.
