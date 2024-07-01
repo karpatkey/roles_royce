@@ -69,7 +69,7 @@ class ContractMethod:
         if not hasattr(self, "_initialized"):
             raise ValueError(f"Missing super().__init__() call in {self.__class__.__name__}.__init__ method")
         contract = Web3().eth.contract(address=None, abi=self.abi)
-        result = contract.encodeABI(fn_name=self.name, args=self.args_list)
+        result = contract.encode_abi(fn_name=self.name, args=self.args_list)
         return result
 
     @property

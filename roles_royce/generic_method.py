@@ -50,5 +50,5 @@ class GenericMethodTransaction:
     def _calc_data(self) -> HexStr:
         """Create the data input for the contract function."""
         contract = Web3().eth.contract(address=None, abi=self.contract_abi)
-        result = contract.encodeABI(fn_name=self.function_name, args=self.function_args)
+        result = contract.encode_abi(fn_name=self.function_name, args=self.function_args)
         return result
