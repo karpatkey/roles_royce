@@ -54,6 +54,7 @@ class ContractMethod:
         self.args = Args()
         self._initialized = True
         self.operation: Operation = Operation.CALL
+        self._inputs = None
 
     @property
     def contract_address(self) -> str:
@@ -70,6 +71,8 @@ class ContractMethod:
             raise ValueError(f"Missing super().__init__() call in {self.__class__.__name__}.__init__ method")
         contract = Web3().eth.contract(address=None, abi=self.abi)
         result = contract.encode_abi(fn_name=self.name, args=self.args_list)
+        # Decode what we encoded to re-use the web3py normalizers
+        self._inputs = contract.decode_function_input(result)[1]
         return result
 
     @property
@@ -85,6 +88,12 @@ class ContractMethod:
         outputs = [self._abi_for(e) for e in self.out_signature]
         abi = {"name": self.name, "type": "function", "inputs": inputs, "outputs": outputs}
         return json.dumps([abi])
+
+    @property
+    def inputs(self):
+        if self._inputs is None:
+            _ = self.data  # Calc the inputs
+        return self._inputs
 
     def call(self, web3, *args, **kwargs):
         """Does a read call on the method.
