@@ -199,14 +199,14 @@ def single_stresstest(
                     item["options"] = [a for a in item["options"] if a["value"] in passing_results]
                     if len(item["options"]) == 0:
                         exec_config["stresstest"] = False
-                        exec_config["stresstest_error"] = ";\n".join(errors)
+                        exec_config["stresstest_error"] = " | ".join(errors)
                         print(exec_config["stresstest_error"])
                     else:
                         exec_config["stresstest"] = True
         else:
             if len(errors) > 0:
                 exec_config["stresstest"] = False
-                exec_config["stresstest_error"] = ";\n".join(errors)
+                exec_config["stresstest_error"] = " | ".join(errors)
             else:
                 exec_config["stresstest"] = True
 

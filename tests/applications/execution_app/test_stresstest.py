@@ -218,7 +218,7 @@ stresstest_outcome = {
                     "label": "Exchange Wallet Token on UniswapV3",
                     "test": True,
                     "stresstest": False,
-                    "stresstest_error": "[USDT]: Error: ('ParameterNotAllowed()', None);\n[USDC]: Error: ('ParameterNotAllowed()', None)",
+                    "stresstest_error": "[USDT]: Error: ('ParameterNotAllowed()', None) | [USDC]: Error: ('ParameterNotAllowed()', None)",
                     "description": "Exchange a wallet token through UniswapV3",
                     "parameters": [
                         {
