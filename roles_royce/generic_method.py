@@ -4,7 +4,7 @@ from typing import Protocol
 from web3 import Web3
 from web3.types import HexStr
 
-from .roles_modifier import Operation
+from .protocols.base import Operation
 
 
 class Transactable(Protocol):
@@ -50,5 +50,5 @@ class GenericMethodTransaction:
     def _calc_data(self) -> HexStr:
         """Create the data input for the contract function."""
         contract = Web3().eth.contract(address=None, abi=self.contract_abi)
-        result = contract.encodeABI(fn_name=self.function_name, args=self.function_args)
+        result = contract.encode_abi(fn_name=self.function_name, args=self.function_args)
         return result

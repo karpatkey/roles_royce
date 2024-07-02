@@ -1,12 +1,14 @@
-import binascii
 import logging
 from dataclasses import dataclass
-from enum import Enum, IntEnum
+from enum import Enum
 
 import eth_abi
 from eth_account import Account
 from web3 import Web3, exceptions
 from web3.types import Address, ChecksumAddress, TxParams, TxReceipt
+
+from roles_royce.protocols.base import Operation
+from roles_royce.protocols.utils import format_bytes32_string
 
 logger = logging.getLogger(__name__)
 
@@ -80,11 +82,7 @@ class TransactionWouldBeReverted(Exception):
     """It is used to indicate that if a transaction is executed, it will be reverted."""
 
 
-class Operation(IntEnum):
-    """Types of operations."""
 
-    CALL = 0
-    DELEGATE_CALL = 1
 
 
 @dataclass
@@ -110,16 +108,6 @@ def set_gas_strategy(strategy: GasStrategies):
     """Set a global default gas strategy"""
     global _gas_strategy
     _gas_strategy = strategy
-
-
-def format_bytes32_string(input_string):
-    # Convert the string to bytes
-    input_bytes = input_string.encode("utf-8")
-    # Pad or truncate the bytes to 32 bytes
-    padded_bytes = input_bytes.ljust(32, b"\0")[:32]
-    # Convert the bytes to hexadecimal representation
-    hex_string = binascii.hexlify(padded_bytes).decode("utf-8")
-    return "0x" + hex_string
 
 
 class RolesMod:
