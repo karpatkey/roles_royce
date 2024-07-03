@@ -13,7 +13,7 @@ class SimpleRepr(type):
 
 
 class AvatarAddress(metaclass=SimpleRepr):
-    pass
+    """To be used in place of the avatar address for example in ContractMethod's fixed_arguments"""
 
 
 class InvalidArgument(Exception):
@@ -35,6 +35,7 @@ class ContractMethod:
 
     At least ``name`` and ``target_address`` must be defined in the
     inherited class.
+    Implements the Transactable protocol.
     """
 
     #: The name of the contract function
@@ -96,6 +97,7 @@ class ContractMethod:
 
     @property
     def inputs(self):
+        """Return a dict with the arguments of the method"""
         if self._inputs is None:
             _ = self.data  # Calc the inputs
         return self._inputs
