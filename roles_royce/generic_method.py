@@ -7,7 +7,7 @@ from web3.types import HexStr
 from .protocols.base import Operation
 
 
-class Transactable(Protocol):
+class TransactableWithProperties(Protocol):
     """Base interface for operations that can be sent to the blockchain."""
 
     #: the operation type
@@ -24,6 +24,22 @@ class Transactable(Protocol):
     def contract_address(self) -> str:
         """Contract address to be called"""
         return ...
+
+
+class TransactableWithValues(Protocol):
+    """Base interface for operations that can be sent to the blockchain."""
+
+    #: the operation type
+    operation: Operation
+    #: the value quantity, eg: `value = 1` is one Wei in Mainnet.
+    value: int
+    #: The calldata of the operation
+    data: str
+    #: Contract address to be called
+    contract_address: str
+
+
+Transactable = TransactableWithProperties | TransactableWithValues
 
 
 @dataclass(kw_only=True)
