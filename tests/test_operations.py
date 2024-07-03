@@ -2,7 +2,8 @@ from defabipedia.types import Chain
 
 from roles_royce import GenericMethodTransaction, Operation, roles
 from roles_royce.constants import GCAddr
-from roles_royce.utils import MULTISENDS, multi_or_one
+from roles_royce.protocols.multisend import MULTISENDS_DEPLOYS
+from roles_royce.utils import multi_or_one
 
 from .utils import web3_gnosis
 
@@ -42,7 +43,7 @@ def test_multi_or_one_multi():
     tx = multi_or_one([approve, add_liquidity], blockchain=Chain.GNOSIS)
     # when building more than one transaction the Multisend contract is used
     assert tx.operation == Operation.DELEGATE_CALL
-    assert tx.contract_address == MULTISENDS[Chain.GNOSIS]
+    assert tx.contract_address == MULTISENDS_DEPLOYS[Chain.GNOSIS]
     assert tx.data == (
         "0x8d80ff0a000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000"
         "00000000000000000000000000000000172004ecaba5870353805a9f068101a40e0f32ed605c600000000000000000000000000"
