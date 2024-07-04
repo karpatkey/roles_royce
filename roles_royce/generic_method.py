@@ -44,6 +44,7 @@ Transactable = TransactableWithProperties | TransactableWithValues
 
 @dataclass(kw_only=True)
 class TxData:
+    """Implements the Transactable protocol as a dataclass"""
     contract_address: str
     data: str
     operation: Operation = Operation.CALL
