@@ -97,9 +97,7 @@ def run_with_args(dao, protocol, blockchain, exit_strategy, percentage, exit_arg
     )
     if result["status"] != 200:
         logger.info(f'Error in transaction builder. Error1: {result["error"]}')
-        return (False, f'error: {result["error"]}')
-        # exec_config["stresstest"] = False
-        # exec_config["stresstest_error"] =
+        return (False, str(result["error"]))
     else:
         logger.info(f'Status of transaction builder: {result["status"]}')
         tx = result["tx_data"]["transaction"]
@@ -108,17 +106,14 @@ def run_with_args(dao, protocol, blockchain, exit_strategy, percentage, exit_arg
             result = execute_env(env=env, transaction=tx, web3=w3)
             if result["status"] != 200:
                 logger.info(f'Error in execution. Error: {result["error"]}')
-                return (False, f"error: {result['error']}")
+                return (False, str(result["error"]))
             else:
                 logger.info(f'Status of execution: {result["status"]}')
-                # exec_config["stresstest"] = True
                 return (True, None)
 
         except Exception as f:
             logger.info(f"Exception in execution. Error: {f}")
-            # exec_config["stresstest"] = False
-            # exec_config["stresstest_error"] =
-            return (False, f"error: {str(f)}")
+            return (False, str(f))
 
 
 def single_stresstest(
@@ -148,12 +143,12 @@ def single_stresstest(
                 if len(item["options"]) == 1:
                     exit_arguments_dict[item["name"]] = item["options"][0]["value"]
                 else:
-                    token_ins = [i["value"] for i in item["options"]]
+                    token_ins = item["options"]
             elif item["name"] == "token_out_address":
                 if len(item["options"]) == 1:
                     exit_arguments_dict[item["name"]] = item["options"][0]["value"]
                 else:
-                    token_outs = [i["value"] for i in item["options"]]
+                    token_outs = item["options"]
 
         if len(token_ins) > 1 and len(token_outs) > 1:
             raise ValueError(
@@ -168,11 +163,13 @@ def single_stresstest(
             options = token_outs
         else:
             option_arg = None
-            options = ["dummy_option"]
+            options = [{"value": "_", "label": "_"}]
 
         passing_results = []
-        error = None
-        for option_value in options:
+        errors: list[str] = []
+        for option in options:
+            option_label = option["label"]
+            option_value = option["value"]
             if option_arg:
                 exit_arguments_dict[option_arg] = option_value
 
@@ -190,30 +187,28 @@ def single_stresstest(
             if result:
                 passing_results.append(option_value)
             else:
-                error = err
+                if option_value:
+                    errors.append(f"[{option_label}]: {err}")
+                else:
+                    errors.append(str(err))
 
         if option_arg:
+            print(errors)
             for item in exec_config["parameters"]:
                 if item["name"] == option_arg:
                     item["options"] = [a for a in item["options"] if a["value"] in passing_results]
                     if len(item["options"]) == 0:
                         exec_config["stresstest"] = False
-                        exec_config["stresstest_error"] = error
+                        exec_config["stresstest_error"] = " | ".join(errors)
+                        print(exec_config["stresstest_error"])
                     else:
                         exec_config["stresstest"] = True
         else:
-            if error:
+            if len(errors) > 0:
                 exec_config["stresstest"] = False
-                exec_config["stresstest_error"] = error
+                exec_config["stresstest_error"] = " | ".join(errors)
             else:
                 exec_config["stresstest"] = True
-
-        for item in exec_config["parameters"]:
-            if item["name"] == "token_in_address" or item["name"] == "token_out_address":
-                if len(item["options"]) == 1:
-                    item["type"] = "constant"
-                    item["value"] = item["options"][0]["value"]
-                    del item["options"]
 
     except Exception as e:
         logger.info(f"Error in transaction builder. Error: {str(e)}")

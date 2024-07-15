@@ -4,10 +4,10 @@ from typing import Protocol
 from web3 import Web3
 from web3.types import HexStr
 
-from .roles_modifier import Operation
+from .protocols.base import Operation
 
 
-class Transactable(Protocol):
+class TransactableWithProperties(Protocol):
     """Base interface for operations that can be sent to the blockchain."""
 
     #: the operation type
@@ -26,8 +26,25 @@ class Transactable(Protocol):
         return ...
 
 
+class TransactableWithValues(Protocol):
+    """Base interface for operations that can be sent to the blockchain."""
+
+    #: the operation type
+    operation: Operation
+    #: the value quantity, eg: `value = 1` is one Wei in Mainnet.
+    value: int
+    #: The calldata of the operation
+    data: str
+    #: Contract address to be called
+    contract_address: str
+
+
+Transactable = TransactableWithProperties | TransactableWithValues
+
+
 @dataclass(kw_only=True)
 class TxData:
+    """Implements the Transactable protocol as a dataclass"""
     contract_address: str
     data: str
     operation: Operation = Operation.CALL
@@ -50,5 +67,5 @@ class GenericMethodTransaction:
     def _calc_data(self) -> HexStr:
         """Create the data input for the contract function."""
         contract = Web3().eth.contract(address=None, abi=self.contract_abi)
-        result = contract.encodeABI(fn_name=self.function_name, args=self.function_args)
+        result = contract.encode_abi(fn_name=self.function_name, args=self.function_args)
         return result

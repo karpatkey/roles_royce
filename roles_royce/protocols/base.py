@@ -1,9 +1,8 @@
+from enum import IntEnum
 import json
 from types import SimpleNamespace
 
 from web3 import Web3
-
-from roles_royce.roles_modifier import Operation
 
 Address = str
 
@@ -14,7 +13,7 @@ class SimpleRepr(type):
 
 
 class AvatarAddress(metaclass=SimpleRepr):
-    pass
+    """To be used in place of the avatar address for example in ContractMethod's fixed_arguments"""
 
 
 class InvalidArgument(Exception):
@@ -25,11 +24,18 @@ class Args(SimpleNamespace):
     pass
 
 
+class Operation(IntEnum):
+    """Types of operations."""
+
+    CALL = 0
+    DELEGATE_CALL = 1
+
 class ContractMethod:
     """Inherit this class to declare a contract function.
 
     At least ``name`` and ``target_address`` must be defined in the
     inherited class.
+    Implements the Transactable protocol.
     """
 
     #: The name of the contract function
@@ -43,7 +49,7 @@ class ContractMethod:
     #: Provide fixed defaults to some function attributes.
     fixed_arguments = dict()
 
-    def __init__(self, value: int = 0, avatar: None | AvatarAddress = None):
+    def __init__(self, value: int = 0, avatar: None | Address = None):
         """
         Args:
             value: The value of the tx, eg: amount of Wei in mainnet, xDai Weis in GC.
@@ -54,6 +60,7 @@ class ContractMethod:
         self.args = Args()
         self._initialized = True
         self.operation: Operation = Operation.CALL
+        self._inputs = None
 
     @property
     def contract_address(self) -> str:
@@ -69,7 +76,9 @@ class ContractMethod:
         if not hasattr(self, "_initialized"):
             raise ValueError(f"Missing super().__init__() call in {self.__class__.__name__}.__init__ method")
         contract = Web3().eth.contract(address=None, abi=self.abi)
-        result = contract.encodeABI(fn_name=self.name, args=self.args_list)
+        result = contract.encode_abi(fn_name=self.name, args=self.args_list)
+        # Decode what we encoded to re-use the web3py normalizers
+        self._inputs = contract.decode_function_input(result)[1]
         return result
 
     @property
@@ -85,6 +94,13 @@ class ContractMethod:
         outputs = [self._abi_for(e) for e in self.out_signature]
         abi = {"name": self.name, "type": "function", "inputs": inputs, "outputs": outputs}
         return json.dumps([abi])
+
+    @property
+    def inputs(self):
+        """Return a dict with the arguments of the method"""
+        if self._inputs is None:
+            _ = self.data  # Calc the inputs
+        return self._inputs
 
     def call(self, web3, *args, **kwargs):
         """Does a read call on the method.
