@@ -29,7 +29,6 @@ from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 def test_safe_and_roles(local_node_eth):
     w3 = local_node_eth.w3
     local_node_eth.set_block(17565000)
-    ethereum_client = SimpleEthereumClient(w3)
 
     # test accounts are generated using the Mnemonic: "test test test test test test test test test test test junk"
     test_account0_addr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
@@ -48,7 +47,7 @@ def test_safe_and_roles(local_node_eth):
     assert w3.eth.get_balance(test_account0_addr) == 10000000000000000000000
 
     ethereum_tx_sent = Safe.create(
-        ethereum_client,
+        SimpleEthereumClient(w3),
         deployer_account=Account.from_key(test_account0_private_key),
         master_copy_address=addresses.MASTER_COPIES[EthereumNetwork.MAINNET][0][0],
         owners=[test_account0_addr],
@@ -56,7 +55,7 @@ def test_safe_and_roles(local_node_eth):
         proxy_factory_address="0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2",
     )
 
-    safe = SimpleSafe(ethereum_tx_sent.contract_address, ethereum_client, test_account0_private_key)
+    safe = SimpleSafe(ethereum_tx_sent.contract_address, w3, test_account0_private_key)
     safe.retrieve_all_info()
 
     # send ETH to the safe

@@ -314,7 +314,7 @@ def steal_safe(w3, safe_address, new_owner_address):
     Return a SimpleSafe instance from an existing safe with a new owner.
 
     The new owner will be added to the owners list, and the threshold will be set to 1,
-    so it will be able to signa and execute transactions.
+    so it will be able to sign and execute transactions.
     """
 
     safe = SimpleSafe(safe_address, w3=w3, signer_key=new_owner_address)
