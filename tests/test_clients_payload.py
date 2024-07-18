@@ -6,28 +6,30 @@ from tests.utils import steal_safe
 
 
 def test_roles_v2_ens(local_node_eth, accounts):
-    test_block = 20314887
+    test_block = 20335968
     w3 = local_node_eth.w3
     local_node_eth.set_block(test_block)
 
     original_safe = "0x4F2083f5fBede34C2714aFfb3105539775f7FE64"
     manager_safe_address = "0xb423e0f6E7430fa29500c5cC9bd83D28c8BD8978"
 
-    safe = steal_safe(w3, safe_address=manager_safe_address, new_owner_address=accounts[0].address)
-    print(safe.retrieve_all_info())
+    role_contract = "0x703806E61847984346d2D7DDd853049627e50A40"
 
-    safe.contract.functions.enableModule("0x703806E61847984346d2D7DDd853049627e50A40").transact({"from": safe.address})
+    manager_safe = steal_safe(w3, safe_address=manager_safe_address, new_owner_address=accounts[0].address)
 
-    print(safe.retrieve_all_info())
+    manager_safe.contract.functions.enableModule(role_contract).transact({"from": manager_safe.address})
+    assert manager_safe.contract.functions.isModuleEnabled(role_contract).call()
+
+    print(manager_safe.retrieve_all_info())
 
     # user = "0x51dEc19Aa2CD414EB982B6D9811081FFcfEe839d"
 
     role = RolesModTester(
         role="MANAGER",
-        contract_address="0x703806E61847984346d2D7DDd853049627e50A40",
+        contract_address=role_contract,
         w3=w3,
-        account=accounts[0].address,
+        account=manager_safe,
     )
 
     method = aave_v3.ApproveToken(ETHAddr.USDC, 1000)
-    assert role.check(contract_address=method.contract_address, data=method.data, block=test_block)
+    role.check(contract_address=method.contract_address, data=method.data)
