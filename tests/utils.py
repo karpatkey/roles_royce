@@ -121,6 +121,8 @@ def fork_unlock_account(w3, address):
     """Unlock the given address on the forked node."""
     return w3.provider.make_request("anvil_impersonateAccount", [address])
 
+def fork_set_balance(w3, address, amount):
+    return w3.provider.make_request("anvil_setBalance", [address, amount])
 
 def fork_reset_state(w3: Web3, url: str, block: int | str = "latest"):
     """Reset the state of the forked node to the state of the blockchain node at the given block.
@@ -306,3 +308,20 @@ def assign_role(local_node, avatar_safe_address: str, roles_mod_address: str, ro
     tx_hash = local_node.w3.eth.send_transaction(tx_to_assign_role)
     tx_receipt = local_node.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)
     return tx_receipt
+
+def steal_safe(w3, safe_address, new_owner_address):
+    """
+    Return a SimpleSafe instance from an existing safe with a new owner.
+
+    The new owner will be added to the owners list, and the threshold will be set to 1,
+    so it will be able to signa and execute transactions.
+    """
+
+    safe = SimpleSafe(safe_address, w3=w3, signer_key=new_owner_address)
+
+    fork_unlock_account(w3, safe_address)
+    fork_set_balance(w3, safe.address, 10000000000000000000) # give some gas: 10 ETH
+
+    # set thresshold to 1 and add owner
+    safe.contract.functions.addOwnerWithThreshold(new_owner_address, 1).transact({"from": safe.address})
+    return safe
