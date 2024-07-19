@@ -5,6 +5,7 @@ from .disassembling_lido import LidoDisassembler
 from .disassembling_swaps import SwapDisassembler
 from .disassembling_dsr import DSRDisassembler
 from .disassembling_spark import SparkDisassembler
+from .disassembling_aave_v3 import AaveV3Disassembler
 
 DISASSEMBLERS = {
     "balancer": BalancerDisassembler,
@@ -13,4 +14,5 @@ DISASSEMBLERS = {
     "swaps": SwapDisassembler,
     "dsr": DSRDisassembler,
     "spark": SparkDisassembler,
+    "aave_v3": AaveV3Disassembler,
 }
