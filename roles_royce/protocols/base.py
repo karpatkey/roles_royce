@@ -30,6 +30,7 @@ class Operation(IntEnum):
     CALL = 0
     DELEGATE_CALL = 1
 
+
 class ContractMethod:
     """Inherit this class to declare a contract function.
 
@@ -177,6 +178,7 @@ class BaseApproveForToken(BaseApprove):
 
 class ApproveForToken(BaseApproveForToken):
     """Approve a token for a specific spender."""
+
     def __init__(self, token: Address, spender: Address, amount: int):
         self.token = token
         self.fixed_arguments = {"spender": spender}
