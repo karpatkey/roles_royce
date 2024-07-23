@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from pytest import approx
 
+from defabipedia.tokens import NATIVE
 from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import spark
@@ -221,7 +222,7 @@ def test_integration_spark_cdp_roles_1(local_node_eth):
     role = 5
 
     top_up_address(w3, bot_address, 100)  # Sends 100 ETH to the bot address, block is increased by 1
-    assert get_balance(w3, ETHAddr.ZERO, bot_address) == int(100e18)
+    assert get_balance(w3, NATIVE, bot_address) == int(100e18)
 
     # Initial data
     initial_DAI_balance = get_balance(w3, ETHAddr.DAI, avatar_safe_address)

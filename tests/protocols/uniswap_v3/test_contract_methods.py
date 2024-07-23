@@ -1,4 +1,4 @@
-from defabipedia.tokens import EthereumTokenAddr as ETHAddr
+from defabipedia.tokens import EthereumTokenAddr as ETHAddr, NATIVE
 from defabipedia.types import Chain
 from defabipedia.uniswap_v3 import ContractSpecs
 from pytest import approx
@@ -186,7 +186,7 @@ def test_integration_eth(local_node_eth, accounts):
         web3=w3,
     )
 
-    eth_balance = get_balance(w3, ETHAddr.ZERO, safe.address) / 10**18
+    eth_balance = get_balance(w3, NATIVE, safe.address) / 10**18
     usdc_balance = get_balance(w3, ETHAddr.USDC, safe.address) / 10**6
 
     assert eth_balance == approx(9.99999, abs=0.3)
@@ -313,7 +313,7 @@ def test_integration_eth(local_node_eth, accounts):
         web3=w3,
     )
 
-    eth_balance = get_balance(w3, ETHAddr.ZERO, safe.address) / 10**18
+    eth_balance = get_balance(w3, NATIVE, safe.address) / 10**18
     usdc_balance = get_balance(w3, ETHAddr.USDC, safe.address) / 10**6
 
     assert eth_balance == approx(10.99999, abs=0.3)

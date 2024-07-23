@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from defabipedia.tokens import Abis as TokenAbis
+from defabipedia.tokens import Abis as TokenAbis, NATIVE
 from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 from defabipedia.types import Chain
 from defabipedia.uniswap_v3 import Abis, ContractSpecs
@@ -72,12 +72,12 @@ class Pool:
         blockchain = Chain.get_blockchain_from_web3(w3)
         factory = ContractSpecs[blockchain].Factory.contract(w3)
 
-        if token0 == GenAddr.E or token0 == GenAddr.ZERO:
+        if token0 == NATIVE or token0 == GenAddr.ZERO:
             token0 = ETHAddr.WETH
             if token1 < token0:
                 token0, token1 = token1, token0
 
-        if token1 == GenAddr.E or token1 == GenAddr.ZERO:
+        if token1 == NATIVE or token1 == GenAddr.ZERO:
             token1 = ETHAddr.WETH
             if token1 < token0:
                 token0, token1 = token1, token0

@@ -16,6 +16,7 @@ from web3 import HTTPProvider, Web3
 from web3.exceptions import ContractLogicError
 from web3.types import TxReceipt
 
+from defabipedia.tokens import NATIVE
 from roles_royce.constants import ETHAddr
 from roles_royce.evm_utils import erc20_abi
 
@@ -235,7 +236,7 @@ def steal_token(w3, token, holder, to, amount):
 
 def get_balance(w3, token, address):
     """Get the token or ETH balance of an address"""
-    if token == ETHAddr.ZERO:
+    if token == NATIVE or token == ETHAddr.ZERO:  # Check allso with ZERO to maintain backwards compat
         return w3.eth.get_balance(address)
     else:
         ctract = w3.eth.contract(address=token, abi=erc20_abi)
