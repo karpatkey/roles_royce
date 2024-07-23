@@ -1,7 +1,7 @@
 from tests.test_roles_modifier import RolesModTester
 from roles_royce.protocols.eth import aave_v3
 from roles_royce.constants import ETHAddr
-from tests.utils import steal_safe
+from tests.fork_utils import steal_safe
 
 
 def test_roles_v2_ens(local_node_eth, accounts):

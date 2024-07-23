@@ -2,7 +2,8 @@ from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import lido
 
-from .utils import create_simple_safe, get_balance
+from .utils import get_balance
+from .fork_utils import create_simple_safe
 from .fork_fixtures import accounts
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 

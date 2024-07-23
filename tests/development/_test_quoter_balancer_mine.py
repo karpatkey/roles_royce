@@ -6,7 +6,8 @@ from defi_protocols.constants import XDAI, ZERO_ADDRESS
 from defi_protocols.functions import get_contract, get_node, last_block
 from web3 import HTTPProvider, Web3
 
-from tests.utils import LOCAL_NODE_PORT, fork_reset_state, fork_unlock_account, get_allowance
+from tests.utils import LOCAL_NODE_PORT, get_allowance
+from tests.fork_utils import fork_unlock_account, fork_reset_state
 
 BALANCER_QUERIES = "0x0F3e0c4218b7b0108a3643cFe9D3ec0d4F57c54e"
 

@@ -10,8 +10,8 @@ from defabipedia.types import Chain
 from roles_royce.protocols.eth import lido
 from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
 from roles_royce.toolshed.disassembling import SwapDisassembler
-from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import create_simple_safe, steal_token
+from tests.roles_utils import apply_presets, deploy_roles, setup_common_roles
+from tests.fork_utils import steal_token, create_simple_safe
 from tests.fork_fixtures import accounts
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 

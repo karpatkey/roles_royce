@@ -9,13 +9,11 @@ from roles_royce.protocols.eth import spark
 from roles_royce.toolshed.anti_liquidation.spark import CDPData, SparkCDPManager
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkToken, SparkUtils
 from tests.utils import (
-    assign_role,
-    create_simple_safe,
     get_allowance,
     get_balance,
-    steal_token,
-    top_up_address,
 )
+from tests.fork_utils import steal_token, create_simple_safe, top_up_address
+from tests.roles_utils import assign_role
 
 from defabipedia.types import Chain
 

@@ -1,5 +1,7 @@
 import pytest
-from .utils import assign_role, create_simple_safe, to_hex_32_bytes
+from .utils import to_hex_32_bytes
+from .fork_utils import create_simple_safe
+from .roles_utils import assign_role
 from .fork_fixtures import accounts, local_node_gc_replay
 
 

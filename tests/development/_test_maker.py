@@ -5,15 +5,13 @@ from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import maker
 from roles_royce.utils import to_checksum_address
-from tests.roles import apply_presets, deploy_roles, setup_common_roles
+from tests.roles_utils import apply_presets, deploy_roles, setup_common_roles
 from tests.utils import (
     LOCAL_NODE_PORT,
-    create_simple_safe,
-    gen_test_accounts,
     get_balance,
     local_node,
-    steal_token,
 )
+from tests.fork_utils import steal_token, create_simple_safe, gen_test_accounts
 from tests.fork_fixtures import accounts
 
 wstETH_JOIN = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from roles_royce.applications.execution_app.stresstest import stresstest
 from roles_royce.applications.execution_app.utils import ENV
-from tests.utils import assign_role
+from tests.roles_utils import assign_role
 
 PERCENTAGE = 20
 MAX_SLIPPAGE = 1

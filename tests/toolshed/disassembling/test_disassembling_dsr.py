@@ -10,8 +10,9 @@ from roles_royce.protocols.eth import maker
 from roles_royce.utils import to_checksum_address
 from roles_royce.toolshed.disassembling import DSRDisassembler
 
-from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import create_simple_safe, get_balance, steal_token, top_up_address
+from tests.roles_utils import apply_presets, deploy_roles, setup_common_roles
+from tests.utils import get_balance
+from tests.fork_utils import steal_token, create_simple_safe, top_up_address
 from tests.fork_fixtures import accounts
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 

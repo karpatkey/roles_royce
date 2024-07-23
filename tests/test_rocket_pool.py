@@ -7,8 +7,9 @@ from pytest import approx
 from roles_royce import roles
 from roles_royce.protocols.eth import rocket_pool
 
-from .roles import apply_presets, deploy_roles, setup_common_roles
-from .utils import create_simple_safe, get_balance, top_up_address
+from .roles_utils import apply_presets, deploy_roles, setup_common_roles
+from .utils import get_balance
+from .fork_utils import create_simple_safe, top_up_address
 from .fork_fixtures import accounts
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 

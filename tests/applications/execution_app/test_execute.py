@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from roles_royce.applications.execution_app.utils import ENV, ExecConfig
-from tests.utils import assign_role
+from tests.roles_utils import assign_role
 from tests.fork_fixtures import accounts, local_node_eth
 
 dao = "GnosisDAO"

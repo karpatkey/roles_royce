@@ -14,13 +14,12 @@ from roles_royce.protocols.eth import aura
 from roles_royce.roles_modifier import TransactionWouldBeReverted
 from roles_royce.utils import MULTISENDS, to_checksum_address
 
-from .roles import apply_presets, deploy_roles, setup_common_roles
+from .roles_utils import apply_presets, deploy_roles, setup_common_roles
 from .utils import (
-    create_simple_safe,
     get_balance,
-    steal_token,
 )
-from .safe import SimpleEthereumClient, SimpleSafe
+from .fork_utils import steal_token, create_simple_safe
+from .simple_safe import SimpleEthereumClient, SimpleSafe
 from tests.fork_fixtures import accounts
 from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 

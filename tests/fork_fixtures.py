@@ -8,16 +8,16 @@ from web3._utils.encoding import Web3JsonEncoder
 from web3 import Web3
 from web3.providers.base import BaseProvider
 
-from tests.utils import (
-    LocalNode,
+from tests.fork_utils import (
     ETH_FORK_NODE_URL,
     ETH_LOCAL_NODE_PORT,
     ETH_LOCAL_NODE_DEFAULT_BLOCK,
-    _local_node,
     GC_FORK_NODE_URL,
     GC_LOCAL_NODE_PORT,
     GC_LOCAL_NODE_DEFAULT_BLOCK,
     TEST_ACCOUNTS,
+    LocalNode,
+    _local_node,
 )
 
 
@@ -129,7 +129,7 @@ def _local_node_replay(local_node, request, chain_name, chain_id):
     RecordMiddleware.clear_interactions()
 
     if mode == "replay_and_assert":
-        with gzip.open(web3_test_data_file, mode='rt') as f:
+        with gzip.open(web3_test_data_file, mode="rt") as f:
             ReplayAndAssertMiddleware.set_interactions(json.load(f))
         fake_local_node = DoNothingLocalNode(chain_id)
         fake_local_node.w3.middleware_onion.inject(ReplayAndAssertMiddleware, "replay_and_assert", layer=0)
@@ -143,7 +143,7 @@ def _local_node_replay(local_node, request, chain_name, chain_id):
         # TODO: don't write the file if the test failed
         # https://docs.pytest.org/en/latest/example/simple.html#making-test-result-information-available-in-fixtures
         data = json.dumps(RecordMiddleware.interactions, indent=2, cls=Web3JsonEncoder)
-        with gzip.open(web3_test_data_file, mode='wt') as f:
+        with gzip.open(web3_test_data_file, mode="wt") as f:
             f.write(data)
 
 
