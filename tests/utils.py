@@ -10,15 +10,12 @@ import subprocess
 import time
 
 import pytest
+from defabipedia.tokens import NATIVE, EthereumTokenAddr, erc20_contract
 from eth_account import Account
 from eth_account.signers.local import LocalAccount
 from web3 import HTTPProvider, Web3
 from web3.exceptions import ContractLogicError
 from web3.types import TxReceipt
-
-from defabipedia.tokens import NATIVE
-from roles_royce.constants import ETHAddr
-from roles_royce.evm_utils import erc20_abi
 
 from .safe import SimpleSafe
 
@@ -229,23 +226,23 @@ def steal_token(w3, token, holder, to, amount):
     """Steal tokens from a holder sending them to another address (sends 1 ETH to the holder first)"""
     fork_unlock_account(w3, holder)
     top_up_address(w3=w3, address=holder, amount=1)
-    ctract = w3.eth.contract(address=token, abi=erc20_abi)
+    ctract = erc20_contract(w3, token)
     tx = ctract.functions.transfer(to, amount).transact({"from": holder})
     return tx
 
 
 def get_balance(w3, token, address):
     """Get the token or ETH balance of an address"""
-    if token == NATIVE or token == ETHAddr.ZERO:  # Check allso with ZERO to maintain backwards compat
+    if token == NATIVE or token == EthereumTokenAddr.ZERO:  # Check allso with ZERO to maintain backwards compat
         return w3.eth.get_balance(address)
     else:
-        ctract = w3.eth.contract(address=token, abi=erc20_abi)
+        ctract = erc20_contract(w3, token)
         return ctract.functions.balanceOf(address).call()
 
 
 def get_allowance(w3, token, owner_address, spender_address):
     """Get the token allowance of an address"""
-    ctract = w3.eth.contract(address=token, abi=erc20_abi)
+    ctract = erc20_contract(w3, token)
     return ctract.functions.allowance(owner_address, spender_address).call()
 
 
