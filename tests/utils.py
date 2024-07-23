@@ -1,18 +1,5 @@
-import pytest
 from defabipedia.tokens import NATIVE, EthereumTokenAddr, erc20_contract
-from web3 import HTTPProvider, Web3
-
-from tests.fork_utils import REMOTE_ETH_NODE_URL, REMOTE_GC_NODE_URL
-
-
-@pytest.fixture(scope="module")
-def web3_gnosis() -> Web3:
-    return Web3(HTTPProvider(REMOTE_GC_NODE_URL))
-
-
-@pytest.fixture(scope="module")
-def web3_eth() -> Web3:
-    return Web3(HTTPProvider(REMOTE_ETH_NODE_URL))
+from web3 import Web3
 
 
 def get_balance(w3, token, address):

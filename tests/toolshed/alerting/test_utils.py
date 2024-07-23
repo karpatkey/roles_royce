@@ -8,14 +8,14 @@ from roles_royce.toolshed.alerting.utils import (
     get_tx_receipt_message_with_transfers,
     EventLogDecoder,
 )
-from tests.utils import web3_gnosis
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth
+from tests.fork_fixtures import local_node_eth, local_node_gc
 
-# FIXME: the following should use local_node_gc instead of web3_gnosis, but for some reason it's not working
-def test_get_token_transfers(local_node_eth, web3_gnosis):
+
+def test_get_token_transfers(local_node_eth, local_node_gc):
     local_node_eth.set_block(17877040)
+    local_node_gc.set_block(35115012)
     w3_eth = local_node_eth.w3
-    w3_gc = web3_gnosis
+    w3_gc = local_node_gc.w3
 
     tx_receipt = w3_eth.eth.get_transaction_receipt(
         "0xfe5e7f623deceea833e7300f1a9b637afcb253cebca0d3968e9190faf1c2cbc4"
