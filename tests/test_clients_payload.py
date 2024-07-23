@@ -15,7 +15,6 @@ def test_roles_v2_ens(local_node_eth, accounts):
     role_contract_address = "0x703806E61847984346d2D7DDd853049627e50A40"
 
     avatar_safe = steal_safe(w3, safe_address=avatar_safe_address, new_owner_address=accounts[0].address)
-    manager_safe = steal_safe(w3, safe_address=manager_safe_address, new_owner_address=accounts[0].address)
 
     avatar_safe.contract.functions.enableModule(role_contract_address).transact({"from": avatar_safe.address})
     assert avatar_safe.contract.functions.isModuleEnabled(role_contract_address).call()
@@ -24,7 +23,7 @@ def test_roles_v2_ens(local_node_eth, accounts):
         role="MANAGER",
         contract_address=role_contract_address,
         w3=w3,
-        account=manager_safe.address,
+        account=manager_safe_address,
     )
 
     method = aave_v3.ApproveToken(ETHAddr.USDC, 1000)
