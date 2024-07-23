@@ -1,7 +1,7 @@
 import json
 
 from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import ContractMethod, AvatarAddress
+from roles_royce.protocols.base import AvatarAddress, ContractMethod
 
 AVATAR_ADDRESS = "0x0EFcCBb9E2C09Ea29551879bd9Da32362b32fc89"
 

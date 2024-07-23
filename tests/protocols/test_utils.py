@@ -1,5 +1,6 @@
+from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
+
 from roles_royce.protocols.utils import check_allowance_and_approve
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 
 def test_check_allowance_and_approve(local_node_eth):

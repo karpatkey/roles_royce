@@ -5,10 +5,10 @@ import sys
 from pathlib import Path
 
 import pytest
+from karpatkit.test_utils.fork import accounts, local_node_eth
 
 from roles_royce.applications.execution_app.utils import ENV, ExecConfig
 from tests.roles_utils import assign_role
-from tests.fork_fixtures import accounts, local_node_eth
 
 dao = "GnosisDAO"
 blockchain = "ETHEREUM"

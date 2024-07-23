@@ -1,11 +1,11 @@
 from defi_protocols.constants import ETHEREUM, ZERO_ADDRESS
 from defi_protocols.functions import get_contract, get_data, get_decimals
 from defi_protocols.Maker import get_vault_data, underlying
+from karpatkit.test_utils.fork import fork_reset_state, fork_unlock_account
 from web3 import HTTPProvider, Web3
 
 from roles_royce.utils import to_checksum_address
 from tests.utils import LOCAL_NODE_PORT
-from tests.fork_utils import fork_unlock_account, fork_reset_state
 
 VAT = "0x35D1b3F3D7966A1DFe207aa4514C12a259A0492B"
 PROXY_REGISTRY = "0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4"

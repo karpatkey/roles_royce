@@ -1,14 +1,14 @@
-from web3 import Web3
 import defabipedia
 from defabipedia.types import Chain
+from karpatkit.test_utils.fork import local_node_eth, local_node_gc
+from web3 import Web3
 
 from roles_royce.toolshed.alerting.utils import (
+    EventLogDecoder,
     get_token_amounts_from_transfer_events,
     get_tx_executed_msg,
     get_tx_receipt_message_with_transfers,
-    EventLogDecoder,
 )
-from tests.fork_fixtures import local_node_eth, local_node_gc
 
 
 def test_get_token_transfers(local_node_eth, local_node_gc):

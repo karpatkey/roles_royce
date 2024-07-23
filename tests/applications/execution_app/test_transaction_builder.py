@@ -1,8 +1,8 @@
 import pytest
+from karpatkit.test_utils.fork import accounts, local_node_eth
 
 from roles_royce.applications.execution_app.transaction_builder import build_transaction
 from roles_royce.applications.execution_app.utils import ENV, ExecConfig
-from tests.fork_fixtures import accounts, local_node_eth
 from tests.roles_utils import assign_role
 
 dao = "GnosisDAO"

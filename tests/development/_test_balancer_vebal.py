@@ -3,10 +3,10 @@ from decimal import Decimal
 from defi_protocols.Balancer import ABI_VEBAL_FEE_DISTRIBUTOR, VEBAL_FEE_DISTRIBUTORS, VEBAL_REWARD_TOKENS
 from defi_protocols.constants import ETHEREUM
 from defi_protocols.functions import get_decimals, last_block
+from karpatkit.test_utils.fork import fork_reset_state, fork_unlock_account
 from web3 import HTTPProvider, Web3
 
 from tests.utils import ETH_FORK_NODE_URL, LOCAL_NODE_PORT
-from tests.fork_utils import fork_unlock_account, fork_reset_state
 
 
 def test_balancer_vebal(wallet, block, decimals=True):

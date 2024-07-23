@@ -1,18 +1,15 @@
-import json
-from web3 import Web3
+import karpatkit.helpers
 import pytest
-
 from defabipedia.rocket_pool import ContractSpecs
 from defabipedia.swap_pools import EthereumSwapPools
 from defabipedia.tokens import Abis
 from defabipedia.types import Chain
+from karpatkit.test_utils.fork import create_simple_safe
+from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
+from web3 import Web3
 
-from roles_royce.roles_modifier import set_gas_strategy, GasStrategies
 from roles_royce.toolshed.disassembling import SwapDisassembler
-from tests.roles_utils import apply_presets, deploy_roles, setup_common_roles
-from tests.fork_utils import steal_token, create_simple_safe
-from tests.fork_fixtures import accounts
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth, local_node_gc
+from tests.roles_utils import deploy_roles, setup_common_roles, apply_roles_presets
 
 ROLE = 4
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
@@ -69,7 +66,7 @@ def test_integration_exit_1(local_node_eth, accounts):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=presets_balancer,
@@ -131,7 +128,7 @@ def test_integration_exit_1_not_enough_eth(local_node_eth, accounts):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=presets_balancer,
@@ -215,7 +212,7 @@ def test_integration_exit_2(local_node_eth, accounts):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=presets_curve,
@@ -248,7 +245,7 @@ def test_integration_exit_2(local_node_eth, accounts):
     )
 
     eth_balance = w3.eth.get_balance(avatar_safe_address)
-    assert eth_balance >0
+    assert eth_balance > 0
 
     steth_contract = w3.eth.contract(address=EthereumSwapPools.Curve_stETH_ETH.tokens[1], abi=Abis.ERC20.abi)
     steth_balance = steth_contract.functions.balanceOf(avatar_safe_address).call()
@@ -361,7 +358,7 @@ def test_integration_exit_3(local_node_eth, accounts):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=preset_uniswapv3,

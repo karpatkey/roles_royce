@@ -1,19 +1,19 @@
 from decimal import Decimal
 
+import karpatkit.helpers
 from defabipedia._1inch import ContractSpecs as _1inchContractSpecs
 from defabipedia.aave_v3 import ContractSpecs
 from defabipedia.spark import ContractSpecs as SparkContractSpecs
 from defabipedia.tokens import Abis as TokenAbis
 from defabipedia.types import Chain
 from eth_abi import encode
+from karpatkit.helpers import get_balance
+from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
 from pytest import approx
 
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import aave_v3
 from roles_royce.toolshed.protocol_utils.aave_v3.cdp import AaveV3CDPManager, CDPData
-
-from .utils import get_balance
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 USER = "0xDf3A7a27704196Af5149CD67D881279e32AF2C21"
 USER2 = "0x7420fA58bA44E1141d5E9ADB6903BE549f7cE0b5"
@@ -824,27 +824,13 @@ def test_integration_1inch_swap(local_node_eth):
     # https://github.com/1inch/1inchProtocol/blob/811f7b69b67d1d9657e3e9c18a2e97f3e2b2b33a/README.md#flags-description
     flags = 0
 
-    if src_token == ETHAddr.ETH:
-        src_token_balance_before = w3.eth.get_balance(GNOSIS_DAO)
-    else:
-        src_token_balance_before = get_balance(w3, src_token, GNOSIS_DAO)
-
-    if dst_token == ETHAddr.ETH:
-        dst_token_balance_before = w3.eth.get_balance(GNOSIS_DAO)
-    else:
-        dst_token_balance_before = get_balance(w3, dst_token, GNOSIS_DAO)
+    src_token_balance_before = get_balance(w3, src_token, GNOSIS_DAO)
+    dst_token_balance_before = get_balance(w3, dst_token, GNOSIS_DAO)
 
     swap = func_obj(**func_params).transact({"from": GNOSIS_DAO, "value": value})
 
-    if src_token == ETHAddr.ETH:
-        src_token_balance_after = w3.eth.get_balance(GNOSIS_DAO)
-    else:
-        src_token_balance_after = get_balance(w3, src_token, GNOSIS_DAO)
-
-    if dst_token == ETHAddr.ETH:
-        dst_token_balance_after = w3.eth.get_balance(GNOSIS_DAO)
-    else:
-        dst_token_balance_after = get_balance(w3, dst_token, GNOSIS_DAO)
+    src_token_balance_after = get_balance(w3, src_token, GNOSIS_DAO)
+    dst_token_balance_after = get_balance(w3, dst_token, GNOSIS_DAO)
 
     collateral = ETHAddr.WETH
 

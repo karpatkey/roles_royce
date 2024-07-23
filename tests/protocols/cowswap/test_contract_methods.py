@@ -1,13 +1,13 @@
+import json
+
 from defabipedia.types import Chain
+from karpatkit.test_utils.fork import accounts, create_simple_safe
+from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
+
 from roles_royce import roles
 from roles_royce.protocols.cowswap.contract_methods import SignOrder
 from roles_royce.protocols.cowswap.utils import create_order_api, quote_order_api
-from tests.roles_utils import apply_presets, deploy_roles, setup_common_roles
-from tests.fork_utils import create_simple_safe
-from tests.fork_fixtures import accounts
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth
-
-import json
+from tests.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 
 def test_sign_order():
@@ -170,7 +170,7 @@ def test_integration_sign_order(local_node_eth, accounts, requests_mock):
             ]
             }"""
 
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=presets,

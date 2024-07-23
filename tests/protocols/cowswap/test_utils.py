@@ -1,6 +1,8 @@
-from defabipedia.types import Chain
-from roles_royce.protocols.cowswap.utils import SwapKind, create_order_api, quote_order_api, Order, create_order
 import json
+
+from defabipedia.types import Chain
+
+from roles_royce.protocols.cowswap.utils import Order, SwapKind, create_order, create_order_api, quote_order_api
 
 
 def test_order():

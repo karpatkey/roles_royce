@@ -1,5 +1,6 @@
+from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
+
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkToken, SparkUtils
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 
 def test_chi(local_node_eth):

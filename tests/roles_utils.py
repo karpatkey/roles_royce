@@ -1,17 +1,15 @@
 import json
 
-from web3.types import TxReceipt
-
 from defabipedia.types import Chain
+from karpatkit.test_utils.fork import TEST_ACCOUNTS, top_up_address
+from karpatkit.test_utils.simple_safe import SimpleSafe
+from karpatkit.test_utils.utils import to_hex_32_bytes
 from web3 import Web3
+from web3.types import TxReceipt
 
 from roles_royce.evm_utils import roles_abi, roles_bytecode
 from roles_royce.generic_method import TxData
-from roles_royce.utils import MULTISENDS, to_checksum_address
-
-from .simple_safe import SimpleSafe
-from .fork_utils import TEST_ACCOUNTS, top_up_address
-from .utils import to_hex_32_bytes
+from roles_royce.utils import MULTISENDS, to_checksum_address, multi_or_one
 
 
 def deploy_roles(w3: Web3, avatar):
@@ -63,7 +61,7 @@ def setup_common_roles(safe: SimpleSafe, roles_ctract):
     safe.send(txs=txns)
 
 
-def apply_presets(safe: SimpleSafe, roles_ctract, json_data, replaces=None):
+def apply_roles_presets(safe: SimpleSafe, roles_ctract, json_data, replaces=None):
     presets_data = json.loads(json_data)
     for tx in presets_data["transactions"]:
         data: str = tx["data"]

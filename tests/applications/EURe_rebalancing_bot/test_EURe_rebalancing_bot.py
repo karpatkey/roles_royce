@@ -1,10 +1,11 @@
 from decimal import Decimal
 
+from karpatkit.test_utils.fork import accounts
+from karpatkit.test_utils.fork import local_node_gc_replay as local_node_gc
+
 from roles_royce.applications.EURe_rebalancing_bot.swaps import Swapper, SwapsData, SwapsDataManager
 from roles_royce.evm_utils import erc20_abi
 from tests.roles_utils import assign_role
-from tests.fork_fixtures import accounts
-from tests.fork_fixtures import local_node_gc_replay as local_node_gc
 
 
 def test_swaps_data():

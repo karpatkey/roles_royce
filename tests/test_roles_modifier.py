@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pytest
+from karpatkit.test_utils.fork import local_node_gc_replay as local_node_gc
 
 from roles_royce.roles_modifier import (
     AGGRESIVE_FEE_MULTIPLER,
@@ -9,11 +10,9 @@ from roles_royce.roles_modifier import (
     NORMAL_GAS_LIMIT_MULTIPLIER,
     GasStrategies,
     RolesMod,
+    TransactionWouldBeReverted,
     set_gas_strategy,
-    TransactionWouldBeReverted
 )
-
-from .fork_fixtures import local_node_gc_replay as local_node_gc
 
 ROLE = 2
 ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"
