@@ -1,4 +1,4 @@
-from roles_royce.protocols.base import ContractMethod, Address
+from roles_royce.protocols.base import Address, ContractMethod
 from roles_royce.protocols.utils import format_bytes32_string
 
 
@@ -97,3 +97,48 @@ def get_exec_transaction_with_role_method(
     else:
         role_method = ExecTransactionWithRoleV1
     return role_method(roles_mod_address, role, to, data, operation, value, should_revert)
+
+
+class EnableModule(ContractMethod):
+    """Enable module"""
+
+    name = "enableModule"
+    in_signature = [
+        ("module", "address"),
+    ]
+
+    def __init__(
+        self,
+        roles_mod_address: Address,
+        module: Address,
+    ):
+        super().__init__()
+        self.target_address = roles_mod_address
+        self.args.module = module
+
+
+class AssignRoles(ContractMethod):
+    """Enable module"""
+
+    name = "enableModule"
+    in_signature = [
+        ("module", "address"),
+        ("roles", "uint16[]"),
+        ("member_of", "bool[]"),
+    ]
+
+    def __init__(
+        self,
+        roles_mod_address: Address,
+        module: Address,
+        assign_list: list[int] | None = None,
+        revoke_list: list[int] | None = None,
+    ):
+        super().__init__()
+        self.target_address = roles_mod_address
+        self.args.module = module
+        assign_list = assign_list or []
+        revoke_list = revoke_list or []
+        self.args.roles = assign_list + revoke_list
+        self.args.member_of = [True] * len(assign_list) + [False] * len(revoke_list)
+        breakpoint()
