@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-import karpatkit.helpers
 from defabipedia import Chain
 from defabipedia.rocket_pool import Abis, ContractSpecs
 from karpatkit.helpers import get_balance
@@ -11,7 +10,7 @@ from pytest import approx
 
 from roles_royce import roles
 from roles_royce.protocols.eth import rocket_pool
-from tests.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 rETH = ContractSpecs[Chain.ETHEREUM].rETH.address
 

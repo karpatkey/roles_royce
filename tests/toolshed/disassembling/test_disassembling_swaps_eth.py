@@ -1,4 +1,3 @@
-import karpatkit.helpers
 import pytest
 from defabipedia.rocket_pool import ContractSpecs
 from defabipedia.swap_pools import EthereumSwapPools
@@ -9,7 +8,7 @@ from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
 from web3 import Web3
 
 from roles_royce.toolshed.disassembling import SwapDisassembler
-from tests.roles_utils import deploy_roles, setup_common_roles, apply_roles_presets
+from roles_royce.toolshed.test_utils.roles_utils import deploy_roles, setup_common_roles, apply_roles_presets
 
 ROLE = 4
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"

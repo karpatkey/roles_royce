@@ -1,7 +1,4 @@
-import json
-
 import pytest
-import requests
 from defabipedia.rocket_pool import ContractSpecs
 from defabipedia.swap_pools import EthereumSwapPools
 from defabipedia.tokens import Abis
@@ -10,10 +7,8 @@ from karpatkit.test_utils.fork import create_simple_safe
 from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
 from karpatkit.test_utils.fork import steal_token
 
-from roles_royce.protocols.eth import lido
-from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
 from roles_royce.toolshed.disassembling import SwapDisassembler
-from tests.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 TEST_ETH_BLOCK = 19590108
 ROLE = 4

@@ -1,14 +1,14 @@
 from defi_protocols.Maker import underlying
 from karpatkit.helpers import get_balance
-from karpatkit.test_utils.fork import accounts, create_simple_safe, gen_test_accounts, steal_token
+from karpatkit.test_utils.fork import create_simple_safe, gen_test_accounts, steal_token
 from web3 import HTTPProvider, Web3
 
 from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import maker
 from roles_royce.utils import to_checksum_address
-from tests.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
-from tests.utils import LOCAL_NODE_PORT, local_node
+from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from tests.utils import LOCAL_NODE_PORT
 
 wstETH_JOIN = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH
 ABI_GEM_JOIN = '[{"constant":true,"inputs":[],"name":"gem","outputs":[{"internalType":"contract GemLike_3","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"ilk","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"}]'

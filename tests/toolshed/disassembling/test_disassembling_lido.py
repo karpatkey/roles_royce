@@ -9,7 +9,7 @@ from karpatkit.test_utils.fork import steal_token
 from roles_royce.protocols.eth import lido
 from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
 from roles_royce.toolshed.disassembling import LidoDisassembler
-from tests.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 presets = """{
   "version": "1.0",

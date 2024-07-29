@@ -10,7 +10,7 @@ from pytest import approx
 
 from roles_royce import roles
 from roles_royce.protocols import uniswap_v3
-from tests.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
 

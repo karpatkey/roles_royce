@@ -8,7 +8,7 @@ import pytest
 from karpatkit.test_utils.fork import accounts, local_node_eth
 
 from roles_royce.applications.execution_app.utils import ENV, ExecConfig
-from tests.roles_utils import assign_role
+from roles_royce.toolshed.test_utils.roles_utils import assign_role
 
 dao = "GnosisDAO"
 blockchain = "ETHEREUM"

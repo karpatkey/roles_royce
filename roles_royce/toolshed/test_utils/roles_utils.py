@@ -9,7 +9,7 @@ from web3.types import TxReceipt
 
 from roles_royce.evm_utils import roles_abi, roles_bytecode
 from roles_royce.generic_method import TxData
-from roles_royce.utils import MULTISENDS, to_checksum_address, multi_or_one
+from roles_royce.utils import MULTISENDS, to_checksum_address
 
 
 def deploy_roles(w3: Web3, avatar):
@@ -46,16 +46,11 @@ def setup_common_roles(safe: SimpleSafe, roles_ctract):
     txns = []
     for role_number in range(1, 6):
         account = TEST_ACCOUNTS[role_number]
-        enable_module = roles_ctract.functions.enableModule(account.address).build_transaction({"from": safe.address})[
-            "data"
-        ]
-        assign_role = roles_ctract.functions.assignRoles(account.address, [role_number], [True]).build_transaction(
-            {"from": safe.address}
-        )["data"]
+        from roles_royce.protocols.roles_modifier.contract_methods import EnableModule, AssignRoles
         txns.extend(
             [
-                TxData(contract_address=roles_ctract.address, data=enable_module),
-                TxData(contract_address=roles_ctract.address, data=assign_role),
+                EnableModule(roles_mod_address=roles_ctract.address, module=account.address),
+                AssignRoles(roles_mod_address=roles_ctract.address, module=account.address, assign_list=[role_number]),
             ]
         )
     safe.send(txs=txns)

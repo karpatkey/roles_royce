@@ -1,6 +1,5 @@
 from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 from karpatkit.constants import Address as GenAddr
-from karpatkit.helpers import get_balance
 from karpatkit.test_utils.fork import accounts, create_simple_safe
 from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
 from karpatkit.test_utils.fork import steal_token, top_up_address
@@ -8,7 +7,7 @@ from pytest import approx
 
 from roles_royce import roles
 from roles_royce.protocols import uniswap_v3
-from tests.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 
 def test_integration(local_node_eth, accounts):

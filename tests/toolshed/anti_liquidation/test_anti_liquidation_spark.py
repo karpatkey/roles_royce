@@ -13,7 +13,7 @@ from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import spark
 from roles_royce.toolshed.anti_liquidation.spark import CDPData, SparkCDPManager
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkToken, SparkUtils
-from tests.roles_utils import assign_role
+from roles_royce.toolshed.test_utils.roles_utils import assign_role
 
 
 def test_spark_cdp_manager_token_addresses(local_node_eth):
