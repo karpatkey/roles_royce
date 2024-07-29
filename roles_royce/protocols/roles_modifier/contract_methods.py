@@ -141,4 +141,3 @@ class AssignRoles(ContractMethod):
         revoke_list = revoke_list or []
         self.args.roles = assign_list + revoke_list
         self.args.member_of = [True] * len(assign_list) + [False] * len(revoke_list)
-        breakpoint()
