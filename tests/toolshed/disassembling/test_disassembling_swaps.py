@@ -8,7 +8,7 @@ from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
 from karpatkit.test_utils.fork import steal_token
 
 from roles_royce.toolshed.disassembling import SwapDisassembler
-from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 TEST_ETH_BLOCK = 19590108
 ROLE = 4

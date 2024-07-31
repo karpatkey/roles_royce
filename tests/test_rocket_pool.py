@@ -10,7 +10,7 @@ from pytest import approx
 
 from roles_royce import roles
 from roles_royce.protocols.eth import rocket_pool
-from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 rETH = ContractSpecs[Chain.ETHEREUM].rETH.address
 

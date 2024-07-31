@@ -10,7 +10,7 @@ from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import maker
 from roles_royce.toolshed.disassembling import DSRDisassembler
 from roles_royce.utils import to_checksum_address
-from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 
 def test_integration_exit_1(local_node_eth, accounts):

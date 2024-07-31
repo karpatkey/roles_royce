@@ -11,7 +11,7 @@ from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import spark
 from roles_royce.toolshed.disassembling import SparkDisassembler
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
-from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 
 def test_integration_1(local_node_eth, accounts):

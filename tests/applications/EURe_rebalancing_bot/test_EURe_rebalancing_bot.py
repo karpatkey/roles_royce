@@ -5,7 +5,7 @@ from karpatkit.test_utils.fork import local_node_gc_replay as local_node_gc
 
 from roles_royce.applications.EURe_rebalancing_bot.swaps import Swapper, SwapsData, SwapsDataManager
 from roles_royce.evm_utils import erc20_abi
-from roles_royce.toolshed.test_utils.roles_utils import assign_role
+from roles_royce.toolshed.test_utils.roles_fork_utils import assign_role
 
 
 def test_swaps_data():

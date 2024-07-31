@@ -7,7 +7,7 @@ from pytest import approx
 
 from roles_royce import roles
 from roles_royce.protocols import uniswap_v3
-from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 
 def test_integration(local_node_eth, accounts):

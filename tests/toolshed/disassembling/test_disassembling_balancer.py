@@ -11,7 +11,7 @@ from roles_royce.constants import ETHAddr
 from roles_royce.evm_utils import erc20_abi
 from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
 from roles_royce.toolshed.disassembling import BalancerDisassembler
-from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 # Preset with the permission to call the exit() function in the Balancer vault (the avatar address is
 # 0xc01318bab7ee1f5ba734172bf7718b5dc6ec90e1)

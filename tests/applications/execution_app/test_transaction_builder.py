@@ -3,7 +3,7 @@ from karpatkit.test_utils.fork import accounts, local_node_eth
 
 from roles_royce.applications.execution_app.transaction_builder import build_transaction
 from roles_royce.applications.execution_app.utils import ENV, ExecConfig
-from roles_royce.toolshed.test_utils.roles_utils import assign_role
+from roles_royce.toolshed.test_utils.roles_fork_utils import assign_role
 
 dao = "GnosisDAO"
 blockchain = "ETHEREUM"

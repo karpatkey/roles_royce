@@ -7,7 +7,7 @@ from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
 from roles_royce import roles
 from roles_royce.protocols.cowswap.methods_swap import create_order_and_swap, swap
 from roles_royce.protocols.cowswap.utils import Order, SwapKind, quote_order_api
-from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 
 def test_create_order_and_swap(local_node_eth, requests_mock):

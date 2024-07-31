@@ -17,7 +17,7 @@ from roles_royce.protocols.eth import aura
 from roles_royce.roles_modifier import TransactionWouldBeReverted
 from roles_royce.utils import MULTISENDS, to_checksum_address
 
-from roles_royce.toolshed.test_utils.roles_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 
 def test_safe_and_roles(local_node_eth):

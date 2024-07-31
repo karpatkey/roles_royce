@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from roles_royce.applications.execution_app.stresstest import stresstest
 from roles_royce.applications.execution_app.utils import ENV
-from roles_royce.toolshed.test_utils.roles_utils import assign_role
+from roles_royce.toolshed.test_utils.roles_fork_utils import assign_role
 
 PERCENTAGE = 20
 MAX_SLIPPAGE = 1
