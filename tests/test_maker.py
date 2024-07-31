@@ -308,6 +308,7 @@ def test_exit_all_drs():
 # -----------------------------------------------------#
 def test_integration_maker_cdp_module_proxy(local_node_eth, accounts):
     w3 = local_node_eth.w3
+    local_node_eth.set_block(18765965)
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -416,6 +417,7 @@ def test_integration_maker_cdp_module_proxy(local_node_eth, accounts):
 
 def test_integration_maker_cdp_module_proxy_bulk(local_node_eth, accounts):
     w3 = local_node_eth.w3
+    local_node_eth.set_block(18765965)
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -545,6 +547,7 @@ def test_integration_maker_cdp_module_proxy_bulk(local_node_eth, accounts):
 
 def test_integration_maker_cdp_module_no_proxy(local_node_eth, accounts):
     w3 = local_node_eth.w3
+    local_node_eth.set_block(18765965)
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -715,6 +718,7 @@ def test_integration_maker_cdp_module_no_proxy(local_node_eth, accounts):
 
 def test_integration_maker_dsr_module_proxy(local_node_eth, accounts):
     w3 = local_node_eth.w3
+    local_node_eth.set_block(18765965)
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -789,6 +793,7 @@ def test_integration_maker_dsr_module_proxy(local_node_eth, accounts):
 
 def test_integration_maker_dsr_module_no_proxy(local_node_eth, accounts):
     w3 = local_node_eth.w3
+    local_node_eth.set_block(18765965)
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
