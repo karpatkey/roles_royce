@@ -106,10 +106,18 @@ class ContractMethod:
     def call(self, web3, *args, **kwargs):
         """Does a read call on the method.
 
-        To use it the ``out_signature`` must be defined.
+        To use it the ``out_signature`` must be defined if the method's output is not empty.
         """
         contract = web3.eth.contract(address=self.target_address, abi=self.abi)
         return contract.functions[self.name](*self.args_list).call(*args, **kwargs)
+
+    def transact(self, web3, txparams):
+        """Performs transact on the method.
+
+        To use it the ``out_signature`` must be defined if the method's output is not empty.
+        """
+        contract = web3.eth.contract(address=self.target_address, abi=self.abi)
+        return contract.functions[self.name](*self.args_list).transact(txparams)
 
     def _get_arg_value(self, element):
         arg_name, arg_type = element
