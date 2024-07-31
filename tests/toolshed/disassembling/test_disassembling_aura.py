@@ -2,12 +2,12 @@ from decimal import Decimal
 
 from defabipedia.aura import Abis
 from defabipedia.types import Chain
+from karpatkit.helpers import get_balance
+from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
+from karpatkit.test_utils.fork import top_up_address
 
 from roles_royce.constants import ETHAddr
 from roles_royce.toolshed.disassembling import AuraDisassembler
-from tests.utils import get_balance, top_up_address
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth
-
 
 # TODO: build an adequate preset to execute the transactions with roles.send
 

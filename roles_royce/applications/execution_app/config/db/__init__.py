@@ -93,10 +93,10 @@ def main():
     PUBLIC_GC_NODE_URL = "https://rpc.ankr.com/gnosis"
 
     w3_eth = Web3(
-        Web3.HTTPProvider(os.environ.get("RR_ETH_FORK_URL", PUBLIC_ETH_NODE_URL))
+        Web3.HTTPProvider(os.environ.get("KKIT_ETH_FORK_URL", PUBLIC_ETH_NODE_URL))
     )  # Will use the endpoint stored as github secret if possible
     w3_gc = Web3(
-        Web3.HTTPProvider(os.environ.get("RR_GC_FORK_URL", PUBLIC_GC_NODE_URL))
+        Web3.HTTPProvider(os.environ.get("KKIT_GC_FORK_URL", PUBLIC_GC_NODE_URL))
     )  # Will use the endpoint stored as github secret if possible
 
     update_aura_db(w3_eth)

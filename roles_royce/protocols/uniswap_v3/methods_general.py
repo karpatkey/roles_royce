@@ -2,7 +2,7 @@ import math
 from datetime import datetime
 from decimal import Decimal
 
-from defabipedia.tokens import EthereumTokenAddr as ETHAddr
+from defabipedia.tokens import EthereumTokenAddr as ETHAddr, NATIVE
 from defabipedia.types import Chain
 from defabipedia.uniswap_v3 import ContractSpecs
 from karpatkit.constants import Address as GenAddr
@@ -359,10 +359,10 @@ class MintNFT(Mint):
             amount0_desired, amount1_desired = amount1_desired, amount0_desired
 
         send_eth = False
-        if token0 == GenAddr.E or token0 == GenAddr.ZERO:
+        if token0 == NATIVE or token0 == GenAddr.ZERO:
             send_eth = True
 
-        if token1 == GenAddr.E or token1 == GenAddr.ZERO:
+        if token1 == NATIVE or token1 == GenAddr.ZERO:
             send_eth = True
 
         amount0_desired = Decimal(amount0_desired * 10**pool.token0_decimals)
@@ -409,10 +409,10 @@ class MintNFT(Mint):
         amount1_min = Decimal(amount1_desired) * (1 - Decimal(amount1_min_slippage) / 100)
 
         value = 0
-        if token0 == GenAddr.E or token0 == GenAddr.ZERO:
+        if token0 == NATIVE or token0 == GenAddr.ZERO:
             value = amount0_desired
 
-        if token1 == GenAddr.E or token1 == GenAddr.ZERO:
+        if token1 == NATIVE or token1 == GenAddr.ZERO:
             value = amount1_desired
 
         super().__init__(

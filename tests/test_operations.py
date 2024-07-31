@@ -5,8 +5,6 @@ from roles_royce.constants import GCAddr
 from roles_royce.protocols.multisend import MULTISENDS_DEPLOYS
 from roles_royce.utils import multi_or_one
 
-from .utils import web3_gnosis
-
 CURVE_USDC_USDT_REWARD_GAUGE = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
 
 approve = GenericMethodTransaction(
@@ -57,16 +55,16 @@ def test_multi_or_one_multi():
     )
 
 
-def test_check_one(web3_gnosis):
+def test_check_one(local_node_gc):
     ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"
     ACCOUNT = "0x7e19DE37A31E40eec58977CEA36ef7fB70e2c5CD"
     status = roles.check(
-        txs=[approve], role=2, account=ACCOUNT, roles_mod_address=ROLES_MOD_ADDRESS, web3=web3_gnosis, block=27586992
+        txs=[approve], role=2, account=ACCOUNT, roles_mod_address=ROLES_MOD_ADDRESS, web3=local_node_gc.w3, block=27586992
     )
     assert status
 
 
-def test_check_multi(web3_gnosis):
+def test_check_multi(local_node_gc):
     ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"
     ACCOUNT = "0x7e19DE37A31E40eec58977CEA36ef7fB70e2c5CD"
     status = roles.check(
@@ -74,7 +72,7 @@ def test_check_multi(web3_gnosis):
         role=2,
         account=ACCOUNT,
         roles_mod_address=ROLES_MOD_ADDRESS,
-        web3=web3_gnosis,
+        web3=local_node_gc.w3,
         block=27586992,
     )
     assert status

@@ -2,16 +2,16 @@ from decimal import Decimal
 
 from defabipedia.balancer import Abis
 from defabipedia.types import Chain
+from karpatkit.test_utils.fork import accounts, create_simple_safe
+from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
+from karpatkit.test_utils.fork import steal_token, top_up_address
 from pytest import approx
 
 from roles_royce.constants import ETHAddr
 from roles_royce.evm_utils import erc20_abi
 from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
 from roles_royce.toolshed.disassembling import BalancerDisassembler
-from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import create_simple_safe, steal_token, top_up_address
-from tests.fork_fixtures import accounts
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 # Preset with the permission to call the exit() function in the Balancer vault (the avatar address is
 # 0xc01318bab7ee1f5ba734172bf7718b5dc6ec90e1)
@@ -31,7 +31,7 @@ def test_integration_exit_1_1(local_node_eth, accounts):
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
 
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=preset,
@@ -190,7 +190,7 @@ def test_integration_exit_1_2(local_node_eth, accounts):
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
 
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=preset,
@@ -393,7 +393,7 @@ def test_integration_exit_1_3(local_node_eth, accounts):
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
 
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=preset,
@@ -567,7 +567,7 @@ def test_integration_exit_2_1(local_node_eth, accounts):
                  {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x5e82669500000000000000000000000000000000000000000000000000000000000000040000000000000000000000005c0f23a5c1be65fa710d385814a7fd1bda480b1c","value": "0"},
                  {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x2fcf52d100000000000000000000000000000000000000000000000000000000000000040000000000000000000000005c0f23a5c1be65fa710d385814a7fd1bda480b1c2e1a7d4d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001","value": "0"}]}"""
 
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=presets,
@@ -646,7 +646,7 @@ def test_integration_exit_2_2(local_node_eth, accounts):
                  {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x5e82669500000000000000000000000000000000000000000000000000000000000000040000000000000000000000005c0f23a5c1be65fa710d385814a7fd1bda480b1c","value": "0"},
                  {"to":"0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data":"0x2fcf52d100000000000000000000000000000000000000000000000000000000000000040000000000000000000000005c0f23a5c1be65fa710d385814a7fd1bda480b1c2e1a7d4d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001","value": "0"}]}"""
 
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=presets,

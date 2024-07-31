@@ -1,17 +1,16 @@
 import json
 
-import pytest
-import requests
 from defabipedia.lido import ContractSpecs
 from defabipedia.types import Chain
+from karpatkit.test_utils.fork import accounts, create_simple_safe
+from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
+from karpatkit.test_utils.fork import steal_token
 
 from roles_royce.protocols.eth import lido
 from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
 from roles_royce.toolshed.disassembling import LidoDisassembler
-from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import create_simple_safe, steal_token
-from tests.fork_fixtures import accounts
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
+
 presets = """{
   "version": "1.0",
   "chainId": "1",
@@ -79,7 +78,7 @@ def test_integration_exit_1(local_node_eth, accounts):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=presets,
@@ -130,7 +129,7 @@ def test_integration_exit_2(local_node_eth, accounts):
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
 
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=presets,
@@ -241,7 +240,7 @@ def test_integration_exit_3(local_node_eth, accounts, requests_mock):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=preset_cowswap,
@@ -307,7 +306,7 @@ def test_integration_exit_4(local_node_eth, accounts, requests_mock):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=preset_cowswap,

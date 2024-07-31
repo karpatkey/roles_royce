@@ -4,18 +4,18 @@ from unittest.mock import mock_open, patch
 
 import pytest
 from defabipedia.types import Chain
+from karpatkit.test_utils.fork import local_node_eth, local_node_gc
 
 from roles_royce.applications.execution_app.config.config_builder import (
     DAO,
     AuraPosition,
     BalancerPosition,
     DAOStrategiesBuilder,
-    WalletPosition,
     LidoPosition,
     MakerPosition,
-    SparkPosition
+    SparkPosition,
+    WalletPosition,
 )
-from tests.fork_fixtures import local_node_eth, local_node_gc
 
 # Load the contents of your test JSON file
 with open(os.path.join(os.path.dirname(__file__), "test_aura_template.json"), "r") as f:

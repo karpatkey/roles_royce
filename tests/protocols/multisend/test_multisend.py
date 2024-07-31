@@ -1,7 +1,8 @@
 from defabipedia import Chain
-from roles_royce.protocols.multisend import MultiSend
-from roles_royce.protocols import aura
+
 from roles_royce import Operation
+from roles_royce.protocols import aura
+from roles_royce.protocols.multisend import MultiSend
 
 
 def test_exect_transaction_with_role():

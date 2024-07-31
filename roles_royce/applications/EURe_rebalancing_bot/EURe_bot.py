@@ -2,6 +2,7 @@ import logging
 import sys
 import time
 
+import karpatkit.helpers
 from defabipedia.tokens import GnosisTokenAddr, erc20_contract
 from defabipedia.types import Chain
 from prometheus_client import start_http_server as prometheus_start_http_server

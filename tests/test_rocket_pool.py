@@ -2,15 +2,15 @@ from decimal import Decimal
 
 from defabipedia import Chain
 from defabipedia.rocket_pool import Abis, ContractSpecs
+from karpatkit.helpers import get_balance
+from karpatkit.test_utils.fork import create_simple_safe
+from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
+from karpatkit.test_utils.fork import top_up_address
 from pytest import approx
 
 from roles_royce import roles
 from roles_royce.protocols.eth import rocket_pool
-
-from .roles import apply_presets, deploy_roles, setup_common_roles
-from .utils import create_simple_safe, get_balance, top_up_address
-from .fork_fixtures import accounts
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 rETH = ContractSpecs[Chain.ETHEREUM].rETH.address
 
@@ -85,7 +85,7 @@ def setup_safe(w3, accounts):
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x2fcf52d1000000000000000000000000000000000000000000000000000000000000000100000000000000000000000016d5a408e807db8ef7c578279beeee6b228f1c1c55362f4d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001","value": "0"},
     {"to": "0x1ffAdc16726dd4F91fF275b4bF50651801B06a86","data": "0x2fcf52d1000000000000000000000000000000000000000000000000000000000000000100000000000000000000000016d5a408e807db8ef7c578279beeee6b228f1c1ca824ae8b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","value": "0"}
     ]}"""
-    apply_presets(
+    apply_roles_presets(
         safe, roles_ctract, json_data=presets, replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", safe.address[2:])]
     )
     return safe, roles_ctract

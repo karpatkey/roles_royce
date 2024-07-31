@@ -1,5 +1,11 @@
 from decimal import Decimal
 
+from defabipedia.tokens import NATIVE
+from defabipedia.types import Chain
+from karpatkit.helpers import get_allowance, get_balance
+from karpatkit.test_utils.fork import create_simple_safe
+from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
+from karpatkit.test_utils.fork import steal_token, top_up_address
 from pytest import approx
 
 from roles_royce import roles
@@ -7,19 +13,8 @@ from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import spark
 from roles_royce.toolshed.anti_liquidation.spark import CDPData, SparkCDPManager
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkToken, SparkUtils
-from tests.utils import (
-    assign_role,
-    create_simple_safe,
-    get_allowance,
-    get_balance,
-    steal_token,
-    top_up_address,
-)
+from roles_royce.toolshed.test_utils.roles_fork_utils import assign_role
 
-from defabipedia.types import Chain
-
-from tests.fork_fixtures import accounts
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth
 
 def test_spark_cdp_manager_token_addresses(local_node_eth):
     w3 = local_node_eth.w3
@@ -221,7 +216,7 @@ def test_integration_spark_cdp_roles_1(local_node_eth):
     role = 5
 
     top_up_address(w3, bot_address, 100)  # Sends 100 ETH to the bot address, block is increased by 1
-    assert get_balance(w3, ETHAddr.ZERO, bot_address) == int(100e18)
+    assert get_balance(w3, NATIVE, bot_address) == int(100e18)
 
     # Initial data
     initial_DAI_balance = get_balance(w3, ETHAddr.DAI, avatar_safe_address)

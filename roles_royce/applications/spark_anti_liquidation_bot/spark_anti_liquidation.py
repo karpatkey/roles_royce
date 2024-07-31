@@ -27,7 +27,7 @@ env = ENV()
 
 test_mode = env.TEST_MODE
 if test_mode:
-    from tests.utils import top_up_address
+    from karpatkit.test_utils.fork import top_up_address
 
     w3 = Web3(Web3.HTTPProvider(f"http://localhost:{env.LOCAL_FORK_PORT}"))
     top_up_address(w3, env.BOT_ADDRESS, 1)

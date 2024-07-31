@@ -1,7 +1,8 @@
-from tests.test_roles_modifier import RolesModTester
-from roles_royce.protocols.eth import aave_v3
+from karpatkit.test_utils.fork import steal_safe
+
 from roles_royce.constants import ETHAddr
-from tests.utils import steal_safe
+from roles_royce.protocols.eth import aave_v3
+from tests.test_roles_modifier import RolesModTester
 
 
 def test_roles_v2_ens(local_node_eth, accounts):

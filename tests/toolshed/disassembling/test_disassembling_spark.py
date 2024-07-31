@@ -1,20 +1,17 @@
-from decimal import Decimal
 import json
+from decimal import Decimal
+
+from defabipedia.spark import ContractSpecs
+from defabipedia.types import Chain
+from karpatkit.helpers import get_balance
+from karpatkit.test_utils.fork import create_simple_safe, steal_token
+from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
 
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import spark
-from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
 from roles_royce.toolshed.disassembling import SparkDisassembler
-from roles_royce.roles_modifier import GasStrategies, set_gas_strategy
-
-from defabipedia.types import Chain
-from defabipedia.spark import ContractSpecs
-
-from tests.roles import apply_presets, deploy_roles, setup_common_roles
-from tests.utils import create_simple_safe, get_balance, steal_token, top_up_address
-from tests.fork_fixtures import accounts
-from tests.fork_fixtures import local_node_eth_replay as local_node_eth, local_node_gc
-
+from roles_royce.toolshed.protocol_utils.spark.utils import SparkUtils
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 
 def test_integration_1(local_node_eth, accounts):
@@ -35,7 +32,7 @@ def test_integration_1(local_node_eth, accounts):
         "value": "0"}
     ]}"""
 
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=presets,
@@ -131,7 +128,7 @@ def test_integration_exit_2(local_node_eth, accounts, requests_mock):
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_contract = deploy_roles(avatar=avatar_safe.address, w3=w3)
     setup_common_roles(avatar_safe, roles_contract)
-    apply_presets(
+    apply_roles_presets(
         avatar_safe,
         roles_contract,
         json_data=preset_cowswap,
