@@ -118,9 +118,9 @@ class EnableModule(ContractMethod):
 
 
 class AssignRoles(ContractMethod):
-    """Enable module"""
+    """Assign roles"""
 
-    name = "enableModule"
+    name = "assignRoles"
     in_signature = [
         ("module", "address"),
         ("roles", "uint16[]"),
@@ -141,3 +141,19 @@ class AssignRoles(ContractMethod):
         revoke_list = revoke_list or []
         self.args.roles = assign_list + revoke_list
         self.args.member_of = [True] * len(assign_list) + [False] * len(revoke_list)
+
+
+class SetMultisend(ContractMethod):
+    name = "setMultisend"
+    in_signature = [
+        ("multisend", "address"),
+    ]
+
+    def __init__(
+        self,
+        roles_mod_address: Address,
+        multisend: Address,
+    ):
+        super().__init__()
+        self.target_address = roles_mod_address
+        self.args.multisend = multisend
