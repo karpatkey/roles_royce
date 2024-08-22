@@ -7,6 +7,7 @@ env:
   DOCKER_REGISTRY: ${{ secrets.DOCKER_URL }}
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  GITHUB_PAT: ${{ secrets.GIT_PAT }}
 
 jobs:
   Test:
@@ -22,6 +23,9 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Set up GIT
+        run: git config --global url."https://${{ secrets.GIT_PAT }}@github.com/".insteadOf "https://github.com/"
 
       - name: Install dependencies
         run: |
