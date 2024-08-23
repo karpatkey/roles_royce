@@ -2,6 +2,7 @@
 FROM python:3.11-alpine3.19 AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG GITHUB_PAT
 
 WORKDIR /build
 
@@ -9,6 +10,8 @@ WORKDIR /build
 
 # Install build dependencies and compile
 RUN apk --no-cache add git gcc musl-dev libffi-dev bash
+
+RUN git config --global url."https://${GITHUB_PAT}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
 COPY roles_royce/applications/requirements.txt .
 COPY pyproject.toml .

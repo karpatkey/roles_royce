@@ -36,7 +36,8 @@ docker run --rm -v $(pwd):/workspace -v $(pwd)/kaniko/.cache:/cache -v $(pwd)/ka
   --cache=true \
   --cache-dir=/cache \
   --compressed-caching=true \
-  --cache-repo="$DOCKER_IMAGE_NAME"
+  --cache-repo="$DOCKER_IMAGE_NAME" \
+  --build-arg GITHUB_PAT="$GITHUB_PAT"
 
   # --cache-copy-layers \
   # --cache-run-layers \
