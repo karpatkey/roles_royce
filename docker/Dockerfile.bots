@@ -36,10 +36,6 @@ ENV PYTHONPATH=.
 
 # To run the specific bot an environment variable APP must be defined.
 # Options are:
-# * APP=bridge_keeper
-# * APP=EURe_rebalancing
-# * APP=spark_anti_liquidation
-# * APP=GBPe_rebalancing
 # * APP=execution_app
 #
 # In doubt check roles_royce/applications/run_app.sh
