@@ -26,8 +26,9 @@ class InterestRateMode(IntEnum):
 
 class DelegationTarget:
     targets = [
-        ContractSpecs[Chain.ETHEREUM].variableDebtWETH.address,
-        ContractSpecs[Chain.ETHEREUM].stableDebtWETH.address,
+        ContractSpecs[Chain.ETHEREUM].variableDebtNative.address,
+        ContractSpecs[Chain.ETHEREUM].stableDebtNative.address,
+        ContractSpecs[Chain.GNOSIS].variableDebtNative.address,
     ]
 
     @staticmethod
@@ -42,9 +43,13 @@ class DelegationType(IntEnum):
 
 
 class ApproveToken(BaseApproveForToken):
-    """approve Token with AaveLendingPoolV3 as spender"""
-
-    fixed_arguments = {"spender": ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address}
+    """Approve Token with AaveLendingPoolV3 as spender, chain agnostic."""
+    
+    def __init__(self, blockchain: Blockchain, token: Address, amount: int):
+        self.fixed_arguments = {
+            "spender": ContractSpecs[blockchain].LendingPoolV3.address
+        }
+        super().__init__(blockchain, token, amount)
 
 
 class ApproveAEthWETH(BaseApprove):
