@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 from defabipedia.aave_v3 import ContractSpecs
-from defabipedia.types import Chain
+from defabipedia.types import Blockchain, Chain
 
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import (
@@ -87,17 +87,17 @@ class DepositToken(ContractMethod):
     """Sender deposits Token and receives aToken in exchange"""
 
     name = "supply"
-    in_signature = (
+    in_signature = [
         ("asset", "address"),
         ("amount", "uint256"),
         ("on_behalf_of", "address"),
         ("referral_code", "uint16"),
-    )
+    ]
     fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
-    target_address = ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address
 
-    def __init__(self, asset: Address, amount: int, avatar: Address):
+    def __init__(self, blockchain: Blockchain, asset: Address, amount: int, avatar: Address):
         super().__init__(avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].LendingPoolV3.address
         self.args.asset = asset
         self.args.amount = amount
 
@@ -108,10 +108,10 @@ class WithdrawToken(ContractMethod):
     name = "withdraw"
     in_signature = [("asset", "address"), ("amount", "uint256"), ("receiver", "address")]
     fixed_arguments = {"receiver": AvatarAddress}
-    target_address = ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address
 
-    def __init__(self, asset: Address, amount: int, avatar: Address):
+    def __init__(self, blockchain: Blockchain, asset: Address, amount: int, avatar: Address):
         super().__init__(avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].LendingPoolV3.address
         self.args.asset = asset
         self.args.amount = amount
 
@@ -151,10 +151,10 @@ class Collateralize(ContractMethod):
     name = "setUserUseReserveAsCollateral"
     in_signature = [("asset", "address"), ("use_as_collateral", "bool")]
     fixed_arguments = {}
-    target_address = ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address
 
-    def __init__(self, asset: Address, use_as_collateral: bool):
+    def __init__(self, blockchain: Blockchain, asset: Address, use_as_collateral: bool):
         super().__init__()
+        self.target_address = ContractSpecs[blockchain].LendingPoolV3.address
         self.args.asset = asset
         self.args.use_as_collateral = use_as_collateral
 
@@ -171,10 +171,12 @@ class Borrow(ContractMethod):
         ("on_behalf_of", "address"),
     )
     fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
-    target_address = ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address
 
-    def __init__(self, asset: Address, amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
+    def __init__(
+        self, blockchain: Blockchain, asset: Address, amount: int, interest_rate_mode: InterestRateMode, avatar: Address
+    ):
         super().__init__(avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].LendingPoolV3.address
         self.args.asset = asset
         self.args.amount = amount
         InterestRateMode.check(interest_rate_mode)
@@ -185,17 +187,19 @@ class Repay(ContractMethod):
     """Repay borrowed Token"""
 
     name = "repay"
-    in_signature = (
+    in_signature = [
         ("asset", "address"),
         ("amount", "uint256"),
         ("interest_rate_mode", "uint256"),
         ("on_behalf_of", "address"),
-    )
+    ]
     fixed_arguments = {"on_behalf_of": AvatarAddress}
-    target_address = ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address
 
-    def __init__(self, asset: Address, amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
+    def __init__(
+        self, blockchain: Blockchain, asset: Address, amount: int, interest_rate_mode: InterestRateMode, avatar: Address
+    ):
         super().__init__(avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].LendingPoolV3.address
         self.args.asset = asset
         self.args.amount = amount
         InterestRateMode.check(interest_rate_mode)
@@ -212,11 +216,11 @@ class BorrowETH(ContractMethod):
         ("interest_rate_mode", "uint256"),
         ("referral_code", "uint16"),
     ]
-    fixed_arguments = {"address": ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address, "referral_code": 0}
-    target_address = ContractSpecs[Chain.ETHEREUM].WrappedTokenGatewayV3.address
 
-    def __init__(self, amount: int, interest_rate_mode: InterestRateMode):
+    def __init__(self, blockchain: Blockchain, amount: int, interest_rate_mode: InterestRateMode):
         super().__init__()
+        self.fixed_arguments = {"address": ContractSpecs[blockchain].LendingPoolV3.address, "referral_code": 0}
+        self.target_address = ContractSpecs[blockchain].WrappedTokenGatewayV3.address
         self.args.amount = amount
         InterestRateMode.check(interest_rate_mode)
         self.args.interest_rate_mode = interest_rate_mode
@@ -232,11 +236,14 @@ class RepayETH(ContractMethod):
         ("interest_rate_mode", "uint256"),
         ("on_behalf_of", "address"),
     ]
-    fixed_arguments = {"address": ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address, "on_behalf_of": AvatarAddress}
-    target_address = ContractSpecs[Chain.ETHEREUM].WrappedTokenGatewayV3.address
 
-    def __init__(self, eth_amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
+    def __init__(self, blockchain: Blockchain, eth_amount: int, interest_rate_mode: InterestRateMode, avatar: Address):
         super().__init__(value=eth_amount, avatar=avatar)
+        self.fixed_arguments = {
+            "address": ContractSpecs[blockchain].LendingPoolV3.address,
+            "on_behalf_of": AvatarAddress,
+        }
+        self.target_address = ContractSpecs[blockchain].WrappedTokenGatewayV3.address
         self.args.amount = eth_amount
         InterestRateMode.check(interest_rate_mode)
         self.args.interest_rate_mode = interest_rate_mode
@@ -247,10 +254,10 @@ class SwapBorrowRateMode(ContractMethod):
 
     name = "swapBorrowRateMode"
     in_signature = [("asset", "address"), ("interest_rate_mode", "uint256")]
-    target_address = ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address
 
-    def __init__(self, asset: Address, interest_rate_mode: InterestRateMode):
+    def __init__(self, blockchain: Blockchain, asset: Address, interest_rate_mode: InterestRateMode):
         super().__init__()
+        self.target_address = ContractSpecs[blockchain].LendingPoolV3.address
         self.args.asset = asset
         InterestRateMode.check(interest_rate_mode)
         self.args.interest_rate_mode = interest_rate_mode
@@ -262,17 +269,19 @@ class StakeAAVE(ContractMethod):
     name = "stake"
     in_signature = [("on_behalf_of", "address"), ("amount", "uint256")]
     fixed_arguments = {"on_behalf_of": AvatarAddress}
-    target_address = ContractSpecs[Chain.ETHEREUM].stkAAVE.address
 
-    def __init__(self, avatar: Address, amount: int):
+    def __init__(self, blockchain: Blockchain, avatar: Address, amount: int):
         super().__init__(avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].stkAAVE.address
         self.args.amount = amount
 
 
 class StakeABPT(StakeAAVE):
     """Stake ABPT in Aave’s safety module"""
 
-    target_address = ContractSpecs[Chain.ETHEREUM].stkABPT.address
+    def __init__(self, blockchain: Blockchain, avatar: Address, amount: int):
+        super().__init__(blockchain, avatar, amount)
+        self.target_address = ContractSpecs[blockchain].stkABPT.address
 
 
 class ClaimRewardsAndStake(ContractMethod):
@@ -281,10 +290,10 @@ class ClaimRewardsAndStake(ContractMethod):
     name = "claimRewardsAndStake"
     in_signature = [("to", "address"), ("amount", "uint256")]
     fixed_arguments = {"to": AvatarAddress}
-    target_address = ContractSpecs[Chain.ETHEREUM].stkAAVE.address
 
-    def __init__(self, avatar: Address, amount: int):
+    def __init__(self, blockchain: Blockchain, avatar: Address, amount: int):
         super().__init__(avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].stkAAVE.address
         self.args.amount = amount
 
 
@@ -294,17 +303,19 @@ class UnstakeAAVE(ContractMethod):
     name = "redeem"
     in_signature = [("to", "address"), ("amount", "uint256")]
     fixed_arguments = {"to": AvatarAddress}
-    target_address = ContractSpecs[Chain.ETHEREUM].stkAAVE.address
 
-    def __init__(self, avatar: Address, amount: int):
+    def __init__(self, blockchain: Blockchain, avatar: Address, amount: int):
         super().__init__(avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].stkAAVE.address
         self.args.amount = amount
 
 
 class UnstakeABPT(UnstakeAAVE):
     """Unstake ABPT. Can only be called during the 2 days unstaking window after the 10 days cooldown period"""
 
-    target_address = ContractSpecs[Chain.ETHEREUM].stkABPT.address
+    def __init__(self, blockchain: Blockchain, avatar: Address, amount: int):
+        super().__init__(blockchain, avatar, amount)
+        self.target_address = ContractSpecs[blockchain].stkABPT.address
 
 
 class CooldownStkAAVE(ContractMethod):
@@ -313,13 +324,18 @@ class CooldownStkAAVE(ContractMethod):
     name = "cooldown"
     in_signature = []
     fixed_arguments = {}
-    target_address = ContractSpecs[Chain.ETHEREUM].stkAAVE.address
+
+    def __init__(self, blockchain: Blockchain, value: int, avatar: Address):
+        super().__init__(value=value, avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].stkAAVE.address
 
 
 class CooldownStkABPT(CooldownStkAAVE):
     """Initiates a 10 days cooldown period, once this is over the 2 days unstaking window opens"""
 
-    target_address = ContractSpecs[Chain.ETHEREUM].stkABPT.address
+    def __init__(self, blockchain: Blockchain, value: int, avatar: Address):
+        super().__init__(blockchain=blockchain, value=value, avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].stkABPT.address
 
 
 class ClaimAAVERewards(ContractMethod):
@@ -328,17 +344,19 @@ class ClaimAAVERewards(ContractMethod):
     name = "claimRewards"
     in_signature = [("to", "address"), ("amount", "uint256")]
     fixed_arguments = {"to": AvatarAddress}
-    target_address = ContractSpecs[Chain.ETHEREUM].stkAAVE.address
 
-    def __init__(self, avatar: Address, amount: int):
+    def __init__(self, blockchain: Blockchain, avatar: Address, amount: int):
         super().__init__(avatar=avatar)
+        self.target_address = ContractSpecs[blockchain].stkAAVE.address
         self.args.amount = amount
 
 
 class ClaimABPTRewards(ClaimAAVERewards):
     """Claim AAVE rewards accrued from staking ABPT"""
 
-    target_address = ContractSpecs[Chain.ETHEREUM].stkABPT.address
+    def __init__(self, blockchain: Blockchain, avatar: Address, amount: int):
+        super().__init__(blockchain, avatar, amount)
+        self.target_address = ContractSpecs[blockchain].stkABPT.address
 
 
 class SwapAndRepay(ContractMethod):
@@ -505,12 +523,18 @@ class LiquidationCall(ContractMethod):
         ("debt_to_cover", "uint256"),
         ("receive_a_token", "bool"),
     ]
-    target_address = ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address
 
     def __init__(
-        self, collateral_asset: Address, debt_asset: Address, user: Address, debt_to_cover: int, receive_a_token: bool
+        self,
+        blockchain: Blockchain,
+        collateral_asset: Address,
+        debt_asset: Address,
+        user: Address,
+        debt_to_cover: int,
+        receive_a_token: bool,
     ):
         super().__init__()
+        self.target_address = ContractSpecs[blockchain].LendingPoolV3.address
         self.args.collateral_asset = collateral_asset
         self.args.debt_asset = debt_asset
         self.args.user = user
