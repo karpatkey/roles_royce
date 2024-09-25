@@ -3,7 +3,6 @@ from enum import IntEnum
 from defabipedia.aave_v3 import ContractSpecs
 from defabipedia.types import Blockchain, Chain
 
-from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import (
     Address,
     AvatarAddress,
@@ -26,9 +25,9 @@ class InterestRateMode(IntEnum):
 
 class DelegationTarget:
     targets = [
-        ContractSpecs[Chain.ETHEREUM].variableDebtNative.address,
-        ContractSpecs[Chain.ETHEREUM].stableDebtNative.address,
-        ContractSpecs[Chain.GNOSIS].variableDebtNative.address,
+        ContractSpecs[Chain.ETHEREUM].variableDebtNATIVE.address,
+        ContractSpecs[Chain.ETHEREUM].stableDebtNATIVE.address,
+        ContractSpecs[Chain.GNOSIS].variableDebtNATIVE.address,
     ]
 
     @staticmethod
@@ -44,19 +43,20 @@ class DelegationType(IntEnum):
 
 class ApproveToken(BaseApproveForToken):
     """Approve Token with AaveLendingPoolV3 as spender, chain agnostic."""
-    
+
     def __init__(self, blockchain: Blockchain, token: Address, amount: int):
-        self.fixed_arguments = {
-            "spender": ContractSpecs[blockchain].LendingPoolV3.address
-        }
-        super().__init__(blockchain, token, amount)
+        self.fixed_arguments = {"spender": ContractSpecs[blockchain].LendingPoolV3.address}
+        super().__init__(token, amount)
 
 
-class ApproveAEthWETH(BaseApprove):
+# TODO: Do we need these helpers for specific token approval?
+# We already ApproveToken, can't the user figure out the token then want to approve?
+class ApproveAWrappedToken(ApproveToken):
     """approve aEthWETH with WrappedTokenGatewayV3 as spender"""
 
-    fixed_arguments = {"spender": ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address}
-    token = ContractSpecs[Chain.ETHEREUM].aEthWETH.address
+    def __init__(self, blockchain: Blockchain, amount: int):
+        token = ContractSpecs[blockchain].aWrappedNative.address
+        super().__init__(blockchain, token, amount)
 
 
 class ApproveForStkAAVE(BaseApprove):
@@ -78,11 +78,11 @@ class ApproveDelegation(ContractMethod):
     variableDebtWETH or stableDebtWETH"""
 
     name = "approveDelegation"
-    in_signature = (("delegatee", "address"), ("amount", "uint256"))
-    fixed_arguments = {"delegatee": ContractSpecs[Chain.ETHEREUM].WrappedTokenGatewayV3.address}
+    in_signature = [("delegatee", "address"), ("amount", "uint256")]
 
-    def __init__(self, target: DelegationTarget, amount: int):
+    def __init__(self, blockcahin: Blockchain, target: Address, amount: int):
         super().__init__()
+        self.fixed_arguments = {"delegatee": ContractSpecs[blockcahin].WrappedTokenGatewayV3.address}
         DelegationTarget.check_delegation_target(target)
         self.target_address = target
         self.args.amount = amount
@@ -168,13 +168,13 @@ class Borrow(ContractMethod):
     """Sender receives Token and receives debtToken (stable or variable debt) token"""
 
     name = "borrow"
-    in_signature = (
+    in_signature = [
         ("asset", "address"),
         ("amount", "uint256"),
         ("interest_rate_mode", "uint256"),
         ("referral_code", "uint16"),
         ("on_behalf_of", "address"),
-    )
+    ]
     fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
 
     def __init__(
@@ -384,11 +384,11 @@ class SwapAndRepay(ContractMethod):
             ),
         ),
     ]
-    target_address = ContractSpecs[Chain.ETHEREUM].ParaSwapRepayAdapter.address
     fixed_arguments = {}
 
     def __init__(
         self,
+        blockcahin: Blockchain,
         collateral_asset: Address,
         debt_asset: Address,
         collateral_amount: int,
@@ -403,6 +403,7 @@ class SwapAndRepay(ContractMethod):
         permit_s,
     ):
         super().__init__()
+        self.target_address = ContractSpecs[blockcahin].ParaSwapRepayAdapter.address
         self.args.collateral_asset, self.args.collateral_amount = collateral_asset, collateral_amount
         self.args.debt_asset, self.args.debt_repay_amount = debt_asset, debt_repay_amount
         InterestRateMode.check(debt_rate_mode)
@@ -509,10 +510,10 @@ class SubmitVote(ContractMethod):
 
     name = "submitVote"
     in_signature = [("proposal_id", "uint256"), ("support", "bool")]
-    target_address = ContractSpecs[Chain.ETHEREUM].GovernanceV2.address
 
-    def __init__(self, proposal_id: int, support: bool):
+    def __init__(self, blockcahin: Blockchain, proposal_id: int, support: bool):
         super().__init__()
+        self.target_address = ContractSpecs[blockcahin].GovernanceV2.address
         self.args.proposal_id = proposal_id
         self.args.support = support
 
