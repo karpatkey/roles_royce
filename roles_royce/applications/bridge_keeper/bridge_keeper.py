@@ -74,7 +74,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
 
     if dynamic_data.bot_ETH_balance < static_data.env.GAS_ETH_THRESHOLD * (10**18):
         title = "Lack of ETH for gas"
-        message = f"  Im running outta ETH for gas! Only {dynamic_data.bot_ETH_balance / (10 ** 18):,5f}%.5f ETH left."
+        message = f"  Im running outta ETH for gas! Only {dynamic_data.bot_ETH_balance / (10 ** 18):.5f}% ETH left."
         messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=flags.lack_of_gas_warning.is_set())
         flags.lack_of_gas_warning.set()
 
@@ -124,8 +124,8 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
     ):
         title = "Refilling the bridge..."
         message = (
-            f'  The bridge"s DAI balance {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):,.2f}'
-            f" dropped below the refill threshold {min(static_data.env.REFILL_THRESHOLD * (10 ** static_data.decimals_DAI), dynamic_data.min_cash_threshold):,.2f}."
+            f'  The bridge"s DAI balance {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):.2f}'
+            f" dropped below the refill threshold {min(static_data.env.REFILL_THRESHOLD * (10 ** static_data.decimals_DAI), dynamic_data.min_cash_threshold):.2f}."
         )
         logger.info(title + "\n" + message)
         tx_receipt = refill_bridge(w3_eth, static_data)
@@ -143,9 +143,9 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
     ):
         title = "Investing DAI..."
         message = (
-            f'  The bridge"s DAI balance {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):,.2f}'
+            f'  The bridge"s DAI balance {dynamic_data.bridge_DAI_balance / (10 ** static_data.decimals_DAI):.2f}'
             f" surpassed Invest threshold + Minimum cash threshold = "
-            f"{static_data.env.INVEST_THRESHOLD + dynamic_data.min_cash_threshold / (10 ** static_data.decimals_DAI):,.2f}."
+            f"{static_data.env.INVEST_THRESHOLD + dynamic_data.min_cash_threshold / (10 ** static_data.decimals_DAI):.2f}."
         )
         logger.info(title + "\n" + message)
         tx_receipt = invest_DAI(w3_eth, static_data)
