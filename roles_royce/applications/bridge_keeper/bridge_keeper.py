@@ -74,7 +74,7 @@ def bot_do(w3_eth, w3_gnosis, static_data: StaticData) -> int:
 
     if dynamic_data.bot_ETH_balance < static_data.env.GAS_ETH_THRESHOLD * (10**18):
         title = "Lack of ETH for gas"
-        message = f"  Im running outta ETH for gas! Only {dynamic_data.bot_ETH_balance / (10 ** 18):.5f}% ETH left."
+        message = f"  Im running outta ETH for gas! Only {dynamic_data.bot_ETH_balance / (10 ** 18):.5f} ETH left."
         messenger.log_and_alert(LoggingLevel.Warning, title, message, alert_flag=flags.lack_of_gas_warning.is_set())
         flags.lack_of_gas_warning.set()
 
