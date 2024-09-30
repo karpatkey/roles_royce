@@ -1,9 +1,11 @@
 from enum import IntEnum
 
-from roles_royce.constants import ETHAddr
-from roles_royce.protocols.base import Address, AvatarAddress, BaseApprove, BaseApproveForToken, ContractMethod
 from defabipedia.spark import ContractSpecs
 from defabipedia.types import Blockchain
+
+from roles_royce.constants import ETHAddr
+from roles_royce.protocols.base import Address, AvatarAddress, BaseApprove, BaseApproveForToken, ContractMethod
+
 
 class RateModel(IntEnum):
     STABLE = 1  # stable is not available at the moment
@@ -27,14 +29,14 @@ class DepositToken(ContractMethod):
     """Sender deposits Token and receives spToken in exchange"""
 
     name = "deposit"
-    in_signature = (
+    in_signature = [
         ("asset", "address"),
         ("amount", "uint256"),
         ("on_behalf_of", "address"),
         ("referral_code", "uint16"),
-    )
+    ]
     fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
-    
+
     def __init__(self, blockchain: Blockchain, token: Address, amount: int, avatar: Address):
         super().__init__(avatar=avatar)
         self.target_address = ContractSpecs[blockchain].LendingPoolV3.address
@@ -48,7 +50,7 @@ class DepositDAIforSDAI(ContractMethod):
     name = "deposit"
     in_signature = [("amount", "uint256"), ("receiver", "address")]
     fixed_arguments = {"receiver": AvatarAddress}
-    
+
     def __init__(self, blockchain: Blockchain, amount: int, avatar: Address):
         super().__init__(avatar=avatar)
         self.target_address = ContractSpecs[blockchain].sDAI.address
@@ -97,13 +99,13 @@ class Borrow(ContractMethod):
     """Sender receives Token and receives debtToken (stable or variable debt) token"""
 
     name = "borrow"
-    in_signature = (
+    in_signature = [
         ("asset", "address"),
         ("amount", "uint256"),
         ("rate_model", "uint256"),
         ("referral_code", "uint16"),
         ("on_behalf_of", "address"),
-    )
+    ]
     fixed_arguments = {"on_behalf_of": AvatarAddress, "referral_code": 0}
 
     def __init__(self, blockchain: Blockchain, token: Address, amount: int, rate_model: RateModel, avatar: Address):
@@ -118,7 +120,7 @@ class Repay(ContractMethod):
     """Repay borrowed Token"""
 
     name = "repay"
-    in_signature = (("asset", "address"), ("amount", "uint256"), ("rate_model", "uint256"), ("on_behalf_of", "address"))
+    in_signature = [("asset", "address"), ("amount", "uint256"), ("rate_model", "uint256"), ("on_behalf_of", "address")]
     fixed_arguments = {"on_behalf_of": AvatarAddress}
 
     def __init__(self, blockchain: Blockchain, token: Address, amount: int, rate_model: RateModel, avatar: Address):
