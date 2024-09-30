@@ -28,7 +28,7 @@ dependencies = [
 
 [project.optional-dependencies]
 all = [ # Put here all the dependencies with a strict version.
-  "karpatkit @ git+https://github.com/karpatkey/karpatkit.git@fe75c24620e933892eec66df5bc27fddc698454a",
+  "karpatkit @ git+https://github.com/karpatkey/karpatkit.git@bd41c176778e9e7c0fc00bab4af66d9bdb015347",
 ]
 
 [project.urls]
