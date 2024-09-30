@@ -87,7 +87,7 @@ def test_withdraw_token():
 
 
 def test_deposit_ETH():
-    method = aave_v3.DepositETH(eth_amount=123, avatar=GNOSIS_DAO)
+    method = aave_v3.DepositNative(blockchain=Chain.ETHEREUM, eth_amount=123, avatar=GNOSIS_DAO)
     assert (
         method.data
         == "0x474cf53d00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d0000000000000000000000000000000000000000000000000000000000000000"
@@ -95,7 +95,7 @@ def test_deposit_ETH():
 
 
 def test_withdraw_ETH():
-    method = aave_v3.WithdrawETH(amount=123, avatar=GNOSIS_DAO)
+    method = aave_v3.WithdrawNative(blockchain=Chain.ETHEREUM, amount=123, avatar=GNOSIS_DAO)
     assert (
         method.data
         == "0x80500d2000000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2000000000000000000000000000000000000000000000000000000000000007b000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d"

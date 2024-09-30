@@ -12,6 +12,8 @@ from roles_royce.protocols.base import (
     InvalidArgument,
 )
 
+SupportedChains = list(ContractSpecs.keys())
+
 
 class InterestRateMode(IntEnum):
     STABLE = 1  # stable is not available at the moment
@@ -107,6 +109,22 @@ class DepositToken(ContractMethod):
         self.args.amount = amount
 
 
+class DepositNative(ContractMethod):
+    """Sender deposits Native Token"""
+
+    name = "depositETH"
+    in_signature = [("address", "address"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
+
+    def __init__(self, blockchain: Blockchain, eth_amount: int, avatar: Address):
+        self.fixed_arguments = {
+            "address": ContractSpecs[blockchain].LendingPoolV3.address,
+            "on_behalf_of": AvatarAddress,
+            "referral_code": 0,
+        }
+        self.target_address = ContractSpecs[blockchain].WrappedTokenGatewayV3.address
+        super().__init__(value=eth_amount, avatar=avatar)
+
+
 class WithdrawToken(ContractMethod):
     """Sender redeems aToken and withdraws Token"""
 
@@ -121,31 +139,15 @@ class WithdrawToken(ContractMethod):
         self.args.amount = amount
 
 
-class DepositETH(ContractMethod):
-    """Sender deposits ETH and receives aETH in exchange"""
-
-    name = "depositETH"
-    in_signature = [("address", "address"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
-    fixed_arguments = {
-        "address": ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address,
-        "on_behalf_of": AvatarAddress,
-        "referral_code": 0,
-    }
-    target_address = ContractSpecs[Chain.ETHEREUM].WrappedTokenGatewayV3.address
-
-    def __init__(self, eth_amount: int, avatar: Address):
-        super().__init__(value=eth_amount, avatar=avatar)
-
-
-class WithdrawETH(ContractMethod):
-    """Sender redeems aETH and withdraws ETH"""
+class WithdrawNative(ContractMethod):
+    """Sender redeems aToken and withdraws Native one"""
 
     name = "withdrawETH"
     in_signature = [("address", "address"), ("amount", "uint256"), ("to", "address")]
-    fixed_arguments = {"address": ContractSpecs[Chain.ETHEREUM].LendingPoolV3.address, "to": AvatarAddress}
-    target_address = ContractSpecs[Chain.ETHEREUM].WrappedTokenGatewayV3.address
 
-    def __init__(self, amount: int, avatar: Address):
+    def __init__(self, blockchain: Blockchain, amount: int, avatar: Address):
+        self.fixed_arguments = {"address": ContractSpecs[blockchain].LendingPoolV3.address, "to": AvatarAddress}
+        self.target_address = ContractSpecs[blockchain].WrappedTokenGatewayV3.address
         super().__init__(avatar=avatar)
         self.args.amount = amount
 
