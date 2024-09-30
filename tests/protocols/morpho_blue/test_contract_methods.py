@@ -7,9 +7,11 @@ from karpatkit.helpers import get_balance
 from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
 from pytest import approx
 
-from roles_royce.protocols.morpho_blue.contract_methods import Supply, Withdraw
+from roles_royce.protocols.morpho_blue.contract_methods import Supply, Withdraw, ApproveMorphoBlue
 
-
+def test_approve():
+    method = ApproveMorphoBlue(blockchain=Chain.ETHEREUM, token="0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", amount=100)
+    assert method.data == "0x095ea7b3000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb0000000000000000000000000000000000000000000000000000000000000064"
 
 def test_supply():
     method = Supply(loan_token="0x6B175474E89094C44Da98b954EedeAC495271d0F",

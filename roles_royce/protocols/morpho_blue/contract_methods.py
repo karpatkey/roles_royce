@@ -15,7 +15,9 @@ from roles_royce.protocols.base import (
 class ApproveMorphoBlue(BaseApproveForToken):
     """approve Token with MorphoBlue as spender"""
 
-    fixed_arguments = {"spender": ContractSpecs[Chain.ETHEREUM].morpho_blue.address}
+    def __init__(self, blockchain: Blockchain, token: Address, amount: int):
+        self.fixed_arguments = {"spender": ContractSpecs[blockchain].morpho_blue.address}
+        super().__init__(token, amount)
 
 
 class Supply(ContractMethod):
