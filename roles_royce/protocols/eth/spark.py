@@ -61,9 +61,9 @@ class ApproveDelegation(ContractMethod):
     name = "approveDelegation"
     in_signature = [("delegatee", "address"), ("amount", "uint256")]
 
-    def __init__(self, blockcahin: Blockchain, target: Address, amount: int):
+    def __init__(self, blockchain: Blockchain, target: Address, amount: int):
         super().__init__()
-        self.fixed_arguments = {"delegatee": ContractSpecs[blockcahin].WrappedTokenGatewayV3.address}
+        self.fixed_arguments = {"delegatee": ContractSpecs[blockchain].WrappedTokenGatewayV3.address}
         self.args.asd = 1
         DelegationTarget.check_delegation_target(target)
         self.target_address = target
@@ -209,7 +209,7 @@ class Repay(ContractMethod):
 
 
 class RepayNative(ContractMethod):
-    """Repay borrowed Native token"""
+    """Repay borrowed ETH"""
 
     name = "repayETH"
     in_signature = [

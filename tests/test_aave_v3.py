@@ -61,7 +61,7 @@ def test_approve_stkABPT():
 
 def test_approve_delegation():
     method = aave_v3.ApproveDelegation(
-        blockcahin=Chain.ETHEREUM, target=ContractSpecs[Chain.ETHEREUM].variableDebtNATIVE.address, amount=123
+        blockchain=Chain.ETHEREUM, target=ContractSpecs[Chain.ETHEREUM].variableDebtNATIVE.address, amount=123
     )
     assert (
         method.data
@@ -254,7 +254,7 @@ def test_claim_ABPT_rewards():
 
 def test_swap_and_repay():
     method = aave_v3.SwapAndRepay(
-        blockcahin=Chain.ETHEREUM,
+        blockchain=Chain.ETHEREUM,
         collateral_asset=ETHAddr.USDC,
         debt_asset=ETHAddr.WETH,
         collateral_amount=123,
@@ -344,7 +344,7 @@ def test_delegate_stkAAVE_by_type():
 
 
 def test_submit_vote():
-    method = aave_v3.SubmitVote(blockcahin=Chain.ETHEREUM, proposal_id=123, support=True)
+    method = aave_v3.SubmitVote(blockchain=Chain.ETHEREUM, proposal_id=123, support=True)
     assert (
         method.data
         == "0x612c56fa000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000001"

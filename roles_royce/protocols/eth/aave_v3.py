@@ -82,9 +82,9 @@ class ApproveDelegation(ContractMethod):
     name = "approveDelegation"
     in_signature = [("delegatee", "address"), ("amount", "uint256")]
 
-    def __init__(self, blockcahin: Blockchain, target: Address, amount: int):
+    def __init__(self, blockchain: Blockchain, target: Address, amount: int):
         super().__init__()
-        self.fixed_arguments = {"delegatee": ContractSpecs[blockcahin].WrappedTokenGatewayV3.address}
+        self.fixed_arguments = {"delegatee": ContractSpecs[blockchain].WrappedTokenGatewayV3.address}
         DelegationTarget.check_delegation_target(target)
         self.target_address = target
         self.args.amount = amount
@@ -390,7 +390,7 @@ class SwapAndRepay(ContractMethod):
 
     def __init__(
         self,
-        blockcahin: Blockchain,
+        blockchain: Blockchain,
         collateral_asset: Address,
         debt_asset: Address,
         collateral_amount: int,
@@ -405,7 +405,7 @@ class SwapAndRepay(ContractMethod):
         permit_s,
     ):
         super().__init__()
-        self.target_address = ContractSpecs[blockcahin].ParaSwapRepayAdapter.address
+        self.target_address = ContractSpecs[blockchain].ParaSwapRepayAdapter.address
         self.args.collateral_asset, self.args.collateral_amount = collateral_asset, collateral_amount
         self.args.debt_asset, self.args.debt_repay_amount = debt_asset, debt_repay_amount
         InterestRateMode.check(debt_rate_mode)
@@ -513,9 +513,9 @@ class SubmitVote(ContractMethod):
     name = "submitVote"
     in_signature = [("proposal_id", "uint256"), ("support", "bool")]
 
-    def __init__(self, blockcahin: Blockchain, proposal_id: int, support: bool):
+    def __init__(self, blockchain: Blockchain, proposal_id: int, support: bool):
         super().__init__()
-        self.target_address = ContractSpecs[blockcahin].GovernanceV2.address
+        self.target_address = ContractSpecs[blockchain].GovernanceV2.address
         self.args.proposal_id = proposal_id
         self.args.support = support
 
