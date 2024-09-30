@@ -12,7 +12,15 @@ from roles_royce.protocols.base import (
     InvalidArgument,
 )
 
+class ApproveMorphoBlue(BaseApproveForToken):
+    """approve Token with MorphoBlue as spender"""
+
+    fixed_arguments = {"spender": ContractSpecs[Chain.ETHEREUM].morpho_blue.address}
+
+
 class Supply(ContractMethod):
+    """Supply token to morpho_blue and receive shares"""
+
     target_address = None
     name = "supply"
     in_signature = (
