@@ -117,15 +117,18 @@ class RedeemSDAIforDAI(ContractMethod):
         self.args.amount = amount
 
 
-class SetUserUseReserveAsCollateral(ContractMethod):
+class Collateralize(ContractMethod):
+    """Set/unset asset as collateral"""
+
     name = "setUserUseReserveAsCollateral"
     in_signature = [("asset", "address"), ("use_as_collateral", "bool")]
+    fixed_arguments = {}
 
-    def __init__(self, blockchain: Blockchain, asset: Address, use: bool):
+    def __init__(self, blockchain: Blockchain, asset: Address, use_as_collateral: bool):
         super().__init__()
         self.target_address = ContractSpecs[blockchain].LendingPoolV3.address
         self.args.asset = asset
-        self.args.use_as_collateral = use
+        self.args.use_as_collateral = use_as_collateral
 
 
 class Borrow(ContractMethod):

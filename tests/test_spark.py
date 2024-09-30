@@ -32,10 +32,18 @@ def test_integration(local_node_eth, accounts):
     assert get_balance(w3, ETHAddr.spGNO, safe.address) == 123_000_000
 
     # Borrow DAI using GNO as collateral
-    res = safe.send([spark.SetUserUseReserveAsCollateral(blockchain=blockchain, asset=ETHAddr.GNO, use=True)])
+    res = safe.send([spark.Collateralize(blockchain=blockchain, asset=ETHAddr.GNO, use_as_collateral=True)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
     res = safe.send(
-        [spark.Borrow(blockchain=blockchain, token=ETHAddr.DAI, amount=1_000, rate_model=spark.RateModel.VARIABLE, avatar=safe.address)]
+        [
+            spark.Borrow(
+                blockchain=blockchain,
+                token=ETHAddr.DAI,
+                amount=1_000,
+                rate_model=spark.RateModel.VARIABLE,
+                avatar=safe.address,
+            )
+        ]
     )
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 1_000
 
