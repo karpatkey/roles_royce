@@ -144,21 +144,25 @@ def test_integration_spark_cdp(local_node_eth, accounts):
     # Deposit GNO, receive spGNO
     safe.send(
         [
-            spark.ApproveToken(token=ETHAddr.GNO, amount=int(123e18)),
+            spark.ApproveToken(blockchain=blockchain, token=ETHAddr.GNO, amount=int(123e18)),
             spark.DepositToken(blockchain=blockchain, token=ETHAddr.GNO, avatar=safe.address, amount=int(123e18)),
-            spark.ApproveToken(token=ETHAddr.GNO, amount=0),
+            spark.ApproveToken(blockchain=blockchain, token=ETHAddr.GNO, amount=0),
         ]
     )
     assert get_balance(w3, ETHAddr.GNO, safe.address) == 0
     assert get_balance(w3, ETHAddr.spGNO, safe.address) == int(123e18)
 
     # Borrow DAI using GNO as collateral
-    safe.send([spark.SetUserUseReserveAsCollateral(blockchain=blockchain, asset=ETHAddr.GNO, use=True)])
+    safe.send([spark.Collateralize(blockchain=blockchain, asset=ETHAddr.GNO, use_as_collateral=True)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
     safe.send(
         [
-            spark.Borrow(blockchain = blockchain,
-                token=ETHAddr.DAI, amount=int(1_000e18), rate_model=spark.RateModel.VARIABLE, avatar=safe.address
+            spark.Borrow(
+                blockchain=blockchain,
+                token=ETHAddr.DAI,
+                amount=int(1_000e18),
+                rate_model=spark.RateModel.VARIABLE,
+                avatar=safe.address,
             )
         ]
     )
@@ -182,9 +186,13 @@ def test_integration_spark_cdp(local_node_eth, accounts):
     assert amount_to_repay == approx(283141934912473742122)
     safe.send(
         [
-            spark.ApproveToken(token=ETHAddr.DAI, amount=amount_to_repay),
-            spark.Repay(blockchain=blockchain,
-                token=ETHAddr.DAI, amount=amount_to_repay, rate_model=spark.RateModel.VARIABLE, avatar=safe.address
+            spark.ApproveToken(blockchain=blockchain, token=ETHAddr.DAI, amount=amount_to_repay),
+            spark.Repay(
+                blockchain=blockchain,
+                token=ETHAddr.DAI,
+                amount=amount_to_repay,
+                rate_model=spark.RateModel.VARIABLE,
+                avatar=safe.address,
             ),
         ]
     )
@@ -239,7 +247,9 @@ def test_integration_spark_cdp_roles_1(local_node_eth):
     amount_of_sDAI_to_redeem = int(Decimal(amount_of_DAI_to_repay) / (Decimal(chi) / Decimal(1e27)))
     assert amount_of_sDAI_to_redeem == approx(177339831130276946729207)
 
-    redeem_sDAI = spark.RedeemSDAIforDAI(blockchain=blockchain, amount=amount_of_sDAI_to_redeem, avatar=avatar_safe_address)
+    redeem_sDAI = spark.RedeemSDAIforDAI(
+        blockchain=blockchain, amount=amount_of_sDAI_to_redeem, avatar=avatar_safe_address
+    )
     status_simulation = roles.check(
         [redeem_sDAI], role=role, account=bot_address, roles_mod_address=roles_mod_address, web3=w3
     )
@@ -257,8 +267,9 @@ def test_integration_spark_cdp_roles_1(local_node_eth):
 
     txns = roles.build(
         [
-            spark.ApproveToken(token=ETHAddr.DAI, amount=delta_in_DAI_balance),
-            spark.Repay(blockchain=blockchain,
+            spark.ApproveToken(blockchain=blockchain, token=ETHAddr.DAI, amount=delta_in_DAI_balance),
+            spark.Repay(
+                blockchain=blockchain,
                 token=ETHAddr.DAI,
                 amount=delta_in_DAI_balance,
                 rate_model=spark.RateModel.VARIABLE,
@@ -311,7 +322,9 @@ def test_integration_spark_cdp_roles_2(local_node_eth, accounts):
     amount_of_sDAI_to_redeem = int(Decimal(amount_of_DAI_to_repay) / (Decimal(chi) / Decimal(1e27)))
     assert amount_of_sDAI_to_redeem == approx(177339831130276946729207)
     blockchain = Chain.get_blockchain_from_web3(w3)
-    redeem_sDAI = spark.RedeemSDAIforDAI(blockchain=blockchain, amount=amount_of_sDAI_to_redeem, avatar=avatar_safe_address)
+    redeem_sDAI = spark.RedeemSDAIforDAI(
+        blockchain=blockchain, amount=amount_of_sDAI_to_redeem, avatar=avatar_safe_address
+    )
     status_simulation = roles.check(
         [redeem_sDAI], role=role, account=bot_address, roles_mod_address=roles_mod_address, web3=w3
     )
@@ -327,7 +340,7 @@ def test_integration_spark_cdp_roles_2(local_node_eth, accounts):
     pre_allowance = get_allowance(w3, ETHAddr.DAI, avatar_safe_address, "0xC13e21B648A5Ee794902342038FF3aDAB66BE987")
     assert pre_allowance == 0
     roles.send(
-        [spark.ApproveToken(token=ETHAddr.DAI, amount=amount_of_DAI_to_repay + int(1000e18))],
+        [spark.ApproveToken(blockchain=blockchain, token=ETHAddr.DAI, amount=amount_of_DAI_to_repay + int(1000e18))],
         role=role,
         private_key=private_key,
         roles_mod_address=roles_mod_address,
@@ -376,13 +389,15 @@ def test_integration_spark_cdp_roles_3(local_node_eth, accounts):
     chi = SparkUtils.get_chi(w3)
     amount_of_sDAI_to_redeem = int(Decimal(amount_of_DAI_to_repay) / (Decimal(chi) / Decimal(1e27)))
     blockchain = Chain.get_blockchain_from_web3(w3)
-    redeem_sDAI = spark.RedeemSDAIforDAI(blockchain=blockchain, amount=amount_of_sDAI_to_redeem, avatar=avatar_safe_address)
+    redeem_sDAI = spark.RedeemSDAIforDAI(
+        blockchain=blockchain, amount=amount_of_sDAI_to_redeem, avatar=avatar_safe_address
+    )
     roles.send([redeem_sDAI], role=role, private_key=private_key, roles_mod_address=roles_mod_address, web3=w3)
 
     DAI_balance = get_balance(w3, ETHAddr.DAI, avatar_safe_address)
     amount_of_DAI_to_repay = amount_of_DAI_to_repay if amount_of_DAI_to_repay < DAI_balance else DAI_balance
     roles.send(
-        [spark.ApproveToken(token=ETHAddr.DAI, amount=amount_of_DAI_to_repay - int(1000e18))],
+        [spark.ApproveToken(blockchain=blockchain, token=ETHAddr.DAI, amount=amount_of_DAI_to_repay - int(1000e18))],
         role=role,
         private_key=private_key,
         roles_mod_address=roles_mod_address,
