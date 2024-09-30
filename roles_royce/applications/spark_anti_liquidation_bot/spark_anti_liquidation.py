@@ -154,7 +154,7 @@ def bot_do(w3: Web3, w3_execution: Web3) -> int:
             spark_cdp=cdp,
             target_health_factor=env.TARGET_HEALTH_FACTOR,
             token_in_address=ETHAddr.DAI,
-            rate_model=spark.RateModel.VARIABLE,
+            rate_model=spark.RateMode.VARIABLE,
             tolerance=env.TOLERANCE,
         )
         amount_of_sDAI_to_redeem = int(
@@ -225,7 +225,7 @@ def bot_do(w3: Web3, w3_execution: Web3) -> int:
                 spark_cdp=cdp,
                 token_in_address=ETHAddr.DAI,
                 token_in_amount=amount_of_DAI_to_repay,
-                rate_model=spark.RateModel.VARIABLE,
+                rate_model=spark.RateMode.VARIABLE,
                 private_key=env.PRIVATE_KEY,
                 role=env.ROLE,
                 roles_mod_address=env.ROLES_MOD_ADDRESS,

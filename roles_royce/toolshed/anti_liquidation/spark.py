@@ -10,7 +10,7 @@ from web3.types import Address, ChecksumAddress
 
 from roles_royce import roles
 from roles_royce.protocols.eth import spark
-from roles_royce.protocols.eth.spark import RateModel
+from roles_royce.protocols.eth.spark import RateMode
 from roles_royce.toolshed.protocol_utils.spark.utils import SparkToken, SparkUtils
 from roles_royce.utils import to_checksum_address
 
@@ -208,8 +208,8 @@ class SparkCDPManager:
                 break
 
         return {
-            RateModel.STABLE: True if borrowed_amount_of_token_in_stable > 0 else False,
-            RateModel.VARIABLE: True if borrowed_amount_of_token_in_variable > 0 else False,
+            RateMode.STABLE: True if borrowed_amount_of_token_in_stable > 0 else False,
+            RateMode.VARIABLE: True if borrowed_amount_of_token_in_variable > 0 else False,
         }
 
     def get_delta_of_token_to_repay(
@@ -217,7 +217,7 @@ class SparkCDPManager:
         spark_cdp: SparkCDP,
         target_health_factor: float | Decimal,
         token_in_address: str,
-        rate_model: RateModel,
+        rate_model: RateMode,
         block: int | str = "latest",
         tolerance: float = 0.01,
     ) -> int:
@@ -233,14 +233,11 @@ class SparkCDPManager:
 
         token_in_borrowed_status = self.check_if_token_is_in_debts(spark_cdp=spark_cdp, token_address=token_in_address)
 
-        if (
-            token_in_borrowed_status[RateModel.STABLE] is False
-            and token_in_borrowed_status[RateModel.VARIABLE] is False
-        ):
+        if token_in_borrowed_status[RateMode.STABLE] is False and token_in_borrowed_status[RateMode.VARIABLE] is False:
             raise ValueError("There is no borrowed amount of token %s." % token_in_address)
-        elif token_in_borrowed_status[rate_model] is False and rate_model == RateModel.STABLE:
+        elif token_in_borrowed_status[rate_model] is False and rate_model == RateMode.STABLE:
             raise ValueError("There is no stable borrowed amount of token %s." % token_in_address)
-        elif token_in_borrowed_status[rate_model] is False and rate_model == RateModel.VARIABLE:
+        elif token_in_borrowed_status[rate_model] is False and rate_model == RateMode.VARIABLE:
             raise ValueError("There is no variable borrowed amount of token %s." % token_in_address)
 
         if health_factor >= target_health_factor * (1 - tolerance):
@@ -255,7 +252,7 @@ class SparkCDPManager:
                     * element[CDPData.LiquidationThreshold]
                 )
 
-        if rate_model is RateModel.STABLE:
+        if rate_model is RateMode.STABLE:
             debt_type = CDPData.StableDebtBalance
         else:
             debt_type = CDPData.VariableDebtBalance
@@ -280,14 +277,14 @@ class SparkCDPManager:
 
     # TODO: the next function can be generalized so that it can repay the debts corresponding to a set of tokens
     # def repay_debt(self, spark_cdp: SparkCDP, token_in_addresses: list[str | ChecksumAddress],
-    #                            rate_models: list[RateModel],
+    #                            rate_models: list[RateMode],
     #                            token_in_amounts: [int], roles_mod_address: str | ChecksumAddress,
     #                            role: int, private_key: str) -> object:
     def repay_single_token_debt(
         self,
         spark_cdp: SparkCDP,
         token_in_address: str | ChecksumAddress | Address,
-        rate_model: RateModel,
+        rate_model: RateMode,
         token_in_amount: int,
         roles_mod_address: str | ChecksumAddress | Address,
         role: int,
@@ -299,14 +296,11 @@ class SparkCDPManager:
 
         token_in_borrowed_status = self.check_if_token_is_in_debts(spark_cdp=spark_cdp, token_address=token_in_address)
 
-        if (
-            token_in_borrowed_status[RateModel.STABLE] is False
-            and token_in_borrowed_status[RateModel.VARIABLE] is False
-        ):
+        if token_in_borrowed_status[RateMode.STABLE] is False and token_in_borrowed_status[RateMode.VARIABLE] is False:
             raise ValueError("There is no borrowed amount of token %s." % token_in_address)
-        elif token_in_borrowed_status[rate_model] is False and rate_model == RateModel.STABLE:
+        elif token_in_borrowed_status[rate_model] is False and rate_model == RateMode.STABLE:
             raise ValueError("There is no stable borrowed amount of token %s." % token_in_address)
-        elif token_in_borrowed_status[rate_model] is False and rate_model == RateModel.VARIABLE:
+        elif token_in_borrowed_status[rate_model] is False and rate_model == RateMode.VARIABLE:
             raise ValueError("There is no variable borrowed amount of token %s." % token_in_address)
 
         token_in_contract = erc20_contract(self.w3, token_in_address)

@@ -40,7 +40,7 @@ def test_integration(local_node_eth, accounts):
                 blockchain=blockchain,
                 token=ETHAddr.DAI,
                 amount=1_000,
-                rate_model=spark.RateModel.VARIABLE,
+                rate_mode=spark.RateMode.VARIABLE,
                 avatar=safe.address,
             )
         ]

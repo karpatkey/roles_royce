@@ -125,7 +125,7 @@ def test_spark_cdp_manager_get_delta(local_node_eth):
         spark_cdp=cdp,
         target_health_factor=target_health_factor,
         token_in_address=ETHAddr.DAI,
-        rate_model=spark.RateModel.VARIABLE,
+        rate_model=spark.RateMode.VARIABLE,
     )
     assert amount_to_repay == 509677655395144366484434
 
@@ -161,7 +161,7 @@ def test_integration_spark_cdp(local_node_eth, accounts):
                 blockchain=blockchain,
                 token=ETHAddr.DAI,
                 amount=int(1_000e18),
-                rate_model=spark.RateModel.VARIABLE,
+                rate_mode=spark.RateMode.VARIABLE,
                 avatar=safe.address,
             )
         ]
@@ -181,7 +181,7 @@ def test_integration_spark_cdp(local_node_eth, accounts):
         spark_cdp=cdp,
         target_health_factor=target_health_factor,
         token_in_address=ETHAddr.DAI,
-        rate_model=spark.RateModel.VARIABLE,
+        rate_model=spark.RateMode.VARIABLE,
     )
     assert amount_to_repay == approx(283141934912473742122)
     safe.send(
@@ -191,7 +191,7 @@ def test_integration_spark_cdp(local_node_eth, accounts):
                 blockchain=blockchain,
                 token=ETHAddr.DAI,
                 amount=amount_to_repay,
-                rate_model=spark.RateModel.VARIABLE,
+                rate_mode=spark.RateMode.VARIABLE,
                 avatar=safe.address,
             ),
         ]
@@ -207,7 +207,7 @@ def test_integration_spark_cdp(local_node_eth, accounts):
         spark_cdp=cdp,
         target_health_factor=target_health_factor,
         token_in_address=ETHAddr.DAI,
-        rate_model=spark.RateModel.VARIABLE,
+        rate_model=spark.RateMode.VARIABLE,
     )
     assert amount_to_repay == 0
 
@@ -238,7 +238,7 @@ def test_integration_spark_cdp_roles_1(local_node_eth):
         spark_cdp=cdp,
         target_health_factor=target_health_factor,
         token_in_address=ETHAddr.DAI,
-        rate_model=spark.RateModel.VARIABLE,
+        rate_model=spark.RateMode.VARIABLE,
     )
     assert amount_of_DAI_to_repay == approx(182246746503552964110971)
     blockchain = Chain.get_blockchain_from_web3(w3)
@@ -272,7 +272,7 @@ def test_integration_spark_cdp_roles_1(local_node_eth):
                 blockchain=blockchain,
                 token=ETHAddr.DAI,
                 amount=delta_in_DAI_balance,
-                rate_model=spark.RateModel.VARIABLE,
+                rate_mode=spark.RateMode.VARIABLE,
                 avatar=avatar_safe_address,
             ),
         ],
@@ -313,7 +313,7 @@ def test_integration_spark_cdp_roles_2(local_node_eth, accounts):
         spark_cdp=cdp,
         target_health_factor=target_health_factor,
         token_in_address=ETHAddr.DAI,
-        rate_model=spark.RateModel.VARIABLE,
+        rate_model=spark.RateMode.VARIABLE,
     )
     assert amount_of_DAI_to_repay == approx(182246746503552964110971)
 
@@ -349,7 +349,7 @@ def test_integration_spark_cdp_roles_2(local_node_eth, accounts):
     cdp_manager.repay_single_token_debt(
         cdp,
         token_in_address=ETHAddr.DAI,
-        rate_model=spark.RateModel.VARIABLE,
+        rate_model=spark.RateMode.VARIABLE,
         token_in_amount=amount_of_DAI_to_repay,
         roles_mod_address=roles_mod_address,
         role=role,
@@ -383,7 +383,7 @@ def test_integration_spark_cdp_roles_3(local_node_eth, accounts):
         spark_cdp=cdp,
         target_health_factor=target_health_factor,
         token_in_address=ETHAddr.DAI,
-        rate_model=spark.RateModel.VARIABLE,
+        rate_model=spark.RateMode.VARIABLE,
     )
 
     chi = SparkUtils.get_chi(w3)
@@ -406,7 +406,7 @@ def test_integration_spark_cdp_roles_3(local_node_eth, accounts):
     cdp_manager.repay_single_token_debt(
         cdp,
         token_in_address=ETHAddr.DAI,
-        rate_model=spark.RateModel.VARIABLE,
+        rate_model=spark.RateMode.VARIABLE,
         token_in_amount=amount_of_DAI_to_repay,
         roles_mod_address=roles_mod_address,
         role=role,
