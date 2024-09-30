@@ -6,6 +6,8 @@ from defabipedia.types import Blockchain
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import Address, AvatarAddress, BaseApprove, BaseApproveForToken, ContractMethod
 
+SupportedChains = list(ContractSpecs.keys())
+
 
 class RateModel(IntEnum):
     STABLE = 1  # stable is not available at the moment
@@ -20,9 +22,11 @@ class ApproveDAIforSDAI(BaseApprove):
 
 
 class ApproveToken(BaseApproveForToken):
-    """approve Token with SparkLendingPoolV3 as spender"""
+    """approve Token with LendingPoolV3 as spender"""
 
-    fixed_arguments = {"spender": ETHAddr.SparkLendingPoolV3}
+    def __init__(self, blockchain: Blockchain, token: Address, amount: int):
+        self.fixed_arguments = {"spender": ContractSpecs[blockchain].LendingPoolV3.address}
+        super().__init__(token, amount)
 
 
 class DepositToken(ContractMethod):
@@ -57,6 +61,22 @@ class DepositDAIforSDAI(ContractMethod):
         self.args.amount = amount
 
 
+class DepositNative(ContractMethod):
+    """Sender deposits Native Token"""
+
+    name = "depositETH"
+    in_signature = [("address", "address"), ("on_behalf_of", "address"), ("referral_code", "uint16")]
+
+    def __init__(self, blockchain: Blockchain, eth_amount: int, avatar: Address):
+        self.fixed_arguments = {
+            "address": ContractSpecs[blockchain].LendingPoolV3.address,
+            "on_behalf_of": AvatarAddress,
+            "referral_code": 0,
+        }
+        self.target_address = ContractSpecs[blockchain].WrappedTokenGatewayV3.address
+        super().__init__(value=eth_amount, avatar=avatar)
+
+
 class WithdrawToken(ContractMethod):
     """Sender redeems spToken and withdraws Token"""
 
@@ -68,6 +88,19 @@ class WithdrawToken(ContractMethod):
         super().__init__(avatar=avatar)
         self.target_address = ContractSpecs[blockchain].LendingPoolV3.address
         self.args.asset = token
+        self.args.amount = amount
+
+
+class WithdrawNative(ContractMethod):
+    """Sender redeems spToken and withdraws Native one"""
+
+    name = "withdrawETH"
+    in_signature = [("address", "address"), ("amount", "uint256"), ("to", "address")]
+
+    def __init__(self, blockchain: Blockchain, amount: int, avatar: Address):
+        self.fixed_arguments = {"address": ContractSpecs[blockchain].LendingPoolV3.address, "to": AvatarAddress}
+        self.target_address = ContractSpecs[blockchain].WrappedTokenGatewayV3.address
+        super().__init__(avatar=avatar)
         self.args.amount = amount
 
 

@@ -320,9 +320,13 @@ class SparkCDPManager:
         if token_in_amount > allowance:
             tx_receipt = roles.send(
                 [
-                    spark.ApproveToken(token=token_in_address, amount=token_in_amount),
-                    spark.Repay(blockchain=blockchain,
-                        token=token_in_address, amount=token_in_amount, rate_model=rate_model, avatar=self.owner_address
+                    spark.ApproveToken(blockchain=blockchain, token=token_in_address, amount=token_in_amount),
+                    spark.Repay(
+                        blockchain=blockchain,
+                        token=token_in_address,
+                        amount=token_in_amount,
+                        rate_model=rate_model,
+                        avatar=self.owner_address,
                     ),
                 ],
                 role=role,
@@ -333,8 +337,12 @@ class SparkCDPManager:
         elif token_in_amount == allowance:
             tx_receipt = roles.send(
                 [
-                    spark.Repay(blockchain=blockchain,
-                        token=token_in_address, amount=token_in_amount, rate_model=rate_model, avatar=self.owner_address
+                    spark.Repay(
+                        blockchain=blockchain,
+                        token=token_in_address,
+                        amount=token_in_amount,
+                        rate_model=rate_model,
+                        avatar=self.owner_address,
                     ),
                 ],
                 role=role,
@@ -345,10 +353,14 @@ class SparkCDPManager:
         else:
             tx_receipt = roles.send(
                 [
-                    spark.Repay(blockchain=blockchain,
-                        token=token_in_address, amount=token_in_amount, rate_model=rate_model, avatar=self.owner_address
+                    spark.Repay(
+                        blockchain=blockchain,
+                        token=token_in_address,
+                        amount=token_in_amount,
+                        rate_model=rate_model,
+                        avatar=self.owner_address,
                     ),
-                    spark.ApproveToken(token=token_in_address, amount=0),
+                    spark.ApproveToken(blockchain=blockchain, token=token_in_address, amount=0),
                 ],
                 role=role,
                 private_key=private_key,

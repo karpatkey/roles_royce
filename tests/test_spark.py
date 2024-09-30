@@ -23,15 +23,14 @@ def test_integration(local_node_eth, accounts):
     # Deposit GNO, receive spGNO
     safe.send(
         [
-            spark.ApproveToken(token=ETHAddr.GNO, amount=123_000_000),
+            spark.ApproveToken(blockchain=blockchain, token=ETHAddr.GNO, amount=123_000_000),
             spark.DepositToken(blockchain=blockchain, token=ETHAddr.GNO, avatar=safe.address, amount=123_000_000),
-            spark.ApproveToken(token=ETHAddr.GNO, amount=0),
+            spark.ApproveToken(blockchain=blockchain, token=ETHAddr.GNO, amount=0),
         ]
     )
     assert get_balance(w3, ETHAddr.GNO, safe.address) == 0
     assert get_balance(w3, ETHAddr.spGNO, safe.address) == 123_000_000
 
-    
     # Borrow DAI using GNO as collateral
     res = safe.send([spark.SetUserUseReserveAsCollateral(blockchain=blockchain, asset=ETHAddr.GNO, use=True)])
     assert get_balance(w3, ETHAddr.DAI, safe.address) == 0
