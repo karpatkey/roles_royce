@@ -73,7 +73,7 @@ class ApproveDelegation(ContractMethod):
 class DepositToken(ContractMethod):
     """Sender deposits Token and receives spToken in exchange"""
 
-    name = "deposit"
+    name = "supply"
     in_signature = [
         ("asset", "address"),
         ("amount", "uint256"),
