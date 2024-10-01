@@ -1,3 +1,4 @@
+from defabipedia.types import Chain
 from karpatkit.test_utils.fork import steal_safe
 
 from roles_royce.constants import ETHAddr
@@ -27,5 +28,5 @@ def test_roles_v2_ens(local_node_eth, accounts):
         account=manager_safe_address,
     )
 
-    method = aave_v3.ApproveToken(ETHAddr.USDC, 1000)
+    method = aave_v3.ApproveToken(Chain.ETHEREUM, ETHAddr.USDC, 1000)
     assert role.check(contract_address=method.contract_address, data=method.data)

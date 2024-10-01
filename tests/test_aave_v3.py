@@ -1,12 +1,11 @@
 from decimal import Decimal
 
-import karpatkit.helpers
 from defabipedia._1inch import ContractSpecs as _1inchContractSpecs
 from defabipedia.aave_v3 import ContractSpecs
 from defabipedia.spark import ContractSpecs as SparkContractSpecs
 from defabipedia.tokens import Abis as TokenAbis
 from defabipedia.types import Chain
-from eth_abi import encode
+from eth_abi.abi import encode
 from karpatkit.helpers import get_balance
 from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
 from pytest import approx
@@ -25,20 +24,21 @@ GNOSIS_DAO = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
 
 # -----------------------------------------------------#
 def test_approve_token():
-    method = aave_v3.ApproveToken(token=ETHAddr.WETH, amount=123)
+    method = aave_v3.ApproveToken(Chain.ETHEREUM, ETHAddr.WETH, 123)
     assert (
         method.data
         == "0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2000000000000000000000000000000000000000000000000000000000000007b"
     )
+    assert method.contract_address == ETHAddr.WETH
 
 
 def test_approve_AEthWETH():
-    method = aave_v3.ApproveAEthWETH(amount=123)
+    method = aave_v3.ApproveAWrappedToken(Chain.ETHEREUM, 123)
     assert (
         method.data
         == "0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2000000000000000000000000000000000000000000000000000000000000007b"
     )
-    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].aEthWETH.address
+    assert method.contract_address == ContractSpecs[Chain.ETHEREUM].aWrappedNative.address
 
 
 def test_approve_stkAAVE():
@@ -60,7 +60,9 @@ def test_approve_stkABPT():
 
 
 def test_approve_delegation():
-    method = aave_v3.ApproveDelegation(target=ContractSpecs[Chain.ETHEREUM].variableDebtWETH.address, amount=123)
+    method = aave_v3.ApproveDelegation(
+        blockchain=Chain.ETHEREUM, target=ContractSpecs[Chain.ETHEREUM].variableDebtNATIVE.address, amount=123
+    )
     assert (
         method.data
         == "0xc04a8a10000000000000000000000000d322a49006fc828f9b5b37ab215f99b4e5cab19c000000000000000000000000000000000000000000000000000000000000007b"
@@ -69,7 +71,7 @@ def test_approve_delegation():
 
 
 def test_deposit_token():
-    method = aave_v3.DepositToken(asset=ETHAddr.WETH, amount=123, avatar=GNOSIS_DAO)
+    method = aave_v3.DepositToken(blockchain=Chain.ETHEREUM, asset=ETHAddr.WETH, amount=123, avatar=GNOSIS_DAO)
     assert (
         method.data
         == "0x617ba037000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000000000000000007b000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d0000000000000000000000000000000000000000000000000000000000000000"
@@ -77,7 +79,7 @@ def test_deposit_token():
 
 
 def test_withdraw_token():
-    method = aave_v3.WithdrawToken(asset=ETHAddr.WETH, amount=123, avatar=GNOSIS_DAO)
+    method = aave_v3.WithdrawToken(blockchain=Chain.ETHEREUM, asset=ETHAddr.WETH, amount=123, avatar=GNOSIS_DAO)
     assert (
         method.data
         == "0x69328dec000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000000000000000000000000000000000007b000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d"
@@ -85,7 +87,7 @@ def test_withdraw_token():
 
 
 def test_deposit_ETH():
-    method = aave_v3.DepositETH(eth_amount=123, avatar=GNOSIS_DAO)
+    method = aave_v3.DepositNative(blockchain=Chain.ETHEREUM, eth_amount=123, avatar=GNOSIS_DAO)
     assert (
         method.data
         == "0x474cf53d00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d0000000000000000000000000000000000000000000000000000000000000000"
@@ -93,7 +95,7 @@ def test_deposit_ETH():
 
 
 def test_withdraw_ETH():
-    method = aave_v3.WithdrawETH(amount=123, avatar=GNOSIS_DAO)
+    method = aave_v3.WithdrawNative(blockchain=Chain.ETHEREUM, amount=123, avatar=GNOSIS_DAO)
     assert (
         method.data
         == "0x80500d2000000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2000000000000000000000000000000000000000000000000000000000000007b000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d"
@@ -101,7 +103,7 @@ def test_withdraw_ETH():
 
 
 def test_collateralize():
-    method = aave_v3.Collateralize(asset=ETHAddr.WETH, use_as_collateral=True)
+    method = aave_v3.Collateralize(blockchain=Chain.ETHEREUM, asset=ETHAddr.WETH, use_as_collateral=True)
     assert (
         method.data
         == "0x5a3b74b9000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000000000000000000000000000000000000000000001"
@@ -110,7 +112,11 @@ def test_collateralize():
 
 def test_borrow():
     method = aave_v3.Borrow(
-        asset=ETHAddr.WETH, amount=123, interest_rate_mode=aave_v3.InterestRateMode.VARIABLE, avatar=GNOSIS_DAO
+        blockchain=Chain.ETHEREUM,
+        asset=ETHAddr.WETH,
+        amount=123,
+        interest_rate_mode=aave_v3.InterestRateMode.VARIABLE,
+        avatar=GNOSIS_DAO,
     )
     assert (
         method.data
@@ -127,7 +133,11 @@ def test_borrow():
 
 def test_repay():
     method = aave_v3.Repay(
-        asset=ETHAddr.WETH, amount=123, interest_rate_mode=aave_v3.InterestRateMode.VARIABLE, avatar=GNOSIS_DAO
+        blockchain=Chain.ETHEREUM,
+        asset=ETHAddr.WETH,
+        amount=123,
+        interest_rate_mode=aave_v3.InterestRateMode.VARIABLE,
+        avatar=GNOSIS_DAO,
     )
     assert (
         method.data
@@ -136,7 +146,9 @@ def test_repay():
 
 
 def test_borrow_ETH():
-    method = aave_v3.BorrowETH(amount=123, interest_rate_mode=aave_v3.InterestRateMode.VARIABLE)
+    method = aave_v3.BorrowETH(
+        blockchain=Chain.ETHEREUM, amount=123, interest_rate_mode=aave_v3.InterestRateMode.VARIABLE
+    )
     assert (
         method.data
         == "0x66514c9700000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2000000000000000000000000000000000000000000000000000000000000007b00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000"
@@ -144,7 +156,12 @@ def test_borrow_ETH():
 
 
 def test_repay_ETH():
-    method = aave_v3.RepayETH(eth_amount=123, interest_rate_mode=aave_v3.InterestRateMode.VARIABLE, avatar=GNOSIS_DAO)
+    method = aave_v3.RepayETH(
+        blockchain=Chain.ETHEREUM,
+        eth_amount=123,
+        interest_rate_mode=aave_v3.InterestRateMode.VARIABLE,
+        avatar=GNOSIS_DAO,
+    )
     assert (
         method.data
         == "0x02c5fcf800000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d"
@@ -152,7 +169,9 @@ def test_repay_ETH():
 
 
 def test_swap_borrow_rate_mode():
-    method = aave_v3.SwapBorrowRateMode(asset=ETHAddr.WETH, interest_rate_mode=aave_v3.InterestRateMode.VARIABLE)
+    method = aave_v3.SwapBorrowRateMode(
+        blockchain=Chain.ETHEREUM, asset=ETHAddr.WETH, interest_rate_mode=aave_v3.InterestRateMode.VARIABLE
+    )
     assert (
         method.data
         == "0x94ba89a2000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000000000000000000000000000000000000000000002"
@@ -160,7 +179,7 @@ def test_swap_borrow_rate_mode():
 
 
 def test_stake_AAVE():
-    method = aave_v3.StakeAAVE(avatar=GNOSIS_DAO, amount=123)
+    method = aave_v3.StakeAAVE(blockchain=Chain.ETHEREUM, avatar=GNOSIS_DAO, amount=123)
     assert (
         method.data
         == "0xadc9772e000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b"
@@ -169,7 +188,7 @@ def test_stake_AAVE():
 
 
 def test_stake_ABPT():
-    method = aave_v3.StakeABPT(avatar=GNOSIS_DAO, amount=123)
+    method = aave_v3.StakeABPT(blockchain=Chain.ETHEREUM, avatar=GNOSIS_DAO, amount=123)
     assert (
         method.data
         == "0xadc9772e000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b"
@@ -178,7 +197,7 @@ def test_stake_ABPT():
 
 
 def test_claim_rewards_and_stake():
-    method = aave_v3.ClaimRewardsAndStake(avatar=GNOSIS_DAO, amount=123)
+    method = aave_v3.ClaimRewardsAndStake(blockchain=Chain.ETHEREUM, avatar=GNOSIS_DAO, amount=123)
     assert (
         method.data
         == "0x955e18af000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b"
@@ -186,7 +205,7 @@ def test_claim_rewards_and_stake():
 
 
 def test_unstake_AAVE():
-    method = aave_v3.UnstakeAAVE(avatar=GNOSIS_DAO, amount=123)
+    method = aave_v3.UnstakeAAVE(blockchain=Chain.ETHEREUM, avatar=GNOSIS_DAO, amount=123)
     assert (
         method.data
         == "0x1e9a6950000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b"
@@ -195,7 +214,7 @@ def test_unstake_AAVE():
 
 
 def test_unstake_ABPT():
-    method = aave_v3.UnstakeABPT(avatar=GNOSIS_DAO, amount=123)
+    method = aave_v3.UnstakeABPT(blockchain=Chain.ETHEREUM, avatar=GNOSIS_DAO, amount=123)
     assert (
         method.data
         == "0x1e9a6950000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b"
@@ -204,19 +223,19 @@ def test_unstake_ABPT():
 
 
 def test_cooldown_stkAAVE():
-    method = aave_v3.CooldownStkAAVE(value=123, avatar=GNOSIS_DAO)
+    method = aave_v3.CooldownStkAAVE(blockchain=Chain.ETHEREUM, value=123, avatar=GNOSIS_DAO)
     assert method.data == "0x787a08a6"
     assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkAAVE.address
 
 
 def test_cooldown_stkABPT():
-    method = aave_v3.CooldownStkABPT(value=123, avatar=GNOSIS_DAO)
+    method = aave_v3.CooldownStkABPT(blockchain=Chain.ETHEREUM, value=123, avatar=GNOSIS_DAO)
     assert method.data == "0x787a08a6"
     assert method.contract_address == ContractSpecs[Chain.ETHEREUM].stkABPT.address
 
 
 def test_claim_AAVE_rewards():
-    method = aave_v3.ClaimAAVERewards(avatar=GNOSIS_DAO, amount=123)
+    method = aave_v3.ClaimAAVERewards(blockchain=Chain.ETHEREUM, avatar=GNOSIS_DAO, amount=123)
     assert (
         method.data
         == "0x9a99b4f0000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b"
@@ -225,7 +244,7 @@ def test_claim_AAVE_rewards():
 
 
 def test_claim_ABPT_rewards():
-    method = aave_v3.ClaimABPTRewards(avatar=GNOSIS_DAO, amount=123)
+    method = aave_v3.ClaimABPTRewards(blockchain=Chain.ETHEREUM, avatar=GNOSIS_DAO, amount=123)
     assert (
         method.data
         == "0x9a99b4f0000000000000000000000000849d52316331967b6ff1198e5e32a0eb168d039d000000000000000000000000000000000000000000000000000000000000007b"
@@ -235,6 +254,7 @@ def test_claim_ABPT_rewards():
 
 def test_swap_and_repay():
     method = aave_v3.SwapAndRepay(
+        blockchain=Chain.ETHEREUM,
         collateral_asset=ETHAddr.USDC,
         debt_asset=ETHAddr.WETH,
         collateral_amount=123,
@@ -324,7 +344,7 @@ def test_delegate_stkAAVE_by_type():
 
 
 def test_submit_vote():
-    method = aave_v3.SubmitVote(proposal_id=123, support=True)
+    method = aave_v3.SubmitVote(blockchain=Chain.ETHEREUM, proposal_id=123, support=True)
     assert (
         method.data
         == "0x612c56fa000000000000000000000000000000000000000000000000000000000000007b0000000000000000000000000000000000000000000000000000000000000001"
@@ -334,7 +354,12 @@ def test_submit_vote():
 
 def test_liquidation_call():
     method = aave_v3.LiquidationCall(
-        collateral_asset=ETHAddr.WETH, debt_asset=ETHAddr.USDC, user=USER, debt_to_cover=123, receive_a_token=False
+        blockchain=Chain.ETHEREUM,
+        collateral_asset=ETHAddr.WETH,
+        debt_asset=ETHAddr.USDC,
+        user=USER,
+        debt_to_cover=123,
+        receive_a_token=False,
     )
     assert (
         method.data
@@ -415,6 +440,8 @@ def test_integration_liquidation_call(local_node_eth):
         close_factor = DEFAULT_LIQUIDATION_CLOSE_FACTOR
     elif health_factor < CLOSE_FACTOR_HF_THRESHOLD:
         close_factor = MAX_LIQUIDATION_CLOSE_FACTOR
+    else:
+        raise ValueError("close_factor: ?")
 
     debt_to_cover_no_decimals = asset_to_pay_debt_data["amount"] * Decimal(close_factor)
     assert debt_to_cover_no_decimals == Decimal("0.2411476123882345670")
@@ -540,6 +567,8 @@ def test_integration_liquidation_call2(local_node_eth):
         close_factor = DEFAULT_LIQUIDATION_CLOSE_FACTOR
     elif health_factor < CLOSE_FACTOR_HF_THRESHOLD:
         close_factor = MAX_LIQUIDATION_CLOSE_FACTOR
+    else:
+        raise ValueError("close_factor: ?")
 
     debt_to_cover_no_decimals = asset_to_pay_debt_data["amount"] * Decimal(close_factor)
     max_amount_collateral_to_liquidate = (
@@ -643,6 +672,8 @@ def test_integration_liquidation_call2(local_node_eth):
         close_factor = DEFAULT_LIQUIDATION_CLOSE_FACTOR
     elif health_factor < CLOSE_FACTOR_HF_THRESHOLD:
         close_factor = MAX_LIQUIDATION_CLOSE_FACTOR
+    else:
+        raise ValueError("close_factor: ?")
 
     debt_to_cover_no_decimals = asset_to_pay_debt_data["amount"] * Decimal(close_factor)
     max_amount_collateral_to_liquidate = (
@@ -721,6 +752,8 @@ def test_bonus_matrix(local_node_eth, owner_address=USER2):
         close_factor = DEFAULT_LIQUIDATION_CLOSE_FACTOR
     elif health_factor < CLOSE_FACTOR_HF_THRESHOLD:
         close_factor = MAX_LIQUIDATION_CLOSE_FACTOR
+    else:
+        raise ValueError("close_factor: ?")
 
     for balance in balances:
         asset_contract = w3.eth.contract(address=balance[CDPData.UnderlyingAddress], abi=TokenAbis.ERC20.abi)
