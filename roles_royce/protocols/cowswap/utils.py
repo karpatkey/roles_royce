@@ -1,10 +1,10 @@
 import json
 from dataclasses import dataclass
-from defabipedia.types import StrEnum
-from web3.types import Address
+
 import requests
-from defabipedia.types import Blockchain, Chain
+from defabipedia.types import Blockchain, Chain, StrEnum
 from web3 import Web3
+from web3.types import Address
 
 
 class SwapKind(StrEnum):
@@ -14,7 +14,8 @@ class SwapKind(StrEnum):
 
 COW_ORDER_API_URL = {
     Chain.ETHEREUM: "https://api.cow.fi/mainnet/api/v1/orders",
-    Chain.GNOSIS: "https://api.cow.fi/xdai/api/v1/orders"}
+    Chain.GNOSIS: "https://api.cow.fi/xdai/api/v1/orders",
+}
 
 COW_QUOTE_API_URL = {
     Chain.ETHEREUM: "https://api.cow.fi/mainnet/api/v1/quote",
@@ -23,8 +24,8 @@ COW_QUOTE_API_URL = {
 
 
 class CONSTANTS(StrEnum):
-    APP_DATA = json.dumps({"appCode": "karpatkey_swap"}, separators=(',', ':'))
-    APP_DATA_HASH = Web3.keccak(text=json.dumps({"appCode": "karpatkey_swap"}, separators=(',', ':'))).hex()
+    APP_DATA = json.dumps({"appCode": "karpatkey_swap"}, separators=(",", ":"))
+    APP_DATA_HASH = Web3.keccak(text=json.dumps({"appCode": "karpatkey_swap"}, separators=(",", ":"))).hex()
     # APP_DATA_HASH is '0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26'
     ERC20_HASH = Web3.keccak(text="erc20").hex()
     # ERC20_HASH is '0x5a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc9'
@@ -70,14 +71,16 @@ class Order:
         }
 
 
-def create_order(sell_token: Address,
-                 buy_token: Address,
-                 receiver: Address,
-                 sell_amount: int,
-                 buy_amount: int,
-                 from_address: Address,
-                 kind: SwapKind,
-                 valid_to: int) -> Order:
+def create_order(
+    sell_token: Address,
+    buy_token: Address,
+    receiver: Address,
+    sell_amount: int,
+    buy_amount: int,
+    from_address: Address,
+    kind: SwapKind,
+    valid_to: int,
+) -> Order:
     """
     Creates an Order object.
 
@@ -95,28 +98,32 @@ def create_order(sell_token: Address,
         Order: The Order object
     """
 
-    return Order(sell_token=sell_token,
-                 buy_token=buy_token,
-                 receiver=receiver,
-                 sell_amount=sell_amount,
-                 buy_amount=buy_amount,
-                 fee_amount=0,
-                 valid_to=valid_to,
-                 kind=kind,
-                 partially_fillable=False,
-                 sell_token_balance="erc20",
-                 buy_token_balance="erc20",
-                 from_address=from_address)
+    return Order(
+        sell_token=sell_token,
+        buy_token=buy_token,
+        receiver=receiver,
+        sell_amount=sell_amount,
+        buy_amount=buy_amount,
+        fee_amount=0,
+        valid_to=valid_to,
+        kind=kind,
+        partially_fillable=False,
+        sell_token_balance="erc20",
+        buy_token_balance="erc20",
+        from_address=from_address,
+    )
 
 
-def quote_order_api(blockchain: Blockchain,
-                    sell_token: Address,
-                    buy_token: Address,
-                    receiver: Address,
-                    from_address: Address,
-                    kind: SwapKind,
-                    amount: int,
-                    valid_to: int | None = None) -> Order:
+def quote_order_api(
+    blockchain: Blockchain,
+    sell_token: Address,
+    buy_token: Address,
+    receiver: Address,
+    from_address: Address,
+    kind: SwapKind,
+    amount: int,
+    valid_to: int | None = None,
+) -> Order:
     """
     Quotes an order using the Cow API and returns the corresponding Order object
 
@@ -155,34 +162,51 @@ def quote_order_api(blockchain: Blockchain,
     else:
         quote_order["buyAmountAfterFee"] = str(amount)
 
-    response = requests.post(
-        COW_QUOTE_API_URL[blockchain], data=json.dumps(quote_order)
-    ).json()
+    response = requests.post(COW_QUOTE_API_URL[blockchain], data=json.dumps(quote_order))
+    response_json = response.json()
 
-    return Order(sell_token=sell_token,
-                 buy_token=buy_token,
-                 receiver=receiver,
-                 sell_amount=int(response["quote"]["sellAmount"]) + int(response["quote"]["feeAmount"]),
-                 buy_amount=int(response["quote"]["buyAmount"]),
-                 fee_amount=0,
-                 valid_to=0 if valid_to is None else valid_to,
-                 kind=kind,
-                 partially_fillable=False,
-                 sell_token_balance="erc20",
-                 buy_token_balance="erc20",
-                 from_address=from_address)
+    def cow_error(error):
+        raise ValueError(f"[CowswapError]: {error}")
+
+    if response.status_code == 400:
+        error_type = response_json["errorType"]
+        error_description = response_json["description"]
+        cow_error(f"{error_type}: {error_description}")
+    if response.status_code == 404:
+        cow_error("No route was found for the specified order.")
+    if response.status_code == 429:
+        cow_error("Too many order quotes.")
+    if response.status_code == 500:
+        cow_error("Unexpected error quoting an order.")
+
+    return Order(
+        sell_token=sell_token,
+        buy_token=buy_token,
+        receiver=receiver,
+        sell_amount=int(response_json["quote"]["sellAmount"]) + int(response_json["quote"]["feeAmount"]),
+        buy_amount=int(response_json["quote"]["buyAmount"]),
+        fee_amount=0,
+        valid_to=0 if valid_to is None else valid_to,
+        kind=kind,
+        partially_fillable=False,
+        sell_token_balance="erc20",
+        buy_token_balance="erc20",
+        from_address=from_address,
+    )
 
 
-def create_order_api(blockchain: Blockchain,
-                     sell_token: Address,
-                     buy_token: Address,
-                     receiver: Address,
-                     from_address: Address,
-                     kind: SwapKind,
-                     amount: int,
-                     valid_to: int,
-                     order: Order | None = None,
-                     fork: bool = False) -> dict:
+def create_order_api(
+    blockchain: Blockchain,
+    sell_token: Address,
+    buy_token: Address,
+    receiver: Address,
+    from_address: Address,
+    kind: SwapKind,
+    amount: int,
+    valid_to: int,
+    order: Order | None = None,
+    fork: bool = False,
+) -> dict:
     """
     Creates an order using the Cow API.
 
