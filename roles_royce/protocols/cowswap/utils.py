@@ -162,14 +162,15 @@ def quote_order_api(
     else:
         quote_order["buyAmountAfterFee"] = str(amount)
 
-    response = requests.post(COW_QUOTE_API_URL[blockchain], data=json.dumps(quote_order)).json()
+    response = requests.post(COW_QUOTE_API_URL[blockchain], data=json.dumps(quote_order))
+    response_json = response.json()
 
     def cow_error(error):
         raise ValueError(f"[CowswapError]: {error}")
 
     if response.status_code == 400:
-        error_type = response["errorType"]
-        error_description = response["description"]
+        error_type = response_json["errorType"]
+        error_description = response_json["description"]
         cow_error(f"{error_type}: {error_description}")
     if response.status_code == 404:
         cow_error("No route was found for the specified order.")
@@ -182,8 +183,8 @@ def quote_order_api(
         sell_token=sell_token,
         buy_token=buy_token,
         receiver=receiver,
-        sell_amount=int(response["quote"]["sellAmount"]) + int(response["quote"]["feeAmount"]),
-        buy_amount=int(response["quote"]["buyAmount"]),
+        sell_amount=int(response_json["quote"]["sellAmount"]) + int(response_json["quote"]["feeAmount"]),
+        buy_amount=int(response_json["quote"]["buyAmount"]),
         fee_amount=0,
         valid_to=0 if valid_to is None else valid_to,
         kind=kind,
