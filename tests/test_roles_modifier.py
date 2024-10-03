@@ -70,10 +70,7 @@ def test_roles_v2(local_node_eth):
     user = "0x8787FC2De4De95c53e5E3a4e5459247D9773ea52"
 
     roles = RolesModTester(
-        role="BALANCER-MANAGER",
-        contract_address="0xBd1099dFD3c11b65FB4BB19A350da2f5B61Efb0d",
-        w3=w3,
-        account=safe
+        role="BALANCER-MANAGER", contract_address="0xBd1099dFD3c11b65FB4BB19A350da2f5B61Efb0d", w3=w3, account=safe
     )
     method = aave_v3.DelegateAAVE(delegatee=user)
     assert roles.check(contract_address=method.contract_address, data=method.data, block=test_block)
@@ -83,7 +80,10 @@ def test_roles_v2(local_node_eth):
     with pytest.raises(TransactionWouldBeReverted) as e:
         roles.check(contract_address=method.contract_address, data=method.data, block=test_block)
     assert e.value.args[0] == "ConditionViolation(uint8,bytes32)"
-    assert e.value.args[1] == (7, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+    assert e.value.args[1] == (
+        7,
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+    )
 
 
 @pytest.mark.skip(reason="test passes locally but we get different gas results on CI")

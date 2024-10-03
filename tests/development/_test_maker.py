@@ -6,8 +6,8 @@ from web3 import HTTPProvider, Web3
 from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import maker
-from roles_royce.utils import to_checksum_address
 from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.utils import to_checksum_address
 from tests.utils import LOCAL_NODE_PORT
 
 wstETH_JOIN = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH

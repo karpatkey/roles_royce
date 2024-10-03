@@ -12,9 +12,8 @@ from pytest import approx
 from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import maker
-from roles_royce.utils import to_checksum_address
-
 from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.utils import to_checksum_address
 
 JOIN_WSTETH_A = "0x10CD5fbe1b404B7E19Ef964B63939907bdaf42E2"  # GemJoin wstETH-A
 JOIN_ETH_A = "0x2F0b23f53734252Bda2277357e97e1517d6B042A"  # ETHJoin ETH-A

@@ -1,23 +1,26 @@
-from roles_royce.protocols.cowswap.contract_methods import SignOrder
-from roles_royce.protocols.cowswap.utils import SwapKind, quote_order_api, create_order_api, Order
-from roles_royce.protocols.utils import check_allowance_and_approve
-from roles_royce.protocols.base import AvatarAddress
-from web3 import Web3
-from roles_royce.generic_method import Transactable
-from defabipedia.types import Chain
 from defabipedia.cowswap_signer import ContractSpecs
+from defabipedia.types import Chain
+from web3 import Web3
 from web3.types import Address
 
+from roles_royce.generic_method import Transactable
+from roles_royce.protocols.base import AvatarAddress
+from roles_royce.protocols.cowswap.contract_methods import SignOrder
+from roles_royce.protocols.cowswap.utils import Order, SwapKind, create_order_api, quote_order_api
+from roles_royce.protocols.utils import check_allowance_and_approve
 
-def create_order_and_swap(w3: Web3,
-                          avatar: AvatarAddress,
-                          sell_token: Address,
-                          buy_token: Address,
-                          amount: int,
-                          kind: SwapKind,
-                          max_slippage: float,
-                          valid_duration: int = 10 * 60,
-                          fork: bool = False) -> list[Transactable]:
+
+def create_order_and_swap(
+    w3: Web3,
+    avatar: AvatarAddress,
+    sell_token: Address,
+    buy_token: Address,
+    amount: int,
+    kind: SwapKind,
+    max_slippage: float,
+    valid_duration: int = 10 * 60,
+    fork: bool = False,
+) -> list[Transactable]:
     """
     Creates a swap order using the Cow API and returns the sign_order Transactable to execute to sign the order on-chain.
 
@@ -47,7 +50,7 @@ def create_order_and_swap(w3: Web3,
         from_address=avatar,
         kind=kind,
         amount=amount,
-        valid_to=w3.eth.get_block('latest').timestamp + valid_duration,
+        valid_to=w3.eth.get_block("latest").timestamp + valid_duration,
     )
 
     order.buy_amount = order.buy_amount if kind == SwapKind.BUY else int(order.buy_amount * (1 - max_slippage))
@@ -62,18 +65,20 @@ def create_order_and_swap(w3: Web3,
         kind=order.kind,
         amount=order.sell_amount,
         valid_to=order.valid_to,
-        order=order)
+        order=order,
+    )
 
     if not fork and not response_create_order["UID"]:
         raise ValueError(f"Order creation failed: {response_create_order['error']}")
 
     result = []
-    approve_transactable = check_allowance_and_approve(w3=w3,
-                                                       avatar=avatar,
-                                                       token=sell_token,
-                                                       spender=ContractSpecs[
-                                                           Chain.get_blockchain_from_web3(w3)].CowswapRelayer.address,
-                                                       amount=order.sell_amount)
+    approve_transactable = check_allowance_and_approve(
+        w3=w3,
+        avatar=avatar,
+        token=sell_token,
+        spender=ContractSpecs[Chain.get_blockchain_from_web3(w3)].CowswapRelayer.address,
+        amount=order.sell_amount,
+    )
     if approve_transactable:
         result.append(approve_transactable)
 
@@ -116,16 +121,17 @@ def swap(w3: Web3, order: Order, valid_duration: int = 10 * 60) -> list[Transact
     if order.receiver != order.from_address:
         raise ValueError("Both the receiver and the from_address must be the avatar safe.")
 
-    if order.valid_to >= w3.eth.get_block('latest').timestamp + valid_duration:
+    if order.valid_to >= w3.eth.get_block("latest").timestamp + valid_duration:
         raise ValueError("Invalid valid_duration: timestamp + valid_duration must be greater than valid_to")
 
     result = []
-    approve_transactable = check_allowance_and_approve(w3=w3,
-                                                       avatar=order.from_address,
-                                                       token=order.sell_token,
-                                                       spender=ContractSpecs[
-                                                           Chain.get_blockchain_from_web3(w3)].CowswapRelayer.address,
-                                                       amount=order.sell_amount)
+    approve_transactable = check_allowance_and_approve(
+        w3=w3,
+        avatar=order.from_address,
+        token=order.sell_token,
+        spender=ContractSpecs[Chain.get_blockchain_from_web3(w3)].CowswapRelayer.address,
+        amount=order.sell_amount,
+    )
     if approve_transactable:
         result.append(approve_transactable)
 

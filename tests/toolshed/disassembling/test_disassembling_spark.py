@@ -4,8 +4,9 @@ from decimal import Decimal
 from defabipedia.spark import ContractSpecs
 from defabipedia.types import Chain
 from karpatkit.helpers import get_balance
-from karpatkit.test_utils.fork import create_simple_safe, steal_token
+from karpatkit.test_utils.fork import create_simple_safe
 from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
+from karpatkit.test_utils.fork import steal_token
 
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.eth import spark
@@ -36,9 +37,7 @@ def test_integration_1(local_node_eth, accounts):
         avatar_safe,
         roles_contract,
         json_data=presets,
-        replaces=[
-            ("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])
-        ],
+        replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
     )
     DAIER = "0xfE9fE2eF61faF6E291b06903dFf85DF25a989498"
     steal_token(w3, ETHAddr.DAI, holder=DAIER, to=avatar_safe.address, amount=1_000)
@@ -46,12 +45,14 @@ def test_integration_1(local_node_eth, accounts):
     avatar_safe.send(
         [
             spark.ApproveDAIforSDAI(amount=1_000),
-            spark.DepositDAIforSDAI(blockchain=blockchain, amount=1_000, avatar=avatar_safe.address)
+            spark.DepositDAIforSDAI(blockchain=blockchain, amount=1_000, avatar=avatar_safe.address),
         ]
     )
     assert get_balance(w3, ETHAddr.DAI, avatar_safe.address) == 0
     chi = SparkUtils.get_chi(w3)
-    assert get_balance(w3, ETHAddr.sDAI, avatar_safe.address) == int(Decimal(1_000) / (Decimal(chi) / Decimal(1e27)))  # 976
+    assert get_balance(w3, ETHAddr.sDAI, avatar_safe.address) == int(
+        Decimal(1_000) / (Decimal(chi) / Decimal(1e27))
+    )  # 976
 
     avatar_safe_address = avatar_safe.address
     disassembler_address = accounts[4].address
@@ -70,6 +71,7 @@ def test_integration_1(local_node_eth, accounts):
     dsr_disassembler.send(txn_transactable, private_key=private_key)
 
     assert get_balance(w3, ETHAddr.sDAI, avatar_safe.address) == 461
+
 
 preset_cowswap = """{
             "version": "1.0",
@@ -103,26 +105,42 @@ preset_cowswap = """{
             ]
             }"""
 
+
 def test_integration_exit_2(local_node_eth, accounts, requests_mock):
     requests_mock.real_http = True
-    requests_mock.post("https://api.cow.fi/mainnet/api/v1/quote",
-                       text=json.dumps({"quote": {"sellToken": "0x83F20F44975D03b1b09e64809B757c47f942BEeA",
-                                                  "buyToken": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-                                                  "receiver": "0x3e83a898fcbe5d4a0d3e886b287a8359034a5952",
-                                                  "sellAmount": "4498223604396024865",
-                                                  "buyAmount": "5225511848017673212", "validTo": 1712885566,
-                                                  "appData": "{\"appCode\":\"karpatkey_swap\"}",
-                                                  "appDataHash": "0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26",
-                                                  "feeAmount": "1776395603475135", "kind": "sell",
-                                                  "partiallyFillable": False, "sellTokenBalance": "erc20",
-                                                  "buyTokenBalance": "erc20", "signingScheme": "presign"},
-                                        "from": "0x3e83a898fcbe5d4a0d3e886b287a8359034a5952",
-                                        "expiration": "2024-04-12T01:04:46.868693450Z", "id": 482569777,
-                                        "verified": False}),
-                       status_code=200)
-    requests_mock.post("https://api.cow.fi/mainnet/api/v1/orders",
-                       text='"0x59dadaec2dd2b84fc499cc62cf95b244701685c9f58491f4f0dd60cfdb9305733e83a898fcbe5d4a0d3e886b287a8359034a595266188cb7"',
-                       status_code=201)
+    requests_mock.post(
+        "https://api.cow.fi/mainnet/api/v1/quote",
+        text=json.dumps(
+            {
+                "quote": {
+                    "sellToken": "0x83F20F44975D03b1b09e64809B757c47f942BEeA",
+                    "buyToken": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                    "receiver": "0x3e83a898fcbe5d4a0d3e886b287a8359034a5952",
+                    "sellAmount": "4498223604396024865",
+                    "buyAmount": "5225511848017673212",
+                    "validTo": 1712885566,
+                    "appData": '{"appCode":"karpatkey_swap"}',
+                    "appDataHash": "0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26",
+                    "feeAmount": "1776395603475135",
+                    "kind": "sell",
+                    "partiallyFillable": False,
+                    "sellTokenBalance": "erc20",
+                    "buyTokenBalance": "erc20",
+                    "signingScheme": "presign",
+                },
+                "from": "0x3e83a898fcbe5d4a0d3e886b287a8359034a5952",
+                "expiration": "2024-04-12T01:04:46.868693450Z",
+                "id": 482569777,
+                "verified": False,
+            }
+        ),
+        status_code=200,
+    )
+    requests_mock.post(
+        "https://api.cow.fi/mainnet/api/v1/orders",
+        text='"0x59dadaec2dd2b84fc499cc62cf95b244701685c9f58491f4f0dd60cfdb9305733e83a898fcbe5d4a0d3e886b287a8359034a595266188cb7"',
+        status_code=201,
+    )
     w3 = local_node_eth.w3
     local_node_eth.set_block(20045539)
     avatar_safe = create_simple_safe(w3=w3, owner=accounts[0])
@@ -156,14 +174,16 @@ def test_integration_exit_2(local_node_eth, accounts, requests_mock):
         signer_address=disassembler_address,
     )
 
-    txn_transactable = spark_disassembler.exit_2(percentage=50, exit_arguments=[{'max_slippage': 1}])
+    txn_transactable = spark_disassembler.exit_2(percentage=50, exit_arguments=[{"max_slippage": 1}])
     tx_receipt = spark_disassembler.send(txn_transactable, private_key=private_key)
 
     assert tx_receipt.status == 1
     for log in tx_receipt.logs:
-        if log.address == '0x9008D19f58AAbD9eD0D60971565AA8510560ab41':
-            uid_from_tx_log = '0x' + log.data.hex()[194:len(log.data.hex()) - 16]
+        if log.address == "0x9008D19f58AAbD9eD0D60971565AA8510560ab41":
+            uid_from_tx_log = "0x" + log.data.hex()[194 : len(log.data.hex()) - 16]
             break
 
-    assert uid_from_tx_log == '0xbf949c5371467eae17cc6a1a33fd9a0e670e43f71da22c65886b0f1f89a7bce86fa4080e06fdbd826426746d0121f9947fe7893f66640913'
-
+    assert (
+        uid_from_tx_log
+        == "0xbf949c5371467eae17cc6a1a33fd9a0e670e43f71da22c65886b0f1f89a7bce86fa4080e06fdbd826426746d0121f9947fe7893f66640913"
+    )

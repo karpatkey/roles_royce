@@ -1,5 +1,5 @@
-from enum import IntEnum
 import json
+from enum import IntEnum
 from types import SimpleNamespace
 
 from web3 import Web3
