@@ -167,19 +167,16 @@ def quote_order_api(
     def cow_error(error):
         raise ValueError(f"[CowswapError]: {error}")
 
-    if not response:
-        if response.status_code == 400:
-            error_type = response["errorType"]
-            error_description = response["description"]
-            cow_error(f"{error_type}: {error_description}")
-        if response.status_code == 404:
-            cow_error("No route was found for the specified order.")
-        if response.status_code == 429:
-            cow_error("Too many order quotes.")
-        if response.status_code == 500:
-            cow_error("Unexpected error quoting an order.")
-
-        cow_error("Unknown error")
+    if response.status_code == 400:
+        error_type = response["errorType"]
+        error_description = response["description"]
+        cow_error(f"{error_type}: {error_description}")
+    if response.status_code == 404:
+        cow_error("No route was found for the specified order.")
+    if response.status_code == 429:
+        cow_error("Too many order quotes.")
+    if response.status_code == 500:
+        cow_error("Unexpected error quoting an order.")
 
     return Order(
         sell_token=sell_token,
