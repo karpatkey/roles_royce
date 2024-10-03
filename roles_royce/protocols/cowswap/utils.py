@@ -1,10 +1,10 @@
 import json
 from dataclasses import dataclass
-from defabipedia.types import StrEnum
-from web3.types import Address
+
 import requests
-from defabipedia.types import Blockchain, Chain
+from defabipedia.types import Blockchain, Chain, StrEnum
 from web3 import Web3
+from web3.types import Address
 
 
 class SwapKind(StrEnum):
@@ -158,6 +158,21 @@ def quote_order_api(blockchain: Blockchain,
     response = requests.post(
         COW_QUOTE_API_URL[blockchain], data=json.dumps(quote_order)
     ).json()
+
+    def cow_error(error):
+        raise ValueError(f"[CowswapError]: {error}")
+
+    if not response:
+        if response.status_code == 400:
+            cow_error(f"{response["errorType"]}: {response["description"]}")
+        if response.status_code == 404:
+            cow_error("No route was found for the specified order.")
+        if response.status_code == 429:
+            cow_error("Too many order quotes.")
+        if response.status_code == 500:
+            cow_error("Unexpected error quoting an order.")
+
+        cow_error("Unknown error")
 
     return Order(sell_token=sell_token,
                  buy_token=buy_token,
