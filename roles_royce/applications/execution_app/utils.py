@@ -19,10 +19,10 @@ from roles_royce.toolshed.disassembling import (
     AuraDisassembler,
     BalancerDisassembler,
     Disassembler,
-    LidoDisassembler,
-    SwapDisassembler,
     DSRDisassembler,
+    LidoDisassembler,
     SparkDisassembler,
+    SwapDisassembler,
 )
 from roles_royce.utils import to_checksum_address
 

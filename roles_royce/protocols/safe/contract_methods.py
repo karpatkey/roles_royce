@@ -1,4 +1,4 @@
-from roles_royce.protocols.base import ContractMethod, Address
+from roles_royce.protocols.base import Address, ContractMethod
 
 
 class EnableModule(ContractMethod):

@@ -15,9 +15,8 @@ from roles_royce.generic_method import TxData
 from roles_royce.protocols import balancer
 from roles_royce.protocols.eth import aura
 from roles_royce.roles_modifier import TransactionWouldBeReverted
-from roles_royce.utils import MULTISENDS, to_checksum_address
-
 from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.utils import MULTISENDS, to_checksum_address
 
 
 def test_safe_and_roles(local_node_eth):
@@ -99,7 +98,7 @@ def test_safe_and_roles(local_node_eth):
     role_ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
 
     tx_hash = role_ctract.constructor(owner, avatar, target).transact({"from": test_account0_addr})  # deploy!
-    roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)['contractAddress']
+    roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)["contractAddress"]
 
     role_ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
     assert role_ctract.functions.avatar().call() == avatar

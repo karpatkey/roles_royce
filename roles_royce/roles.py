@@ -13,7 +13,12 @@ logger = logging.getLogger(__name__)
 
 
 def build(
-    txs: List[Transactable], role: int | str, account: str, roles_mod_address: str, web3: Web3, tx_kwargs: dict | None = None
+    txs: List[Transactable],
+    role: int | str,
+    account: str,
+    roles_mod_address: str,
+    web3: Web3,
+    tx_kwargs: dict | None = None,
 ) -> dict:
     """Create a transaction to later be sent to the blockchain or other uses
     such as studying it or composing it with other contracts.

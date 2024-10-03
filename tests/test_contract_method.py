@@ -137,7 +137,6 @@ def test_method_with_tuple_array():
     assert abi["outputs"][0]["type"] == "tuple[]"
 
 
-
 def test_method_values():
     class MyDeposit(ContractMethod):
         name = "deposit"

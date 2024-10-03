@@ -7,9 +7,9 @@ from web3 import Web3
 
 from roles_royce.evm_utils import roles_abi, roles_bytecode
 from roles_royce.generic_method import TxData
-from roles_royce.utils import MULTISENDS, to_checksum_address
-from roles_royce.protocols.roles_modifier.contract_methods import EnableModule, AssignRoles
+from roles_royce.protocols.roles_modifier.contract_methods import AssignRoles, EnableModule
 from roles_royce.protocols.safe.contract_methods import EnableModule as SafeEnableModule
+from roles_royce.utils import MULTISENDS, to_checksum_address
 
 
 def deploy_roles(w3: Web3, avatar):
@@ -65,5 +65,6 @@ def assign_role(local_node, avatar_safe_address: str, roles_mod_address: str, ro
     local_node.unlock_account(avatar_safe_address)
     # The amount of ETH of the Avatar address is increased
     top_up_address(local_node.w3, address=avatar_safe_address, amount=1)
-    AssignRoles(roles_mod_address=roles_mod_address, module=asignee, assign_list=[role]).transact(local_node.w3,
-                                                                                                  txparams={"from": avatar_safe_address})
+    AssignRoles(roles_mod_address=roles_mod_address, module=asignee, assign_list=[role]).transact(
+        local_node.w3, txparams={"from": avatar_safe_address}
+    )

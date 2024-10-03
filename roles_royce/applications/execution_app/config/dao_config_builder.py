@@ -7,9 +7,9 @@ from roles_royce.applications.execution_app.config.config_builder import (
     BalancerPosition,
     DAOStrategiesBuilder,
     LidoPosition,
-    WalletPosition,
     MakerPosition,
     SparkPosition,
+    WalletPosition,
 )
 from roles_royce.applications.execution_app.pulley_fork import PulleyFork
 
@@ -22,13 +22,20 @@ def main(
     lido: list[LidoPosition],
     wallet_tokens: list[WalletPosition],
     maker: list[MakerPosition],
-    spark: list[SparkPosition]
+    spark: list[SparkPosition],
 ):
     with PulleyFork(blockchain) as fork:
         w3 = Web3(Web3.HTTPProvider(fork.url()))
 
         strategies = DAOStrategiesBuilder(
-            dao, blockchain, balancer=balancer, aura=aura, lido=lido, wallet_tokens=wallet_tokens, maker=maker, spark=spark
+            dao,
+            blockchain,
+            balancer=balancer,
+            aura=aura,
+            lido=lido,
+            wallet_tokens=wallet_tokens,
+            maker=maker,
+            spark=spark,
         )
         strategies_dict = strategies.build_dict(w3)
         return strategies_dict

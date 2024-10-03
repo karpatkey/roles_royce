@@ -59,7 +59,12 @@ def test_check_one(local_node_gc):
     ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"
     ACCOUNT = "0x7e19DE37A31E40eec58977CEA36ef7fB70e2c5CD"
     status = roles.check(
-        txs=[approve], role=2, account=ACCOUNT, roles_mod_address=ROLES_MOD_ADDRESS, web3=local_node_gc.w3, block=27586992
+        txs=[approve],
+        role=2,
+        account=ACCOUNT,
+        roles_mod_address=ROLES_MOD_ADDRESS,
+        web3=local_node_gc.w3,
+        block=27586992,
     )
     assert status
 
