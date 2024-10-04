@@ -55,7 +55,7 @@ class ENV:
 
     AVATAR_SAFE_ADDRESS: Address = field(init=False)
     ROLES_MOD_ADDRESS: Address = field(init=False)
-    ROLE: int = field(init=False)
+    ROLE: int | str = field(init=False)
     PRIVATE_KEY: str = field(init=False)
     DISASSEMBLER_ADDRESS: Address = field(init=False)
 
@@ -98,11 +98,14 @@ class ENV:
             self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLES_MOD_ADDRESS",
             default="",
         )
-        self.ROLE: int = config(
+        self.ROLE: str = config(
             self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLE",
-            cast=int,
-            default=0,
+            default="0"
         )
+        try:
+            self.ROLE = int(self.ROLE)
+        except ValueError:
+            pass
         self.PRIVATE_KEY: str = config(
             self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_PRIVATE_KEY",
             default="",
