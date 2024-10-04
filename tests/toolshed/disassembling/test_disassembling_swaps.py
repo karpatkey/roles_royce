@@ -49,9 +49,11 @@ presets_balancer = """{
 ]
 }"""
 
+
 @pytest.mark.skip(reason="Cowswap Signer is tested in test_disassembling_lido tests 3 and 4")
 def test_integration_exit_1():
     pass
+
 
 def test_integration_exit_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
