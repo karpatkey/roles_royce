@@ -1,4 +1,5 @@
 from defabipedia.types import Blockchain
+from defabipedia.aura import ContractSpecs
 
 from roles_royce.constants import ETHAddr
 from roles_royce.protocols.base import Address, BaseApprove, BaseApproveForToken, ContractMethod
@@ -196,3 +197,90 @@ class ProcessExpiredLocks(ContractMethod):
     def __init__(self, relock: bool):
         super().__init__()
         self.args.relock = relock
+
+class ClaimRewards(ContractMethod):
+    """claim rewards"""
+
+    name = "claimRewards"
+    in_signature = (
+        ("reward_contracts", "address[]"),
+        ("extra_reward_contracts", "address[]"),
+        ("token_reward_contracts", "address[]"),
+        ("token_reward_tokens", "address[]"),
+        (
+            "amounts",
+            (
+                (
+                    ("deposit_max_amount", "uint256"),
+                    ("min_amounts_out", "uint256"),
+                    ("deposit_max_amount_2", "uint256"),
+                    ("deposit_max_amount_3", "uint256"),
+                ),
+                "tuple",
+            ),
+        ),
+        (
+            "options",
+            (
+                (
+                    ("claim", "bool"),
+                    ("claim_locked", "bool"),
+                    ("lock", "bool"),
+                    ("lock_deposited", "bool"),
+                    ("use_all_wallet_funds", "bool"),
+                    ("use_compounder", "bool"),
+                    ("lock2", "bool")
+                ),
+                "tuple",
+            )
+        )
+        )
+    target_address = None
+
+    def __init__(self, 
+                 blockchain: Blockchain, 
+                 reward_contracts: list, 
+                 extra_reward_contracts: list, 
+                 token_reward_contracts: list, 
+                 token_reward_tokens: list, 
+                 deposit_max_amount: int,
+                 min_amounts_out: int,
+                 deposit_max_amount_2: int,
+                 deposit_max_amount_3: int,
+                 claim: bool,
+                 claim_locked: bool,
+                 lock: bool,
+                 lock_deposited: bool,
+                 use_all_wallet_funds: bool,
+                 use_compounder: bool,
+                 lock2: bool):
+        self.target_address = ContractSpecs[blockchain].ClaimZap.address
+        super().__init__()
+        self.args.reward_contracts = reward_contracts
+        self.args.extra_reward_contracts = extra_reward_contracts
+        self.args.token_reward_contracts = token_reward_contracts
+        self.args.token_reward_tokens = token_reward_tokens
+        self.args.deposit_max_amount = deposit_max_amount
+        self.args.min_amounts_out = min_amounts_out
+        self.args.deposit_max_amount_2 = deposit_max_amount_2
+        self.args.deposit_max_amount_3 = deposit_max_amount_3
+        self.args.amounts = [self.args.deposit_max_amount, 
+                             self.args.min_amounts_out, 
+                             self.args.deposit_max_amount_2, 
+                             self.args.deposit_max_amount_3]
+        self.args.claim = claim
+        self.args.claim_locked = claim_locked
+        self.args.lock = lock
+        self.args.lock_deposited = lock_deposited
+        self.args.use_all_wallet_funds = use_all_wallet_funds
+        self.args.use_compounder = use_compounder
+        self.args.lock2 = lock2
+        self.args.options = [self.args.claim, 
+                             self.args.claim_locked, 
+                             self.args.lock, 
+                             self.args.lock_deposited, 
+                             self.args.use_all_wallet_funds, 
+                             self.args.use_compounder, 
+                             self.args.lock2]
+
+
