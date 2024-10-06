@@ -4,12 +4,12 @@ from defabipedia.types import Chain
 from karpatkit.test_utils.fork import TEST_ACCOUNTS, top_up_address
 from karpatkit.test_utils.simple_safe import SimpleSafe
 from web3 import Web3
-
+from defabipedia.multisend import ContractSpecs as MultiSendContractSpecs
 from roles_royce.evm_utils import roles_abi, roles_bytecode
 from roles_royce.generic_method import TxData
 from roles_royce.protocols.roles_modifier.contract_methods import AssignRoles, EnableModule
 from roles_royce.protocols.safe.contract_methods import EnableModule as SafeEnableModule
-from roles_royce.utils import MULTISENDS, to_checksum_address
+from roles_royce.utils import to_checksum_address
 
 
 def deploy_roles(w3: Web3, avatar):
@@ -24,7 +24,7 @@ def deploy_roles(w3: Web3, avatar):
     roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)["contractAddress"]
 
     ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
-    ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact({"from": avatar})
+    ctract.functions.setMultisend(MultiSendContractSpecs[Chain.ETHEREUM].MultiSend.address).transact({"from": avatar})
     return ctract
 
 

@@ -7,7 +7,6 @@ from eth_abi import abi
 from web3 import Web3
 
 from .generic_method import Transactable
-from .protocols.multisend import MULTISENDS_DEPLOYS as MULTISENDS  # For backwards compat
 from .protocols.multisend import MultiSend
 
 TENDERLY_API_URL = "https://api.tenderly.co/api/v1/"

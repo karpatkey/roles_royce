@@ -1,1 +1,1 @@
-from .contract_methods import MULTISENDS_DEPLOYS, MultiSend
+from .contract_methods import MultiSend
