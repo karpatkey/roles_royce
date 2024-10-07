@@ -95,7 +95,6 @@ def check(
         w3=web3,
         value=tx_data.value,
     )
-    a = use_old_multisend_if_needed(web3, roles_mod_address, tx_data.contract_address)
 
     return roles_mod.check(use_old_multisend_if_needed(web3, roles_mod_address, tx_data.contract_address), tx_data.data, block=block)
 
