@@ -2,15 +2,30 @@ import logging
 from typing import List
 
 from defabipedia.types import Chain
+from defabipedia.multisend import ContractSpecs
 from web3 import Web3
 from web3.types import TxReceipt
 
 from .generic_method import Transactable
 from .roles_modifier import RolesMod
 from .utils import multi_or_one
+from roles_royce.evm_utils import roles_abi
 
 logger = logging.getLogger(__name__)
 
+# FIXME, the following function should be removed when roles v1 is no longer supported by Roles Royce. This function is
+#  only used in this script
+def use_old_multisend_if_needed(w3: Web3, roles_mod_address: str, address: str)-> str:
+    """Returns the roles modifier contract's multisend address if the roles modifier contract is v1 and the address
+    is the (new) multisend contract. To be used as a hacky patch in the 'build', 'check' and 'send' functions for roles
+    v1 contract instances that use the old multisend contract, not the one in defabipedia."""
+    if address == ContractSpecs[Chain.GNOSIS].MultiSend.address:
+        try:
+            return w3.eth.contract(roles_mod_address, abi=roles_abi).functions.multisend().call()
+        except:
+            pass
+    else:
+        return address
 
 def build(
     txs: List[Transactable],
@@ -44,9 +59,10 @@ def build(
         value=tx_data.value,
     )
     tx_kwargs = tx_kwargs or {}
-    tx = roles_mod.build(tx_data.contract_address, tx_data.data, **tx_kwargs)
+    tx = roles_mod.build(use_old_multisend_if_needed(web3, roles_mod_address, tx_data.contract_address), tx_data.data, **tx_kwargs)
     tx["from"] = account
     return tx
+
 
 
 def check(
@@ -79,7 +95,9 @@ def check(
         w3=web3,
         value=tx_data.value,
     )
-    return roles_mod.check(tx_data.contract_address, tx_data.data, block=block)
+    a = use_old_multisend_if_needed(web3, roles_mod_address, tx_data.contract_address)
+
+    return roles_mod.check(use_old_multisend_if_needed(web3, roles_mod_address, tx_data.contract_address), tx_data.data, block=block)
 
 
 def send(
@@ -113,6 +131,6 @@ def send(
         value=tx_data.value,
     )
     tx_kwargs = tx_kwargs or {}
-    roles_mod_execute = roles_mod.execute(tx_data.contract_address, tx_data.data, **tx_kwargs)
+    roles_mod_execute = roles_mod.execute(use_old_multisend_if_needed(web3, roles_mod_address, tx_data.contract_address), tx_data.data, **tx_kwargs)
     roles_mod_tx1 = roles_mod.get_tx_receipt(roles_mod_execute)
     return roles_mod_tx1
