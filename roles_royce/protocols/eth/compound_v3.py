@@ -28,7 +28,6 @@ class Allow(ContractMethod):
 
     name = "allow"
     in_signature = [("manager", "address"), ("is_allowed", "bool")]
-    
 
     def __init__(self, blockchain: Blockchain, comet: Address):
         self.fixed_arguments = {"manager": ContractSpecs[blockchain].base_bulker.address, "is_allowed": True}
@@ -52,8 +51,10 @@ class Supply(ContractMethod):
         self.args.asset = token
         self.args.amount = amount
 
+
 class SupplyETH(ContractMethod):
     """Supply ETH"""
+
     name = "invoke"
     in_signature = [("actions", "bytes32[]"), ("data", "bytes[]")]
     fixed_arguments = {"actions": [ACTION_SUPPLY_NATIVE_TOKEN]}
@@ -84,6 +85,7 @@ class Withdraw(ContractMethod):
 
 class WithdrawETH(ContractMethod):
     """Withdraw ETH"""
+
     name = "invoke"
     in_signature = [("actions", "bytes32[]"), ("data", "bytes[]")]
     target_address = None

@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 from defabipedia.morpho import ContractSpecs
-from defabipedia.types import Chain, Blockchain
+from defabipedia.types import Blockchain, Chain
 
 from roles_royce.protocols.base import (
     Address,
@@ -11,6 +11,7 @@ from roles_royce.protocols.base import (
     ContractMethod,
     InvalidArgument,
 )
+
 
 class ApproveMorphoBlue(BaseApproveForToken):
     """approve Token with MorphoBlue as spender"""
@@ -68,15 +69,16 @@ class Supply(ContractMethod):
         self.args.oracle = oracle
         self.args.irm = irm
         self.args.lltv = lltv
-        self.args.market_params =[
+        self.args.market_params = [
             self.args.loan_token,
             self.args.collateral_token,
             self.args.oracle,
             self.args.irm,
-            self.args.lltv
+            self.args.lltv,
         ]
         self.args.assets = assets
         self.args.shares = shares
+
 
 class Withdraw(ContractMethod):
     target_address = None
@@ -124,12 +126,12 @@ class Withdraw(ContractMethod):
         self.args.oracle = oracle
         self.args.irm = irm
         self.args.lltv = lltv
-        self.args.market_params =[
+        self.args.market_params = [
             self.args.loan_token,
             self.args.collateral_token,
             self.args.oracle,
             self.args.irm,
-            self.args.lltv
+            self.args.lltv,
         ]
         self.args.assets = assets
         self.args.shares = shares

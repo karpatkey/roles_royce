@@ -11,11 +11,11 @@ from web3 import Web3
 from web3.exceptions import ContractLogicError
 
 from roles_royce.generic_method import Transactable
+from roles_royce.protocols import cowswap
 from roles_royce.protocols.balancer.methods_general import ApproveForVault
 from roles_royce.protocols.balancer.methods_swap import ExactTokenInSingleSwap, QuerySwap, SingleSwap
 from roles_royce.protocols.balancer.types_and_enums import SwapKind
 from roles_royce.protocols.base import Address
-from roles_royce.protocols import cowswap
 from roles_royce.protocols.swap_pools.quote_methods import QuoteCurve, QuoteUniswapV3
 from roles_royce.protocols.swap_pools.swap_methods import (
     ApproveCurve,

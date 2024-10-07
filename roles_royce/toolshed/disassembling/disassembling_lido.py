@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 from decimal import Decimal
+
 from defabipedia.lido import ContractSpecs
 from defabipedia.tokens import EthereumTokenAddr
+
 from roles_royce.generic_method import Transactable
-from roles_royce.protocols.base import Address
 from roles_royce.protocols import cowswap
+from roles_royce.protocols.base import Address
 from roles_royce.protocols.eth import lido
 from roles_royce.toolshed.disassembling.disassembling_swaps import SwapDisassembler
 
@@ -34,7 +36,7 @@ class LidoDisassembler(Disassembler):
         return int(Decimal(contract.functions.balanceOf(self.avatar_safe_address).call()) * Decimal(fraction))
 
     def exit_1(
-            self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
+        self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
     ) -> list[Transactable]:
         """
         Unstakes stETH from Lido
@@ -79,9 +81,8 @@ class LidoDisassembler(Disassembler):
         return txns
 
     def exit_2(
-            self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
+        self, percentage: float, exit_arguments: list[dict] = None, amount_to_redeem: int = None
     ) -> list[Transactable]:
-
         """
         Unwraps wstETH and unstakes for ETH on Lido
 
@@ -101,7 +102,9 @@ class LidoDisassembler(Disassembler):
         if amount_to_redeem is None:
             amount_to_redeem = self.get_amount_to_redeem(address, fraction)
         contract = ContractSpecs[self.blockchain].wstETH.contract(self.w3)
-        amount_for_list = contract.functions.getWstETHByStETH(1_000_000_000_000_000_000_000).call() #just to be safe that the chunk size is too big
+        amount_for_list = contract.functions.getWstETHByStETH(
+            1_000_000_000_000_000_000_000
+        ).call()  # just to be safe that the chunk size is too big
         chunk_amount = amount_to_redeem
         if chunk_amount > amount_for_list:
             chunks = []
@@ -151,21 +154,23 @@ class LidoDisassembler(Disassembler):
 
         if amount_to_redeem == 0:
             return []
-        
-        if 'anvil' in self.w3.client_version:
+
+        if "anvil" in self.w3.client_version:
             fork = True
         else:
             fork = False
 
-        return cowswap.create_order_and_swap(w3=self.w3,
-                                             avatar=self.avatar_safe_address,
-                                             sell_token=EthereumTokenAddr.stETH,
-                                             buy_token=EthereumTokenAddr.E,
-                                             amount=amount_to_redeem,
-                                             kind=cowswap.SwapKind.SELL,
-                                             max_slippage=max_slippage,
-                                             valid_duration=20 * 60,
-                                             fork=fork)
+        return cowswap.create_order_and_swap(
+            w3=self.w3,
+            avatar=self.avatar_safe_address,
+            sell_token=EthereumTokenAddr.stETH,
+            buy_token=EthereumTokenAddr.E,
+            amount=amount_to_redeem,
+            kind=cowswap.SwapKind.SELL,
+            max_slippage=max_slippage,
+            valid_duration=20 * 60,
+            fork=fork,
+        )
 
     def exit_4(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
         """
@@ -194,22 +199,24 @@ class LidoDisassembler(Disassembler):
 
         if amount_to_redeem == 0:
             return []
-        
-        if 'anvil' in self.w3.client_version:
+
+        if "anvil" in self.w3.client_version:
             fork = True
         else:
             fork = False
 
-        return cowswap.create_order_and_swap(w3=self.w3,
-                                             avatar=self.avatar_safe_address,
-                                             sell_token=EthereumTokenAddr.wstETH,
-                                             buy_token=EthereumTokenAddr.E,
-                                             amount=amount_to_redeem,
-                                             kind=cowswap.SwapKind.SELL,
-                                             max_slippage=max_slippage,
-                                             valid_duration=20 * 60,
-                                             fork=fork)
-    
+        return cowswap.create_order_and_swap(
+            w3=self.w3,
+            avatar=self.avatar_safe_address,
+            sell_token=EthereumTokenAddr.wstETH,
+            buy_token=EthereumTokenAddr.E,
+            amount=amount_to_redeem,
+            kind=cowswap.SwapKind.SELL,
+            max_slippage=max_slippage,
+            valid_duration=20 * 60,
+            fork=fork,
+        )
+
     def exit_5(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
         """Make a swap on Balancer with stETH to ETH
         Args:
@@ -228,12 +235,12 @@ class LidoDisassembler(Disassembler):
         """
 
         swap_disassembler = SwapDisassembler(
-                                                w3=self.w3,
-                                                avatar_safe_address=self.avatar_safe_address,
-                                                roles_mod_address=self.roles_mod_address,
-                                                role=self.role,
-                                                signer_address=self.signer_address,
-                                            )
+            w3=self.w3,
+            avatar_safe_address=self.avatar_safe_address,
+            roles_mod_address=self.roles_mod_address,
+            role=self.role,
+            signer_address=self.signer_address,
+        )
         txns = swap_disassembler.exit_2(percentage, exit_arguments, amount_to_redeem)
 
         return txns
@@ -256,12 +263,12 @@ class LidoDisassembler(Disassembler):
         """
 
         swap_disassembler = SwapDisassembler(
-                                        w3=self.w3,
-                                        avatar_safe_address=self.avatar_safe_address,
-                                        roles_mod_address=self.roles_mod_address,
-                                        role=self.role,
-                                        signer_address=self.signer_address,
-                                    )
+            w3=self.w3,
+            avatar_safe_address=self.avatar_safe_address,
+            roles_mod_address=self.roles_mod_address,
+            role=self.role,
+            signer_address=self.signer_address,
+        )
         txns = swap_disassembler.exit_3(percentage, exit_arguments, amount_to_redeem)
 
         return txns
@@ -284,16 +291,16 @@ class LidoDisassembler(Disassembler):
         """
 
         swap_disassembler = SwapDisassembler(
-                                        w3=self.w3,
-                                        avatar_safe_address=self.avatar_safe_address,
-                                        roles_mod_address=self.roles_mod_address,
-                                        role=self.role,
-                                        signer_address=self.signer_address,
-                                    )
+            w3=self.w3,
+            avatar_safe_address=self.avatar_safe_address,
+            roles_mod_address=self.roles_mod_address,
+            role=self.role,
+            signer_address=self.signer_address,
+        )
         txns = swap_disassembler.exit_4(percentage, exit_arguments, amount_to_redeem)
 
         return txns
-    
+
     def exit_8(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
         """Make a swap on Balancer with wstETH to ETH
         Args:
@@ -311,17 +318,17 @@ class LidoDisassembler(Disassembler):
             list[ Transactable]:  List of transactions to execute.
         """
         swap_disassembler = SwapDisassembler(
-                                        w3=self.w3,
-                                        avatar_safe_address=self.avatar_safe_address,
-                                        roles_mod_address=self.roles_mod_address,
-                                        role=self.role,
-                                        signer_address=self.signer_address,
-                                    )
-        
+            w3=self.w3,
+            avatar_safe_address=self.avatar_safe_address,
+            roles_mod_address=self.roles_mod_address,
+            role=self.role,
+            signer_address=self.signer_address,
+        )
+
         txns = swap_disassembler.exit_2(percentage, exit_arguments, amount_to_redeem)
 
         return txns
-    
+
     def exit_9(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
         """Make a swap on Curve with wsteth to ETH
         Args:
@@ -339,18 +346,20 @@ class LidoDisassembler(Disassembler):
             list[ Transactable]:  List of transactions to execute.
         """
         swap_disassembler = SwapDisassembler(
-                                        w3=self.w3,
-                                        avatar_safe_address=self.avatar_safe_address,
-                                        roles_mod_address=self.roles_mod_address,
-                                        role=self.role,
-                                        signer_address=self.signer_address,
-                                    )
-        
+            w3=self.w3,
+            avatar_safe_address=self.avatar_safe_address,
+            roles_mod_address=self.roles_mod_address,
+            role=self.role,
+            signer_address=self.signer_address,
+        )
+
         txns = swap_disassembler.exit_3(percentage, exit_arguments, amount_to_redeem)
 
         return txns
-    
-    def exit_10(self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None) -> list[Transactable]:
+
+    def exit_10(
+        self, percentage: float, exit_arguments: list[dict], amount_to_redeem: int = None
+    ) -> list[Transactable]:
         """Make a swap on UnsiwapV3 with wstETH to ETH
         Args:
             percentage (float): Percentage of token to remove.
@@ -367,12 +376,12 @@ class LidoDisassembler(Disassembler):
             list[ Transactable]:  List of transactions to execute.
         """
         swap_disassembler = SwapDisassembler(
-                                        w3=self.w3,
-                                        avatar_safe_address=self.avatar_safe_address,
-                                        roles_mod_address=self.roles_mod_address,
-                                        role=self.role,
-                                        signer_address=self.signer_address,
-                                    )
+            w3=self.w3,
+            avatar_safe_address=self.avatar_safe_address,
+            roles_mod_address=self.roles_mod_address,
+            role=self.role,
+            signer_address=self.signer_address,
+        )
         txns = swap_disassembler.exit_4(percentage, exit_arguments, amount_to_redeem)
 
         return txns

@@ -8,7 +8,7 @@ from karpatkit.test_utils.fork import local_node_eth_replay as local_node_eth
 from web3 import Web3
 
 from roles_royce.toolshed.disassembling import SwapDisassembler
-from roles_royce.toolshed.test_utils.roles_fork_utils import deploy_roles, setup_common_roles, apply_roles_presets
+from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
 
 ROLE = 4
 AVATAR = "0x849D52316331967b6fF1198e5E32A0eB168D039d"
@@ -58,6 +58,7 @@ presets_balancer = """{
 ]
 }"""
 
+
 def test_integration_exit_1(local_node_eth, accounts):
     w3 = local_node_eth.w3
     local_node_eth.set_block(BLOCK)
@@ -71,11 +72,13 @@ def test_integration_exit_1(local_node_eth, accounts):
         json_data=presets_balancer,
         replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
     )
-    w3.eth.send_transaction({
-        'to': avatar_safe.address,
-        'from': "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc", #5th fork account
-        'value': Web3.to_wei(6000, "ether")
-    })
+    w3.eth.send_transaction(
+        {
+            "to": avatar_safe.address,
+            "from": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",  # 5th fork account
+            "value": Web3.to_wei(6000, "ether"),
+        }
+    )
 
     blockchain = Chain.get_blockchain_from_web3(w3)
 
@@ -119,6 +122,7 @@ def test_integration_exit_1(local_node_eth, accounts):
     reth_contract = ContractSpecs[blockchain].rETH.contract(w3)
     reth_balance = reth_contract.functions.balanceOf(avatar_safe_address).call()
     assert reth_balance > 0
+
 
 def test_integration_exit_1_not_enough_eth(local_node_eth, accounts):
     w3 = local_node_eth.w3
@@ -167,9 +171,10 @@ def test_integration_exit_1_not_enough_eth(local_node_eth, accounts):
             exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
             amount_to_redeem=amount_in,
         )
-    
+
     expected_error_message = "Must keep at least a balance of 3 of native token"
     assert str(exc_info.value) == expected_error_message
+
 
 presets_curve = """{
   "version": "1.0",
@@ -204,6 +209,7 @@ presets_curve = """{
 ]
 }"""
 
+
 def test_integration_exit_2(local_node_eth, accounts):
     w3 = local_node_eth.w3
     local_node_eth.set_block(BLOCK)
@@ -217,11 +223,13 @@ def test_integration_exit_2(local_node_eth, accounts):
         json_data=presets_curve,
         replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
     )
-    w3.eth.send_transaction({
-        'to': avatar_safe.address,
-        'from': "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc", #5th fork account
-        'value': Web3.to_wei(6000, "ether")
-    })
+    w3.eth.send_transaction(
+        {
+            "to": avatar_safe.address,
+            "from": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",  # 5th fork account
+            "value": Web3.to_wei(6000, "ether"),
+        }
+    )
 
     blockchain = Chain.get_blockchain_from_web3(w3)
 
@@ -253,7 +261,7 @@ def test_integration_exit_2(local_node_eth, accounts):
     txn_transactable = swap_curve_disassembler.exit_3(
         percentage=50,
         exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
-        amount_to_redeem=amount_in
+        amount_to_redeem=amount_in,
     )
     send_it = swap_curve_disassembler.send(txn_transactable, private_key)
 
@@ -364,11 +372,13 @@ def test_integration_exit_3(local_node_eth, accounts):
         replaces=[("c01318bab7ee1f5ba734172bf7718b5dc6ec90e1", avatar_safe.address[2:])],
     )
 
-    w3.eth.send_transaction({
-        'to': avatar_safe.address,
-        'from': "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc", #5th fork account
-        'value': Web3.to_wei(6000, "ether")
-    })
+    w3.eth.send_transaction(
+        {
+            "to": avatar_safe.address,
+            "from": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",  # 5th fork account
+            "value": Web3.to_wei(6000, "ether"),
+        }
+    )
 
     blockchain = Chain.get_blockchain_from_web3(w3)
 
@@ -400,7 +410,7 @@ def test_integration_exit_3(local_node_eth, accounts):
     txn_transactable = swap_uniswapv3_disassembler.exit_4(
         percentage=50,
         exit_arguments=[{"token_in_address": token_in, "max_slippage": 1, "token_out_address": token_out}],
-        amount_to_redeem=amount_in
+        amount_to_redeem=amount_in,
     )
     send_it = swap_uniswapv3_disassembler.send(txn_transactable, private_key)
 

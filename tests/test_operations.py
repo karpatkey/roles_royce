@@ -1,8 +1,8 @@
 from defabipedia.types import Chain
+from defabipedia.multisend import ContractSpecs as MultiSendContractSpecs
 
 from roles_royce import GenericMethodTransaction, Operation, roles
 from roles_royce.constants import GCAddr
-from roles_royce.protocols.multisend import MULTISENDS_DEPLOYS
 from roles_royce.utils import multi_or_one
 
 CURVE_USDC_USDT_REWARD_GAUGE = "0x7f90122BF0700F9E7e1F688fe926940E8839F353"
@@ -41,7 +41,7 @@ def test_multi_or_one_multi():
     tx = multi_or_one([approve, add_liquidity], blockchain=Chain.GNOSIS)
     # when building more than one transaction the Multisend contract is used
     assert tx.operation == Operation.DELEGATE_CALL
-    assert tx.contract_address == MULTISENDS_DEPLOYS[Chain.GNOSIS]
+    assert tx.contract_address == MultiSendContractSpecs[Chain.GNOSIS].MultiSend.address
     assert tx.data == (
         "0x8d80ff0a000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000"
         "00000000000000000000000000000000172004ecaba5870353805a9f068101a40e0f32ed605c600000000000000000000000000"
@@ -59,7 +59,12 @@ def test_check_one(local_node_gc):
     ROLES_MOD_ADDRESS = "0xB6CeDb9603e7992A5d42ea2246B3ba0a21342503"
     ACCOUNT = "0x7e19DE37A31E40eec58977CEA36ef7fB70e2c5CD"
     status = roles.check(
-        txs=[approve], role=2, account=ACCOUNT, roles_mod_address=ROLES_MOD_ADDRESS, web3=local_node_gc.w3, block=27586992
+        txs=[approve],
+        role=2,
+        account=ACCOUNT,
+        roles_mod_address=ROLES_MOD_ADDRESS,
+        web3=local_node_gc.w3,
+        block=27586992,
     )
     assert status
 
