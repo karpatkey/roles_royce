@@ -42,7 +42,6 @@ class DynamicData:
     GBPe_spot_price: float
     drift_in_spot_price: float = field(init=False)
 
-
     def __post_init__(self):
         self.drift_GBPe_to_x3CRV = self.GBPe_to_x3CRV * self.x3CRV_price / (self.GBP_price * self.amount_GBPe) - 1
         self.drift_x3CRV_to_GBPe = self.x3CRV_to_GBPe * self.GBP_price / (self.amount_x3CRV * self.x3CRV_price) - 1

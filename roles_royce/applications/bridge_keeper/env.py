@@ -2,11 +2,11 @@ import json
 from dataclasses import dataclass, field
 
 from decouple import config
+from karpatkit.test_utils.fork import fork_unlock_account
 from web3 import Web3
 from web3.types import Address, ChecksumAddress
 
 from roles_royce.applications.utils import check_env_endpoints, custom_config, to_dict
-from karpatkit.test_utils.fork import fork_unlock_account
 
 
 @dataclass

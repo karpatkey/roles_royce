@@ -19,10 +19,10 @@ from roles_royce.toolshed.disassembling import (
     AuraDisassembler,
     BalancerDisassembler,
     Disassembler,
-    LidoDisassembler,
-    SwapDisassembler,
     DSRDisassembler,
+    LidoDisassembler,
     SparkDisassembler,
+    SwapDisassembler,
 )
 from roles_royce.utils import to_checksum_address
 
@@ -98,10 +98,7 @@ class ENV:
             self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLES_MOD_ADDRESS",
             default="",
         )
-        self.ROLE: str = config(
-            self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLE",
-            default="0"
-        )
+        self.ROLE: str = config(self.DAO.upper() + "_" + self.BLOCKCHAIN.upper() + "_ROLE", default="0")
         try:
             self.ROLE = int(self.ROLE)
         except ValueError:

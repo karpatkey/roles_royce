@@ -8,7 +8,6 @@ from web3 import Web3
 
 from .generic_method import Transactable
 from .protocols.multisend import MultiSend
-from .protocols.multisend import MULTISENDS_DEPLOYS as MULTISENDS  # For backwards compat
 
 TENDERLY_API_URL = "https://api.tenderly.co/api/v1/"
 TENDERLY_DASHBOARD_URL = "https://dashboard.tenderly.co/"

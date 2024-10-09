@@ -1,14 +1,16 @@
 import binascii
 
-from roles_royce.protocols.base import AvatarAddress, ApproveForToken
-from web3 import Web3
-from roles_royce.generic_method import Transactable
 from defabipedia.tokens import Abis
+from web3 import Web3
 from web3.types import Address
 
+from roles_royce.generic_method import Transactable
+from roles_royce.protocols.base import ApproveForToken, AvatarAddress
 
-def check_allowance_and_approve(w3: Web3, avatar: AvatarAddress, token: Address, spender: Address,
-                                amount: int) -> Transactable | None:
+
+def check_allowance_and_approve(
+    w3: Web3, avatar: AvatarAddress, token: Address, spender: Address, amount: int
+) -> Transactable | None:
     """
     Checks if the allowance of the token is enough for the spender to spend the amount and if not, returns an
     approve transactable to approve the spender to spend the amount

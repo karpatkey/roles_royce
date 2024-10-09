@@ -1,6 +1,7 @@
 from decimal import Decimal
 
-from defabipedia.tokens import Abis as TokenAbis, NATIVE
+from defabipedia.tokens import NATIVE
+from defabipedia.tokens import Abis as TokenAbis
 from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 from defabipedia.types import Chain
 from defabipedia.uniswap_v3 import Abis, ContractSpecs
