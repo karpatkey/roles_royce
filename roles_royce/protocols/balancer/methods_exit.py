@@ -62,18 +62,19 @@ class ExactBptSingleTokenExit(_ExactBptSingleTokenExit):
         min_amount_out: int,
         assets: list[Address] = None,
     ):
+        pool = Pool(w3, pool_id)
         if assets is None:
-            assets = Pool(w3, pool_id).assets()
-        pool_kind = Pool(w3, pool_id).pool_kind()
+            assets = pool.assets()
+        pool_kind = pool.pool_kind()
 
         exit_token_index = assets.index(token_out_address)
         min_amounts_out = [0] * exit_token_index + [min_amount_out] + [0] * (len(assets) - exit_token_index - 1)
 
         if pool_kind == PoolKind.ComposableStablePool:
-            bpt_index = Pool(w3, pool_id).bpt_index_from_composable()
+            bpt_index = pool.bpt_index_from_composable()
             assets.pop(bpt_index)
             exit_token_index_up = assets.index(token_out_address)
-            assets = Pool(w3, pool_id).assets()
+            assets = pool.assets()
         else:
             exit_token_index_up = exit_token_index
 
@@ -136,9 +137,10 @@ class ExactBptProportionalExit(_ExactBptProportionalExit):
         min_amounts_out: list[int],
         assets: list[Address] = None,
     ):
+        pool = Pool(w3, pool_id)
         if assets is None:
-            assets = Pool(w3, pool_id).assets()
-        pool_kind = Pool(w3, pool_id).pool_kind()
+            assets = pool.assets()
+        pool_kind = pool.pool_kind()
 
         super().__init__(
             blockchain=Chain.get_blockchain_from_web3(w3),
@@ -200,9 +202,10 @@ class ExactTokensExit(_ExactTokensExit):
         max_bpt_amount_in: int,
         assets: list[Address] = None,
     ):
+        pool = Pool(w3, pool_id)
         if assets is None:
-            assets = Pool(w3, pool_id).assets()
-        pool_kind = Pool(w3, pool_id).pool_kind()
+            assets = pool.assets()
+        pool_kind = pool.pool_kind()
 
         super().__init__(
             blockchain=Chain.get_blockchain_from_web3(w3),
@@ -422,9 +425,10 @@ class ExactTokensExitSlippage(ExactTokensExit):
         bpt_in, amounts_out_sim = m.call(web3=w3)
 
         # If the pool is composable stable, remove the amount corresponding to the bpt
-        pool_kind = Pool(w3, pool_id).pool_kind()
+        pool = Pool(w3, pool_id)
+        pool_kind = pool.pool_kind()
         if pool_kind == PoolKind.ComposableStablePool:
-            bpt_index = Pool(w3, pool_id).bpt_index_from_composable()
+            bpt_index = pool.bpt_index_from_composable()
             del amounts_out_sim[bpt_index]
 
         for index in range(len(amounts_out)):
@@ -449,11 +453,12 @@ class ExactSingleTokenProportionalExitSlippage(ExactTokensExit):
         max_slippage: float,
         assets: list[Address] = None,
     ):
+        pool = Pool(w3, pool_id)
         if assets is None:
-            assets = Pool(w3, pool_id).assets()
+            assets = pool.assets()
 
         token_index = assets.index(token_out_address)
-        balances = Pool(w3, pool_id).pool_balances()
+        balances = pool.pool_balances()
 
         # Get the corresponding proportional amounts out
         amounts_out = [
@@ -461,9 +466,9 @@ class ExactSingleTokenProportionalExitSlippage(ExactTokensExit):
         ]
 
         # If the pool is composable stable, remove the amount corresponding to the bpt
-        pool_kind = Pool(w3, pool_id).pool_kind()
+        pool_kind = pool.pool_kind()
         if pool_kind == PoolKind.ComposableStablePool:
-            bpt_index = Pool(w3, pool_id).bpt_index_from_composable()
+            bpt_index = pool.bpt_index_from_composable()
             del amounts_out[bpt_index]
 
         m = ExactTokensQueryExit(w3=w3, pool_id=pool_id, amounts_out=amounts_out)

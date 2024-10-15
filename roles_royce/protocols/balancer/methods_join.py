@@ -372,10 +372,11 @@ class ExactSingleTokenProportionalJoinSlippage(ExactTokensJoin):
         max_slippage: float,
         assets: list[Address] = None,
     ):
+        pool = Pool(w3, pool_id)
         if assets is None:
-            assets = Pool(w3, pool_id).assets()
+            assets = pool.assets()
         join_token_index = assets.index(token_in_address)
-        balances = Pool(w3, pool_id).pool_balances()
+        balances = pool.pool_balances()
         amounts_in = [
             int(Decimal(balance) * Decimal(amount_in) / Decimal(balances[join_token_index])) for balance in balances
         ]
