@@ -1,4 +1,4 @@
-from defabipedia import Blockchain, Chain
+from defabipedia import Blockchain
 from defabipedia.multisend import ContractSpecs
 from hexbytes import HexBytes
 
@@ -31,23 +31,15 @@ class MultiSend(ContractMethod):
         ("transactions", "bytes"),
     ]
 
-    def __init__(
-        self,
-        blockchain: Blockchain,
-        encoded_txns: bytes,
-    ):
+    def __init__(self, blockchain: Blockchain, encoded_txns: bytes, target_address: str | None = None):
         super().__init__()
         self.operation: Operation = Operation.DELEGATE_CALL
         self.args.transactions = encoded_txns
-        self.target_address = ContractSpecs[blockchain].MultiSend.address
+        self.target_address = target_address or ContractSpecs[blockchain].MultiSend.address
 
     @classmethod
-    def from_transactables(
-        cls,
-        blockchain: Blockchain,
-        txns: list[Transactable],
-    ):
+    def from_transactables(cls, blockchain: Blockchain, txns: list[Transactable], target_address: str | None = None):
         encoded_data = b"".join(
             [encode_multisend_tx(tx.operation, tx.contract_address, tx.value, tx.data) for tx in txns]
         )
-        return MultiSend(blockchain, encoded_data)
+        return MultiSend(blockchain, encoded_data, target_address)
