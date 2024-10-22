@@ -78,9 +78,9 @@ class SingleSwap(ContractMethod):
             self.args.user_data,
         ]
         self.args.funds = [
-            self.fixed_arguments["sender"],
+            self.avatar,
             self.fixed_arguments["from_internal_balance"],
-            self.fixed_arguments["recipient"],
+            self.avatar,
             self.fixed_arguments["to_internal_balance"],
         ]
         self.args.deadline = deadline
@@ -201,8 +201,8 @@ class QuerySwap(ContractMethod):
             self.args.user_data,
         ]
         self.args.funds = [
-            self.fixed_arguments["sender"],
+            self.avatar,
             self.fixed_arguments["from_internal_balance"],
-            self.fixed_arguments["recipient"],
+            self.avatar,
             self.fixed_arguments["to_internal_balance"],
         ]

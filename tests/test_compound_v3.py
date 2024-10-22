@@ -8,7 +8,9 @@ from defabipedia.types import Chain
 
 
 def test_approve():
-    m = compound.ApproveToken(token=EthereumTokenAddr.USDC, comet=ContractSpecs[Chain.ETHEREUM].cUSDCv3.address, amount=123)
+    m = compound.ApproveToken(
+        token=EthereumTokenAddr.USDC, comet=ContractSpecs[Chain.ETHEREUM].cUSDCv3.address, amount=123
+    )
     assert (
         m.data
         == "0x095ea7b3000000000000000000000000c3d688b66703497daa19211eedff47f25384cdc3000000000000000000000000000000000000000000000000000000000000007b"
@@ -60,7 +62,9 @@ def test_withdraw_eth():
 
 
 def test_borrow():
-    m = compound.Borrow(comet=ContractSpecs[Chain.ETHEREUM].cUSDCv3.address, token=EthereumTokenAddr.USDC, amount=100 * 10**6)
+    m = compound.Borrow(
+        comet=ContractSpecs[Chain.ETHEREUM].cUSDCv3.address, token=EthereumTokenAddr.USDC, amount=100 * 10**6
+    )
     assert (
         m.data
         == "0xf3fef3a3000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000000000005f5e100"
@@ -70,7 +74,9 @@ def test_borrow():
 def test_claim():
     m = compound.Claim(
         blockchain=Chain.ETHEREUM,
-        comet=ContractSpecs[Chain.ETHEREUM].cUSDCv3.address, avatar="0x24Dd242c3c4061b1fCaA5119af608B56afBaEA95", should_accrue=True
+        comet=ContractSpecs[Chain.ETHEREUM].cUSDCv3.address,
+        avatar="0x24Dd242c3c4061b1fCaA5119af608B56afBaEA95",
+        should_accrue=True,
     )
     assert (
         m.data

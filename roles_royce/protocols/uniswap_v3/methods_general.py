@@ -97,27 +97,27 @@ def mint_nft(
 
     blockchain = Chain.get_blockchain_from_web3(w3)
     if mint.value > 0:
-        if mint.args.token0 != ETHAddr.WETH:
+        if mint.token0 != ETHAddr.WETH:
             if not check_allowance(
                 w3,
                 avatar,
                 ContractSpecs[blockchain].PositionsNFT.address,
-                mint.args.token0,
-                mint.args.amount0_desired,
+                mint.token0,
+                mint.amount0_desired,
             ):
                 mint_trasactables.append(
-                    ApproveForPositionsNFT(blockchain, mint.args.token0, mint.args.amount0_desired)
+                    ApproveForPositionsNFT(blockchain, mint.token0, mint.amount0_desired)
                 )
         else:
             if not check_allowance(
                 w3,
                 avatar,
                 ContractSpecs[blockchain].PositionsNFT.address,
-                mint.args.token1,
-                mint.args.amount1_desired,
+                mint.token1,
+                mint.amount1_desired,
             ):
                 mint_trasactables.append(
-                    ApproveForPositionsNFT(blockchain, mint.args.token1, mint.args.amount1_desired)
+                    ApproveForPositionsNFT(blockchain, mint.token1, mint.amount1_desired)
                 )
 
         mint_trasactables.append(mint)
@@ -127,18 +127,18 @@ def mint_nft(
             w3,
             avatar,
             ContractSpecs[blockchain].PositionsNFT.address,
-            mint.args.token0,
-            mint.args.amount0_desired,
+            mint.token0,
+            mint.amount0_desired,
         ):
-            mint_trasactables.append(ApproveForPositionsNFT(blockchain, mint.args.token0, mint.args.amount0_desired))
+            mint_trasactables.append(ApproveForPositionsNFT(blockchain, mint.token0, mint.amount0_desired))
         if not check_allowance(
             w3,
             avatar,
             ContractSpecs[blockchain].PositionsNFT.address,
-            mint.args.token1,
-            mint.args.amount1_desired,
+            mint.token1,
+            mint.amount1_desired,
         ):
-            mint_trasactables.append(ApproveForPositionsNFT(blockchain, mint.args.token1, mint.args.amount1_desired))
+            mint_trasactables.append(ApproveForPositionsNFT(blockchain, mint.token1, mint.amount1_desired))
 
         mint_trasactables.append(mint)
 
@@ -198,13 +198,13 @@ def increase_liquidity_nft(
                 avatar,
                 ContractSpecs[blockchain].PositionsNFT.address,
                 increase_liquidity.nft_position.pool.token0,
-                increase_liquidity.args.amount0_desired,
+                increase_liquidity.amount0_desired,
             ):
                 increase_liquidity_trasactables.append(
                     ApproveForPositionsNFT(
                         blockchain,
                         increase_liquidity.nft_position.pool.token0,
-                        increase_liquidity.args.amount0_desired,
+                        increase_liquidity.amount0_desired,
                     )
                 )
         else:
@@ -213,13 +213,13 @@ def increase_liquidity_nft(
                 avatar,
                 ContractSpecs[blockchain].PositionsNFT.address,
                 increase_liquidity.nft_position.pool.token1,
-                increase_liquidity.args.amount1_desired,
+                increase_liquidity.amount1_desired,
             ):
                 increase_liquidity_trasactables.append(
                     ApproveForPositionsNFT(
                         blockchain,
                         increase_liquidity.nft_position.pool.token1,
-                        increase_liquidity.args.amount1_desired,
+                        increase_liquidity.amount1_desired,
                     )
                 )
 
@@ -231,13 +231,13 @@ def increase_liquidity_nft(
             avatar,
             ContractSpecs[blockchain].PositionsNFT.address,
             increase_liquidity.nft_position.pool.token0,
-            increase_liquidity.args.amount0_desired,
+            increase_liquidity.amount0_desired,
         ):
             increase_liquidity_trasactables.append(
                 ApproveForPositionsNFT(
                     blockchain,
                     increase_liquidity.nft_position.pool.token0,
-                    increase_liquidity.args.amount0_desired,
+                    increase_liquidity.amount0_desired,
                 )
             )
         if not check_allowance(
@@ -245,13 +245,13 @@ def increase_liquidity_nft(
             avatar,
             ContractSpecs[blockchain].PositionsNFT.address,
             increase_liquidity.nft_position.pool.token1,
-            increase_liquidity.args.amount1_desired,
+            increase_liquidity.amount1_desired,
         ):
             increase_liquidity_trasactables.append(
                 ApproveForPositionsNFT(
                     blockchain,
                     increase_liquidity.nft_position.pool.token1,
-                    increase_liquidity.args.amount1_desired,
+                    increase_liquidity.amount1_desired,
                 )
             )
 
@@ -309,12 +309,12 @@ def decrease_liquidity_nft(
         ):
             raise ValueError("One of the tokens must be WETH")
         elif decrease_liquidity.nft_position.pool.token0 == ETHAddr.WETH:
-            amount_minimum_unwrap = decrease_liquidity.args.amount0_min
-            amount_minimum_sweep = decrease_liquidity.args.amount1_min
+            amount_minimum_unwrap = decrease_liquidity.amount0_min
+            amount_minimum_sweep = decrease_liquidity.amount1_min
             sweep_token = decrease_liquidity.nft_position.pool.token1
         else:
-            amount_minimum_unwrap = decrease_liquidity.args.amount1_min
-            amount_minimum_sweep = decrease_liquidity.args.amount0_min
+            amount_minimum_unwrap = decrease_liquidity.amount1_min
+            amount_minimum_sweep = decrease_liquidity.amount0_min
             sweep_token = decrease_liquidity.nft_position.pool.token0
 
         decrease_liquidity_trasactables.append(decrease_liquidity)

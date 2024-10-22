@@ -198,16 +198,11 @@ class SingleSwap(ContractMethod):
     ):
         self.target_address = ContractSpecs[blockchain].Vault.address
         super().__init__(avatar=avatar)
-        self.args.single_swap["pool_id"] = pool_id
-        self.args.single_swap["kind"] = swap_kind
-        self.args.single_swap["asset_in"] = token_in_address
-        self.args.single_swap["asset_out"] = token_out_address
-        self.args.single_swap["amount"] = amount
-        self.args.single_swap["user_data"] = self.fixed_arguments["user_data"]
+        self.args.single_swap = [pool_id, swap_kind, token_in_address, token_out_address, amount, self.fixed_arguments["user_data"]]
         self.args.funds = [
-            self.fixed_arguments["sender"],
+            self.avatar,
             self.fixed_arguments["from_internal_balance"],
-            self.fixed_arguments["recipient"],
+            self.avatar,
             self.fixed_arguments["to_internal_balance"],
         ]
         self.args.deadline = self.fixed_arguments["deadline"]
