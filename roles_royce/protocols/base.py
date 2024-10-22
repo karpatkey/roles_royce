@@ -119,10 +119,10 @@ class ContractMethod:
         contract = web3.eth.contract(address=self.target_address, abi=self.abi)
         return contract.functions[self.name](*self.args_list).transact(txparams)
 
-    def _get_arg_value(self, element):
+    def _get_arg_value(self, element, tuple_name=None):
         arg_name, arg_type = element
         if type(arg_type) in (list, tuple):
-            value = tuple(self._get_arg_value(e) for e in arg_type[0])
+            value = tuple(getattr(self.args, arg_name))
         else:
             if arg_name in self.fixed_arguments:
                 value = self.fixed_arguments[arg_name]

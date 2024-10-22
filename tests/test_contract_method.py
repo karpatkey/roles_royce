@@ -112,29 +112,30 @@ def test_method_with_tuple():
 
 
 def test_method_with_tuple_array():
-    class GetWithdrawalStatus(ContractMethod):
-        name = "getWithdrawalStatus"
-        in_signature = [("request_ids", "uint256[]")]
-        out_signature = [
+    class MyMethod(ContractMethod):
+        name = "mymethod"
+        in_signature = [
             (
-                "statuses",
+                "vectors",
                 (  # an array of structs
                     (
-                        ("amount_of_stETH", "uint256"),
-                        ("amount_of_shares", "uint256"),
-                        ("owner", "address"),
-                        ("timestamp", "uint256"),
-                        ("is_finalized", "bool"),
-                        ("is_claimed", "bool"),
+                        ("a", "uint8"),
+                        ("b", "uint8"),
                     ),
                     "tuple[]",
                 ),
             )
         ]
 
-    method = GetWithdrawalStatus()
-    abi = json.loads(method.abi)[0]
-    assert abi["outputs"][0]["type"] == "tuple[]"
+        def __init__(self, vectors):
+            super().__init__()
+            self.args.vectors = vectors
+
+    method = MyMethod(vectors=[[1, 2], [3, 4]])
+    assert (
+        method.data
+        == "0xc7a0c901000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004"
+    )
 
 
 def test_method_values():
