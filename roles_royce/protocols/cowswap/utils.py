@@ -3,8 +3,8 @@ from dataclasses import dataclass
 
 import requests
 from defabipedia.types import Blockchain, Chain, StrEnum
+from eth_typing import Address
 from web3 import Web3
-from web3.types import Address
 
 
 class SwapKind(StrEnum):
