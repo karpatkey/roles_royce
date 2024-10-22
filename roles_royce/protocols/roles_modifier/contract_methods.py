@@ -117,8 +117,8 @@ class EnableModule(ContractMethod):
         self.args.module = module
 
 
-class AssignRoles(ContractMethod):
-    """Assign roles"""
+class AssignRolesV1(ContractMethod):
+    """Assign roles for the V1 of the Roles Mod Contracts."""
 
     name = "assignRoles"
     in_signature = [
@@ -141,6 +141,178 @@ class AssignRoles(ContractMethod):
         revoke_list = revoke_list or []
         self.args.roles = assign_list + revoke_list
         self.args.member_of = [True] * len(assign_list) + [False] * len(revoke_list)
+
+
+class AssignRolesV2(ContractMethod):
+    """Assign roles for the V2 of the Roles Mod Contracts."""
+
+    name = "assignRoles"
+    in_signature = [
+        ("module", "address"),
+        ("role_keys", "bytes32[]"),
+        ("member_of", "bool[]"),
+    ]
+
+    def __init__(
+        self,
+        roles_mod_address: Address,
+        module: Address,
+        assign_list: list[str] | None = None,
+        revoke_list: list[str] | None = None,
+    ):
+        super().__init__()
+        self.target_address = roles_mod_address
+        self.args.module = module
+        assign_list = assign_list or []
+        revoke_list = revoke_list or []
+        self.args.role_keys = assign_list + revoke_list
+        self.args.member_of = [True] * len(assign_list) + [False] * len(revoke_list)
+
+
+class ScopeTarget(ContractMethod):
+    """Scope target for the V2 of the Roles Mod Contracts."""
+
+    name = "scopeTarget"
+    in_signature = [
+        ("role_key", "bytes32"),
+        ("target", "address"),
+    ]
+
+    def __init__(
+        self,
+        roles_mod_address: Address,
+        role_key: str,
+        target: Address
+    ):
+        super().__init__()
+        self.target_address = roles_mod_address
+        self.args.role_key = role_key
+        self.args.target = target
+
+"""
+      "to": "0x27d8bb2e33Bc38A9CE93fdD90C80677b8436aFfb",
+      "value": "0",
+      "contractMethod": {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "roleKey",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "targetAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes4",
+            "name": "selector",
+            "type": "bytes4"
+          },
+          {
+            "internalType": "struct ConditionFlat[]",
+            "name": "conditions",
+            "type": "tuple[]",
+            "components": [
+              {
+                "internalType": "uint8",
+                "name": "parent",
+                "type": "uint8"
+              },
+              {
+                "internalType": "enum ParameterType",
+                "name": "paramType",
+                "type": "uint8"
+              },
+              {
+                "internalType": "enum Operator",
+                "name": "operator",
+                "type": "uint8"
+              },
+              {
+                "internalType": "bytes",
+                "name": "compValue",
+                "type": "bytes"
+              }
+            ]
+          },
+          {
+            "internalType": "enum ExecutionOptions",
+            "name": "options",
+            "type": "uint8"
+          }
+        ],
+        "name": "scopeFunction",
+        "payable": false
+      },
+      "contractInputsValues": {
+        "roleKey": "0x475541524449414e2d4175726152656c6f636b65720000000000000000000000",
+        "targetAddress": "0x5b2364fD757E262253423373E4D57C5c011Ad7F4",
+        "selector": "0xd34640b2",
+        "conditions": "[[0,5,5,0x],[0,4,0,0x],[0,4,0,0x],[0,4,0,0x],[0,4,0,0x],[0,1,0,0x],[0,3,5,0x],[1,1,0,0x],[2,1,0,0x],[3,1,0,0x],[4,1,0,0x],[6,1,0,0x],[6,1,0,0x],[6,1,16,0x0000000000000000000000000000000000000000000000000000000000000000],[6,1,16,0x0000000000000000000000000000000000000000000000000000000000000000],[6,1,16,0x0000000000000000000000000000000000000000000000000000000000000000],[6,1,16,0x0000000000000000000000000000000000000000000000000000000000000000],[6,1,16,0x0000000000000000000000000000000000000000000000000000000000000001]]",
+        "options": "0"
+      }
+    }
+"""
+
+class ScopeFunction(ContractMethod):
+    """Scope function for the V2 of the Roles Mod Contracts."""
+
+    name = "scopeFunction"
+    in_signature = [
+        ("role_key", "bytes32"),
+        ("target", "address"),
+        ("selector", "bytes4"),
+        (
+            "conditions",
+            [
+                (
+                    ("parent", "uint8"),
+                    ("param_type", "uint8"),
+                    ("operator", "uint8"),
+                    ("compvalue", "bytes"),
+                ),
+                "tuple[]",
+            ],
+        ),
+        ("options", "uint8"),
+    ]
+
+    def __init__(
+        self,
+        roles_mod_address: Address,
+        role_key: str,
+        target: Address,
+        selector: str,
+        conditions: list,
+        options: int,
+    ):
+        super().__init__()
+        self.target_address = roles_mod_address
+        self.args.role_key = role_key
+        self.args.target = target
+        self.args.selector = selector
+        self.args.conditions = conditions
+        self.args.options = options
+
+
+class AllowFunction(ContractMethod):
+    """Allow function for the V2 of the Roles Mod Contracts."""
+
+    name = "allowFunction"
+    in_signature = [
+        ("role_key", "bytes32"),
+        ("target", "address"),
+        ("selector", "bytes4"),
+    ]
+
+    def __init__(self, roles_mod_address: Address, role_key: str, target: Address, selector: str, options: int):
+        super().__init__()
+        self.target_address = roles_mod_address
+        self.args.role_key = role_key
+        self.args.target = target
+        self.args.selector = selector
+        self.args.options = options
 
 
 class SetMultisend(ContractMethod):

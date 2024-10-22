@@ -7,7 +7,7 @@ from web3 import Web3
 from defabipedia.multisend import ContractSpecs as MultiSendContractSpecs
 from roles_royce.evm_utils import roles_abi, roles_bytecode
 from roles_royce.generic_method import TxData
-from roles_royce.protocols.roles_modifier.contract_methods import AssignRoles, EnableModule
+from roles_royce.protocols.roles_modifier.contract_methods import AssignRolesV1, EnableModule
 from roles_royce.protocols.safe.contract_methods import EnableModule as SafeEnableModule
 from roles_royce.utils import to_checksum_address
 
@@ -46,7 +46,7 @@ def setup_common_roles(safe: SimpleSafe, roles_ctract):
         txns.extend(
             [
                 EnableModule(roles_mod_address=roles_ctract.address, module=account.address),
-                AssignRoles(roles_mod_address=roles_ctract.address, module=account.address, assign_list=[role_number]),
+                AssignRolesV1(roles_mod_address=roles_ctract.address, module=account.address, assign_list=[role_number]),
             ]
         )
     safe.send(txs=txns)
@@ -65,6 +65,6 @@ def assign_role(local_node, avatar_safe_address: str, roles_mod_address: str, ro
     local_node.unlock_account(avatar_safe_address)
     # The amount of ETH of the Avatar address is increased
     top_up_address(local_node.w3, address=avatar_safe_address, amount=1)
-    AssignRoles(roles_mod_address=roles_mod_address, module=asignee, assign_list=[role]).transact(
+    AssignRolesV1(roles_mod_address=roles_mod_address, module=asignee, assign_list=[role]).transact(
         local_node.w3, txparams={"from": avatar_safe_address}
     )
