@@ -2,7 +2,8 @@ import math
 from datetime import datetime
 from decimal import Decimal
 
-from defabipedia.tokens import EthereumTokenAddr as ETHAddr, NATIVE
+from defabipedia.tokens import NATIVE
+from defabipedia.tokens import EthereumTokenAddr as ETHAddr
 from defabipedia.types import Chain
 from defabipedia.uniswap_v3 import ContractSpecs
 from karpatkit.constants import Address as GenAddr

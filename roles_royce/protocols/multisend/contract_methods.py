@@ -1,14 +1,9 @@
+from defabipedia import Blockchain
+from defabipedia.multisend import ContractSpecs
 from hexbytes import HexBytes
 
-from defabipedia import Blockchain, Chain
 from roles_royce import Transactable
 from roles_royce.protocols.base import ContractMethod, Operation
-
-
-MULTISENDS_DEPLOYS = {
-    Chain.ETHEREUM: "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
-    Chain.GNOSIS: "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
-}
 
 
 def encode_multisend_tx(operation: int, to, value: int, data: str):
@@ -16,9 +11,7 @@ def encode_multisend_tx(operation: int, to, value: int, data: str):
     operation = HexBytes("{:0>2x}".format(operation))  # Operation 1 byte
     to = HexBytes("{:0>40x}".format(int(to, 16)))  # Address 20 bytes
     value = HexBytes("{:0>64x}".format(value))  # Value 32 bytes
-    data_length = HexBytes(
-        "{:0>64x}".format(len(data))
-    )  # Data length 32 bytes
+    data_length = HexBytes("{:0>64x}".format(len(data)))  # Data length 32 bytes
     return operation + to + value + data_length + data
 
 
@@ -38,21 +31,15 @@ class MultiSend(ContractMethod):
         ("transactions", "bytes"),
     ]
 
-    def __init__(
-            self,
-            blockchain: Blockchain,
-            encoded_txns: bytes,
-    ):
+    def __init__(self, blockchain: Blockchain, encoded_txns: bytes, target_address: str | None = None):
         super().__init__()
         self.operation: Operation = Operation.DELEGATE_CALL
         self.args.transactions = encoded_txns
-        self.target_address = MULTISENDS_DEPLOYS.get(blockchain)
+        self.target_address = target_address or ContractSpecs[blockchain].MultiSend.address
 
     @classmethod
-    def from_transactables(
-            cls,
-            blockchain: Blockchain,
-            txns: list[Transactable],
-    ):
-        encoded_data = b"".join([encode_multisend_tx(tx.operation, tx.contract_address, tx.value, tx.data) for tx in txns])
-        return MultiSend(blockchain, encoded_data)
+    def from_transactables(cls, blockchain: Blockchain, txns: list[Transactable], target_address: str | None = None):
+        encoded_data = b"".join(
+            [encode_multisend_tx(tx.operation, tx.contract_address, tx.value, tx.data) for tx in txns]
+        )
+        return MultiSend(blockchain, encoded_data, target_address)

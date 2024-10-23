@@ -35,8 +35,8 @@ def test_sign_order():
     )
 
     assert (
-            signer_tx.data
-            == "0x569d34890000000000000000000000006b175474e89094c44da98b954eedeac495271d0f0000000000000000000000006810e776880c02933d47db1b9fc05908e5386b96000000000000000000000000458cd345b4c05e8df39d0a07220feb4ec19f5e6f000000000000000000000000000000000000000000000036324e621e9cbd00710000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000006615af89ec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e260000000000000000000000000000000000000000000000000000000000000000f3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee34677500000000000000000000000000000000000000000000000000000000000000005a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc95a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc900000000000000000000000000000000000000000000000000000000000002580000000000000000000000000000000000000000000000000000000000000000"
+        signer_tx.data
+        == "0x569d34890000000000000000000000006b175474e89094c44da98b954eedeac495271d0f0000000000000000000000006810e776880c02933d47db1b9fc05908e5386b96000000000000000000000000458cd345b4c05e8df39d0a07220feb4ec19f5e6f000000000000000000000000000000000000000000000036324e621e9cbd00710000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000006615af89ec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e260000000000000000000000000000000000000000000000000000000000000000f3b277728b3fee749481eb3e0b3b48980dbbab78658fc419025cb16eee34677500000000000000000000000000000000000000000000000000000000000000005a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc95a28e9363bb942b639270062aa6bb295f434bcdfc42c97267bf003f272060dc900000000000000000000000000000000000000000000000000000000000002580000000000000000000000000000000000000000000000000000000000000000"
     )
 
 
@@ -47,8 +47,8 @@ def test_integration_uid_match(local_node_eth, accounts, requests_mock):
 
     blockchain = Chain.get_blockchain_from_web3(w3)
 
-    avatar_safe_address = '0x58e6c7ab55Aa9012eAccA16d1ED4c15795669E1C'
-    disassembler_address = '0x8072470F155c69C0706dd6016D6720D7Eb0438Fb'
+    avatar_safe_address = "0x58e6c7ab55Aa9012eAccA16d1ED4c15795669E1C"
+    disassembler_address = "0x8072470F155c69C0706dd6016D6720D7Eb0438Fb"
     local_node_eth.unlock_account(disassembler_address)
     role = 1
 
@@ -57,21 +57,34 @@ def test_integration_uid_match(local_node_eth, accounts, requests_mock):
     sell_amount = 784999999999994999997
     kind = "sell"
 
-    requests_mock.post("https://api.cow.fi/mainnet/api/v1/quote",
-                       text=json.dumps({"quote": {"sellToken": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-                                                  "buyToken": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-                                                  "receiver": "0x58e6c7ab55aa9012eacca16d1ed4c15795669e1c",
-                                                  "sellAmount": "784979836180084865665",
-                                                  "buyAmount": "784194345945024902508", "validTo": 1712784934,
-                                                  "appData": "{\"appCode\":\"karpatkey_swap\"}",
-                                                  "appDataHash": "0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26",
-                                                  "feeAmount": "20163819910134332", "kind": "sell",
-                                                  "partiallyFillable": False, "sellTokenBalance": "erc20",
-                                                  "buyTokenBalance": "erc20", "signingScheme": "presign"},
-                                        "from": "0x58e6c7ab55aa9012eacca16d1ed4c15795669e1c",
-                                        "expiration": "2024-04-10T21:07:34.875627713Z", "id": 481408144,
-                                        "verified": False}),
-                       status_code=200)
+    requests_mock.post(
+        "https://api.cow.fi/mainnet/api/v1/quote",
+        text=json.dumps(
+            {
+                "quote": {
+                    "sellToken": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+                    "buyToken": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                    "receiver": "0x58e6c7ab55aa9012eacca16d1ed4c15795669e1c",
+                    "sellAmount": "784979836180084865665",
+                    "buyAmount": "784194345945024902508",
+                    "validTo": 1712784934,
+                    "appData": '{"appCode":"karpatkey_swap"}',
+                    "appDataHash": "0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26",
+                    "feeAmount": "20163819910134332",
+                    "kind": "sell",
+                    "partiallyFillable": False,
+                    "sellTokenBalance": "erc20",
+                    "buyTokenBalance": "erc20",
+                    "signingScheme": "presign",
+                },
+                "from": "0x58e6c7ab55aa9012eacca16d1ed4c15795669e1c",
+                "expiration": "2024-04-10T21:07:34.875627713Z",
+                "id": 481408144,
+                "verified": False,
+            }
+        ),
+        status_code=200,
+    )
 
     order = quote_order_api(
         blockchain=blockchain,
@@ -88,9 +101,11 @@ def test_integration_uid_match(local_node_eth, accounts, requests_mock):
     # and w3.eth.get_block('latest').timestamp is approximately 1712782991 (sometimes it is 1712782992, etc.)
     valid_to = 1712782991 + valid_duration - 1000
 
-    requests_mock.post("https://api.cow.fi/mainnet/api/v1/orders",
-                       text='"0x529ed6e1ec9ba395c58fca9f20eb2e0a16a4e484082b8a7b824a901142c5d94258e6c7ab55aa9012eacca16d1ed4c15795669e1c66178747"',
-                       status_code=201)
+    requests_mock.post(
+        "https://api.cow.fi/mainnet/api/v1/orders",
+        text='"0x529ed6e1ec9ba395c58fca9f20eb2e0a16a4e484082b8a7b824a901142c5d94258e6c7ab55aa9012eacca16d1ed4c15795669e1c66178747"',
+        status_code=201,
+    )
     response_create_order = create_order_api(
         blockchain=blockchain,
         sell_token=order.sell_token,
@@ -100,7 +115,8 @@ def test_integration_uid_match(local_node_eth, accounts, requests_mock):
         kind=order.kind,
         amount=order.sell_amount,
         valid_to=valid_to,
-        order=order)
+        order=order,
+    )
 
     sign_order_transactable = SignOrder(
         blockchain=blockchain,
@@ -114,18 +130,20 @@ def test_integration_uid_match(local_node_eth, accounts, requests_mock):
         valid_duration=valid_duration,
         kind=kind,
     )
-    tx = roles.build(txs=[sign_order_transactable],
-                     account=disassembler_address,
-                     role=role,
-                     roles_mod_address='0x8C33ee6E439C874713a9912f3D3debfF1Efb90Da',
-                     web3=w3)
+    tx = roles.build(
+        txs=[sign_order_transactable],
+        account=disassembler_address,
+        role=role,
+        roles_mod_address="0x8C33ee6E439C874713a9912f3D3debfF1Efb90Da",
+        web3=w3,
+    )
     tx_hash = w3.eth.send_transaction(tx)
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 
     assert tx_receipt.status == 1
     for log in tx_receipt.logs:
-        if log.address == '0x9008D19f58AAbD9eD0D60971565AA8510560ab41':
-            uid_from_tx_log = '0x' + log.data.hex()[194:len(log.data.hex()) - 16]
+        if log.address == "0x9008D19f58AAbD9eD0D60971565AA8510560ab41":
+            uid_from_tx_log = "0x" + log.data.hex()[194 : len(log.data.hex()) - 16]
             break
 
     assert uid_from_tx_log == response_create_order["UID"]
@@ -188,9 +206,34 @@ def test_integration_sign_order(local_node_eth, accounts, requests_mock):
     sell_amount = 4499999999999499999
     kind = "sell"
 
-    requests_mock.post("https://api.cow.fi/mainnet/api/v1/quote",
-                        text=json.dumps({"quote": {"sellToken": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84", "buyToken": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "receiver": "0x01b1214ecf83ff63b12e18b05b3db84cae375635", "sellAmount": "4494365075127968832", "buyAmount": "4490141191271109775", "validTo": 1712786610, "appData": "{\"appCode\":\"karpatkey_swap\"}", "appDataHash": "0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26", "feeAmount": "5634924871531167", "kind": "sell", "partiallyFillable": False, "sellTokenBalance": "erc20", "buyTokenBalance": "erc20", "signingScheme": "presign"}, "from": "0x01b1214ecf83ff63b12e18b05b3db84cae375635", "expiration": "2024-04-10T21:35:30.813459830Z", "id": 481431436, "verified": False}),
-                        status_code=200)
+    requests_mock.post(
+        "https://api.cow.fi/mainnet/api/v1/quote",
+        text=json.dumps(
+            {
+                "quote": {
+                    "sellToken": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+                    "buyToken": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                    "receiver": "0x01b1214ecf83ff63b12e18b05b3db84cae375635",
+                    "sellAmount": "4494365075127968832",
+                    "buyAmount": "4490141191271109775",
+                    "validTo": 1712786610,
+                    "appData": '{"appCode":"karpatkey_swap"}',
+                    "appDataHash": "0xec4d31696be1272dc6f998e7119a6776e55100c5f8a225ca4ff9529a9eef8e26",
+                    "feeAmount": "5634924871531167",
+                    "kind": "sell",
+                    "partiallyFillable": False,
+                    "sellTokenBalance": "erc20",
+                    "buyTokenBalance": "erc20",
+                    "signingScheme": "presign",
+                },
+                "from": "0x01b1214ecf83ff63b12e18b05b3db84cae375635",
+                "expiration": "2024-04-10T21:35:30.813459830Z",
+                "id": 481431436,
+                "verified": False,
+            }
+        ),
+        status_code=200,
+    )
     order = quote_order_api(
         blockchain=blockchain,
         sell_token=sell_token,
@@ -206,9 +249,11 @@ def test_integration_sign_order(local_node_eth, accounts, requests_mock):
     # and w3.eth.get_block('latest').timestamp is approximately 1712784730 (sometimes it is 1712784731, etc.)
     valid_to = 1712784730 + valid_duration - 1000
 
-    requests_mock.post("https://api.cow.fi/mainnet/api/v1/orders",
-                        text='"0x6c9fbbe347d133956af1e2fcf0b1adede666faec6198cfecb96d9f292de2e60e01b1214ecf83ff63b12e18b05b3db84cae37563566178e12"',
-                        status_code=201)
+    requests_mock.post(
+        "https://api.cow.fi/mainnet/api/v1/orders",
+        text='"0x6c9fbbe347d133956af1e2fcf0b1adede666faec6198cfecb96d9f292de2e60e01b1214ecf83ff63b12e18b05b3db84cae37563566178e12"',
+        status_code=201,
+    )
     response_create_order = create_order_api(
         blockchain=blockchain,
         sell_token=order.sell_token,
@@ -217,7 +262,8 @@ def test_integration_sign_order(local_node_eth, accounts, requests_mock):
         from_address=order.from_address,
         kind=order.kind,
         amount=order.sell_amount,
-        valid_to=valid_to)
+        valid_to=valid_to,
+    )
 
     sign_order_transactable = SignOrder(
         blockchain=blockchain,
@@ -237,8 +283,8 @@ def test_integration_sign_order(local_node_eth, accounts, requests_mock):
 
     assert tx_receipt.status == 1
     for log in tx_receipt.logs:
-        if log.address == '0x9008D19f58AAbD9eD0D60971565AA8510560ab41':
-            uid_from_tx_log = '0x' + log.data.hex()[194:len(log.data.hex()) - 16]
+        if log.address == "0x9008D19f58AAbD9eD0D60971565AA8510560ab41":
+            uid_from_tx_log = "0x" + log.data.hex()[194 : len(log.data.hex()) - 16]
             break
 
     assert uid_from_tx_log == response_create_order["UID"]

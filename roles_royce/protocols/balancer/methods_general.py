@@ -1,5 +1,4 @@
-from defabipedia.types import Chain
-from web3 import Web3
+from defabipedia.types import Blockchain, Chain
 
 from roles_royce.constants import CrossChainAddr
 from roles_royce.protocols.base import Address, BaseApproveForToken
@@ -14,10 +13,10 @@ class ApproveForVault(BaseApproveForToken):
 
 
 class Stake(StakeInGauge):
-    def __init__(self, w3: Web3, gauge_address: Address, amount: int):
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3), gauge_address=gauge_address, amount=amount)
+    def __init__(self, blockchain: Blockchain, gauge_address: Address, amount: int):
+        super().__init__(blockchain=blockchain, gauge_address=gauge_address, amount=amount)
 
 
 class Unstake(UnstakeFromGauge):
-    def __init__(self, w3: Web3, gauge_address: Address, amount: int):
-        super().__init__(blockchain=Chain.get_blockchain_from_web3(w3), gauge_address=gauge_address, amount=amount)
+    def __init__(self, blockchain: Blockchain, gauge_address: Address, amount: int):
+        super().__init__(blockchain=blockchain, gauge_address=gauge_address, amount=amount)

@@ -7,7 +7,7 @@ from karpatkit.helpers import get_balance
 from karpatkit.test_utils.fork import create_simple_safe, steal_token
 from karpatkit.test_utils.simple_safe import SimpleEthereumClient, SimpleSafe
 from web3 import Web3
-
+from defabipedia.multisend import ContractSpecs as MultiSendContractSpecs
 from roles_royce import roles
 from roles_royce.constants import ETHAddr
 from roles_royce.evm_utils import dai_abi, roles_abi, roles_bytecode
@@ -15,9 +15,8 @@ from roles_royce.generic_method import TxData
 from roles_royce.protocols import balancer
 from roles_royce.protocols.eth import aura
 from roles_royce.roles_modifier import TransactionWouldBeReverted
-from roles_royce.utils import MULTISENDS, to_checksum_address
-
 from roles_royce.toolshed.test_utils.roles_fork_utils import apply_roles_presets, deploy_roles, setup_common_roles
+from roles_royce.utils import to_checksum_address
 
 
 def test_safe_and_roles(local_node_eth):
@@ -99,7 +98,7 @@ def test_safe_and_roles(local_node_eth):
     role_ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
 
     tx_hash = role_ctract.constructor(owner, avatar, target).transact({"from": test_account0_addr})  # deploy!
-    roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)['contractAddress']
+    roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)["contractAddress"]
 
     role_ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
     assert role_ctract.functions.avatar().call() == avatar
@@ -107,7 +106,7 @@ def test_safe_and_roles(local_node_eth):
     # give the roles_mod to the safe
     role_ctract.functions.setTarget(safe.address).transact({"from": test_account0_addr})
     role_ctract.functions.setAvatar(safe.address).transact({"from": test_account0_addr})
-    role_ctract.functions.setMultisend(MULTISENDS[Chain.ETHEREUM]).transact({"from": test_account0_addr})
+    role_ctract.functions.setMultisend(MultiSendContractSpecs[Chain.ETHEREUM].MultiSend.address).transact({"from": test_account0_addr})
     role_ctract.functions.transferOwnership(safe.address).transact({"from": test_account0_addr})
 
     assert role_ctract.functions.owner().call() == safe.address

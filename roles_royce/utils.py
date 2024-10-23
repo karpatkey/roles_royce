@@ -8,7 +8,6 @@ from web3 import Web3
 
 from .generic_method import Transactable
 from .protocols.multisend import MultiSend
-from .protocols.multisend import MULTISENDS_DEPLOYS as MULTISENDS  # For backwards compat
 
 TENDERLY_API_URL = "https://api.tenderly.co/api/v1/"
 TENDERLY_DASHBOARD_URL = "https://dashboard.tenderly.co/"
@@ -32,9 +31,9 @@ def to_data_input(name, signature, args):
     return f"{encoded_signature}{encoded_args}"
 
 
-def multi_or_one(txs: List[Transactable], blockchain: Blockchain) -> Transactable:
+def multi_or_one(txs: List[Transactable], blockchain: Blockchain, target_address: str | None = None) -> Transactable:
     if len(txs) > 1:
-        multisend_method = MultiSend.from_transactables(blockchain, txs)
+        multisend_method = MultiSend.from_transactables(blockchain, txs, target_address)
         return multisend_method
     elif len(txs) == 1:
         return txs[0]

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from defabipedia.lido import ContractSpecs
 from defabipedia.swap_pools import SwapPoolInstances
-from defabipedia.tokens import erc20_contract, EthereumTokenAddr
+from defabipedia.tokens import EthereumTokenAddr, erc20_contract
 from defabipedia.types import Blockchain, Chain, SwapPools
 from web3 import Web3
 from web3.types import Address
@@ -45,7 +45,7 @@ whitelist_poolIDs = [
     "0x49cbd67651fbabce12d1df18499896ec87bef46f00000000000000000000064a",  # USDC-USDT-DAI-sDAI eth
     "0xbad20c15a773bf03ab973302f61fabcea5101f0a000000000000000000000034",  # WETH-wstETH gc
     "0x7644fa5d0ea14fcf3e813fdf93ca9544f8567655000000000000000000000066",  # USDT-sDAI-USDC gc
-    #"0xdd439304a77f54b1f7854751ac1169b279591ef7000000000000000000000064",  # sDAI-EURe gc
+    # "0xdd439304a77f54b1f7854751ac1169b279591ef7000000000000000000000064",  # sDAI-EURe gc
     "0x2086f52651837600180de173b09470f54ef7491000000000000000000000004f",  # USDT-USDC-WXDAI gc
     "0x06135a9ae830476d3a941bae9010b63732a055f4000000000000000000000065",  # stERU-EURe gc
     "0xc9f00c3a713008ddf69b768d90d4978549bfdf9400000000000000000000006d",  # crvUSD-sDAI gc
@@ -61,12 +61,11 @@ wallet_tokens_swap = [
                     "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",  # wstETH
                     "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",  # ankrETH
                     "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b",  # ETHx
-                ],  
+                ],
                 "token_out": [
                     "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  # ETH
                     "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",  # WETH
-
-                ],  
+                ],
             },
             {
                 "token_in": [
@@ -77,74 +76,85 @@ wallet_tokens_swap = [
                     "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",  # wstETH
                     "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",  # ankrETH
                     "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b",  # ETHx
-                ],  
+                ],
                 "token_out": [
                     "0x6B175474E89094C44Da98b954EedeAC495271d0F",  # DAI
-                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",  # USDT 
+                    "0xdAC17F958D2ee523a2206206994597C13D831ec7",  # USDT
                     "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
-                ],  
+                ],
             },
             {
                 "token_in": ["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"],  # USDC
                 "token_out": [
                     "0x6B175474E89094C44Da98b954EedeAC495271d0F",  # DAI
                     "0xdAC17F958D2ee523a2206206994597C13D831ec7",  # USDT
-                ],  
+                ],
             },
             {
                 "token_in": ["0xdAC17F958D2ee523a2206206994597C13D831ec7"],  # USDT
                 "token_out": [
                     "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
                     "0x6B175474E89094C44Da98b954EedeAC495271d0F",  # DAI
-                ], 
+                ],
             },
             {
                 "token_in": ["0x6B175474E89094C44Da98b954EedeAC495271d0F"],  # DAI
                 "token_out": [
                     "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",  # USDC
                     "0xdAC17F958D2ee523a2206206994597C13D831ec7",  # USDT
-                ],  
+                ],
             },
         ]
     },
     {
         "gnosis": [
             {
-                "token_in": ["0xcB444e90D8198415266c6a2724b7900fb12FC56E",], # EURe
-                "token_out": ["0x1337BedC9D22ecbe766dF105c9623922A27963EC"  # 3CRV
-                ],  
+                "token_in": [
+                    "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
+                ],  # EURe
+                "token_out": ["0x1337BedC9D22ecbe766dF105c9623922A27963EC"],  # 3CRV
             },
             {
-                "token_in": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6"], # USDT
-                "token_out": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", # USDC
-                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # XDAI
+                "token_in": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6"],  # USDT
+                "token_out": [
+                    "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",  # USDC
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                ],  # XDAI
             },
             {
-                "token_in": ["0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"], # WXDAI
-                "token_out": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
-                              "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"], # USDC
+                "token_in": ["0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"],  # WXDAI
+                "token_out": [
+                    "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",  # USDT
+                    "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
+                ],  # USDC
             },
             {
-                "token_in": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"], # USDC
-                "token_out": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
-                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # XDAI
+                "token_in": ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"],  # USDC
+                "token_out": [
+                    "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",  # USDT
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                ],  # XDAI
             },
             {
-                "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"], # WSTETH
-                "token_out": ["0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1"], # WETH
+                "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"],  # WSTETH
+                "token_out": ["0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1"],  # WETH
             },
             {
-                "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"], # sDAI
-                "token_out": ["0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1", # WETH
-                              "0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
-                              "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", # USDC
-                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"] # xDAI
+                "token_in": ["0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6"],  # sDAI
+                "token_out": [
+                    "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1",  # WETH
+                    "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",  # USDT
+                    "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",  # USDC
+                    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                ],  # xDAI
             },
             {
-                "token_in": ["0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"], # xDAI
-                "token_out": ["0x4ECaBa5870353805a9F068101A40E0f32ed605C6", # USDT
-                              "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"] # USDC
-            }
+                "token_in": ["0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"],  # xDAI
+                "token_out": [
+                    "0x4ECaBa5870353805a9F068101A40E0f32ed605C6",  # USDT
+                    "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
+                ],  # USDC
+            },
         ]
     },
 ]
@@ -209,10 +219,11 @@ def seed_dict(dao: DAO, blockchain: Blockchain, positions: list) -> dict:
     }
     return data
 
+
 def get_wrapped_from_native(w3: Web3) -> str:
     Blockchain = Chain.get_blockchain_from_web3(w3)
     if Blockchain == Chain.ETHEREUM:
-        wrapped_token = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"   
+        wrapped_token = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
         wrapped_symbol = "WETH"
         native_symbol = "ETH"
         return wrapped_token, wrapped_symbol, native_symbol
@@ -223,6 +234,7 @@ def get_wrapped_from_native(w3: Web3) -> str:
         return wrapped_token, wrapped_symbol, native_symbol
     else:
         raise ValueError("Blockchain not supported")
+
 
 # -----------------------------------------------------------------------------------------------------------------------
 # Position classes
@@ -341,7 +353,8 @@ class WalletPosition:
             token_contract = erc20_contract(w3, self.token_in_address)
             token_symbol = token_contract.functions.symbol().call()
             return f"{blockchain}_WalletPosition_{token_symbol}"
-        
+
+
 @dataclass
 class MakerPosition:
     position_id: str
@@ -357,7 +370,8 @@ class MakerPosition:
     def position_id_human_readable(self, w3: Web3) -> str:
         blockchain = Chain.get_blockchain_from_web3(w3)
         return f"{blockchain}_MakerPosition_{self.address}"
-    
+
+
 @dataclass
 class SparkPosition:
     position_id: str
@@ -369,7 +383,7 @@ class SparkPosition:
     def position_id_tech(self) -> Address:
         """The address used at Spark"""
         return self.address
-    
+
     def position_id_human_readable(self, w3: Web3) -> str:
         blockchain = Chain.get_blockchain_from_web3(w3)
         return f"{blockchain}_SparkPosition_{self.address}"
@@ -408,7 +422,7 @@ class DAOStrategiesBuilder:
         if self.maker:
             positions.extend(self.build_maker_positions(w3, self.maker))
         if self.spark:
-            positions.extend(self.build_spark_positions(w3, self.spark))    
+            positions.extend(self.build_spark_positions(w3, self.spark))
         return seed_dict(self.dao, self.blockchain, positions)
 
     def build_json(self, w3: Web3):
@@ -613,7 +627,7 @@ class DAOStrategiesBuilder:
                     del position["exec_config"][5]
                 elif "Curve" not in protocol_list:
                     del position["exec_config"][4]
-               
+
             if lido_position.lido_address == ContractSpecs[blockchain].wstETH.address:
                 if blockchain == Chain.GNOSIS:
                     position["exec_config"] = list(
@@ -629,8 +643,6 @@ class DAOStrategiesBuilder:
                 position["exec_config"] = list(
                     filter(lambda x: x["function_name"] not in ["exit_2", "exit_4"], position["exec_config"])
                 )
-
-
 
             for i in range(len(position["exec_config"])):
                 print(
@@ -666,28 +678,28 @@ class DAOStrategiesBuilder:
                             position["position_id_tech"] = wallet_position.position_id_tech()
                             position["position_id_human_readable"] = wallet_position.position_id_human_readable(w3)
 
-                            #add swaps for cowswap
-                            position["exec_config"][0]["parameters"][0]["options"][0]["value"]=token_in_address
+                            # add swaps for cowswap
+                            position["exec_config"][0]["parameters"][0]["options"][0]["value"] = token_in_address
                             del position["exec_config"][0]["parameters"][2]["options"][0]
                             if token_in_address == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
                                 x, y, token_in_symbol = get_wrapped_from_native(w3)
                             else:
                                 token_in_contract = erc20_contract(w3, token_in_address)
                                 token_in_symbol = token_in_contract.functions.symbol().call()
-                            position["exec_config"][0]["parameters"][0]["options"][0]["label"]=token_in_symbol
+                            position["exec_config"][0]["parameters"][0]["options"][0]["label"] = token_in_symbol
                             for token_out in swap_entry["token_out"]:
                                 if token_out == "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE":
                                     x, y, token_out_symbol = get_wrapped_from_native(w3)
                                 else:
                                     token_out_contract = erc20_contract(w3, token_out)
                                     token_out_symbol = token_out_contract.functions.symbol().call()
-                                
+
                                 position["exec_config"][0]["parameters"][2]["options"].append(
                                     {"value": token_out, "label": token_out_symbol}
                                 )
                                 position["position_id_human_readable"] += f"_to_{token_out_symbol}_in_CowSwap"
 
-                            #add swaps for balancer, curve and uniswapv3
+                            # add swaps for balancer, curve and uniswapv3
                             token_pairs = []
                             for token_out in swap_entry["token_out"]:
                                 token_pairs.append([token_in_address, token_out])
@@ -747,7 +759,9 @@ class DAOStrategiesBuilder:
                                     position["exec_config"][i]["parameters"][2]["options"].append(
                                         {"value": instance["pair"][1], "label": token_out_symbol}
                                     )
-                                    position["position_id_human_readable"] += f"_to_{token_out_symbol}_in_{instance['pool'].protocol}"
+                                    position[
+                                        "position_id_human_readable"
+                                    ] += f"_to_{token_out_symbol}_in_{instance['pool'].protocol}"
                                 else:
                                     if not any(
                                         option["value"] == instance["pair"][1]
@@ -773,7 +787,7 @@ class DAOStrategiesBuilder:
                             else:
                                 print("        Not adding: ", wallet_position)
         return result
-    
+
     @staticmethod
     def build_maker_positions(w3: Web3, positions: list[MakerPosition]) -> list[dict]:
         with open(os.path.join(os.path.dirname(__file__), "templates", "maker_template.json"), "r") as f:
@@ -801,7 +815,7 @@ class DAOStrategiesBuilder:
 
             result.append(position)
         return result
-    
+
     @staticmethod
     def build_spark_positions(w3: Web3, positions: list[SparkPosition]) -> list[dict]:
         with open(os.path.join(os.path.dirname(__file__), "templates", "spark_template.json"), "r") as f:
@@ -829,4 +843,3 @@ class DAOStrategiesBuilder:
 
             result.append(position)
         return result
-

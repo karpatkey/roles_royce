@@ -2,9 +2,10 @@ from defabipedia.cowswap_signer import ContractSpecs
 from defabipedia.types import Blockchain
 from web3 import Web3
 from web3.types import Address
+
 from roles_royce.protocols.base import AvatarAddress, ContractMethod
-from roles_royce.roles_modifier import Operation
 from roles_royce.protocols.cowswap.utils import CONSTANTS
+from roles_royce.roles_modifier import Operation
 
 
 class SignOrder(ContractMethod):
@@ -46,7 +47,7 @@ class SignOrder(ContractMethod):
         "partially_fillable": False,
         "sell_token_balance": CONSTANTS.ERC20_HASH,
         "buy_token_balance": CONSTANTS.ERC20_HASH,
-        "fee_amount_bp": 0
+        "fee_amount_bp": 0,
     }
 
     def __init__(
