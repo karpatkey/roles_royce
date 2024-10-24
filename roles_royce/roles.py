@@ -9,7 +9,7 @@ from web3.types import TxReceipt
 from .generic_method import Transactable
 from .roles_modifier import RolesMod
 from .utils import multi_or_one
-from roles_royce.evm_utils import roles_abi
+from roles_royce.evm_utils import roles_v1_abi
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ def use_old_multisend_if_needed(w3: Web3, roles_mod_address: str, address: str)-
     v1 contract instances that use the old multisend contract, not the one in defabipedia."""
     if address == ContractSpecs[Chain.GNOSIS].MultiSend.address:
         try:
-            return w3.eth.contract(roles_mod_address, abi=roles_abi).functions.multisend().call()
+            return w3.eth.contract(roles_mod_address, abi=roles_v1_abi).functions.multisend().call()
         except:
             pass
     else:

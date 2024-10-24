@@ -354,11 +354,7 @@ class SwapAndRepay(ContractMethod):
         self.args.debt_rate_mode = debt_rate_mode
         self.args.buy_all_balance_offset = buy_all_balance_offset
         self.args.paraswap_data = calldata
-        self.args.amount = permit_amount
-        self.args.deadline = permit_deadline
-        self.args.v = permit_v
-        self.args.r = permit_r
-        self.args.s = permit_s
+        self.args.permit = (permit_amount, permit_deadline, permit_v, permit_r, permit_s)
 
 
 class SwapAndDeposit(ContractMethod):
@@ -405,11 +401,7 @@ class SwapAndDeposit(ContractMethod):
         self.args.swap_all_balance_offset = swap_all_balance_offset
         self.args.swap_calldata = calldata
         self.args.augustus = augustus
-        self.args.amount = permit_amount
-        self.args.deadline = permit_deadline
-        self.args.v = permit_v
-        self.args.r = permit_r
-        self.args.s = permit_s
+        self.args.permit = (permit_amount, permit_deadline, permit_v, permit_r, permit_s)
 
 
 class DelegateAAVE(ContractMethod):

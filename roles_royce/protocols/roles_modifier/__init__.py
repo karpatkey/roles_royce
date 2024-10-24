@@ -1,8 +1,13 @@
 from .contract_methods import (
-    AssignRoles,
+    AssignRolesV1,
+    AssignRolesV2,
     EnableModule,
     ExecTransactionWithRoleV1,
     ExecTransactionWithRoleV2,
+    ScopeTarget,
+    ScopeFunction,
+    AllowFunction,
     SetMultisend,
+    SetTransactionUnwrapper,
     get_exec_transaction_with_role_method,
 )
