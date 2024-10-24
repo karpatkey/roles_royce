@@ -10,6 +10,7 @@ from roles_royce.protocols.roles_modifier import (
     ExecTransactionWithRoleV2,
     get_exec_transaction_with_role_method,
 )
+from roles_royce.protocols.roles_modifier.contract_methods import SetTransactionUnwrapper
 
 
 def test_exect_transaction_with_role():
@@ -137,7 +138,7 @@ def test_scope_target():
     roles_mod_address = "0x27d8bb2e33Bc38A9CE93fdD90C80677b8436aFfb"
     method = ScopeTarget(
         roles_mod_address=roles_mod_address,
-        role_key="0x475541524449414e2d4175726152656c6f636b65720000000000000000000000",
+        role="0x475541524449414e2d4175726152656c6f636b65720000000000000000000000",
         target="0x5b2364fD757E262253423373E4D57C5c011Ad7F4",
     )
 
@@ -185,7 +186,7 @@ def test_scope_function():
     roles_mod_address = "0x27d8bb2e33Bc38A9CE93fdD90C80677b8436aFfb"
     method = ScopeFunction(
         roles_mod_address=roles_mod_address,
-        role_key="0x475541524449414e2d4175726152656c6f636b65720000000000000000000000",
+        role="0x475541524449414e2d4175726152656c6f636b65720000000000000000000000",
         target="0x5b2364fD757E262253423373E4D57C5c011Ad7F4",
         selector="0xd34640b2",
         conditions=[
@@ -289,3 +290,14 @@ def test_scope_function():
         function_name="scopeFunction", function_args=function_args, contract_abi=abi, contract_address=roles_mod_address
     )
     assert generic_tx.data == expected
+
+
+def test_set_transaction_unwrapper():
+    roles_mod_address = "0x27d8bb2e33Bc38A9CE93fdD90C80677b8436aFfb"
+    method = SetTransactionUnwrapper(
+        roles_mod_address=roles_mod_address,
+        to="0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526",
+        selector="0x8d80ff0a",
+        adapter="0x93B7fCbc63ED8a3a24B59e1C3e6649D50B7427c0",
+    )
+    assert method.data == "0x2916a9af00000000000000000000000038869bf66a61cf6bdb996a6ae40d5853fd43b5268d80ff0a0000000000000000000000000000000000000000000000000000000000000000000000000000000093b7fcbc63ed8a3a24b59e1c3e6649d50b7427c0"

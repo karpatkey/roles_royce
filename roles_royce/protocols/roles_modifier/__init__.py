@@ -7,7 +7,7 @@ from .contract_methods import (
     ScopeTarget,
     ScopeFunction,
     AllowFunction,
-
     SetMultisend,
+    SetTransactionUnwrapper,
     get_exec_transaction_with_role_method,
 )

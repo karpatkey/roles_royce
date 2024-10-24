@@ -5,27 +5,39 @@ from karpatkit.test_utils.fork import TEST_ACCOUNTS, top_up_address
 from karpatkit.test_utils.simple_safe import SimpleSafe
 from web3 import Web3
 from defabipedia.multisend import ContractSpecs as MultiSendContractSpecs
-from roles_royce.evm_utils import roles_abi, roles_bytecode
+from roles_royce.evm_utils import roles_v1_abi, roles_v2_abi, roles_v1_bytecode, roles_v2_bytecode
 from roles_royce.generic_method import TxData
 from roles_royce.protocols.roles_modifier.contract_methods import AssignRolesV1, EnableModule
 from roles_royce.protocols.safe.contract_methods import EnableModule as SafeEnableModule
 from roles_royce.utils import to_checksum_address
 
-
-def deploy_roles(w3: Web3, avatar):
-    # Deploy a Roles contrat without using the ProxyFactory (to simplify things)
+def _deploy_roles(w3:Web3, owner, avatar, target, abi, bytecode):
+    # constructor: owner(address), avatar(address), target(address)
     role_constructor_bytes = "000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
-    bytecode_without_default_constructor = roles_bytecode[: -len(role_constructor_bytes)]
+    bytecode_without_default_constructor = bytecode[: -len(role_constructor_bytes)]
 
-    ctract = w3.eth.contract(abi=roles_abi, bytecode=bytecode_without_default_constructor)
+    ctract = w3.eth.contract(abi=abi, bytecode=bytecode_without_default_constructor)
 
-    owner = avatar = target = to_checksum_address(avatar)
+    owner, avatar, target = to_checksum_address(owner), to_checksum_address(avatar), to_checksum_address(target)
     tx_hash = ctract.constructor(owner, avatar, target).transact({"from": avatar})  # deploy!
     roles_ctract_address = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=5)["contractAddress"]
 
-    ctract = w3.eth.contract(roles_ctract_address, abi=roles_abi)
+    ctract = w3.eth.contract(roles_ctract_address, abi=abi)
+
+    return ctract
+
+def deploy_roles(w3: Web3, avatar, owner=None, target=None):
+    """Deploy a Roles Modifier V1 contract"""
+    owner, target = owner or avatar, target or avatar
+    ctract = _deploy_roles(w3, owner, avatar, target, roles_v1_abi, roles_v1_bytecode)
     ctract.functions.setMultisend(MultiSendContractSpecs[Chain.ETHEREUM].MultiSend.address).transact({"from": avatar})
     return ctract
+
+
+def deploy_roles_v2(w3: Web3, avatar, owner=None, target=None):
+    """Deploy a Roles Modifier V2 contract"""
+    owner, target = owner or avatar, target or avatar
+    return _deploy_roles(w3, owner, avatar, target, roles_v2_abi, roles_v2_bytecode)
 
 
 def setup_common_roles(safe: SimpleSafe, roles_ctract):
@@ -45,7 +57,7 @@ def setup_common_roles(safe: SimpleSafe, roles_ctract):
         account = TEST_ACCOUNTS[role_number]
         txns.extend(
             [
-                EnableModule(roles_mod_address=roles_ctract.address, module=account.address),
+                EnableModule(roles_mod_address=roles_ctract.address, module=account.address),  # FIXME: this is not needed!
                 AssignRolesV1(roles_mod_address=roles_ctract.address, module=account.address, assign_list=[role_number]),
             ]
         )
