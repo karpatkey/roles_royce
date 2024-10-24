@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from defabipedia.lido import ContractSpecs
 from defabipedia.tokens import EthereumTokenAddr
+from defabipedia.types import Chain
 
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols import cowswap
