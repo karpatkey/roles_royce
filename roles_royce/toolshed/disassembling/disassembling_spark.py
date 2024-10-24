@@ -85,7 +85,7 @@ class SparkDisassembler(Disassembler):
             fork = False
 
         return cowswap.create_order_and_swap(
-            w3=self.w3,
+            blockchain=self.blockchain,
             avatar=self.avatar_safe_address,
             sell_token=ContractSpecs[self.blockchain].sDAI.address,
             buy_token=Addresses[self.blockchain].USDC,

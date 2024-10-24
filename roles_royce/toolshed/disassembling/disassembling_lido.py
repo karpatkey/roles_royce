@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from defabipedia.lido import ContractSpecs
 from defabipedia.tokens import EthereumTokenAddr
+from defabipedia.types import Chain
 
 from roles_royce.generic_method import Transactable
 from roles_royce.protocols import cowswap
@@ -161,7 +162,7 @@ class LidoDisassembler(Disassembler):
             fork = False
 
         return cowswap.create_order_and_swap(
-            w3=self.w3,
+            blockchain=Chain.get_blockchain_from_web3(self.w3),
             avatar=self.avatar_safe_address,
             sell_token=EthereumTokenAddr.stETH,
             buy_token=EthereumTokenAddr.E,
@@ -206,7 +207,7 @@ class LidoDisassembler(Disassembler):
             fork = False
 
         return cowswap.create_order_and_swap(
-            w3=self.w3,
+            blockchain=Chain.get_blockchain_from_web3(self.w3),
             avatar=self.avatar_safe_address,
             sell_token=EthereumTokenAddr.wstETH,
             buy_token=EthereumTokenAddr.E,

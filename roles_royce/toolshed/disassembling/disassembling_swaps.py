@@ -170,7 +170,7 @@ class SwapDisassembler(Disassembler):
             token_in = self.get_wrapped_token()
 
         cow_txns = cowswap.create_order_and_swap(
-            w3=self.w3,
+            blockchain=self.blockchain,
             avatar=self.avatar_safe_address,
             sell_token=token_in,
             buy_token=token_out,

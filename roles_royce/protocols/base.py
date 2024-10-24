@@ -2,9 +2,10 @@ import json
 from enum import IntEnum
 from types import SimpleNamespace
 
+from eth_typing import Address as EvmAddress
 from web3 import Web3
 
-Address = str
+Address = str | EvmAddress
 
 
 class SimpleRepr(type):

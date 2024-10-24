@@ -60,7 +60,7 @@ def test_create_order_and_swap(local_node_eth, requests_mock):
     )
 
     transactables = create_order_and_swap(
-        w3=w3,
+        blockchain=Chain.ETHEREUM,
         avatar=avatar_safe,
         sell_token=sell_token,
         buy_token=buy_token,
@@ -202,7 +202,7 @@ def test_integration_create_order_and_swap(local_node_eth, accounts, requests_mo
     max_slippage = 0.1
 
     transactables = create_order_and_swap(
-        w3=w3,
+        blockchain=Chain.ETHEREUM,
         avatar=avatar_safe_address,
         sell_token=sell_token,
         buy_token=buy_token,
