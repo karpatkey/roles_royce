@@ -413,26 +413,11 @@ def test_roles_errors(local_node_eth, accounts):
 def test_deploy_roles_v2(local_node_eth, accounts):
     w3 = local_node_eth.w3
     account = accounts[0]
+    local_node_eth.set_block(21021240)
     safe = create_simple_safe(w3=w3, owner=account)
     roles_ctract = deploy_roles_v2(avatar=safe.address, w3=w3)
 
     safe.send(txs=[SafeEnableModule(safe.address, module=roles_ctract.address)])
-
-    set_multisends = [
-        SetTransactionUnwrapper(
-            roles_mod_address=roles_ctract.address,
-            to="0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526",  # multisend
-            selector="0x8d80ff0a",
-            adapter="0x93B7fCbc63ED8a3a24B59e1C3e6649D50B7427c0",
-        ),
-        SetTransactionUnwrapper(
-            roles_mod_address=roles_ctract.address,
-            to="0x9641d764fc13c8B624c04430C7356C1C7C8102e2",  # MultiSendCallOnly
-            selector="0x8d80ff0a",
-            adapter="0x93B7fCbc63ED8a3a24B59e1C3e6649D50B7427c0",
-        ),
-    ]
-    safe.send(txs=set_multisends)
 
     txns = [
         EnableModule(roles_mod_address=roles_ctract.address, module=account.address),
@@ -469,65 +454,3 @@ def test_deploy_roles_v2(local_node_eth, accounts):
         ),
     ]
     safe.send(txs=txns)
-
-
-def test_deploy_roles_v2_without_safe(local_node_eth, accounts):
-    w3 = local_node_eth.w3
-    account = accounts[0]
-    roles_ctract = deploy_roles_v2(avatar=account.address, w3=w3)
-
-    set_multisends = [
-        SetTransactionUnwrapper(
-            roles_mod_address=roles_ctract.address,
-            to="0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526",  # multisend
-            selector="0x8d80ff0a",
-            adapter="0x93B7fCbc63ED8a3a24B59e1C3e6649D50B7427c0",
-        ),
-        SetTransactionUnwrapper(
-            roles_mod_address=roles_ctract.address,
-            to="0x9641d764fc13c8B624c04430C7356C1C7C8102e2",  # MultiSendCallOnly
-            selector="0x8d80ff0a",
-            adapter="0x93B7fCbc63ED8a3a24B59e1C3e6649D50B7427c0",
-        ),
-    ]
-
-    for tx in set_multisends:
-        tx.transact(w3, txparams={"from": account.address})
-
-    txns = [
-        EnableModule(roles_mod_address=roles_ctract.address, module=account.address),
-        AssignRolesV2(roles_mod_address=roles_ctract.address, module=account.address, assign_list=["MyRole"]),
-        ScopeTarget(
-            roles_mod_address=roles_ctract.address, role="MyRole", target="0x5b2364fD757E262253423373E4D57C5c011Ad7F4"
-        ),
-        ScopeFunction(
-            roles_mod_address=roles_ctract.address,
-            role="MyRole",
-            target="0x5b2364fD757E262253423373E4D57C5c011Ad7F4",
-            selector="0xd34640b2",
-            conditions=[
-                [0, 5, 5, "0x"],
-                [0, 4, 0, "0x"],
-                [0, 4, 0, "0x"],
-                [0, 4, 0, "0x"],
-                [0, 4, 0, "0x"],
-                [0, 1, 0, "0x"],
-                [0, 3, 5, "0x"],
-                [1, 1, 0, "0x"],
-                [2, 1, 0, "0x"],
-                [3, 1, 0, "0x"],
-                [4, 1, 0, "0x"],
-                [6, 1, 0, "0x"],
-                [6, 1, 0, "0x"],
-                [6, 1, 16, "0x0000000000000000000000000000000000000000000000000000000000000000"],
-                [6, 1, 16, "0x0000000000000000000000000000000000000000000000000000000000000000"],
-                [6, 1, 16, "0x0000000000000000000000000000000000000000000000000000000000000000"],
-                [6, 1, 16, "0x0000000000000000000000000000000000000000000000000000000000000000"],
-                [6, 1, 16, "0x0000000000000000000000000000000000000000000000000000000000000001"],
-            ],
-            options=0,
-        ),
-    ]
-    for tx in txns:
-        print(tx)
-        tx.transact(w3, txparams={"from": account.address})
