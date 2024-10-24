@@ -207,7 +207,7 @@ def test_safe_and_roles(local_node_eth):
 
 def test_balancer_aura_withdraw(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    local_node_eth.reset_state()
+    local_node_eth.set_block(17565000)
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -336,13 +336,13 @@ def test_balancer_aura_withdraw(local_node_eth, accounts):
 
 def test_simple_account_balance(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    local_node_eth.reset_state()
+    local_node_eth.set_block(17565000)
     assert w3.eth.get_balance(accounts[0].address) == 10000000000000000000000
 
 
 def test_build_operation(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    local_node_eth.reset_state()
+    local_node_eth.set_block(21021240)
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
@@ -388,7 +388,7 @@ def test_build_operation(local_node_eth, accounts):
 
 def test_roles_errors(local_node_eth, accounts):
     w3 = local_node_eth.w3
-    local_node_eth.reset_state()
+    local_node_eth.set_block(21021240)
     safe = create_simple_safe(w3=w3, owner=accounts[0])
     roles_ctract = deploy_roles(avatar=safe.address, w3=w3)
     setup_common_roles(safe, roles_ctract)
